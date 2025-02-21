@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giving-KCMI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body class="d-flex flex-column min-vh-100 giving-page">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">
+          <img
+            src="./assets/img/kcmi-logo.jpeg"
+            alt="KCMI Logo"
+            width="50"
+            class="rounded-circle"
+          />
+          KCMI
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./mission-kcmi.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./location.html">Location</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                Resources
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="./sermons.html">Sermons</a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/L6DyfegmTCGHuSBk6"
+                    >Counselling</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/NcScEq6WFDeBankw5"
+                    >Welfare Request</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/QxiASWogkGFamvEJ8"
+                    >Celebrations</a
+                  >
+                </li>
+
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/gKTwNc9gNiVCWWrJ6"
+                    >Prayer Request</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/pzcwLAbUbXXjWxVU6"
+                    >First Timer Form</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <form id="search-form" class="d-flex align-items-center">
+            <input
+              id="search-input"
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              autocomplete="on"
+            />
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+            <button
+              id="prev-match"
+              class="btn btn-outline-secondary mx-1"
+              type="button"
+              style="display: none"
+            >
+              ⬆
+            </button>
+            <button
+              id="next-match"
+              class="btn btn-outline-secondary mx-1"
+              type="button"
+              style="display: none"
+            >
+              ⬇
+            </button>
+            <button
+              id="clear-search"
+              class="btn btn-outline-danger mx-1"
+              type="button"
+              style="display: none"
+            >
+              ❌
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <main>
+      <div class="container-lg pt-4 header-content">
+        <div class="row">
+          <div class="col-lg-6" data-aos="fade-right">
+            <h1 class="text-danger display-4 mt-2">Giving</h1>
+            <p>
+              Your giving is a reflection of your heart. It is an act of worship
+              and a way to honor God with your finances. Your generosity helps
+              us to reach more people with the message of hope and love.
+            </p>
+            <p>
+              We believe in the principle of sowing and reaping. When you give
+              generously, you will reap generously. Your giving is an investment
+              into the Kingdom of God and will yield a great harvest.
+            </p>
+            <p>
+              We encourage you to give cheerfully and with a heart of gratitude.
+              Your gift will make a difference in the lives of many people.
+            </p>
+          </div>
+          <div
+            class="col-lg-6 my-3 d-flex flex-column align-items-center"
+            data-aos="fade-left"
+          >
+            <div
+              id="video-container"
+              class="w-100 d-flex justify-content-center"
+            >
+              <video
+                class="w-100"
+                id="my-video"
+                autoplay
+                loop
+                muted
+                poster="./assets/img/ecobank.png"
+              >
+                <source src="./assets/img/giving-kcmi.MP4" type="video/mp4" />
+                <div class="video-fallback">
+                  <p>Your browser does not support the video tag.</p>
+                  <img src="./assets/img/ecobank.png" alt="Ecobank Logo" />
+                  <br />
+                  <p>ACCOUNT NAME: KINGDOM COVENANT MINISTRIES INTERNATIONAL</p>
+                  <p>BANK NAME: ECOBANK</p>
+                </div>
+              </video>
+            </div>
+            <div class="text-center mt-3">
+              <a href="#" id="copy-link" data-account-number="1602002211"
+                >Click to Copy 1602002211</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="container-fluid bg-danger text-white"
+      data-aos="fade-up"
+      data-aos-duration="1000"
+    >
+      <div class="container py-5">
+        <div class="row">
+          <div class="col-6 col-md-2 mb-3">
+            <h5>Quick Links</h5>
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a href="./index.html" class="nav-link p-0 text-white">Home</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./services.html" class="nav-link p-0 text-white"
+                  >Services</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./giving-kcmi.html" class="nav-link p-0 text-white"
+                  >Donations</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./faqs.html" class="nav-link p-0 text-white">FAQs</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./contact-us.html" class="nav-link p-0 text-white"
+                  >Contact Us</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-md-5 offset-md-1 mb-3">
+            <form id="subscriptionForm">
+              <h5>Subscribe to Daily Faith Recharge</h5>
+              <p>Receive daily inspiration and faith-building messages.</p>
+              <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control"
+                  placeholder="Email address"
+                  required
+                />
+                <button class="btn btn-light" type="submit">Subscribe</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div
+          class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
+        >
+          <p class="d-flex align-items-center">
+            <img
+              src="./assets/img/kcmi-logo.jpeg"
+              alt="KCMI Logo"
+              width="50"
+              class="me-2 rounded-circle"
+            />
+            &copy; 2025 Kingdom Covenant Ministries International
+          </p>
+          <div class="d-flex justify-content-center">
+            <a
+              href="https://www.youtube.com/@rehoboth-tv"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/youtube-logo.png"
+                alt="YouTube"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/tiktok-logo.avif"
+                alt="Tiktok"
+                width="25"
+                height="25"
+                class="rounded-circle"
+              />
+            </a>
+            <a
+              href="https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/facebook-logo.png"
+                alt="Facebook"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://www.instagram.com/kcmiworldwide?igsh=MWdlazQwejJ0dmpzbQ%3D%3D&utm_source=qr"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/instagram-logo.png"
+                alt="Instagram"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://twitter.com/kcmi_official"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/twitter-logo.png"
+                alt="Twitter"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a href="#" target="_blank" class="mx-2">
+              <img
+                src="./assets/img/WhatsApp.svg.webp"
+                alt="WhatsApp"
+                width="30"
+                height="30"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      //   Video Player
+      const video = document.getElementById("my-video");
+
+      // Optional: If you want to control looping or autoplay with JS:
+      // video.loop = true;
+      // video.autoplay = true;
+      // video.muted = true; // Start muted
+
+      // If you need to handle errors or other video events, add listeners here.
+      video.addEventListener("error", (error) => {
+        console.error("Video error:", error);
+        // Handle the error (e.g., show a fallback poster)
+      });
+      //   Click to copy
+      document
+        .getElementById("copy-link")
+        .addEventListener("click", function (event) {
+          event.preventDefault(); // Prevent default anchor link behavior
+
+          // Get the text you want to copy
+          const textToCopy = this.getAttribute("data-account-number");
+
+          // Use the Clipboard API to copy the text
+          navigator.clipboard.writeText(textToCopy).then(
+            () => {
+              alert("Account Number copied to clipboard!"); // Success message
+            },
+            (err) => {
+              alert("Failed to copy text: " + err); // Error message
+            }
+          );
+        });
+    </script>
+
+    <script src="./js/scripts.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 1000,
+        easing: "ease-in-out",
+        once: true,
+      });
+    </script>
+  </body>
+</html>

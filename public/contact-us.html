@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us - KCMI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body class="d-flex flex-column min-vh-100 contact-page">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">
+          <img
+            src="./assets/img/kcmi-logo.jpeg"
+            alt="KCMI Logo"
+            width="50"
+            class="rounded-circle"
+          />
+          KCMI
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./mission-kcmi.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./location.html">Location</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                Resources
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="./sermons.html">Sermons</a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/L6DyfegmTCGHuSBk6"
+                    >Counselling</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/NcScEq6WFDeBankw5"
+                    >Welfare Request</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/QxiASWogkGFamvEJ8"
+                    >Celebrations</a
+                  >
+                </li>
+
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/gKTwNc9gNiVCWWrJ6"
+                    >Prayer Request</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/pzcwLAbUbXXjWxVU6"
+                    >First Timer Form</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <form id="search-form" class="d-flex align-items-center">
+            <input
+              id="search-input"
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              autocomplete="on"
+            />
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+            <button
+              id="prev-match"
+              class="btn btn-outline-secondary mx-1"
+              type="button"
+              style="display: none"
+            >
+              ⬆
+            </button>
+            <button
+              id="next-match"
+              class="btn btn-outline-secondary mx-1"
+              type="button"
+              style="display: none"
+            >
+              ⬇
+            </button>
+            <button
+              id="clear-search"
+              class="btn btn-outline-danger mx-1"
+              type="button"
+              style="display: none"
+            >
+              ❌
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <main>
+      <section class="container-fluid justify-content-center">
+        <div class="container-fluid contact-container">
+          <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+              <h1 class="mb-4">Contact Us</h1>
+              <p class="lead">
+                We at KCMI love to hear from you! Whether you have a prayer
+                request, need counseling, or simply want to connect, we're here
+                for you.
+              </p>
+
+              <!-- Contact Details Section -->
+
+              <div class="row mt-2">
+                <div class="col-xl-6 mb-4">
+                  <a
+                    href="mailto:kingdomcovenantministriesinter@gmail.com"
+                    class="text-decoration-none link-primary click-to-contact"
+                  >
+                    <i class="bi bi-envelope contact-icon"></i> <br />
+                    <span>kingdomcovenantministriesinter@gmail.com</span>
+                  </a>
+                </div>
+                <div class="col-xl-6 mb-2">
+                  <a
+                    href="tel:+2348012345678"
+                    class="text-decoration-none link-primary click-to-contact"
+                  >
+                    <i class="bi bi-telephone contact-icon"></i> <br />
+                    <span>+234 801 234 5678</span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="row mt-5">
+                <div class="col-md-12">
+                  <h2>Find Us</h2>
+                  <div class="contact-page-map-container">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509364!2d144.9537353153167!3d-37.817209979751575!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1069cdd952c0a237%3A0xf79c75918f6481f9!2sLocation!5e0!3m2!1sen!2sng!4v1706900000000!5m2!1sen!2sng"
+                      allowfullscreen=""
+                      loading="lazy"
+                      referrerpolicy="no-referrer-when-downgrade"
+                    >
+                    </iframe>
+                  </div>
+                  <p class="mt-3">
+                    Outside of Port Harcourt, Nigeria?
+                    <a href="./location.html" class="link-primary"
+                      >See our other locations here</a
+                    >
+                  </p>
+                </div>
+              </div>
+
+              <div class="row mt-5">
+                <div class="col-md-8 offset-md-2">
+                  <h2>Or send us a message:</h2>
+                  <form id="contactForm">
+                    <div class="mb-3">
+                      <label for="email" class="form-label"
+                        >Email address</label
+                      >
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="phone" class="form-label">Phone Number</label>
+                      <input
+                        type="tel"
+                        class="form-control"
+                        id="phone"
+                        name="phone"
+                        placeholder="Enter your phone number"
+                        pattern="^\+?[0-9\s-]{7,15}$"
+                        title="Enter a valid phone number"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="message" class="form-label"
+                        >Your Message</label
+                      >
+                      <textarea
+                        class="form-control"
+                        id="message"
+                        name="message"
+                        rows="4"
+                        placeholder="Type your message here..."
+                        required
+                      ></textarea>
+                    </div>
+                    <input
+                      type="hidden"
+                      id="recaptchaToken"
+                      name="recaptchaToken"
+                    />
+                    <button
+                      id="submitBtn"
+                      type="submit"
+                      class="btn btn-primary btn-lg"
+                    >
+                      Submit
+                    </button>
+                    <p id="formStatus" class="mt-3"></p>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="bg-danger text-white">
+      <div class="container py-5">
+        <div class="row">
+          <div
+            class="col-6 col-md-2 mb-3"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            <h5>Quick Links</h5>
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a href="./index.html" class="nav-link p-0 text-white">Home</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-white">Services</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./giving-kcmi.html" class="nav-link p-0 text-white"
+                  >Donations</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./faqs.html" class="nav-link p-0 text-white">FAQs</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./contact-us.html" class="nav-link p-0 text-white"
+                  >Contact Us</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="col-md-5 offset-md-1 mb-3"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            <form id="subscriptionForm">
+              <h5>Subscribe to Daily Faith Recharge</h5>
+              <p>Receive daily inspiration and faith-building messages.</p>
+              <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control"
+                  placeholder="Email address"
+                  required
+                  autocomplete="email"
+                />
+                <button class="btn btn-light" type="submit">Subscribe</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div
+          class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
+        >
+          <p
+            class="d-flex align-items-center"
+            data-aos="fade-up"
+            data-aos-delay="300"
+          >
+            <img
+              src="./assets/img/kcmi-logo.jpeg"
+              alt="KCMI Logo"
+              width="50"
+              class="me-2 rounded-circle"
+            />
+            &copy; 2025 Kingdom Covenant Ministries International
+          </p>
+          <div
+            class="d-flex justify-content-center social-icons"
+            data-aos="fade-up"
+            data-aos-delay="400"
+          >
+            <a
+              href="https://www.youtube.com/@rehoboth-tv"
+              target="_blank"
+              class="mx-2"
+              aria-label="Visit our YouTube Channel"
+            >
+              <img
+                src="./assets/img/youtube-logo.png"
+                alt="YouTube"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
+              target="_blank"
+              class="mx-2"
+              aria-label="Visit our TikTok Page"
+            >
+              <img
+                src="./assets/img/tiktok-logo.avif"
+                alt="Tiktok"
+                width="25"
+                height="25"
+                class="rounded-circle"
+              />
+            </a>
+            <a
+              href="https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d"
+              target="_blank"
+              class="mx-2"
+              aria-label="Visit our Facebook Page"
+            >
+              <img
+                src="./assets/img/facebook-logo.png"
+                alt="Facebook"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://www.instagram.com/kcmiworldwide?igsh=MWdlazQwejJ0dmpzbQ%3D%3D&utm_source=qr"
+              target="_blank"
+              class="mx-2"
+              aria-label="Visit our Instagram Page"
+            >
+              <img
+                src="./assets/img/instagram-logo.png"
+                alt="Instagram"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://twitter.com/kcmi_official"
+              target="_blank"
+              class="mx-2"
+              aria-label="Visit our Twitter Page"
+            >
+              <img
+                src="./assets/img/twitter-logo.png"
+                alt="Twitter"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://wa.me/1234567890"
+              target="_blank"
+              class="mx-2"
+              aria-label="Visit our WhatsApp Page"
+            >
+              <img
+                src="./assets/img/WhatsApp.svg.webp"
+                alt="WhatsApp"
+                width="30"
+                height="30"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      grecaptcha.ready(() => {
+        grecaptcha
+          .execute("your-site-key", { action: "contact" })
+          .then((token) => {
+            document.getElementById("recaptchaToken").value = token;
+          });
+      });
+
+      document
+        .getElementById("contactForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sending...";
+
+          const email = document.getElementById("email").value;
+          const phone = document.getElementById("phone").value;
+          const message = document.getElementById("message").value;
+          const recaptchaToken =
+            document.getElementById("recaptchaToken").value;
+          const statusElement = document.getElementById("formStatus");
+
+          statusElement.textContent = "Sending message...";
+          statusElement.style.color = "blue";
+
+          try {
+            const response = await fetch("/submit-contact", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, phone, message, recaptchaToken }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+              statusElement.textContent = "Message sent successfully!";
+              statusElement.style.color = "green";
+              document.getElementById("contactForm").reset();
+            } else {
+              statusElement.textContent = "Error: " + data.message;
+              statusElement.style.color = "red";
+            }
+          } catch (error) {
+            statusElement.textContent = "Failed to send message.";
+            statusElement.style.color = "red";
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit";
+          }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=your-site-key"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="./js/scripts.js" defer></script>
+  </body>
+</html>

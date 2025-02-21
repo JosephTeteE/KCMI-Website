@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frequently Asked Questions - KCMI</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body class="d-flex flex-column min-vh-100 faqs-page">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html">
+          <img
+            src="./assets/img/kcmi-logo.jpeg"
+            alt="KCMI Logo"
+            width="50"
+            class="rounded-circle"
+          />
+          KCMI
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" href="./index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./mission-kcmi.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./location.html">Location</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                Resources
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="./sermons.html">Sermons</a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/L6DyfegmTCGHuSBk6"
+                    >Counselling</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/NcScEq6WFDeBankw5"
+                    >Welfare Request</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/QxiASWogkGFamvEJ8"
+                    >Celebrations</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/gKTwNc9gNiVCWWrJ6"
+                    >Prayer Request</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://forms.gle/pzcwLAbUbXXjWxVU6"
+                    >First Timer Form</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <form id="search-form" class="d-flex align-items-center">
+            <input
+              id="search-input"
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              autocomplete="on"
+            />
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+            <button
+              id="prev-match"
+              class="btn btn-outline-secondary mx-1"
+              type="button"
+              style="display: none"
+            >
+              ⬆
+            </button>
+            <button
+              id="next-match"
+              class="btn btn-outline-secondary mx-1"
+              type="button"
+              style="display: none"
+            >
+              ⬇
+            </button>
+            <button
+              id="clear-search"
+              class="btn btn-outline-danger mx-1"
+              type="button"
+              style="display: none"
+            >
+              ❌
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      <div class="container">
+        <h1 class="text-center my-5" data-aos="fade-up">
+          Frequently Asked Questions
+        </h1>
+
+        <div class="accordion" id="faqAccordion" data-aos="fade-up">
+          <!-- FAQ Items -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+                aria-expanded="false"
+                aria-controls="collapseOne"
+              >
+                How can I be born again?
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingOne"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Being born again is a spiritual rebirth, a transformation that
+                  happens when you accept Jesus Christ as your Lord and Savior.
+                  Here are the steps:
+                </p>
+                <ol>
+                  <li>
+                    <strong>Acknowledge:</strong> Recognize that you are a
+                    sinner and need God's forgiveness. (Romans 3:23)
+                  </li>
+                  <li>
+                    <strong>Repent:</strong> Turn away from your sins and commit
+                    to living a life that pleases God. (Acts 3:19)
+                  </li>
+                  <li>
+                    <strong>Believe:</strong> Believe that Jesus Christ is the
+                    Son of God, that He died for your sins, and that He rose
+                    again. (John 3:16)
+                  </li>
+                  <li>
+                    <strong>Confess:</strong> Confess with your mouth that Jesus
+                    is Lord and believe in your heart that God raised Him from
+                    the dead. (Romans 10:9-10)
+                  </li>
+                  <li>
+                    <strong>Pray:</strong> Pray a simple prayer like this: "Dear
+                    God, I am a sinner. I believe Jesus died for my sins and
+                    rose again. I repent of my sins and ask You to forgive me.
+                    Come into my life, Lord Jesus, and be my Savior. Amen."
+                  </li>
+                </ol>
+                <p>
+                  If you've taken these steps, welcome to the family of God! We
+                  encourage you to find a Bible-believing church (like KCMI!) to
+                  grow in your faith.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                How can I attend a KCMI service?
+              </button>
+            </h2>
+            <div
+              id="collapseTwo"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingTwo"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  We'd love to have you join us! You can attend a service at any
+                  of our KCMI branches. Please visit our
+                  <a href="./location.html">Locations</a> page to find the
+                  branch nearest to you, along with service times and
+                  directions.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                How can I watch KCMI services online?
+              </button>
+            </h2>
+            <div
+              id="collapseThree"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingThree"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  We provide online service viewing through these platforms:<br />
+                  Website: Visit our homepage and click the "Watch Live" button
+                  during service hours to stream directly on our site.<br />
+                  Facebook: Follow our
+                  <a
+                    href="https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d"
+                    target="_blank"
+                    class="mx-2"
+                  >
+                    <img
+                      src="./assets/img/facebook-logo.png"
+                      alt="Facebook"
+                      width="25"
+                      height="25"
+                      style="margin-top: -3px"
+                    />
+                    Kingdom Covenant Ministries International
+                  </a>
+                  page on Facebook, to watch our live streams there.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseFour"
+                aria-expanded="false"
+                aria-controls="collapseFour"
+              >
+                How can I give to KCMI?
+              </button>
+            </h2>
+            <div
+              id="collapseFour"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingFour"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>You can give to KCMI in several ways:</p>
+                <ul>
+                  <li>
+                    <strong>In Person:</strong> During our services, offering
+                    envelopes are available.
+                  </li>
+                  <li>
+                    <strong>Online:</strong> Visit our
+                    <a href="./giving-kcmi.html">Giving</a> page for online
+                    giving options.
+                  </li>
+                  <li>
+                    <strong>Bank Transfer:</strong> Details for bank transfers
+                    are also available on our
+                    <a href="./giving-kcmi.html">Giving</a> page.<br />
+                    ACCOUNT NAME: KINGDOM COVENANT MINISTRIES INTERNATIONAL
+                    <br />
+                    BANK NAME: ECOBANK <br />
+                    ACCOUNT NUMBER: 1602002211
+                  </li>
+                </ul>
+                <p>Thank you for your generous support!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseFive"
+                aria-expanded="false"
+                aria-controls="collapseFive"
+              >
+                How can I submit a prayer request?
+              </button>
+            </h2>
+            <div
+              id="collapseFive"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingFive"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  You can submit a prayer request through our online form<br />
+                  Click the "Submit Prayer Request" button below, and it will
+                  take you to a Google Form where you can share your request.<br />
+                </p>
+                <div class="d-flex align-items-center justify-content-center">
+                  <a
+                    href="https://forms.gle/gKTwNc9gNiVCWWrJ6"
+                    class="btn-primary btn text-white"
+                  >
+                    Submit Prayer Request</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSix">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseSix"
+                aria-expanded="false"
+                aria-controls="collapseSix"
+              >
+                How can I contact KCMI?
+              </button>
+            </h2>
+            <div
+              id="collapseSix"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingSix"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>You can reach us through the following methods:</p>
+                <ul>
+                  <li>
+                    <strong>Email:</strong>
+                    <a href="mailto:kingdomcovenantministriesinter@gmail.com"
+                      >kingdomcovenantministriesinter@gmail.com</a
+                    >
+                  </li>
+                  <li><strong>Phone:</strong> +234 801 234 5678</li>
+                  <li>
+                    <strong>Contact Form:</strong> Visit our
+                    <a href="./contact-us.html">Contact Us</a> page to send us a
+                    message.
+                  </li>
+                  <li>
+                    <strong>Visit:</strong> Visit our
+                    <a href="./location.html">Locations</a> page.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSeven">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseSeven"
+                aria-expanded="false"
+                aria-controls="collapseSeven"
+              >
+                Where can I find past sermons?
+              </button>
+            </h2>
+            <div
+              id="collapseSeven"
+              class="accordion-collapse collapse"
+              aria-labelledby="headingSeven"
+              data-bs-parent="#faqAccordion"
+            >
+              <div class="accordion-body">
+                <p>You can find past sermons on our:</p>
+                <ul>
+                  <li>
+                    <a
+                      href="https://www.youtube.com/@rehoboth-tv"
+                      target="_blank"
+                    >
+                      <i class="fa-brands fa-youtube"></i> YouTube
+                    </a>
+                    channel
+                  </li>
+                  <li>
+                    <a
+                      href="https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
+                      target="_blank"
+                    >
+                      <i class="fa-brands fa-tiktok"></i> TikTok
+                    </a>
+                    page
+                  </li>
+                  <li>Silverbird TV: Fridays, 8:00 PM</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-danger text-white" data-aos="fade-up">
+      <div class="container py-5">
+        <div class="row">
+          <div class="col-6 col-md-2 mb-3">
+            <h5>Quick Links</h5>
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a href="./index.html" class="nav-link p-0 text-white">Home</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./services.html" class="nav-link p-0 text-white"
+                  >Services</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./giving-kcmi.html" class="nav-link p-0 text-white"
+                  >Donations</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./faqs.html" class="nav-link p-0 text-white">FAQs</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="./contact-us.html" class="nav-link p-0 text-white"
+                  >Contact Us</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-md-5 offset-md-1 mb-3">
+            <form id="subscriptionForm">
+              <h5>Subscribe to Daily Faith Recharge</h5>
+              <p>Receive daily inspiration and faith-building messages.</p>
+              <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control"
+                  placeholder="Email address"
+                  required
+                />
+                <button class="btn btn-light" type="submit">Subscribe</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div
+          class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
+        >
+          <p class="d-flex align-items-center">
+            <img
+              src="./assets/img/kcmi-logo.jpeg"
+              alt="KCMI Logo"
+              width="50"
+              class="me-2 rounded-circle"
+            />
+            &copy; 2025 Kingdom Covenant Ministries International
+          </p>
+          <div class="d-flex justify-content-center">
+            <a
+              href="https://www.youtube.com/@rehoboth-tv"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/youtube-logo.png"
+                alt="YouTube"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/tiktok-logo.avif"
+                alt="Tiktok"
+                width="25"
+                height="25"
+                class="rounded-circle"
+              />
+            </a>
+            <a
+              href="https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/facebook-logo.png"
+                alt="Facebook"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://www.instagram.com/kcmiworldwide?igsh=MWdlazQwejJ0dmpzbQ%3D%3D&utm_source=qr"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/instagram-logo.png"
+                alt="Instagram"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a
+              href="https://twitter.com/kcmi_official"
+              target="_blank"
+              class="mx-2"
+            >
+              <img
+                src="./assets/img/twitter-logo.png"
+                alt="Twitter"
+                width="30"
+                height="30"
+              />
+            </a>
+            <a href="#" target="_blank" class="mx-2">
+              <img
+                src="./assets/img/WhatsApp.svg.webp"
+                alt="WhatsApp"
+                width="30"
+                height="30"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Initialize AOS (Animate On Scroll)
+      AOS.init({
+        duration: 1000, // Animation duration
+        once: true, // Animate only once
+      });
+
+      // Add smooth scrolling to FAQ links
+      document
+        .querySelectorAll(".faqs-page .accordion-body a")
+        .forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute("href"));
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth" });
+            }
+          });
+        });
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Custom JS -->
+    <script src="./js/scripts.js" defer></script>
+  </body>
+</html>
