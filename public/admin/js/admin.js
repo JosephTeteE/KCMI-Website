@@ -13,7 +13,7 @@ if (!saveEmbedButton || !embedElement) {
       return;
     }
 
-    const backendUrl = "/api/livestream";
+    const backendUrl = "https://kcmi-backend.onrender.com/api/livestream"; // Updated URL
 
     try {
       const response = await fetch(`${backendUrl}`, {
