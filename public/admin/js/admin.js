@@ -13,21 +13,29 @@ if (!saveEmbedButton || !embedElement) {
       return;
     }
 
+    const backendUrl = "YOUR_BACKEND_URL"; // Replace with your actual backend URL
+
     try {
-      const response = await fetch("/api/livestream", {
+      const response = await fetch(`${backendUrl}/api/livestream`, {
+        // Use the full URL here
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ embedCode }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log("Livestream updated:", data);
       alert("Livestream embed code has been successfully updated!");
     } catch (error) {
       console.error(
         "Failed to update livestream. Please try again later.",
         error
       );
+      alert("Failed to update livestream. Please try again later.");
     }
   });
 }
-// The admin.js file contains client-side JavaScript code that sends a POST request to the /api/livestream route to save the embed code to the database. The code retrieves the embed code from the input field on the page, validates it, and then sends it to the server using the fetch API. If the request is successful, an alert is displayed to confirm that the embed code has been updated. If an error occurs, an error message is logged to the console.
