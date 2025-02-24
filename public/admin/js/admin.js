@@ -13,11 +13,10 @@ if (!saveEmbedButton || !embedElement) {
       return;
     }
 
-    const backendUrl = "YOUR_BACKEND_URL"; // Replace with your actual backend URL
+    const backendUrl = "/api/livestream";
 
     try {
-      const response = await fetch(`${backendUrl}/api/livestream`, {
-        // Use the full URL here
+      const response = await fetch(`${backendUrl}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ embedCode }),

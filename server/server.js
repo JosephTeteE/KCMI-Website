@@ -5,18 +5,22 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const pool = require("./db");
 const nodemailer = require("nodemailer");
-const axios = require("axios"); // For reCAPTCHA verification
+const axios = require("axios");
 
 dotenv.config(); // Load environment variables from.env file
 
 const app = express();
 app.use(express.json()); // Parse JSON request bodies
-app.use(cors({ origin: "https://kcmi-website.vercel.app/" })); // Allow only specific frontend origins.  Change this in production!
-app.use(express.static(path.join(__dirname, "../public"))); // Serve static files
+
+// CORS Configuration - Important: Adjust origin for production
+app.use(cors({ origin: "https://kcmi-website.vercel.app/" }));
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "../public")));
 
 const isProduction = process.env.NODE_ENV === "production";
 
-// Check if essential environment variables are set *for production*
+// Check if essential environment variables are set for production
 if (
   isProduction &&
   (!process.env.SMTP_HOST ||
@@ -28,28 +32,26 @@ if (
   process.exit(1);
 }
 
-// Nodemailer Transporter for Sending Emails via Gmail
+// Nodemailer Transporter for Sending Emails
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // smtp.gmail.com
-  port: Number(process.env.SMTP_PORT) || 465, // 465 for SSL, 587 for TLS
-  secure: process.env.SMTP_PORT == 465, // true for SSL, false for TLS
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: process.env.SMTP_PORT == 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
 
-// Function to Validate Email Format
+// Helper Functions for Validation
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-// Function to Validate Phone Number (Basic)
 const isValidPhone = (phone) => /^\+?[0-9\s-]+$/.test(phone);
 
-// Function to Verify Google reCAPTCHA Token (Conditional)
+// reCAPTCHA Verification (Conditional)
 async function verifyRecaptcha(token) {
   if (!isProduction) {
     console.log("reCAPTCHA verification skipped in development.");
-    return true; // Bypass reCAPTCHA in development
+    return true;
   }
 
   try {
@@ -99,7 +101,7 @@ app.post("/submit-contact", async (req, res) => {
   // Define email options
   const mailOptions = {
     from: process.env.SMTP_USER,
-    to: "kcmiworldwide.church@gmail.com", //  Make sure this is correct
+    to: "kcmiworldwide.church@gmail.com", // Make sure this is correct
     subject: "New Contact-Us Form Request",
     text: `Email: ${email}\nPhone: ${phone || "Not provided"}\nMessage: ${
       message || "No message provided"
@@ -187,44 +189,9 @@ app.post("/subscribe", async (req, res) => {
   }
 });
 
-// Livestream Routes
-app.post("/api/livestream", async (req, res) => {
-  const { embedCode } = req.body;
-
-  if (!embedCode) {
-    return res.status(400).json({ message: "Embed code is required" });
-  }
-
-  try {
-    await pool.execute(
-      "REPLACE INTO livestream (id, embed_code) VALUES (1,?)",
-      [embedCode]
-    );
-    console.log("Updated embed code:", embedCode);
-    res.json({ message: "Livestream embed updated successfully" });
-  } catch (error) {
-    console.error("Database Error:", error);
-    res
-      .status(500)
-      .json({ message: "Database error occurred", error: error.message });
-  }
-});
-
-app.get("/api/livestream", async (req, res) => {
-  try {
-    const [rows] = await pool.execute(
-      "SELECT embed_code FROM livestream WHERE id = 1"
-    );
-    const embedCode = rows.length > 0 ? rows.embed_code : "";
-    console.log("Retrieved embed code:", embedCode);
-    res.json({ embedCode });
-  } catch (error) {
-    console.error("Database Error:", error);
-    res
-      .status(500)
-      .json({ message: "Database error occurred", error: error.message });
-  }
-});
+// Import and Mount Livestream Routes
+const livestreamRoutes = require("../api/livestream");
+app.use("/api/livestream", livestreamRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
