@@ -7,7 +7,7 @@ const pool = require("./db");
 const nodemailer = require("nodemailer");
 const axios = require("axios"); // For reCAPTCHA verification
 
-dotenv.config(); // Load environment variables from .env file
+dotenv.config(); // Load environment variables from.env file
 
 const app = express();
 app.use(express.json()); // Parse JSON request bodies
@@ -24,7 +24,7 @@ if (
     !process.env.SMTP_PASS ||
     !process.env.RECAPTCHA_SECRET_KEY)
 ) {
-  console.error("Missing SMTP or reCAPTCHA configuration in .env file.");
+  console.error("Missing SMTP or reCAPTCHA configuration in.env file.");
   process.exit(1);
 }
 
@@ -119,7 +119,7 @@ app.post("/submit-contact", async (req, res) => {
 
     // Store message in MySQL database (optional)
     await pool.execute(
-      "INSERT INTO contact_messages (email, phone, message) VALUES (?, ?, ?)",
+      "INSERT INTO contact_messages (email, phone, message) VALUES (?,?,?)",
       [email, phone || "Not provided", message]
     );
 
@@ -197,7 +197,7 @@ app.post("/api/livestream", async (req, res) => {
 
   try {
     await pool.execute(
-      "REPLACE INTO livestream (id, embed_code) VALUES (1, ?)",
+      "REPLACE INTO livestream (id, embed_code) VALUES (1,?)",
       [embedCode]
     );
     console.log("Updated embed code:", embedCode);
@@ -215,7 +215,7 @@ app.get("/api/livestream", async (req, res) => {
     const [rows] = await pool.execute(
       "SELECT embed_code FROM livestream WHERE id = 1"
     );
-    const embedCode = rows.length > 0 ? rows[0].embed_code : "";
+    const embedCode = rows.length > 0 ? rows.embed_code : "";
     console.log("Retrieved embed code:", embedCode);
     res.json({ embedCode });
   } catch (error) {
