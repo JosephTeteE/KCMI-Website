@@ -181,12 +181,22 @@
                 autoplay
                 loop
                 muted
-                poster="./assets/img/ecobank.png"
+                playsinline
+                webkit-playsinline
+                preload="auto"
+                disablePictureInPicture
+                controlsList="nodownload nofullscreen noplaybackrate"
+                onloadeddata="this.play();"
+                poster="./assets/img/kcmi-giving-fallback-image.png"
               >
+                <source src="./assets/img/giving-kcmi.webm" type="video/webm" />
                 <source src="./assets/img/giving-kcmi.MP4" type="video/mp4" />
                 <div class="video-fallback">
                   <p>Your browser does not support the video tag.</p>
-                  <img src="./assets/img/ecobank.png" alt="Ecobank Logo" />
+                  <img
+                    src="./assets/img/kcmi-giving-fallback-image.png"
+                    alt="Ecobank Logo"
+                  />
                   <br />
                   <p>ACCOUNT NAME: KINGDOM COVENANT MINISTRIES INTERNATIONAL</p>
                   <p>BANK NAME: ECOBANK</p>
@@ -287,7 +297,7 @@
               class="mx-2"
             >
               <img
-                src="./assets/img/tiktok-logo.avif"
+                src="./assets/img/tiktok-logo.png"
                 alt="Tiktok"
                 width="25"
                 height="25"
