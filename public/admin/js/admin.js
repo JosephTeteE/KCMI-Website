@@ -1,4 +1,4 @@
-// js/admin.js
+// public/admin/js/admin.js
 const saveEmbedButton = document.getElementById("saveEmbed");
 const embedElement = document.getElementById("embedCode");
 
