@@ -1,4 +1,4 @@
-/* styles.css - FINAL RESOLVED VERSION (Optimized and Corrected) - UPDATED CALENDAR & MAP STYLES + ABOUT-APOSTLE-AIKINS & CONTACT-US STYLES */
+/* public/css/styles.css*/
 
 /* -------------------------------------------------------------------------- */
 /* ## General Styles (Global Styles - Applied to all pages)                 */
@@ -8,7 +8,7 @@ body {
   font-family: "Poppins", sans-serif;
   color: black;
   background-color: white; /* Default background for most pages */
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   padding-top: 20px; /* Add padding to avoid navbar overlap on all pages */
 }
 
@@ -85,7 +85,7 @@ body main {
 }
 
 .index-page .homepage-header-lead-text {
-  font-size: 1.75rem;
+  font-size: clamp(1.6rem, 2.5vw, 2rem); /* Fluid font size for lead text */
   font-weight: 350; /* Lighter font weight for lead text */
 }
 
@@ -95,7 +95,10 @@ body main {
 
 .index-page .homepage-carousel-section {
   margin-top: -40px;
+
   padding: 4rem 0; /* Match section padding if needed */
+  margin-bottom: 0px !important;
+  padding-bottom: 0px !important;
 }
 
 .index-page .homepage-carousel-wrapper {
@@ -153,7 +156,7 @@ body main {
 
 .index-page .homepage-campus-card p {
   color: #555; /* Slightly muted text for body */
-  font-size: 0.9rem; /* Slightly smaller font size for card text */
+  font-size: 1.1rem; /* Slightly smaller font size for card text */
   line-height: 1.5; /* Improve text readability */
 }
 
@@ -173,6 +176,7 @@ body main {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+  margin-top: 0px;
 }
 
 /* Ensure slides are properly positioned */
@@ -237,12 +241,11 @@ body main {
   font-weight: bold;
   margin-bottom: 1rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  width: 100%;
+  font-size: clamp(1.75rem, 3vw, 2.5rem); /* Fluid font size for headings */
 }
 
 .index-page .homepage-content-overlay p {
-  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  font-size: clamp(1rem, 2vw, 1.25rem); /* Fluid font size for paragraphs */
   line-height: 1.6;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   width: 100%;
@@ -357,7 +360,11 @@ body main {
 }
 
 .calendar-container h2 {
-  font-size: 2.5rem; /* Larger heading */
+  font-size: clamp(
+    2rem,
+    4vw,
+    2.5rem
+  ); /* Fluid font size for calendar heading */
   font-weight: bold;
   margin-bottom: 1.5rem; /* Spacing below heading */
   color: #333; /* Dark text for better contrast */
@@ -407,7 +414,7 @@ body main {
 }
 
 .homepage-map-text h2 {
-  font-size: 2.5rem; /* Larger heading */
+  font-size: clamp(2rem, 4vw, 2.5rem); /* Fluid font size for map heading */
   font-weight: bold;
   margin-bottom: 1rem; /* Spacing below heading */
   color: #333; /* Dark text for better contrast */
@@ -431,6 +438,7 @@ body main {
     color: black; /* Ensure text is readable */
     background-color: white; /* Add a background color for contrast */
     padding-top: 10vh; /* Adjust padding if needed */
+    padding-bottom: 1rem;
   }
 }
 @media (max-width: 768px) {
@@ -438,7 +446,10 @@ body main {
     font-size: 2.15rem;
   }
   .index-page .homepage-header-lead-text {
-    font-size: 1.1em;
+    font-size: 1.5rem; /* Adjusted for smaller screens */
+  }
+  .index-page .homepage-campus-card p {
+    font-size: 1rem; /* Slightly smaller font size for card text on smaller screens */
   }
 }
 
@@ -486,7 +497,7 @@ body main {
 /* Style for paragraphs on about-apostle-aikins.html */
 .about-apostle-page .brief-history-about {
   color: white; /* Text color from inline style */
-  font-size: 2.05rem; /* Font size from inline style */
+  font-size: clamp(1.7rem, 2.5vw, 2rem); /* Fluid font size for paragraphs */
 }
 
 /* Slideshow container for about-apostle-aikins.html */
@@ -538,7 +549,11 @@ body main {
 
 /* Contact Heading */
 .contact-page h1 {
-  font-size: 2.75rem; /* Larger heading */
+  font-size: clamp(
+    2rem,
+    4vw,
+    2.75rem
+  ); /* Fluid font size for contact heading */
   font-weight: bold;
   margin-bottom: 1.5rem; /* Spacing below heading */
   color: #333; /* Dark text for better contrast */
@@ -546,7 +561,7 @@ body main {
 
 /* Contact Lead Text */
 .contact-page .lead {
-  font-size: 2.05rem; /* Slightly larger text */
+  font-size: clamp(1.6rem, 2.5vw, 2rem); /* Fluid font size for lead text */
   color: #555; /* Slightly muted text for body */
   line-height: 1.6; /* Improve readability */
 }
@@ -655,14 +670,14 @@ body main {
 }
 
 .faqs-page h1 {
-  font-size: 2.5rem; /* Larger heading */
+  font-size: clamp(2rem, 4vw, 2.5rem); /* Fluid font size for FAQ heading */
   font-weight: bold;
   color: #333; /* Dark text for better contrast */
   margin-bottom: 2rem; /* Spacing below heading */
 }
 
 .faqs-page .accordion-button {
-  font-size: 1.25rem; /* Larger font for questions */
+  font-size: clamp(1.25rem, 2vw, 1.5rem); /* Fluid font size for questions */
   font-weight: bold;
   color: #007bff; /* Primary color for questions */
   background-color: #f8f9fa; /* Light background for accordion headers */
@@ -683,7 +698,7 @@ body main {
 }
 
 .faqs-page .accordion-body {
-  font-size: 1.1rem; /* Slightly larger font for answers */
+  font-size: clamp(1rem, 1.5vw, 1.1rem); /* Fluid font size for answers */
   color: #555; /* Slightly muted text for answers */
   line-height: 1.6; /* Improve readability */
   padding: 1.5rem; /* Add padding for better spacing */
@@ -734,9 +749,13 @@ body main {
   margin-top: 1em;
 }
 
-/* Reduce margin-bottom on the heading */
 .livestream-page main h2 {
-  margin-bottom: -16.5rem; /* Adjust this value as needed (e.g., 0, 0.5rem) */
+  font-size: clamp(
+    1.75rem,
+    3vw,
+    2rem
+  ); /* Fluid font size for livestream heading */
+  margin-bottom: -16.5rem; /* Adjust this value as needed */
 }
 
 /* Ensure video container takes full width of its parent */
@@ -766,7 +785,7 @@ body main {
 /* -------------------------------------------------------------------------- */
 .giving-page main {
   margin-top: 35px; /* Adjusted for the fixed navbar */
-  font-size: 1.5rem;
+  font-size: 1.6rem; /* Base font size */
 }
 
 /* -------------------------------------------------------------------------- */

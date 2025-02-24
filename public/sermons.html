@@ -187,18 +187,26 @@
                   autoplay
                   loop
                   muted
+                  playsinline
+                  webkit-playsinline
+                  preload="auto"
+                  disablePictureInPicture
+                  onloadeddata="this.play();"
+                  preload="auto"
                 >
-                  <source
-                    src="./assets/img/rehoboth-wells-silverbird-video.mp4"
-                    type="video/mp4"
-                  />
                   <source
                     src="./assets/img/rehoboth-wells-silverbird-video.webm"
                     type="video/webm"
                   />
-                  <div class="video-fallback">
-                    <p>Your browser does not support the video tag.</p>
-                  </div>
+                  <source
+                    src="./assets/img/rehoboth-wells-silverbird-video.mp4"
+                    type="video/mp4"
+                  />
+
+                  <img
+                    src="./assets/img/rehoboth-wells-fallback-image.png"
+                    class="video-fallback"
+                  />
                 </video>
               </div>
             </div>
@@ -234,7 +242,7 @@
         <div class="container sermon-platform-text">
           <h1 class="text-danger">
             <img
-              src="./assets/img/tiktok-logo.avif"
+              src="./assets/img/tiktok-logo.png"
               alt="TikTok Logo"
               height="40"
             />
@@ -358,7 +366,7 @@
               class="mx-2"
             >
               <img
-                src="./assets/img/tiktok-logo.avif"
+                src="./assets/img/tiktok-logo.png"
                 alt="Tiktok"
                 width="25"
                 height="25"

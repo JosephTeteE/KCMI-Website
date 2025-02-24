@@ -1,11 +1,5 @@
-#Ignore npm packages
-node_modules/
-
-#Ignore operating system files.DS_Store
-Thumbs.db
-
-#Ignore log files
-*.log
-
 #Ignore the.env file
 .env
+
+#Ignore the .htpasswd file
+.htpasswd
