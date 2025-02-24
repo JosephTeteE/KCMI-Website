@@ -1,3 +1,4 @@
+// server/server.js
 // Import Required Modules
 const express = require("express");
 const path = require("path");
@@ -7,13 +8,19 @@ const pool = require("./db");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 
-dotenv.config(); // Load environment variables from.env file
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 app.use(express.json()); // Parse JSON request bodies
 
 // CORS Configuration - Important: Adjust origin for production
-app.use(cors({ origin: "https://kcmi-website.vercel.app/" }));
+app.use(
+  cors({
+    origin: "https://kcmi-website.vercel.app", // Your frontend domain
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  })
+);
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "../public")));
@@ -28,7 +35,7 @@ if (
     !process.env.SMTP_PASS ||
     !process.env.RECAPTCHA_SECRET_KEY)
 ) {
-  console.error("Missing SMTP or reCAPTCHA configuration in.env file.");
+  console.error("Missing SMTP or reCAPTCHA configuration in .env file.");
   process.exit(1);
 }
 
