@@ -155,12 +155,22 @@
           playsinline
           webkit-playsinline
           preload="auto"
-          controlsList="nodownload nofullscreen noplaybackrate"
           disablePictureInPicture
+          controlsList="nodownload nofullscreen noplaybackrate"
+          onloadeddata="this.play();"
         >
+          <source
+            src="./assets/img/KCMI-background-reel.webm"
+            type="video/webm"
+          />
           <source
             src="./assets/img/KCMI-background-reel.mp4"
             type="video/mp4"
+          />
+          <!-- Fallback image for unsupported browsers -->
+          <img
+            src="./assets/img/welcome-to-kcmi-fallback-image.png"
+            alt="Background Image"
           />
         </video>
       </div>
@@ -298,7 +308,7 @@
       </section>
 
       <section
-        class="container-fluid homepage-pastor-slideshow-section homepage-about-apostle-aikins mt-5"
+        class="container-fluid homepage-pastor-slideshow-section homepage-about-apostle-aikins"
       >
         <div class="container-fluid homepage-pastor-slideshow">
           <div class="homepage-pastor-slide active slide1"></div>
@@ -520,7 +530,7 @@
               class="mx-2"
             >
               <img
-                src="./assets/img/tiktok-logo.avif"
+                src="./assets/img/tiktok-logo.png"
                 alt="Tiktok"
                 width="25"
                 height="25"
