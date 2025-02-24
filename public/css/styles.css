@@ -433,6 +433,14 @@ body main {
     padding-top: 10vh; /* Adjust padding if needed */
   }
 }
+@media (max-width: 768px) {
+  .index-page .header-welcome-text {
+    font-size: 2.15rem;
+  }
+  .index-page .homepage-header-lead-text {
+    font-size: 1.1em;
+  }
+}
 
 /* Responsive adjustments for Map and Calendar - NEW STYLES */
 @media (max-width: 768px) {

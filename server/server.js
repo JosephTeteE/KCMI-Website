@@ -11,7 +11,7 @@ dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 app.use(express.json()); // Parse JSON request bodies
-app.use(cors({ origin: "https://yourdomain.com" })); // Allow only specific frontend origins.  Change this in production!
+app.use(cors({ origin: "https://kcmi-website.vercel.app/" })); // Allow only specific frontend origins.  Change this in production!
 app.use(express.static(path.join(__dirname, "../public"))); // Serve static files
 
 const isProduction = process.env.NODE_ENV === "production";
