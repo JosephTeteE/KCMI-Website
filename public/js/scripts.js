@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
   // ==========================================================================
-  // === Livestream Embed Code Fetching and Loading (No changes needed) ===
+  // === Livestream Embed Code Fetching and Loading ===
   // ==========================================================================
   try {
     const response = await fetch("/api/livestream");
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ==========================================================================
-  // === Navbar Toggler and Click-Outside-to-Close Logic (No changes needed) ===
+  // === Navbar Toggler and Click-Outside-to-Close Logic ===
   // ==========================================================================
   const navbarToggler = document.querySelector(".navbar-toggler");
   const body = document.body;
@@ -51,9 +51,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // =========================================================================
-  // === Navbar Search Functionality                                        ===
+  // === Navbar Search Functionality ===
   // =========================================================================
-  // === Search State Variables ===
   let matches = []; // Array to store all highlighted search matches (HTML elements).
   let currentMatchIndex = -1; // Index of the currently highlighted match in the 'matches' array.
   let originalHTML = new Map(); // Map to store the original HTML content of elements before highlighting, for reset.
@@ -77,8 +76,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   /**
    * Checks if an element is actually visible on the page (not hidden by CSS display/visibility).
-   * This detailed visibility check is important to avoid highlighting elements that are not
-   * part of the user-rendered layout (e.g., hidden elements, template content).
    * @param {HTMLElement} element - The element to check for visibility.
    * @returns {boolean} - True if the element is visible, false otherwise.
    */
@@ -177,7 +174,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       !searchTerm ||
       !element.innerText.toLowerCase().includes(searchTerm)
     )
-      // Added searchTerm check for efficiency
       return;
 
     if (!originalHTML.has(element)) {
@@ -256,6 +252,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // =========================================================================
+  // === Initialize reCAPTCHA for Contact & Subscription Forms ===
+  // =========================================================================
+  function onLoadRecaptcha() {
+    grecaptcha.ready(function () {
+      console.log("reCAPTCHA is ready!");
+    });
+  }
+
+  // =========================================================================
   // === Footer Subscription Form Logic ===
   // =========================================================================
   const whatsappForm = document.getElementById("whatsappSubscriptionForm");
@@ -264,13 +269,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       event.preventDefault();
       const email = document.getElementById("whatsappEmail").value;
 
-      // Get reCAPTCHA token for subscription form
-      const recaptchaToken = await grecaptcha.execute(
-        "6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl", // reCAPTCHA site key for subscription
-        { action: "submit_subscription" }
-      );
-
       try {
+        const recaptchaToken = await grecaptcha.execute(
+          "6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl", // Subscription reCAPTCHA key
+          { action: "submit_subscription" }
+        );
+
         const response = await fetch("/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -282,33 +286,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         const data = await response.json();
+        alert(data.message);
+
         if (data.success) {
-          alert(data.message);
-          // Close the modal after successful submission
           const modal = bootstrap.Modal.getInstance(
             document.getElementById("whatsappModal")
           );
           modal.hide();
-          whatsappForm.reset(); // Reset the form after successful submission
-        } else {
-          alert(data.message);
+          whatsappForm.reset();
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Subscription Error:", error);
         alert("An error occurred. Please try again.");
       }
     });
   }
 
-  // === Footer DFR WhatsApp Subscription Form Modal Logic ===
-  const whatsappNumber = document.getElementById("DFRwhatsappNumber");
-  if (whatsappNumber) {
-    whatsappNumber.addEventListener("click", () => {
-      navigator.clipboard.writeText(whatsappNumber.textContent);
-      alert("Phone number copied to clipboard!");
-    });
-  }
-
+  // =========================================================================
+  // === Initialize AOS (Animate On Scroll) ===
+  // =========================================================================
   AOS.init({
     duration: 1000,
     easing: "ease-in-out",
@@ -316,6 +312,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     mirror: false,
   });
 
+  // =========================================================================
+  // === Click-to-Copy WhatsApp Number Functionality ===
+  // =========================================================================
+  const whatsappNumberElement = document.getElementById("DFRwhatsappNumber");
+
+  if (whatsappNumberElement) {
+    whatsappNumberElement.addEventListener("click", function () {
+      const number = this.textContent.trim(); // Get the WhatsApp number from the element's text
+
+      // Copy the number to the clipboard
+      navigator.clipboard
+        .writeText(number)
+        .then(() => {
+          // Provide feedback to the user
+          const originalText = this.textContent;
+          this.textContent = "Copied to Clipboard!";
+          setTimeout(() => {
+            this.textContent = originalText; // Reset the text after 2 seconds
+          }, 1000);
+        })
+        .catch((err) => {
+          console.error("Failed to copy:", err);
+          alert("Failed to copy WhatsApp number. Please try again.");
+        });
+    });
+  }
+
+  // =========================================================================
+  // === Smooth Scroll for Anchor Links ===
+  // =========================================================================
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener("click", function (e) {
       e.preventDefault();
