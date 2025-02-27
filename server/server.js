@@ -9,15 +9,15 @@ const pool = require("./db");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 const app = express();
-app.use(express.json()); // Parse JSON request bodies
+app.use(express.json());
 
-// CORS Configuration (updated origin)
+// CORS Configuration
 const corsOptions = {
-  origin: "https://kcmi-website.vercel.app", // Replace with your actual Vercel domain
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: "https://kcmi-website.vercel.app",
+  methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 app.use(cors(corsOptions));
@@ -37,11 +37,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Validation Helpers
-const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const isValidPhone = (phone) => /^\+?[0-9\s-]+$/.test(phone);
-
-// reCAPTCHA Verification (updated to always verify)
+// reCAPTCHA Verification
 async function verifyRecaptcha(token, formType) {
   try {
     const secretKey =
@@ -53,10 +49,7 @@ async function verifyRecaptcha(token, formType) {
       `https://www.google.com/recaptcha/api/siteverify`,
       null,
       {
-        params: {
-          secret: secretKey,
-          response: token,
-        },
+        params: { secret: secretKey, response: token },
       }
     );
     return response.data.success;
@@ -70,19 +63,18 @@ async function verifyRecaptcha(token, formType) {
 app.post("/submit-contact", async (req, res) => {
   const { email, phone, message, recaptchaToken } = req.body;
 
-  // Verify reCAPTCHA token for contact form
   if (!(await verifyRecaptcha(recaptchaToken, "contact"))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
-  if (!email || !isValidEmail(email)) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
       .json({ success: false, message: "Valid email required" });
   }
-  if (phone && !isValidPhone(phone)) {
+  if (phone && !/^\+?[0-9\s-]+$/.test(phone)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid phone format" });
@@ -90,7 +82,7 @@ app.post("/submit-contact", async (req, res) => {
 
   const mailOptions = {
     from: process.env.SMTP_USER,
-    to: "kcmiworldwide.church@gmail.com", // Replace with your actual recipient email
+    to: "kcmiworldwide.church@gmail.com",
     subject: "New Contact-Us Form Request",
     text: `Email: ${email}\nPhone: ${phone || "Not provided"}\nMessage: ${
       message || "No message provided"
@@ -107,7 +99,6 @@ app.post("/submit-contact", async (req, res) => {
   try {
     await transporter.sendMail(mailOptions);
     await transporter.sendMail(autoReplyMailOptions);
-
     res.json({ success: true, message: "Message sent successfully!" });
   } catch (error) {
     console.error("Email failed:", error);
@@ -119,14 +110,13 @@ app.post("/submit-contact", async (req, res) => {
 app.post("/subscribe", async (req, res) => {
   const { email, subscriptionType, recaptchaToken } = req.body;
 
-  // Verify reCAPTCHA token for subscription form
   if (!(await verifyRecaptcha(recaptchaToken, "subscription"))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
-  if (!email || !isValidEmail(email)) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
       .json({ success: false, message: "Valid email required" });
@@ -134,10 +124,8 @@ app.post("/subscribe", async (req, res) => {
 
   try {
     if (subscriptionType === "whatsapp") {
-      // Generate WhatsApp subscription link (replace with your actual link)
-      const whatsappLink = `https://wa.me/+2348084583102?text=Subscribe`; // Replace with your actual WhatsApp number
+      const whatsappLink = `https://wa.me/+2348084583102?text=Subscribe`;
 
-      // Send email with WhatsApp subscription link
       await transporter.sendMail({
         from: process.env.SMTP_USER,
         to: email,
