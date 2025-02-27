@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KCMI's Vision and Mission</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,20 +17,30 @@
     />
 
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    <link rel="stylesheet" href="./css/styles.css" />
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-
-    <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+
+    <link
+      href="https://unpkg.com/aos@2.3.1/dist/aos.css"
+      rel="stylesheet"
+      integrity="sha384-/rJKQnzOkEo+daG0jMjU1IwwY9unxt1NBw3Ef2fmOJ3PW/TfAg2KXVoWwMZQZtw9"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="./css/styles.css" />
+
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl"></script>
   </head>
   <body class="d-flex flex-column min-vh-100 kcmi-mission-page">
     <nav
@@ -261,15 +275,14 @@
       </section>
     </main>
 
-    <footer class="bg-danger text-white">
+    <footer
+      class="bg-danger text-white"
+      data-aos="fade-up"
+      data-aos-duration="1000"
+    >
       <div class="container py-5">
         <div class="row">
-          <div
-            class="col-6 col-md-2 mb-3"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            data-aos-delay="100"
-          >
+          <div class="col-6 col-md-2 mb-3">
             <h5>Quick Links</h5>
             <ul class="nav flex-column">
               <li class="nav-item mb-2">
@@ -296,59 +309,56 @@
             </ul>
           </div>
 
-          <div
-            class="col-md-5 offset-md-1 mb-3"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            data-aos-delay="200"
-          >
-            <form id="subscriptionForm">
-              <h5>Subscribe to Daily Faith Recharge</h5>
-              <p>Receive daily inspiration and faith-building messages.</p>
-              <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  class="form-control"
-                  placeholder="Email address"
-                  required
-                  autocomplete="email"
+          <div class="col-md-5 offset-md-1 mb-3">
+            <p>
+              Daily Faith Recharge:<br />
+              Subscribe to receive daily faith inspiration <br />
+              Choose how
+            </p>
+            <div class="mb-2">
+              <a
+                href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
+                target="_blank"
+                class="btn btn-light w-100"
+              >
+                Listen on Spotify
+                <img
+                  src="./assets/img/spotify-logo.png"
+                  width="30"
+                  height="30"
+                  class="rounded-circle"
                 />
-                <button class="btn btn-light" type="submit">Subscribe</button>
-              </div>
-            </form>
+              </a>
+            </div>
+            <div>
+              <button
+                class="btn btn-outline-light w-100"
+                data-bs-toggle="modal"
+                data-bs-target="#whatsappModal"
+              >
+                Join WhatsApp Broadcast
+              </button>
+            </div>
           </div>
         </div>
 
         <div
           class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
         >
-          <p
-            class="d-flex align-items-center"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            data-aos-delay="300"
-          >
+          <p class="d-flex align-items-center">
             <img
               src="./assets/img/kcmi-logo.jpeg"
               alt="KCMI Logo"
               width="50"
               class="me-2 rounded-circle"
             />
-            &copy; 2025 Kingdom Covenant Ministries International
+            © 2025 Kingdom Covenant Ministries International
           </p>
-          <div
-            class="d-flex justify-content-center social-icons"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            data-aos-delay="400"
-          >
+          <div class="d-flex justify-content-center">
             <a
               href="https://www.youtube.com/@rehoboth-tv"
               target="_blank"
               class="mx-2"
-              aria-label="Visit our YouTube Channel"
             >
               <img
                 src="./assets/img/youtube-logo.png"
@@ -361,7 +371,6 @@
               href="https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
               target="_blank"
               class="mx-2"
-              aria-label="Visit our TikTok Page"
             >
               <img
                 src="./assets/img/tiktok-logo.png"
@@ -375,7 +384,6 @@
               href="https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d"
               target="_blank"
               class="mx-2"
-              aria-label="Visit our Facebook Page"
             >
               <img
                 src="./assets/img/facebook-logo.png"
@@ -388,7 +396,6 @@
               href="https://www.instagram.com/kcmiworldwide?igsh=MWdlazQwejJ0dmpzbQ%3D%3D&utm_source=qr"
               target="_blank"
               class="mx-2"
-              aria-label="Visit our Instagram Page"
             >
               <img
                 src="./assets/img/instagram-logo.png"
@@ -401,7 +408,6 @@
               href="https://twitter.com/kcmi_official"
               target="_blank"
               class="mx-2"
-              aria-label="Visit our Twitter Page"
             >
               <img
                 src="./assets/img/twitter-logo.png"
@@ -410,12 +416,7 @@
                 height="30"
               />
             </a>
-            <a
-              href="#"
-              target="_blank"
-              class="mx-2"
-              aria-label="Visit our WhatsApp Page"
-            >
+            <a href="#" target="_blank" class="mx-2">
               <img
                 src="./assets/img/WhatsApp.svg.webp"
                 alt="WhatsApp"
@@ -426,15 +427,67 @@
           </div>
         </div>
       </div>
+
+      <div
+        class="modal fade"
+        id="whatsappModal"
+        tabindex="-1"
+        aria-labelledby="whatsappModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-danger text-white">
+            <div class="modal-header">
+              <h5 class="modal-title" id="whatsappModalLabel">
+                Join Daily Faith Recharge WhatsApp Broadcast
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                To join our WhatsApp broadcast, please send a message to
+                <strong id="DFRwhatsappNumber">+234 8084 58 3102</strong> with
+                the message "Subscribe".
+              </p>
+              <p>
+                Or enter your email below, to receive a WhatsApp subscription
+                link
+              </p>
+              <form id="whatsappSubscriptionForm">
+                <div class="mb-3">
+                  <label for="whatsappEmail" class="form-label"
+                    >Email address</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control bg-light text-dark"
+                    id="whatsappEmail"
+                    name="email"
+                    required
+                  />
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-light">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </footer>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
-      defer
+      onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
     ></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="./js/scripts.js" defer></script>
   </body>
 </html>

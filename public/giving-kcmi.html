@@ -1,9 +1,19 @@
+<!-- public/giving-kcmi.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Giving-KCMI</title>
+    <title>Giving to KCMI - Support Our Ministry</title>
+    <meta
+      name="description"
+      content="Support the mission of KCMI by giving generously. Learn about different ways to contribute to our church and make a difference."
+    />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,13 +23,25 @@
     />
 
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
     />
 
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link
+      href="https://unpkg.com/aos@2.3.1/dist/aos.css"
+      rel="stylesheet"
+      integrity="sha384-/rJKQnzOkEo+daG0jMjU1IwwY9unxt1NBw3Ef2fmOJ3PW/TfAg2KXVoWwMZQZtw9"
+      crossorigin="anonymous"
+    />
 
     <link rel="stylesheet" href="./css/styles.css" />
+
+    <script
+      src="https://www.google.com/recaptcha/api.js?render=6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl"
+      defer
+    ></script>
   </head>
   <body class="d-flex flex-column min-vh-100 giving-page">
     <!-- Navbar -->
@@ -214,7 +236,7 @@
     </main>
     <!-- Footer -->
     <footer
-      class="container-fluid bg-danger text-white"
+      class="bg-danger text-white"
       data-aos="fade-up"
       data-aos-duration="1000"
     >
@@ -248,21 +270,35 @@
           </div>
 
           <div class="col-md-5 offset-md-1 mb-3">
-            <form id="subscriptionForm">
-              <h5>Subscribe to Daily Faith Recharge</h5>
-              <p>Receive daily inspiration and faith-building messages.</p>
-              <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  class="form-control"
-                  placeholder="Email address"
-                  required
+            <p>
+              Daily Faith Recharge:<br />
+              Subscribe to receive daily faith inspiration <br />
+              Choose how
+            </p>
+            <div class="mb-2">
+              <a
+                href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
+                target="_blank"
+                class="btn btn-light w-100"
+              >
+                Listen on Spotify
+                <img
+                  src="./assets/img/spotify-logo.png"
+                  width="30"
+                  height="30"
+                  class="rounded-circle"
                 />
-                <button class="btn btn-light" type="submit">Subscribe</button>
-              </div>
-            </form>
+              </a>
+            </div>
+            <div>
+              <button
+                class="btn btn-outline-light w-100"
+                data-bs-toggle="modal"
+                data-bs-target="#whatsappModal"
+              >
+                Join WhatsApp Broadcast
+              </button>
+            </div>
           </div>
         </div>
 
@@ -276,7 +312,7 @@
               width="50"
               class="me-2 rounded-circle"
             />
-            &copy; 2025 Kingdom Covenant Ministries International
+            © 2025 Kingdom Covenant Ministries International
           </p>
           <div class="d-flex justify-content-center">
             <a
@@ -351,54 +387,90 @@
           </div>
         </div>
       </div>
+
+      <div
+        class="modal fade"
+        id="whatsappModal"
+        tabindex="-1"
+        aria-labelledby="whatsappModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-danger text-white">
+            <div class="modal-header">
+              <h5 class="modal-title" id="whatsappModalLabel">
+                Join Daily Faith Recharge WhatsApp Broadcast
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                To join our WhatsApp broadcast, please send a message to
+                <strong id="DFRwhatsappNumber">+234 8084 58 3102</strong> with
+                the message "Subscribe".
+              </p>
+              <p>
+                Or enter your email below, to receive a WhatsApp subscription
+                link
+              </p>
+              <form id="whatsappSubscriptionForm">
+                <div class="mb-3">
+                  <label for="whatsappEmail" class="form-label"
+                    >Email address</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control bg-light text-dark"
+                    id="whatsappEmail"
+                    name="email"
+                    required
+                  />
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-light">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </footer>
 
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+      onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
+    ></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="./js/scripts.js" defer></script>
+
     <script>
-      //   Video Player
       const video = document.getElementById("my-video");
 
-      // Optional: If you want to control looping or autoplay with JS:
-      // video.loop = true;
-      // video.autoplay = true;
-      // video.muted = true; // Start muted
-
-      // If you need to handle errors or other video events, add listeners here.
       video.addEventListener("error", (error) => {
         console.error("Video error:", error);
-        // Handle the error (e.g., show a fallback poster)
       });
-      //   Click to copy
+
       document
         .getElementById("copy-link")
         .addEventListener("click", function (event) {
-          event.preventDefault(); // Prevent default anchor link behavior
-
-          // Get the text you want to copy
+          event.preventDefault();
           const textToCopy = this.getAttribute("data-account-number");
-
-          // Use the Clipboard API to copy the text
           navigator.clipboard.writeText(textToCopy).then(
             () => {
-              alert("Account Number copied to clipboard!"); // Success message
+              alert("Account Number copied to clipboard!");
             },
             (err) => {
-              alert("Failed to copy text: " + err); // Error message
+              alert("Failed to copy text: " + err);
             }
           );
         });
-    </script>
-
-    <script src="./js/scripts.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-      AOS.init({
-        duration: 1000,
-        easing: "ease-in-out",
-        once: true,
-      });
     </script>
   </body>
 </html>
