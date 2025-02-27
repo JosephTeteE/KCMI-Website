@@ -32,7 +32,10 @@
 
     <link rel="stylesheet" href="./css/styles.css" />
 
-    <script src="https://www.google.com/recaptcha/api.js?render=6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl"></script>
+    <script
+      src="https://www.google.com/recaptcha/api.js?render=explicit"
+      defer
+    ></script>
   </head>
   <body class="d-flex flex-column min-vh-100 page-sermons">
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
@@ -445,59 +448,57 @@
           </div>
         </div>
       </div>
-
-      <div
-        class="modal fade"
-        id="whatsappModal"
-        tabindex="-1"
-        aria-labelledby="whatsappModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content bg-danger text-white">
-            <div class="modal-header">
-              <h5 class="modal-title" id="whatsappModalLabel">
-                Join Daily Faith Recharge WhatsApp Broadcast
-              </h5>
-              <button
-                type="button"
-                class="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <p>
-                To join our WhatsApp broadcast, please send a message to
-                <strong id="DFRwhatsappNumber">+234 8084 58 3102</strong> with
-                the message "Subscribe".
-              </p>
-              <p>
-                Or enter your email below, to receive a WhatsApp subscription
-                link
-              </p>
-              <form id="whatsappSubscriptionForm">
-                <div class="mb-3">
-                  <label for="whatsappEmail" class="form-label"
-                    >Email address</label
-                  >
-                  <input
-                    type="email"
-                    class="form-control bg-light text-dark"
-                    id="whatsappEmail"
-                    name="email"
-                    required
-                  />
-                </div>
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-light">Submit</button>
-                </div>
-              </form>
-            </div>
+    </footer>
+    <div
+      class="modal fade"
+      id="whatsappModal"
+      tabindex="-1"
+      aria-labelledby="whatsappModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content bg-danger text-white">
+          <div class="modal-header">
+            <h5 class="modal-title" id="whatsappModalLabel">
+              Join Daily Faith Recharge WhatsApp Broadcast
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              To join our WhatsApp broadcast, please send a message to
+              <strong id="DFRwhatsappNumber">+234 8084 58 3102</strong> with the
+              message "Subscribe".
+            </p>
+            <p>
+              Or enter your email below, to receive a WhatsApp subscription link
+            </p>
+            <form id="whatsappSubscriptionForm">
+              <div class="mb-3">
+                <label for="whatsappEmail" class="form-label"
+                  >Email address</label
+                >
+                <input
+                  type="email"
+                  class="form-control bg-light text-dark"
+                  id="whatsappEmail"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-light">Submit</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
-    </footer>
+    </div>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
