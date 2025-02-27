@@ -14,9 +14,9 @@ dotenv.config(); // Load environment variables
 const app = express();
 app.use(express.json()); // Parse JSON request bodies
 
-// CORS Configuration
+// CORS Configuration (updated origin)
 const corsOptions = {
-  origin: "https://kcmi-website.vercel.app",
+  origin: "https://kcmi-website.vercel.app", // Replace with your actual Vercel domain
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -25,20 +25,6 @@ app.options("*", cors(corsOptions));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "../public")));
-
-const isProduction = process.env.NODE_ENV === "production";
-
-// Ensure essential environment variables are set in production
-if (
-  isProduction &&
-  (!process.env.SMTP_HOST ||
-    !process.env.SMTP_USER ||
-    !process.env.SMTP_PASS ||
-    !process.env.RECAPTCHA_SECRET_KEY)
-) {
-  console.error("Missing SMTP or reCAPTCHA configuration in .env file.");
-  process.exit(1);
-}
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
@@ -55,20 +41,20 @@ const transporter = nodemailer.createTransport({
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const isValidPhone = (phone) => /^\+?[0-9\s-]+$/.test(phone);
 
-// reCAPTCHA Verification
-async function verifyRecaptcha(token) {
-  if (!isProduction) {
-    console.log("Skipping reCAPTCHA verification in development.");
-    return true;
-  }
-
+// reCAPTCHA Verification (updated to always verify)
+async function verifyRecaptcha(token, formType) {
   try {
+    const secretKey =
+      formType === "contact"
+        ? process.env.RECAPTCHA_SECRET_KEY_CONTACT
+        : process.env.RECAPTCHA_SECRET_KEY_SUBSCRIPTION;
+
     const response = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify`,
       null,
       {
         params: {
-          secret: process.env.RECAPTCHA_SECRET_KEY,
+          secret: secretKey,
           response: token,
         },
       }
@@ -84,11 +70,13 @@ async function verifyRecaptcha(token) {
 app.post("/submit-contact", async (req, res) => {
   const { email, phone, message, recaptchaToken } = req.body;
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
+  // Verify reCAPTCHA token for contact form
+  if (!(await verifyRecaptcha(recaptchaToken, "contact"))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
+
   if (!email || !isValidEmail(email)) {
     return res
       .status(400)
@@ -102,7 +90,7 @@ app.post("/submit-contact", async (req, res) => {
 
   const mailOptions = {
     from: process.env.SMTP_USER,
-    to: "kcmiworldwide.church@gmail.com",
+    to: "kcmiworldwide.church@gmail.com", // Replace with your actual recipient email
     subject: "New Contact-Us Form Request",
     text: `Email: ${email}\nPhone: ${phone || "Not provided"}\nMessage: ${
       message || "No message provided"
@@ -120,11 +108,6 @@ app.post("/submit-contact", async (req, res) => {
     await transporter.sendMail(mailOptions);
     await transporter.sendMail(autoReplyMailOptions);
 
-    await pool.execute(
-      "INSERT INTO contact_messages (email, phone, message) VALUES (?,?,?)",
-      [email, phone || "Not provided", message]
-    );
-
     res.json({ success: true, message: "Message sent successfully!" });
   } catch (error) {
     console.error("Email failed:", error);
@@ -134,13 +117,15 @@ app.post("/submit-contact", async (req, res) => {
 
 // Handle Subscription Form Submission
 app.post("/subscribe", async (req, res) => {
-  const { email, recaptchaToken } = req.body;
+  const { email, subscriptionType, recaptchaToken } = req.body;
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
+  // Verify reCAPTCHA token for subscription form
+  if (!(await verifyRecaptcha(recaptchaToken, "subscription"))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
+
   if (!email || !isValidEmail(email)) {
     return res
       .status(400)
@@ -148,21 +133,24 @@ app.post("/subscribe", async (req, res) => {
   }
 
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: "kcmiworldwide.church@gmail.com",
-      subject: "New Subscription Request",
-      text: `New subscriber: ${email}`,
-    });
+    if (subscriptionType === "whatsapp") {
+      // Generate WhatsApp subscription link (replace with your actual link)
+      const whatsappLink = `https://wa.me/+2348084583102?text=Subscribe`; // Replace with your actual WhatsApp number
 
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "Welcome to Daily Faith Recharge!",
-      text: "Thank you for subscribing! You'll receive our daily devotionals.\n\nBlessings,\nKCMI Team",
-    });
+      // Send email with WhatsApp subscription link
+      await transporter.sendMail({
+        from: process.env.SMTP_USER,
+        to: email,
+        subject: "Join Daily Faith Recharge on WhatsApp",
+        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nThank you!\nKCMI Team`,
+      });
 
-    res.json({ success: true, message: "Subscription successful!" });
+      res.json({ success: true, message: "WhatsApp subscription link sent!" });
+    } else {
+      res
+        .status(400)
+        .json({ success: false, message: "Invalid subscription type" });
+    }
   } catch (error) {
     console.error("Subscription failed:", error);
     res.status(500).json({ success: false, message: "Error subscribing" });

@@ -1,15 +1,22 @@
+<!-- public/location.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KCMI's Locations Worldwide</title>
-
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
+    <title>KCMI Locations - Find a Church Branch Near You</title>
+    <meta
+      name="description"
+      content="Find KCMI church locations worldwide. Discover a KCMI church near you and connect with our global community."
     />
 
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
@@ -17,15 +24,19 @@
 
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.1.0/css/flag-icon.min.css"
-    />
-    <link rel="stylesheet" href="./css/styles.css" />
 
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <link
+      href="https://unpkg.com/aos@2.3.1/dist/aos.css"
+      rel="stylesheet"
+      integrity="sha384-/rJKQnzOkEo+daG0jMjU1IwwY9unxt1NBw3Ef2fmOJ3PW/TfAg2KXVoWwMZQZtw9"
+      crossorigin="anonymous"
+    />
+
+    <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body class="d-flex flex-column min-vh-100 page-location">
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
@@ -180,11 +191,11 @@
                 class="btn btn-primary my-2"
                 onclick="filterCards('Nigeria')"
               >
-                <span class="flag-icon flag-icon-ng"></span>
                 <img
                   src="./assets/img/nigeria-flag.png"
                   style="border-radius: 55%"
                   width="25"
+                  onerror="this.style.display='none'"
                 />
                 Nigeria
               </button>
@@ -192,19 +203,24 @@
                 class="btn btn-primary my-2"
                 onclick="filterCards('Ghana')"
               >
-                <span class="flag-icon flag-icon-gh"></span>
-                <img src="./assets/img/ghana-flag.png" width="25" /> Ghana
+                <img
+                  src="./assets/img/ghana-flag.png"
+                  width="25"
+                  onerror="this.style.display='none'"
+                />
+                Ghana
               </button>
               <button
                 class="btn btn-primary my-2"
                 onclick="filterCards('Togo')"
               >
-                <span class="flag-icon flag-icon-tg"></span>
                 <img
                   src="./assets/img/togo-flag.png"
                   style="border-radius: 50%"
                   width="37"
-                />Togo
+                  onerror="this.style.display='none'"
+                />
+                Togo
               </button>
             </div>
             <button class="btn btn-primary my-2" onclick="filterCards('All')">
@@ -541,8 +557,7 @@
     <footer
       class="bg-danger text-white"
       data-aos="fade-up"
-      data-aos-duration="600"
-      data-aos-delay="200"
+      data-aos-duration="1000"
     >
       <div class="container py-5">
         <div class="row">
@@ -574,22 +589,35 @@
           </div>
 
           <div class="col-md-5 offset-md-1 mb-3">
-            <form id="subscriptionForm">
-              <h5>Subscribe to Daily Faith Recharge</h5>
-              <p>Receive daily inspiration and faith-building messages.</p>
-              <div class="d-flex flex-column flex-sm-row w-100 gap-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  class="form-control"
-                  placeholder="Email address"
-                  required
-                  autocomplete="email"
+            <p>
+              Daily Faith Recharge:<br />
+              Subscribe to receive daily faith inspiration <br />
+              Choose how
+            </p>
+            <div class="mb-2">
+              <a
+                href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
+                target="_blank"
+                class="btn btn-light w-100"
+              >
+                Listen on Spotify
+                <img
+                  src="./assets/img/spotify-logo.png"
+                  width="30"
+                  height="30"
+                  class="rounded-circle"
                 />
-                <button class="btn btn-light" type="submit">Subscribe</button>
-              </div>
-            </form>
+              </a>
+            </div>
+            <div>
+              <button
+                class="btn btn-outline-light w-100"
+                data-bs-toggle="modal"
+                data-bs-target="#whatsappModal"
+              >
+                Join WhatsApp Broadcast
+              </button>
+            </div>
           </div>
         </div>
 
@@ -603,7 +631,7 @@
               width="50"
               class="me-2 rounded-circle"
             />
-            &copy; 2025 Kingdom Covenant Ministries International
+            © 2025 Kingdom Covenant Ministries International
           </p>
           <div class="d-flex justify-content-center">
             <a
@@ -678,27 +706,81 @@
           </div>
         </div>
       </div>
+
+      <div
+        class="modal fade"
+        id="whatsappModal"
+        tabindex="-1"
+        aria-labelledby="whatsappModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content bg-danger text-white">
+            <div class="modal-header">
+              <h5 class="modal-title" id="whatsappModalLabel">
+                Join Daily Faith Recharge WhatsApp Broadcast
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>
+                To join our WhatsApp broadcast, please send a message to
+                <strong id="DFRwhatsappNumber">+234 8084 58 3102</strong> with
+                the message "Subscribe".
+              </p>
+              <p>
+                Or enter your email below, to receive a WhatsApp subscription
+                link
+              </p>
+              <form id="whatsappSubscriptionForm">
+                <div class="mb-3">
+                  <label for="whatsappEmail" class="form-label"
+                    >Email address</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control bg-light text-dark"
+                    id="whatsappEmail"
+                    name="email"
+                    required
+                  />
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-light">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </footer>
 
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+      onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
+    ></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-      AOS.init();
-    </script>
+    <script src="./js/scripts.js" defer></script>
 
     <script>
       document.querySelectorAll(".see-more").forEach((button) => {
         button.addEventListener("click", function (event) {
-          event.preventDefault(); // Prevent default link behavior
+          event.preventDefault();
           const text = this.closest(".card-body").querySelector(".card-text");
 
           if (text.classList.contains("expanded")) {
-            // Collapse the text
-            text.style.height = "7.1em"; // Set back to collapsed height
+            text.style.height = "7.1em";
             text.classList.remove("expanded");
             this.textContent = "See More";
           } else {
-            // Expand the text
-            text.style.height = `${text.scrollHeight}px`; // Set to full height
+            text.style.height = `${text.scrollHeight}px`;
             text.classList.add("expanded");
             this.textContent = "See Less";
           }
@@ -710,7 +792,6 @@
           const phoneNumber =
             this.previousElementSibling.getAttribute("data-phone");
 
-          // Copy to clipboard
           navigator.clipboard
             .writeText(phoneNumber)
             .then(() => {
@@ -724,13 +805,12 @@
 
       document.querySelectorAll(".whatsapp-link").forEach((link) => {
         link.addEventListener("click", function (event) {
-          event.preventDefault(); // Prevent default behavior
+          event.preventDefault();
 
           const phoneNumber =
             this.closest(".phone-number").getAttribute("data-phone");
           const whatsappURL = `https://wa.me/${phoneNumber.replace(/\D/g, "")}`;
 
-          // Open WhatsApp link in a new tab
           window.open(whatsappURL, "_blank");
         });
       });
@@ -742,15 +822,18 @@
             country === "All" ||
             card.getAttribute("data-country") === country
           ) {
-            card.style.display = "flex"; // Show matching cards or all cards
+            card.style.display = "flex";
           } else {
-            card.style.display = "none"; // Hide non-matching cards
+            card.style.display = "none";
           }
         });
-        AOS.refresh(); // Re-initialize AOS after filtering
+        AOS.refresh();
       }
+
+      AOS.init({
+        duration: 1000,
+        once: true,
+      });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./js/scripts.js"></script>
   </body>
 </html>

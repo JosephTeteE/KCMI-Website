@@ -1,4 +1,4 @@
-// scripts.js
+// public/js/scripts.js //
 
 document.addEventListener("DOMContentLoaded", async () => {
   // ==========================================================================
@@ -255,48 +255,73 @@ document.addEventListener("DOMContentLoaded", async () => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  // ==========================================================================
-  // === Footer Subscription Form Logic (No changes needed) ===
-  // ==========================================================================
-  const subscriptionForm = document.getElementById("subscriptionForm");
-  if (subscriptionForm) {
-    subscriptionForm.addEventListener("submit", async function (event) {
+  // =========================================================================
+  // === Footer Subscription Form Logic ===
+  // =========================================================================
+  const whatsappForm = document.getElementById("whatsappSubscriptionForm");
+  if (whatsappForm) {
+    whatsappForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const email = document.getElementById("email").value;
+      const email = document.getElementById("whatsappEmail").value;
+
+      // Get reCAPTCHA token for subscription form
+      const recaptchaToken = await grecaptcha.execute(
+        "6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl", // reCAPTCHA site key for subscription
+        { action: "submit_subscription" }
+      );
 
       try {
         const response = await fetch("/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({
+            email: email,
+            subscriptionType: "whatsapp",
+            recaptchaToken: recaptchaToken,
+          }),
         });
 
-        if (!response.ok)
-          throw new Error(`HTTP error! Status: ${response.status}`);
-
         const data = await response.json();
-        alert(data.message);
-        if (data.success) subscriptionForm.reset();
+        if (data.success) {
+          alert(data.message);
+          // Close the modal after successful submission
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("whatsappModal")
+          );
+          modal.hide();
+          whatsappForm.reset(); // Reset the form after successful submission
+        } else {
+          alert(data.message);
+        }
       } catch (error) {
-        console.error("Error subscribing:", error);
-        alert("Error subscribing. Please try again.");
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
       }
     });
   }
-});
 
-AOS.init({
-  duration: 800,
-  easing: "ease-in-out",
-  once: true,
-  mirror: false,
-});
+  // === Footer DFR WhatsApp Subscription Form Modal Logic ===
+  const whatsappNumber = document.getElementById("DFRwhatsappNumber");
+  if (whatsappNumber) {
+    whatsappNumber.addEventListener("click", () => {
+      navigator.clipboard.writeText(whatsappNumber.textContent);
+      alert("Phone number copied to clipboard!");
+    });
+  }
 
-document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  anchor.addEventListener("click", function (e) {
-    e.preventDefault();
-    document.querySelector(this.getAttribute("href")).scrollIntoView({
-      behavior: "smooth",
+  AOS.init({
+    duration: 1000,
+    easing: "ease-in-out",
+    once: true,
+    mirror: false,
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute("href")).scrollIntoView({
+        behavior: "smooth",
+      });
     });
   });
 });
