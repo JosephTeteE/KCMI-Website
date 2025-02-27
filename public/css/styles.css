@@ -1,4 +1,4 @@
-/* public/css/styles.css*/
+/* public/css/styles.css */
 
 /* -------------------------------------------------------------------------- */
 /* ## General Styles (Global Styles - Applied to all pages)                 */
@@ -8,8 +8,14 @@ body {
   font-family: "Poppins", sans-serif;
   color: black;
   background-color: white; /* Default background for most pages */
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   padding-top: 20px; /* Add padding to avoid navbar overlap on all pages */
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 1.05rem; /* Slightly smaller font size on smaller screens */
+  }
 }
 
 html {
@@ -291,7 +297,7 @@ body main {
 .index-page .homepage-giving-section {
   position: relative; /* To position the heart and inscription */
   color: black;
-  padding: 6rem 0;
+  padding: 1rem 0;
   text-align: center;
 }
 
@@ -325,7 +331,7 @@ body main {
 .index-page .homepage-prayer-request-section {
   position: relative; /* To position the background image */
   text-align: center;
-  padding: 6rem 0;
+  padding: 1rem 0;
   color: black; /* Adjust text color for better readability */
 }
 
@@ -355,8 +361,9 @@ body main {
 /* Church Events Calendar Section - NEW STYLES */
 /* -------------------------------------------------------------------------- */
 .calendar-container {
-  margin: 4rem 0; /* Add spacing around the calendar */
+  margin: 1rem 0; /* Add spacing around the calendar */
   text-align: center; /* Center-align the heading */
+  margin-top: 2rem;
 }
 
 .calendar-container h2 {
@@ -382,14 +389,15 @@ body main {
 /* Map Section - NEW STYLES */
 /* -------------------------------------------------------------------------- */
 .homepage-map-section {
-  margin: 4rem 0; /* Add spacing around the map section */
+  padding: 1rem 0; /* Add spacing around the map section */
+  margin-top: 1rem;
 }
 
 .homepage-map-text-container {
   display: flex;
   flex-wrap: wrap; /* Allow wrapping on smaller screens */
   align-items: center;
-  gap: 2rem; /* Spacing between map and text */
+  gap: 0.5rem; /* Spacing between map and text */
 }
 
 .homepage-map-container {
@@ -451,6 +459,9 @@ body main {
   .index-page .homepage-campus-card p {
     font-size: 1rem; /* Slightly smaller font size for card text on smaller screens */
   }
+  .index-page .homepage-giving-section {
+    margin-top: -15px;
+  }
 }
 
 /* Responsive adjustments for Map and Calendar - NEW STYLES */
@@ -466,7 +477,7 @@ body main {
 
   .homepage-map-container {
     width: 100%; /* Full width for map on smaller screens */
-    margin-bottom: 1.5rem; /* Spacing below map */
+    margin-bottom: 0.5rem; /* Spacing below map */
   }
 }
 
@@ -859,4 +870,12 @@ body main {
 /* -------------------------------------------------------------------------- */
 .page-services main {
   margin-top: 5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ## Footer Daily Faith Recharge Modal style                                 */
+/* -------------------------------------------------------------------------- */
+#DFRwhatsappNumber {
+  text-decoration: underline;
+  cursor: pointer; /* Change cursor to pointer on hover */
 }
