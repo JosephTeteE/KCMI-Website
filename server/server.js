@@ -169,8 +169,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Test Database Connection
-const pool = require("./db");
-
 async function testDB() {
   try {
     console.log("Testing database connection...");
