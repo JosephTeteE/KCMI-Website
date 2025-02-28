@@ -167,3 +167,18 @@ app.use("/api/livestream", livestreamRoutes);
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Test Database Connection
+const pool = require("./db");
+
+async function testDB() {
+  try {
+    console.log("Testing database connection...");
+    const [rows] = await pool.execute("SELECT 1");
+    console.log("✅ Database connected successfully!", rows);
+  } catch (error) {
+    console.error("❌ Database connection failed!", error);
+  }
+}
+
+testDB();
