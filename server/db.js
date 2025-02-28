@@ -13,7 +13,7 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
   ssl: {
-    ca: Buffer.from(process.env.DB_SSL_CERT_BASE64, "base64").toString("utf-8"),
+    ca: Buffer.from(process.env.DB_SSL_CERT_BASE64, "base64"),
   },
   waitForConnections: true,
   connectionLimit: 10,
