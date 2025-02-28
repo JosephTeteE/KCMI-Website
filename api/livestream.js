@@ -1,4 +1,4 @@
-// File: public/admin/js/admin.js
+// File: api/livestream.js
 // Desc: Frontend logic for updating and retrieving the livestream embed code
 // Desc: API routes for updating and retrieving the livestream embed code
 // The code snippet below is from the admin.js file in the public/admin/js directory. It is responsible for handling the logic for updating and retrieving the livestream embed code. The code uses the Fetch API to make HTTP requests to the backend server, specifically to the /api/livestream route. The backend server is expected to handle these requests and interact with the database to update or retrieve the embed code.
