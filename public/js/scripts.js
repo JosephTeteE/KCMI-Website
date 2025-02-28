@@ -1,14 +1,21 @@
-// public/js/scripts.js //
+// public/js/scripts.js
 
 document.addEventListener("DOMContentLoaded", async () => {
   // ==========================================================================
   // === Livestream Embed Code Fetching and Loading ===
   // ==========================================================================
+  console.log("Document fully loaded, initializing livestream fetching...");
+
   try {
+    console.log("Fetching livestream embed code...");
     const response = await fetch("/api/livestream");
+    console.log(`Livestream fetch response status: ${response.status}`);
+
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
     const data = await response.json();
+    console.log("Livestream embed code retrieved:", data);
+
     const embedCode = data.embedCode ? data.embedCode.trim() : "";
 
     const livestreamContainer = document.getElementById(
@@ -17,9 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const watchLiveContainer = document.getElementById("watch-live-container");
 
     if (embedCode) {
+      console.log("Updating livestream container with embed code...");
       if (livestreamContainer) livestreamContainer.innerHTML = embedCode;
       if (watchLiveContainer) watchLiveContainer.style.display = "block";
     } else {
+      console.warn("No embed code found. Hiding 'Watch Live' container.");
       if (watchLiveContainer) watchLiveContainer.style.display = "none";
     }
   } catch (error) {
