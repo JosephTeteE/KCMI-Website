@@ -9,4 +9,5 @@
 .key
 
 #Ignore node_modules
-node_modulesserver/certs/
+node_modules
+server/certs/
