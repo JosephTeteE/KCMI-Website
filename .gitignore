@@ -3,3 +3,7 @@
 
 #Ignore the .htpasswd file
 .htpasswd
+
+.crt
+.pem
+.key
