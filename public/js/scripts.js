@@ -8,7 +8,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     console.log("Fetching livestream embed code...");
-    const response = await fetch("/api/livestream");
+    const response = await fetch(
+      "https://kcmi-backend.onrender.com/api/livestream"
+    );
     console.log(`Livestream fetch response status: ${response.status}`);
 
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
