@@ -1,6 +1,6 @@
 // public/admin/js/admin.js
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const saveEmbedButton = document.getElementById("saveEmbed");
   const embedElement = document.getElementById("embedCode");
 
@@ -9,14 +9,26 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  const backendUrl = "https://kcmi-backend.onrender.com/api/livestream";
+
+  // Fetch and display existing embed code on page load
+  try {
+    const response = await fetch(backendUrl);
+    if (response.ok) {
+      const data = await response.json();
+      embedElement.value = data.embedCode || "";
+    }
+  } catch (error) {
+    console.error("Failed to load existing embed code.", error);
+  }
+
+  // Save new embed code when button is clicked
   saveEmbedButton.addEventListener("click", async () => {
     const embedCode = embedElement.value.trim();
     if (!embedCode) {
       alert("Please enter an embed code.");
       return;
     }
-
-    const backendUrl = "https://kcmi-backend.onrender.com/api/livestream";
 
     try {
       const response = await fetch(backendUrl, {

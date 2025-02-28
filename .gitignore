@@ -3,3 +3,10 @@
 
 #Ignore the .htpasswd file
 .htpasswd
+
+.crt
+.pem
+.key
+
+#Ignore node_modules
+node_modulesserver/certs/

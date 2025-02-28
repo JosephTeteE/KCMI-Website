@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT) || 465,
-  secure: process.env.SMTP_PORT == 465,
+  secure: process.env.SMTP_PORT == 465, // SSL if port is 465
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -142,6 +142,21 @@ app.post("/subscribe", async (req, res) => {
   } catch (error) {
     console.error("Subscription failed:", error);
     res.status(500).json({ success: false, message: "Error subscribing" });
+  }
+});
+
+// Database Connection Check (New)
+app.get("/api/db-check", async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    await connection.ping();
+    connection.release();
+    res.json({ success: true, message: "Database connection successful!" });
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Database connection error" });
   }
 });
 
