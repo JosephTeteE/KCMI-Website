@@ -40,7 +40,8 @@
     <link rel="stylesheet" href="./css/styles.css" />
 
     <script
-      src="https://www.google.com/recaptcha/api.js?render=explicit"
+      src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onLoadRecaptcha"
+      async
       defer
     ></script>
   </head>
@@ -394,6 +395,7 @@
             src="https://calendar.google.com/calendar/embed?src=f2379708c284df781369c76d7820f065e5983f70742e84c77080938d7178f50d%40group.calendar.google.com&ctz=Africa%2FLagos"
             frameborder="0"
             scrolling="no"
+            loading="lazy"
           ></iframe>
         </div>
       </div>
