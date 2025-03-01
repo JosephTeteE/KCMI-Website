@@ -46,7 +46,8 @@
     <link rel="stylesheet" href="./css/styles.css" />
 
     <script
-      src="https://www.google.com/recaptcha/api.js?render=explicit"
+      src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onLoadRecaptcha"
+      async
       defer
     ></script>
   </head>
@@ -502,7 +503,9 @@
     <script>
       grecaptcha.ready(() => {
         grecaptcha
-          .execute("your-site-key", { action: "contact" })
+          .execute("6LewGdoqAAAAAFTARgCxGqapOnvk7oTBqfbJNBok", {
+            action: "contact",
+          })
           .then((token) => {
             document.getElementById("recaptchaToken").value = token;
           });
