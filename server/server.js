@@ -8,6 +8,7 @@ const dotenv = require("dotenv"); // Load environment variables from .env file
 const pool = require("./db"); // Import database connection pool
 const nodemailer = require("nodemailer"); // Module for sending emails
 const axios = require("axios"); // Promise-based HTTP client for making API requests
+const jwt = require("jsonwebtoken"); // Import the jsonwebtoken library
 
 dotenv.config(); // Load environment variables
 
@@ -173,6 +174,19 @@ app.get("/api/db-check", async (req, res) => {
 // Livestream Routes
 const livestreamRoutes = require("../api/livestream"); // Import livestream routes
 app.use("/api/livestream", livestreamRoutes); // Mount livestream routes under '/api/livestream'
+
+// Authentication Endpoint
+app.post("/api/auth", async (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === process.env.AD_USER && password === process.env.AD_PASS) {
+    // Generate JWT
+    const token = jwt.sign({ username }, process.env.JWT_SECRET);
+    res.json({ token });
+  } else {
+    res.status(401).json({ message: "Invalid credentials" });
+  }
+});
 
 // Start Server
 const PORT = process.env.PORT || 5000; // Get port from environment variables or use 5000 as default

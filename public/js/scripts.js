@@ -211,9 +211,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         watchLiveButton.textContent = "Join Us Live";
         watchLiveButton.style.backgroundColor = "green";
       } else {
-        watchLiveButton.textContent = "Revisit the Last Service";
+        watchLiveButton.textContent = "Rewatch the Last Service";
         watchLiveButton.style.backgroundColor = "red";
       }
+      document.getElementById("watch-live-container").style.display = "block";
     } catch (error) {
       console.error("Error fetching livestream data:", error); // Log fetch errors
       watchLiveButton.textContent = "Watch Live";
