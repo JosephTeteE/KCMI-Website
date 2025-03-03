@@ -761,29 +761,21 @@ body main {
 }
 
 .livestream-page main h2 {
-  font-size: clamp(
-    1.75rem,
-    3vw,
-    2rem
-  ); /* Fluid font size for livestream heading */
-  margin-bottom: -16.5rem; /* Adjust this value as needed */
+  font-size: clamp(1.75rem, 3vw, 2rem);
+  margin-bottom: 1rem; /* Adjusted margin for better spacing */
 }
 
-/* Ensure video container takes full width of its parent */
-.livestream-page .ratio {
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-/* Make the video iframe fill the ratio container */
-.livestream-page .ratio > div {
+/* Responsive Video Container */
+.livestream-page .video-responsive {
   position: relative;
-  padding-bottom: 56.25%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
   height: 0;
+  overflow: hidden;
+  max-width: 960px; /* Optional: Limit maximum width */
+  margin: 0 auto; /* Center the video container */
 }
 
-.livestream-page .ratio iframe {
+.livestream-page .video-responsive iframe {
   position: absolute;
   top: 0;
   left: 0;

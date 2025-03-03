@@ -1,6 +1,5 @@
+// public/js/scripts.js
 document.addEventListener("DOMContentLoaded", async () => {
-  // public/js/scripts.js
-
   // ==========================================================================
   // === Livestream Embed Code Fetching and Loading ===
   // ==========================================================================
@@ -24,21 +23,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const livestreamContainer = document.getElementById(
       "livestream-video-container"
     );
-    const watchLiveContainer = document.getElementById("watch-live-container");
 
     if (embedCode) {
       console.log("Updating livestream container with embed code...");
       if (livestreamContainer) {
         livestreamContainer.innerHTML = embedCode;
       }
-      if (watchLiveContainer) {
-        watchLiveContainer.style.display = "block";
-      }
     } else {
-      console.warn("No embed code found. Hiding 'Watch Live' container.");
-      if (watchLiveContainer) {
-        watchLiveContainer.style.display = "none";
-      }
+      console.warn("No embed code found.");
     }
   } catch (error) {
     console.error("Error fetching livestream:", error);
