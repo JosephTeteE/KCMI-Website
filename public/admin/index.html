@@ -125,8 +125,26 @@
       // Check for existing token on page load
       const token = localStorage.getItem("token");
       if (token) {
-        loginForm.style.display = "none";
-        adminContent.style.display = "block";
+        try {
+          const decodedToken = jwt_decode(token);
+          if (decodedToken.exp < Date.now() / 1000) {
+            // Check if token is expired
+            localStorage.removeItem("token");
+            loginForm.style.display = "block"; // Show login form if token is expired
+            adminContent.style.display = "none";
+          } else {
+            loginForm.style.display = "none";
+            adminContent.style.display = "block";
+          }
+        } catch (error) {
+          console.error("JWT decode error:", error);
+          localStorage.removeItem("token");
+          loginForm.style.display = "block"; // Show login form if token is invalid
+          adminContent.style.display = "none";
+        }
+      } else {
+        loginForm.style.display = "block"; // Show login form if no token is found
+        adminContent.style.display = "none";
       }
     </script>
 

@@ -180,8 +180,10 @@ app.post("/api/auth", async (req, res) => {
   const { username, password } = req.body;
 
   if (username === process.env.AD_USER && password === process.env.AD_PASS) {
-    // Generate JWT
-    const token = jwt.sign({ username }, process.env.JWT_SECRET);
+    // Generate JWT with expiration time (1 minute)
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+      expiresIn: "1m",
+    }); // Updated expiration time
     res.json({ token });
   } else {
     res.status(401).json({ message: "Invalid credentials" });
