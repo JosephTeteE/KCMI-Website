@@ -30,11 +30,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    const isLive = document.getElementById("isLiveCheckbox").checked;
+
     try {
       const response = await fetch(backendUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ embedCode }),
+        body: JSON.stringify({ embedCode, isLive }),
       });
 
       if (!response.ok)

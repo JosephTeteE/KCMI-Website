@@ -16,12 +16,14 @@ router.use((req, res, next) => {
 
 // 🔹 Update Livestream Embed Code
 router.post("/", async (req, res) => {
-  const { embedCode } = req.body;
+  const { embedCode, isLive } = req.body;
 
   if (!embedCode) {
     console.warn("⚠️ Missing embedCode in request");
     return res.status(400).json({ message: "Embed code is required" });
   }
+
+  console.log("isLive status received:", isLive);
 
   let connection;
   try {
@@ -29,8 +31,8 @@ router.post("/", async (req, res) => {
     console.log("✅ Connected to database for update");
 
     await connection.execute(
-      "REPLACE INTO livestream (id, embed_code) VALUES (1, ?)",
-      [embedCode]
+      "REPLACE INTO livestream (id, embed_code, isLive) VALUES (1, ?, ?)",
+      [embedCode, isLive]
     );
 
     console.log("🎥 Livestream embed code updated successfully!");
@@ -39,7 +41,7 @@ router.post("/", async (req, res) => {
     console.error("❌ Database Error on POST:", error);
     res.status(500).json({ message: "Database error", error: error.message });
   } finally {
-    if (connection) connection.release(); // Ensure connection is released
+    if (connection) connection.release();
   }
 });
 
@@ -51,21 +53,24 @@ router.get("/", async (req, res) => {
     console.log("✅ Connected to database for retrieval");
 
     const [rows] = await connection.execute(
-      "SELECT embed_code FROM livestream WHERE id = 1"
+      "SELECT embed_code, isLive FROM livestream WHERE id = 1"
     );
 
     if (rows.length > 0) {
-      console.log("🎥 Livestream embed retrieved:", rows[0].embed_code);
+      console.log("🎥 Livestream embed and isLive status retrieved:", rows[0]);
     } else {
       console.warn("⚠️ No livestream embed found in database.");
     }
 
-    res.json({ embedCode: rows.length > 0 ? rows[0].embed_code : "" });
+    res.json({
+      embedCode: rows.length > 0 ? rows[0].embed_code : "",
+      isLive: rows.length > 0 ? rows[0].isLive : false,
+    });
   } catch (error) {
     console.error("❌ Database Error on GET:", error);
     res.status(500).json({ message: "Database error", error: error.message });
   } finally {
-    if (connection) connection.release(); // Ensure connection is released
+    if (connection) connection.release();
   }
 });
 

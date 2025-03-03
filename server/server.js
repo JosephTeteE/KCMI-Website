@@ -1,50 +1,52 @@
 // server/server.js
 
 // Import Required Modules
-const express = require("express");
-const path = require("path");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const pool = require("./db");
-const nodemailer = require("nodemailer");
-const axios = require("axios");
+const express = require("express"); // Express framework for web server
+const path = require("path"); // Node.js module for handling file paths
+const cors = require("cors"); // Enable Cross-Origin Resource Sharing
+const dotenv = require("dotenv"); // Load environment variables from .env file
+const pool = require("./db"); // Import database connection pool
+const nodemailer = require("nodemailer"); // Module for sending emails
+const axios = require("axios"); // Promise-based HTTP client for making API requests
 
-dotenv.config();
+dotenv.config(); // Load environment variables
 
-const app = express();
-app.use(express.json());
+const app = express(); // Create an Express application instance
+app.use(express.json()); // Middleware to parse JSON request bodies
 
 // CORS Configuration
 const corsOptions = {
-  origin: "https://kcmi-website.vercel.app",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: "https://kcmi-website.vercel.app", // Allow requests from this origin
+  methods: ["GET", "POST"], // Allow these HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
 };
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors(corsOptions)); // Apply CORS middleware with the specified options
+app.options("*", cors(corsOptions)); // Handle preflight requests for all routes
 
 // Serve static files
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "../public"))); // Serve static files from the 'public' directory
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 465,
-  secure: process.env.SMTP_PORT == 465, // SSL if port is 465
+  host: process.env.SMTP_HOST, // SMTP server host
+  port: Number(process.env.SMTP_PORT) || 465, // SMTP server port
+  secure: process.env.SMTP_PORT == 465, // Use SSL if port is 465
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.SMTP_USER, // SMTP username
+    pass: process.env.SMTP_PASS, // SMTP password
   },
 });
 
 // reCAPTCHA Verification
 async function verifyRecaptcha(token, formType) {
   try {
+    // Determine the correct reCAPTCHA secret key based on form type
     const secretKey =
       formType === "contact"
         ? process.env.RECAPTCHA_SECRET_KEY_CONTACT
         : process.env.RECAPTCHA_SECRET_KEY_SUBSCRIPTION;
 
+    // Make a POST request to Google's reCAPTCHA API to verify the token
     const response = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify`,
       null,
@@ -52,70 +54,77 @@ async function verifyRecaptcha(token, formType) {
         params: { secret: secretKey, response: token },
       }
     );
-    return response.data.success;
+    return response.data.success; // Return the success status from the API response
   } catch (error) {
     console.error("reCAPTCHA verification failed:", error);
-    return false;
+    return false; // Return false if verification fails
   }
 }
 
 // Handle Contact Form Submission
 app.post("/submit-contact", async (req, res) => {
-  const { email, phone, message, recaptchaToken } = req.body;
+  const { email, phone, message, recaptchaToken } = req.body; // Extract data from request body
 
+  // Verify reCAPTCHA token
   if (!(await verifyRecaptcha(recaptchaToken, "contact"))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
+  // Validate email format
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
       .json({ success: false, message: "Valid email required" });
   }
+  // Validate phone format (if provided)
   if (phone && !/^\+?[0-9\s-]+$/.test(phone)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid phone format" });
   }
 
+  // Configure email options
   const mailOptions = {
-    from: process.env.SMTP_USER,
-    to: "kcmiworldwide.church@gmail.com",
-    subject: "New Contact-Us Form Request",
+    from: process.env.SMTP_USER, // Sender address
+    to: "kcmiworldwide.church@gmail.com", // Recipient address
+    subject: "New Contact-Us Form Request", // Email subject
     text: `Email: ${email}\nPhone: ${phone || "Not provided"}\nMessage: ${
       message || "No message provided"
-    }`,
+    }`, // Email body
   };
 
+  // Configure auto-reply email options
   const autoReplyMailOptions = {
-    from: process.env.SMTP_USER,
-    to: email,
-    subject: "Thank you for contacting KCMI!",
-    text: "We have received your message and will get back to you shortly.\n\nBlessings,\nKCMI Team",
+    from: process.env.SMTP_USER, // Sender address
+    to: email, // Recipient address (original sender)
+    subject: "Thank you for contacting KCMI!", // Email subject
+    text: "We have received your message and will get back to you shortly.\n\nBlessings,\nKCMI Team", // Email body
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    await transporter.sendMail(autoReplyMailOptions);
-    res.json({ success: true, message: "Message sent successfully!" });
+    await transporter.sendMail(mailOptions); // Send the main email
+    await transporter.sendMail(autoReplyMailOptions); // Send the auto-reply email
+    res.json({ success: true, message: "Message sent successfully!" }); // Send success response
   } catch (error) {
-    console.error("Email failed:", error);
-    res.status(500).json({ success: false, message: "Error sending message" });
+    console.error("Email failed:", error); // Log email sending error
+    res.status(500).json({ success: false, message: "Error sending message" }); // Send error response
   }
 });
 
 // Handle Subscription Form Submission
 app.post("/subscribe", async (req, res) => {
-  const { email, subscriptionType, recaptchaToken } = req.body;
+  const { email, subscriptionType, recaptchaToken } = req.body; // Extract data from request body
 
+  // Verify reCAPTCHA token
   if (!(await verifyRecaptcha(recaptchaToken, "subscription"))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
+  // Validate email format
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
@@ -124,59 +133,60 @@ app.post("/subscribe", async (req, res) => {
 
   try {
     if (subscriptionType === "whatsapp") {
-      const whatsappLink = `https://wa.me/+2348084583102?text=Subscribe`;
+      const whatsappLink = `https://wa.me/+2348084583102?text=Subscribe`; // WhatsApp subscription link
 
+      // Configure email options for WhatsApp subscription
       await transporter.sendMail({
-        from: process.env.SMTP_USER,
-        to: email,
-        subject: "Join Daily Faith Recharge on WhatsApp",
-        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nThank you!\nKCMI Team`,
+        from: process.env.SMTP_USER, // Sender address
+        to: email, // Recipient address
+        subject: "Join Daily Faith Recharge on WhatsApp", // Email subject
+        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nThank you!\nKCMI Team`, // Email body
       });
 
-      res.json({ success: true, message: "WhatsApp subscription link sent!" });
+      res.json({ success: true, message: "WhatsApp subscription link sent!" }); // Send success response
     } else {
       res
         .status(400)
-        .json({ success: false, message: "Invalid subscription type" });
+        .json({ success: false, message: "Invalid subscription type" }); // Send error response for invalid subscription type
     }
   } catch (error) {
-    console.error("Subscription failed:", error);
-    res.status(500).json({ success: false, message: "Error subscribing" });
+    console.error("Subscription failed:", error); // Log subscription error
+    res.status(500).json({ success: false, message: "Error subscribing" }); // Send error response
   }
 });
 
-// Database Connection Check (New)
+// Database Connection Check
 app.get("/api/db-check", async (req, res) => {
   try {
-    const connection = await pool.getConnection();
-    await connection.ping();
-    connection.release();
-    res.json({ success: true, message: "Database connection successful!" });
+    const connection = await pool.getConnection(); // Get a database connection from the pool
+    await connection.ping(); // Ping the database to check the connection
+    connection.release(); // Release the connection back to the pool
+    res.json({ success: true, message: "Database connection successful!" }); // Send success response
   } catch (error) {
-    console.error("Database connection failed:", error);
+    console.error("Database connection failed:", error); // Log database connection error
     res
       .status(500)
-      .json({ success: false, message: "Database connection error" });
+      .json({ success: false, message: "Database connection error" }); // Send error response
   }
 });
 
 // Livestream Routes
-const livestreamRoutes = require("../api/livestream");
-app.use("/api/livestream", livestreamRoutes);
+const livestreamRoutes = require("../api/livestream"); // Import livestream routes
+app.use("/api/livestream", livestreamRoutes); // Mount livestream routes under '/api/livestream'
 
 // Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5000; // Get port from environment variables or use 5000 as default
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); // Start the server and log the port
 
 // Test Database Connection
 async function testDB() {
   try {
     console.log("Testing database connection...");
-    const [rows] = await pool.execute("SELECT 1");
-    console.log("✅ Database connected successfully!", rows);
+    const [rows] = await pool.execute("SELECT 1"); // Execute a simple query to test the connection
+    console.log("✅ Database connected successfully!", rows); // Log success message
   } catch (error) {
-    console.error("❌ Database connection failed!", error);
+    console.error("❌ Database connection failed!", error); // Log connection error
   }
 }
 
-testDB();
+testDB(); // Call the function to test the database connection
