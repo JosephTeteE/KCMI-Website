@@ -1,4 +1,5 @@
 // public/js/scripts.js
+// This file contains the JavaScript logic for the frontend of the website.
 document.addEventListener("DOMContentLoaded", async () => {
   // ==========================================================================
   // === Livestream Embed Code Fetching and Loading ===
@@ -189,4 +190,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
   }
+
+  // ==========================================================================
+  // === Watch Live Button Update Logic ===
+  // ==========================================================================
+  const watchLiveButton = document
+    .getElementById("watch-live-container")
+    .querySelector("a"); // Select the <a> tag inside the container
+
+  async function checkLivestreamStatus() {
+    try {
+      const response = await fetch(
+        "https://kcmi-backend.onrender.com/api/livestream"
+      );
+      const data = await response.json();
+
+      console.log("API response:", data); // Log the API response
+
+      if (data.isLive) {
+        watchLiveButton.textContent = "Join Us Live";
+        watchLiveButton.style.backgroundColor = "green";
+      } else {
+        watchLiveButton.textContent = "Revisit the Last Service";
+        watchLiveButton.style.backgroundColor = "red";
+      }
+    } catch (error) {
+      console.error("Error fetching livestream data:", error); // Log fetch errors
+      watchLiveButton.textContent = "Watch Live";
+      watchLiveButton.style.backgroundColor = "gray";
+    }
+  }
+
+  // Call the function initially and then periodically
+  checkLivestreamStatus();
+  setInterval(checkLivestreamStatus, 30000); // Check every 30 seconds
 });
