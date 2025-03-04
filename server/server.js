@@ -89,7 +89,7 @@ app.post("/submit-contact", async (req, res) => {
   // Configure email options
   const mailOptions = {
     from: process.env.SMTP_USER, // Sender address
-    to: "kcmiworldwide.church@gmail.com", // Recipient address
+    to: "kcmi.forms@gmail.com", // Recipient address
     subject: "New Contact-Us Form Request", // Email subject
     text: `Email: ${email}\nPhone: ${phone || "Not provided"}\nMessage: ${
       message || "No message provided"
