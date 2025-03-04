@@ -1,5 +1,76 @@
 // public/js/scripts.js
 // This file contains the JavaScript logic for the frontend of the website.
+
+// =========================================================================
+// === Initialize reCAPTCHA for Contact & Subscription Forms ===
+// =========================================================================
+function onLoadRecaptcha() {
+  console.log("Initializing reCAPTCHA...");
+
+  try {
+    grecaptcha.ready(function () {
+      console.log("reCAPTCHA API is ready.");
+
+      // Contact Form reCAPTCHA (handled inline in contact-us.html)
+      console.log("Contact form reCAPTCHA logic should be executed inline.");
+
+      // WhatsApp Subscription Form reCAPTCHA
+      const whatsappForm = document.getElementById("whatsappSubscriptionForm");
+      if (whatsappForm) {
+        console.log("Found WhatsApp subscription form. Adding event listener.");
+
+        whatsappForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const email = document.getElementById("whatsappEmail").value;
+
+          try {
+            console.log("Generating reCAPTCHA token for subscription form...");
+            const recaptchaToken = await grecaptcha.execute(
+              "6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl",
+              { action: "submit_subscription" }
+            );
+            console.log("reCAPTCHA token generated:", recaptchaToken);
+
+            console.log("Submitting subscription form data...");
+            const response = await fetch("/subscribe", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: email,
+                subscriptionType: "whatsapp",
+                recaptchaToken: recaptchaToken,
+              }),
+            });
+
+            console.log("Subscription form response status:", response.status);
+            const data = await response.json();
+            console.log("Subscription form response data:", data);
+
+            alert(data.message);
+
+            if (data.success) {
+              const modal = bootstrap.Modal.getInstance(
+                document.getElementById("whatsappModal")
+              );
+              if (modal) {
+                modal.hide();
+                whatsappForm.reset();
+              }
+            }
+          } catch (error) {
+            console.error("Subscription Error:", error);
+            alert("An error occurred. Please try again.");
+          }
+        });
+      } else {
+        console.warn("WhatsApp subscription form not found.");
+      }
+    });
+  } catch (error) {
+    console.error("reCAPTCHA initialization error:", error);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   // ==========================================================================
   // === Livestream Embed Code Fetching and Loading ===
@@ -77,85 +148,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
   });
-
-  // =========================================================================
-  // === Initialize reCAPTCHA for Contact & Subscription Forms ===
-  // =========================================================================
-  function onLoadRecaptcha() {
-    console.log("Initializing reCAPTCHA...");
-
-    try {
-      grecaptcha.ready(function () {
-        console.log("reCAPTCHA API is ready.");
-
-        // Contact Form reCAPTCHA (handled inline in contact-us.html)
-        console.log("Contact form reCAPTCHA logic should be executed inline.");
-
-        // WhatsApp Subscription Form reCAPTCHA
-        const whatsappForm = document.getElementById(
-          "whatsappSubscriptionForm"
-        );
-        if (whatsappForm) {
-          console.log(
-            "Found WhatsApp subscription form. Adding event listener."
-          );
-
-          whatsappForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const email = document.getElementById("whatsappEmail").value;
-
-            try {
-              console.log(
-                "Generating reCAPTCHA token for subscription form..."
-              );
-              const recaptchaToken = await grecaptcha.execute(
-                "6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl",
-                { action: "submit_subscription" }
-              );
-              console.log("reCAPTCHA token generated:", recaptchaToken);
-
-              console.log("Submitting subscription form data...");
-              const response = await fetch("/subscribe", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: email,
-                  subscriptionType: "whatsapp",
-                  recaptchaToken: recaptchaToken,
-                }),
-              });
-
-              console.log(
-                "Subscription form response status:",
-                response.status
-              );
-              const data = await response.json();
-              console.log("Subscription form response data:", data);
-
-              alert(data.message);
-
-              if (data.success) {
-                const modal = bootstrap.Modal.getInstance(
-                  document.getElementById("whatsappModal")
-                );
-                if (modal) {
-                  modal.hide();
-                  whatsappForm.reset();
-                }
-              }
-            } catch (error) {
-              console.error("Subscription Error:", error);
-              alert("An error occurred. Please try again.");
-            }
-          });
-        } else {
-          console.warn("WhatsApp subscription form not found.");
-        }
-      });
-    } catch (error) {
-      console.error("reCAPTCHA initialization error:", error);
-    }
-  }
 
   // ==========================================================================
   // === Initialize AOS (Animate On Scroll) ===
