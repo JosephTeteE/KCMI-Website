@@ -501,13 +501,24 @@
     </div>
 
     <script>
+      console.log("Initializing reCAPTCHA for contact form...");
+
       grecaptcha.ready(() => {
+        console.log("reCAPTCHA API is ready for contact form.");
+
         grecaptcha
           .execute("6LewGdoqAAAAAFTARgCxGqapOnvk7oTBqfbJNBok", {
             action: "contact",
           })
           .then((token) => {
+            console.log("Contact form reCAPTCHA token generated:", token);
             document.getElementById("recaptchaToken").value = token;
+          })
+          .catch((error) => {
+            console.error(
+              "Error generating contact form reCAPTCHA token:",
+              error
+            );
           });
       });
 
@@ -515,6 +526,8 @@
         .getElementById("contactForm")
         .addEventListener("submit", async function (event) {
           event.preventDefault();
+
+          console.log("Contact form submission initiated.");
 
           const submitBtn = document.getElementById("submitBtn");
           submitBtn.disabled = true;
@@ -531,13 +544,19 @@
           statusElement.style.color = "blue";
 
           try {
+            console.log("Sending contact form data to server...");
+
             const response = await fetch("/submit-contact", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email, phone, message, recaptchaToken }),
             });
 
+            console.log("Contact form response status:", response.status);
+
             const data = await response.json();
+            console.log("Contact form response data:", data);
+
             if (data.success) {
               statusElement.textContent = "Message sent successfully!";
               statusElement.style.color = "green";
@@ -547,6 +566,7 @@
               statusElement.style.color = "red";
             }
           } catch (error) {
+            console.error("Contact form submission error:", error);
             statusElement.textContent = "Failed to send message.";
             statusElement.style.color = "red";
           } finally {
