@@ -1,9 +1,7 @@
 // public/js/scripts.js
 // This file contains the JavaScript logic for the frontend of the website.
 
-// =========================================================================
-// === Initialize reCAPTCHA for Contact & Subscription Forms ===
-// =========================================================================
+// Function to initialize reCAPTCHA
 function onLoadRecaptcha() {
   console.log("Initializing reCAPTCHA...");
 
@@ -96,13 +94,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       "livestream-video-container"
     );
 
-    if (embedCode) {
+    if (embedCode && livestreamContainer) {
       console.log("Updating livestream container with embed code...");
-      if (livestreamContainer) {
-        livestreamContainer.innerHTML = embedCode;
-      }
+      livestreamContainer.innerHTML = embedCode;
     } else {
-      console.warn("No embed code found.");
+      console.warn("No embed code found or container missing.");
     }
   } catch (error) {
     console.error("Error fetching livestream:", error);
@@ -192,9 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function checkLivestreamStatus() {
     try {
-      const response = await fetch(
-        "https://kcmi-backend.onrender.com/api/livestream"
-      );
+      const response = await fetch("/api/livestream"); // Changed to relative URL
       const data = await response.json();
 
       console.log("API response:", data); // Log the API response
