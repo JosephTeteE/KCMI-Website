@@ -35,7 +35,7 @@ function onLoadRecaptcha() {
             console.log("Generating reCAPTCHA token for subscription form...");
 
             const recaptchaToken = await grecaptcha.execute(
-              "6LdwouMqAAAAANg9Y2OM_A9TTHayJXDheteqd-kl",
+              "6LfJPuoqAAAAAM7yyCUHkv03T0bp8ZLguODiENFs",
               { action: "submit_subscription" }
             );
 
