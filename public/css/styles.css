@@ -58,15 +58,27 @@ body main {
 /* -------------------------------------------------------------------------- */
 
 /* Video Background for Header Section on homepage */
-.index-page .homepage-header-video-container {
+.homepage-header-video-container.navbar-open {
+  top: 280px; /* Adjust this value to match the height of your expanded navbar */
+  transition: top 0.3s ease; /* Smooth transition for the video */
+}
+
+/* Ensure the video container resets correctly when navbar is open */
+.homepage-header-video-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 70vh; /* Height of the video background section */
+  height: 70vh;
   overflow: hidden;
-  z-index: -2; /* Place video behind content */
-  padding-top: 20px; /* Clearance from the top to avoid cropping by fixed navbar */
+  z-index: -2;
+  padding-top: 20px;
+  transition: top 0.3s ease;
+}
+
+/* Adjust the top position when navbar is open */
+body.navbar-open .homepage-header-video-container {
+  top: 280px; /* Adjust this value based on your navbar height */
 }
 
 .index-page .homepage-header-video-container video {
@@ -83,11 +95,12 @@ body main {
 
 /* Header/Hero Content (text and buttons on top of video) */
 .index-page .homepage-header-content {
-  position: relative; /* For z-index stacking */
-  z-index: 10; /* Place content above the video */
-  color: white; /* Text color for header content */
-  text-align: center; /* Center-align header text */
-  padding: 10vh 5%; /* Vertical and horizontal padding for header content */
+  position: relative;
+  z-index: 10;
+  color: white;
+  text-align: center;
+  padding: 10vh 5%;
+  background-color: transparent;
 }
 
 .index-page .homepage-header-lead-text {
@@ -440,13 +453,32 @@ body main {
 
 @media (max-width: 992px) {
   .index-page .homepage-header-video-container {
-    display: none; /* Hide video on smaller screens */
+    height: 70vh; /* Adjusted height for smaller screens */
+  }
+  .index-page .homepage-header-video-container > video {
+    display: none; /* Hide the original video on smaller screens */
+  }
+  .index-page .homepage-header-video-container .small-screen-video {
+    display: block !important; /* Show the new video on smaller screens */
+    filter: brightness(0.8); /* Slightly reduce image brightness */
+    z-index: 0 !important;
+
+    width: auto !important;
+    height: auto !important;
+    position: relative !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(
+      -50%,
+      -50%
+    ) !important; /* Center the video within its container */
+    object-fit: scale-down !important; /* Ensure video maintains aspect ratio without zooming in */
   }
   .index-page .homepage-header-content {
-    color: black; /* Ensure text is readable */
-    background-color: white; /* Add a background color for contrast */
+    color: white; /* Ensure text is readable */
+    background-color: transparent; /* Add a background color for contrast */
     padding-top: 10vh; /* Adjust padding if needed */
-    padding-bottom: 1rem;
+    padding-bottom: 5rem;
   }
 }
 @media (max-width: 768px) {
@@ -957,7 +989,31 @@ body main {
 }
 
 [data-bs-theme="dark"] footer {
-  background-color: #1e1e1e !important; /* Darker footer */
+  background-color: #300630 !important; /* Dark background for footer */
+  color: #e0e0e0; /* Light text for footer */
+}
+
+[data-bs-theme="dark"] footer a {
+  color: #e0e0e0; /* Light text for footer links */
+}
+
+[data-bs-theme="dark"] footer a:hover {
+  color: #ffffff; /* Brighter text on hover */
+}
+
+[data-bs-theme="dark"] footer a img.mx-2 {
+  filter: brightness(1.5); /* Increase brightness for social icons */
+  background-color: transparent; /* Remove any background color */
+  border-radius: 50%; /* Optional: Add rounded corners */
+}
+[data-bs-theme="dark"] .modal-content {
+  background-color: #300630 !important; /* Dark background for modals */
+  color: #e0e0e0; /* Light text for modals */
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+  border-color: #444; /* Darker border for modal header/footer */
 }
 
 [data-bs-theme="dark"] .accordion-button {
@@ -968,16 +1024,6 @@ body main {
 [data-bs-theme="dark"] .accordion-body {
   background-color: #1e1e1e; /* Dark background for accordion body */
   color: #e0e0e0; /* Light text for accordion body */
-}
-
-[data-bs-theme="dark"] .modal-content {
-  background-color: #1e1e1e; /* Dark background for modals */
-  color: #e0e0e0; /* Light text for modals */
-}
-
-[data-bs-theme="dark"] .modal-header,
-[data-bs-theme="dark"] .modal-footer {
-  border-color: #444; /* Darker border for modal header/footer */
 }
 
 [data-bs-theme="dark"] .btn-light {
@@ -1026,19 +1072,6 @@ body main {
 
 [data-bs-theme="dark"] .video-responsive iframe {
   filter: brightness(0.8); /* Slightly reduce video brightness */
-}
-
-[data-bs-theme="dark"] .footer {
-  background-color: #1e1e1e; /* Dark background for footer */
-  color: #e0e0e0; /* Light text for footer */
-}
-
-[data-bs-theme="dark"] .footer a {
-  color: #e0e0e0; /* Light text for footer links */
-}
-
-[data-bs-theme="dark"] .footer a:hover {
-  color: #ffffff; /* Brighter text on hover */
 }
 
 [data-bs-theme="dark"] .display-1 {

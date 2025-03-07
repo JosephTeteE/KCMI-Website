@@ -312,3 +312,44 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+// ==========================================================================
+// Navbar Video Container Logic
+// ==========================================================================
+document.addEventListener("DOMContentLoaded", function () {
+  const navbarToggler = document.querySelector(".navbar-toggler");
+  const videoContainer = document.querySelector(
+    ".homepage-header-video-container"
+  );
+  const navbar = document.querySelector(".navbar-collapse");
+
+  if (navbarToggler && videoContainer) {
+    navbarToggler.addEventListener("click", function () {
+      videoContainer.classList.toggle("navbar-open");
+    });
+  }
+
+  function resetVideoContainer() {
+    if (window.innerWidth >= 992) {
+      videoContainer.classList.remove("navbar-open");
+      videoContainer.style.top = "0"; // Reset top position
+    }
+  }
+
+  window.addEventListener("resize", function () {
+    const navbar = document.querySelector(".navbar-collapse");
+    const videoContainer = document.querySelector(
+      ".homepage-header-video-container"
+    );
+
+    if (navbar && videoContainer && navbar.classList.contains("show")) {
+      const navbarHeight = navbar.offsetHeight;
+      videoContainer.style.top = `${navbarHeight}px`;
+    } else {
+      videoContainer.style.top = "0";
+    }
+  });
+
+  // Initial reset check
+  resetVideoContainer();
+});
