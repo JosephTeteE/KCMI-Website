@@ -871,3 +871,239 @@ body main {
   text-decoration: underline;
   cursor: pointer; /* Change cursor to pointer on hover */
 }
+
+/* Dark mode styles */
+/* -------------------------------------------------------------------------- */
+/* ## Dark Mode Styles (Using Bootstrap's data-bs-theme="dark")              */
+/* -------------------------------------------------------------------------- */
+
+[data-bs-theme="dark"] {
+  /* General dark mode styles */
+  background-color: #121212; /* Darker background for better contrast */
+  color: #e0e0e0; /* Light text for readability */
+}
+
+[data-bs-theme="dark"] body {
+  background-color: #121212; /* Ensure body has dark background */
+  color: #e0e0e0; /* Light text for body */
+}
+
+[data-bs-theme="dark"] .navbar {
+  background-color: #1e1e1e !important; /* Darker navbar */
+}
+
+[data-bs-theme="dark"] .navbar .nav-link {
+  color: #e0e0e0 !important; /* Light text for navbar links */
+}
+
+[data-bs-theme="dark"] .navbar .nav-link:hover {
+  color: #ffffff !important; /* Brighter text on hover */
+}
+
+[data-bs-theme="dark"] .homepage-header-content {
+  color: #e0e0e0; /* Light text for header content */
+  background-color: rgba(
+    36,
+    17,
+    17,
+    0.7
+  ); /* Darker overlay for better contrast */
+}
+
+[data-bs-theme="dark"] .homepage-campus-card {
+  background-color: #1e1e1e; /* Dark background for carousel cards */
+  border-color: #444; /* Darker border for cards */
+}
+
+[data-bs-theme="dark"] .homepage-campus-card h3,
+[data-bs-theme="dark"] .homepage-campus-card p {
+  color: #e0e0e0; /* Light text for card content */
+}
+
+[data-bs-theme="dark"] .homepage-campus-card img {
+  filter: brightness(0.8); /* Slightly reduce image brightness */
+}
+
+[data-bs-theme="dark"] .homepage-pastor-slideshow-section {
+  background-color: #1e1e1e; /* Dark background for slideshow section */
+}
+
+[data-bs-theme="dark"] .homepage-content-overlay {
+  background-color: rgba(0, 0, 0, 0.7); /* Darker overlay for better contrast */
+}
+
+[data-bs-theme="dark"] .homepage-giving-section {
+  background-color: #1e1e1e; /* Dark background for giving section */
+}
+
+[data-bs-theme="dark"] .homepage-giving-section::before {
+  opacity: 0.2; /* Adjust overlay opacity for dark mode */
+}
+
+[data-bs-theme="dark"] .homepage-prayer-request-section {
+  background-color: #1e1e1e; /* Dark background for prayer section */
+}
+
+[data-bs-theme="dark"] .homepage-prayer-request-section::before {
+  opacity: 0.2; /* Adjust overlay opacity for dark mode */
+}
+
+[data-bs-theme="dark"] .calendar-container iframe {
+  background-color: #1e1e1e; /* Dark background for calendar */
+}
+
+[data-bs-theme="dark"] .homepage-map-container iframe {
+  filter: brightness(0.8); /* Slightly reduce map brightness */
+}
+
+[data-bs-theme="dark"] footer {
+  background-color: #1e1e1e !important; /* Darker footer */
+}
+
+[data-bs-theme="dark"] .accordion-button {
+  background-color: #2c2c2c; /* Dark background for accordion buttons */
+  color: #e0e0e0; /* Light text for accordion buttons */
+}
+
+[data-bs-theme="dark"] .accordion-body {
+  background-color: #1e1e1e; /* Dark background for accordion body */
+  color: #e0e0e0; /* Light text for accordion body */
+}
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: #1e1e1e; /* Dark background for modals */
+  color: #e0e0e0; /* Light text for modals */
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+  border-color: #444; /* Darker border for modal header/footer */
+}
+
+[data-bs-theme="dark"] .btn-light {
+  background-color: #444; /* Darker background for light buttons */
+  color: #e0e0e0; /* Light text for light buttons */
+}
+
+[data-bs-theme="dark"] .btn-light:hover {
+  background-color: #555; /* Slightly lighter on hover */
+}
+
+[data-bs-theme="dark"] .btn-dark {
+  background-color: #e0e0e0; /* Light background for dark buttons */
+  color: #121212; /* Dark text for dark buttons */
+}
+
+[data-bs-theme="dark"] .btn-dark:hover {
+  background-color: #ffffff; /* Brighter on hover */
+}
+
+[data-bs-theme="dark"] .form-control {
+  background-color: #2c2c2c; /* Dark background for form inputs */
+  color: #e0e0e0; /* Light text for form inputs */
+  border-color: #444; /* Darker border for form inputs */
+}
+
+[data-bs-theme="dark"] .form-control:focus {
+  background-color: #2c2c2c; /* Dark background for focused form inputs */
+  color: #e0e0e0; /* Light text for focused form inputs */
+  border-color: #666; /* Lighter border for focused form inputs */
+}
+
+[data-bs-theme="dark"] .card {
+  background-color: #1e1e1e; /* Dark background for cards */
+  border-color: #444; /* Darker border for cards */
+}
+
+[data-bs-theme="dark"] .card-title,
+[data-bs-theme="dark"] .card-text {
+  color: #e0e0e0; /* Light text for card content */
+}
+
+[data-bs-theme="dark"] .card img {
+  filter: brightness(0.8); /* Slightly reduce image brightness */
+}
+
+[data-bs-theme="dark"] .video-responsive iframe {
+  filter: brightness(0.8); /* Slightly reduce video brightness */
+}
+
+[data-bs-theme="dark"] .footer {
+  background-color: #1e1e1e; /* Dark background for footer */
+  color: #e0e0e0; /* Light text for footer */
+}
+
+[data-bs-theme="dark"] .footer a {
+  color: #e0e0e0; /* Light text for footer links */
+}
+
+[data-bs-theme="dark"] .footer a:hover {
+  color: #ffffff; /* Brighter text on hover */
+}
+
+[data-bs-theme="dark"] .display-1 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .display-2 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .display-3 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .display-4 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .display-5 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .display-6 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] p {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] h1 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] h2 {
+  color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+  background-color: #121212 !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ## Dark Mode Toggle Button Styles                                         */
+/* -------------------------------------------------------------------------- */
+
+#darkModeToggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100000;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#darkModeToggle:hover {
+  background-color: #555; /* Slightly darker background on hover */
+  color: #fff; /* Lighter text on hover */
+}

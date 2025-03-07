@@ -270,3 +270,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   setInterval(checkLivestreamStatus, 30000); // Check every 30 seconds
 });
+
+// ==========================================================================
+// Dark Mode Toggle
+// ==========================================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  const darkIcon = document.getElementById("darkIcon");
+  const lightIcon = document.getElementById("lightIcon");
+  const prefersDarkMode = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches;
+
+  // Check local storage for dark mode preference, or system preference if none is set
+  if (
+    localStorage.getItem("darkMode") === "enabled" ||
+    (prefersDarkMode && localStorage.getItem("darkMode") !== "disabled")
+  ) {
+    document.documentElement.setAttribute("data-bs-theme", "dark");
+    darkIcon.style.display = "none";
+    lightIcon.style.display = "inline";
+  }
+
+  darkModeToggle.addEventListener("click", function () {
+    const isDarkMode =
+      document.documentElement.getAttribute("data-bs-theme") === "dark";
+    document.documentElement.setAttribute(
+      "data-bs-theme",
+      isDarkMode ? "light" : "dark"
+    );
+
+    if (isDarkMode) {
+      localStorage.setItem("darkMode", "disabled");
+      darkIcon.style.display = "inline";
+      lightIcon.style.display = "none";
+    } else {
+      localStorage.setItem("darkMode", "enabled");
+      darkIcon.style.display = "none";
+      lightIcon.style.display = "inline";
+    }
+  });
+});
