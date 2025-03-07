@@ -12,3 +12,7 @@
 node_modules
 server/certs/
 ca.txt
+
+.DS_Store
+public/**/.DS_Store
+server/**/.DS_Store

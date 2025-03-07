@@ -957,7 +957,31 @@ body main {
 }
 
 [data-bs-theme="dark"] footer {
-  background-color: #1e1e1e !important; /* Darker footer */
+  background-color: #300630 !important; /* Dark background for footer */
+  color: #e0e0e0; /* Light text for footer */
+}
+
+[data-bs-theme="dark"] footer a {
+  color: #e0e0e0; /* Light text for footer links */
+}
+
+[data-bs-theme="dark"] footer a:hover {
+  color: #ffffff; /* Brighter text on hover */
+}
+
+[data-bs-theme="dark"] footer a img.mx-2 {
+  filter: brightness(1.5); /* Increase brightness for social icons */
+  background-color: transparent; /* Remove any background color */
+  border-radius: 50%; /* Optional: Add rounded corners */
+}
+[data-bs-theme="dark"] .modal-content {
+  background-color: #300630 !important; /* Dark background for modals */
+  color: #e0e0e0; /* Light text for modals */
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+  border-color: #444; /* Darker border for modal header/footer */
 }
 
 [data-bs-theme="dark"] .accordion-button {
@@ -968,16 +992,6 @@ body main {
 [data-bs-theme="dark"] .accordion-body {
   background-color: #1e1e1e; /* Dark background for accordion body */
   color: #e0e0e0; /* Light text for accordion body */
-}
-
-[data-bs-theme="dark"] .modal-content {
-  background-color: #1e1e1e; /* Dark background for modals */
-  color: #e0e0e0; /* Light text for modals */
-}
-
-[data-bs-theme="dark"] .modal-header,
-[data-bs-theme="dark"] .modal-footer {
-  border-color: #444; /* Darker border for modal header/footer */
 }
 
 [data-bs-theme="dark"] .btn-light {
@@ -1026,19 +1040,6 @@ body main {
 
 [data-bs-theme="dark"] .video-responsive iframe {
   filter: brightness(0.8); /* Slightly reduce video brightness */
-}
-
-[data-bs-theme="dark"] .footer {
-  background-color: #1e1e1e; /* Dark background for footer */
-  color: #e0e0e0; /* Light text for footer */
-}
-
-[data-bs-theme="dark"] .footer a {
-  color: #e0e0e0; /* Light text for footer links */
-}
-
-[data-bs-theme="dark"] .footer a:hover {
-  color: #ffffff; /* Brighter text on hover */
 }
 
 [data-bs-theme="dark"] .display-1 {
