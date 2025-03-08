@@ -16,11 +16,9 @@ function onLoadRecaptcha() {
       console.log("reCAPTCHA API is ready.");
 
       // Contact Form reCAPTCHA (handled inline in contact-us.html)
-
       console.log("Contact form reCAPTCHA logic should be executed inline.");
 
       // WhatsApp Subscription Form reCAPTCHA
-
       const whatsappForm = document.getElementById("whatsappSubscriptionForm");
 
       if (whatsappForm) {
@@ -265,9 +263,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Call the function initially and then periodically
-
   checkLivestreamStatus();
-
   setInterval(checkLivestreamStatus, 30000); // Check every 30 seconds
 });
 

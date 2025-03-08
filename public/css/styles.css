@@ -25,7 +25,7 @@ html {
 }
 
 section {
-  padding: 4rem 0;
+  padding: 2rem 0; /* Reduced padding for sections */
   font-size: 1.75rem;
 }
 
@@ -69,11 +69,12 @@ body main {
   top: 0;
   left: 0;
   width: 100%;
-  height: 70vh;
+  height: 60vh; /* Reduced height to minimize spacing */
   overflow: hidden;
   z-index: -2;
-  padding-top: 20px;
+  padding-top: 10px; /* Reduced padding */
   transition: top 0.3s ease;
+  filter: brightness(0.7); /* Slightly reduce video brightness */
 }
 
 /* Adjust the top position when navbar is open */
@@ -81,6 +82,7 @@ body.navbar-open .homepage-header-video-container {
   top: 280px; /* Adjust this value based on your navbar height */
 }
 
+/* Video styles for larger screens */
 .index-page .homepage-header-video-container video {
   min-width: 100%;
   min-height: 100%;
@@ -99,13 +101,66 @@ body.navbar-open .homepage-header-video-container {
   z-index: 10;
   color: white;
   text-align: center;
-  padding: 10vh 5%;
+  padding: 5vh 5%;
   background-color: transparent;
 }
 
+#index-page-hero-content {
+  padding-top: 2rem;
+}
 .index-page .homepage-header-lead-text {
   font-size: clamp(1.6rem, 2.5vw, 2rem); /* Fluid font size for lead text */
   font-weight: 350; /* Lighter font weight for lead text */
+}
+
+/* -------------------------------------------------------------------------- */
+/* ## Responsive Media Queries for Header Section                            */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 992px) {
+  /* Hide the video on smaller screens */
+  .index-page .homepage-header-video-container > video {
+    display: none;
+  }
+
+  /* Use a static fallback image for smaller screens */
+  .index-page .homepage-header-video-container {
+    background-image: url("../assets/img/welcome-to-kcmi-fallback-image.png");
+    background-size: cover;
+    background-position: center;
+    height: 65vh; /* Reduced height */
+    width: 100vw;
+    filter: brightness(0.45); /* Slightly reduce image brightness */
+  }
+
+  /* Ensure text is readable on smaller screens */
+  .index-page .homepage-header-content {
+    color: white; /* Change text color for better contrast */
+    background-color: transparent; /* Remove background color */
+    padding-top: 10vh;
+    padding-bottom: 5rem;
+    margin-bottom: 0px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Hide the video on smaller screens */
+  .index-page .homepage-header-video-container > video {
+    display: none;
+  }
+
+  /* Use a static fallback image for smaller screens */
+  .index-page .homepage-header-video-container {
+    display: none; /* Hide the video container */
+  }
+
+  /* Ensure text is readable on smaller screens */
+  .index-page .homepage-header-content {
+    color: black; /* Change text color for better contrast */
+    background-color: transparent; /* Remove background color */
+    padding-top: 5vh; /* Reduced padding */
+    padding-bottom: 3rem; /* Reduced padding */
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -113,9 +168,8 @@ body.navbar-open .homepage-header-video-container {
 /* -------------------------------------------------------------------------- */
 
 .index-page .homepage-carousel-section {
-  margin-top: -40px;
-
-  padding: 4rem 0; /* Match section padding if needed */
+  margin-top: -20px; /* Reduced negative margin */
+  padding: 2rem 0; /* Reduced padding */
   margin-bottom: 0px !important;
   padding-bottom: 0px !important;
 }
@@ -124,28 +178,28 @@ body.navbar-open .homepage-header-video-container {
   overflow-x: auto; /* Enable horizontal scrolling for carousel */
   -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
   position: relative; /* For positioning carousel controls if needed */
-  padding-bottom: 20px; /* Space below carousel for scrollbar */
+  padding-bottom: 10px; /* Reduced space below carousel for scrollbar */
 }
 
 .index-page .homepage-carousel-container {
   display: flex; /* Use flexbox for horizontal layout of cards */
-  gap: 20px; /* Spacing between carousel cards */
-  padding: 20px 0; /* Vertical padding for carousel container */
+  gap: 10px; /* Reduced spacing between carousel cards */
+  padding: 10px 0; /* Reduced vertical padding for carousel container */
   overflow-x: scroll; /* Enable horizontal scroll if content overflows */
   scroll-snap-type: x mandatory; /* Enable scroll snapping for cards */
-  scroll-padding-inline: 20px; /* Padding at start and end of scroll area */
+  scroll-padding-inline: 10px; /* Reduced padding at start and end of scroll area */
 }
 
 .index-page .homepage-campus-card {
   flex: 0 0 auto; /* Do not grow, do not shrink, base width is automatic */
   width: calc(
-    33.333% - 20px * 2 / 3
+    33.333% - 10px * 2 / 3
   ); /* Target 3 cards in a row, adjust as needed */
-  min-width: 300px; /* Minimum width for each card */
+  min-width: 280px; /* Slightly reduced minimum width for each card */
   max-width: calc(
-    33.333% - 20px * 2 / 3
+    33.333% - 10px * 2 / 3
   ); /* Max width to maintain 3 cards layout */
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -162,25 +216,25 @@ body.navbar-open .homepage-header-video-container {
 .index-page .homepage-campus-card img {
   width: 100%;
   border-radius: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 10px; /* Reduced margin */
   aspect-ratio: 16 / 9; /* Maintain 16:9 aspect ratio for images */
   object-fit: cover; /* Ensure images cover the space without distortion */
 }
 
 .index-page .homepage-campus-card h3 {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem; /* Reduced margin */
   font-weight: bold;
   color: #333; /* Darker heading for better readability */
 }
 
 .index-page .homepage-campus-card p {
   color: #555; /* Slightly muted text for body */
-  font-size: 1.1rem; /* Slightly smaller font size for card text */
-  line-height: 1.5; /* Improve text readability */
+  font-size: 1rem; /* Slightly smaller font size for card text */
+  line-height: 1.4; /* Improved text readability */
 }
 
 .index-page .homepage-campus-card .btn-primary {
-  margin-top: 1rem;
+  margin-top: 0.5rem; /* Reduced margin */
 }
 
 /* -------------------------------------------------------------------------- */
@@ -189,9 +243,9 @@ body.navbar-open .homepage-header-video-container {
 .index-page .homepage-pastor-slideshow-section {
   position: relative;
   overflow: hidden;
-  min-height: 350px;
+  min-height: 300px; /* Reduced height */
   height: auto; /* Changed from fixed height to auto */
-  padding: 3rem 0; /* Changed from margin to padding for better containment */
+  padding: 2rem 0; /* Reduced padding */
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -236,7 +290,7 @@ body.navbar-open .homepage-header-video-container {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: clamp(1rem, 3vw, 2.5rem);
+  padding: clamp(1rem, 3vw, 2rem); /* Reduced padding */
   text-align: center;
   background-color: rgba(0, 0, 0, 0.6);
   width: 100%;
@@ -246,10 +300,10 @@ body.navbar-open .homepage-header-video-container {
 
 /* Circular pastor image - Responsive Sizing */
 .index-page .homepage-content-overlay .overlay-picture-apostle {
-  width: clamp(220px, 40vw, 300px);
+  width: clamp(200px, 40vw, 280px); /* Slightly reduced size */
   height: auto;
   border-radius: 50%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem; /* Reduced margin */
   border: 3px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   object-fit: cover;
@@ -258,14 +312,14 @@ body.navbar-open .homepage-header-video-container {
 /* Text Styling */
 .index-page .homepage-content-overlay h2 {
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem; /* Reduced margin */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  font-size: clamp(1.75rem, 3vw, 2.5rem); /* Fluid font size for headings */
+  font-size: clamp(1.5rem, 3vw, 2rem); /* Slightly reduced font size */
 }
 
 .index-page .homepage-content-overlay p {
-  font-size: clamp(1rem, 2vw, 1.25rem); /* Fluid font size for paragraphs */
-  line-height: 1.6;
+  font-size: clamp(0.9rem, 2vw, 1.1rem); /* Slightly reduced font size */
+  line-height: 1.5; /* Improved readability */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   width: 100%;
   max-width: 800px;
@@ -320,8 +374,8 @@ body.navbar-open .homepage-header-video-container {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 200px; /* Adjust size as needed */
-  height: 200px;
+  width: 150px; /* Reduced size */
+  height: 150px;
   background-image: url("../assets/img/cross-in-heart.png"); /* Corrected path */
   background-size: contain;
   background-repeat: no-repeat;
@@ -376,23 +430,23 @@ body.navbar-open .homepage-header-video-container {
 .calendar-container {
   margin: 1rem 0; /* Add spacing around the calendar */
   text-align: center; /* Center-align the heading */
-  margin-top: 2rem;
+  margin-top: 1rem; /* Reduced margin */
 }
 
 .calendar-container h2 {
   font-size: clamp(
-    2rem,
+    1.75rem,
     4vw,
-    2.5rem
-  ); /* Fluid font size for calendar heading */
+    2.25rem
+  ); /* Slightly reduced font size for calendar heading */
   font-weight: bold;
-  margin-bottom: 1.5rem; /* Spacing below heading */
+  margin-bottom: 1rem; /* Spacing below heading */
   color: #333; /* Dark text for better contrast */
 }
 
 .calendar-container iframe {
   width: 100%; /* Full width */
-  height: 500px; /* Fixed height for calendar */
+  height: 400px; /* Reduced height for calendar */
   border: none; /* Remove iframe border */
   border-radius: 10px; /* Rounded corners */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
@@ -415,8 +469,8 @@ body.navbar-open .homepage-header-video-container {
 
 .homepage-map-container {
   flex: 1; /* Allow map to grow and take available space */
-  min-width: 300px; /* Minimum width for map */
-  height: 400px; /* Fixed height for map */
+  min-width: 280px; /* Slightly reduced minimum width for map */
+  height: 350px; /* Reduced height for map */
   border-radius: 10px; /* Rounded corners */
   overflow: hidden; /* Clip iframe to rounded corners */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* More pronounced shadow */
@@ -430,76 +484,34 @@ body.navbar-open .homepage-header-video-container {
 
 .homepage-map-text {
   flex: 1; /* Allow text to grow and take available space */
-  min-width: 300px; /* Minimum width for text */
+  min-width: 280px; /* Slightly reduced minimum width for text */
   text-align: center; /* Center-align text */
 }
 
 .homepage-map-text h2 {
-  font-size: clamp(2rem, 4vw, 2.5rem); /* Fluid font size for map heading */
+  font-size: clamp(
+    1.75rem,
+    4vw,
+    2.25rem
+  ); /* Slightly reduced font size for map heading */
   font-weight: bold;
-  margin-bottom: 1rem; /* Spacing below heading */
+  margin-bottom: 0.5rem; /* Reduced spacing below heading */
   color: #333; /* Dark text for better contrast */
 }
 
 .homepage-map-text p {
-  font-size: 1.25rem; /* Slightly larger text */
+  font-size: 1.1rem; /* Slightly smaller text */
   color: #555; /* Slightly muted text for body */
-  line-height: 1.6; /* Improve readability */
+  line-height: 1.5; /* Improve readability */
 }
 
 /* -------------------------------------------------------------------------- */
 /* ## Responsive Media Queries                                               */
 /* -------------------------------------------------------------------------- */
 
-@media (max-width: 992px) {
-  .index-page .homepage-header-video-container {
-    height: 70vh; /* Adjusted height for smaller screens */
-  }
-  .index-page .homepage-header-video-container > video {
-    display: none; /* Hide the original video on smaller screens */
-  }
-  .index-page .homepage-header-video-container .small-screen-video {
-    display: block !important; /* Show the new video on smaller screens */
-    filter: brightness(0.8); /* Slightly reduce image brightness */
-    z-index: 0 !important;
-
-    width: auto !important;
-    height: auto !important;
-    position: relative !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(
-      -50%,
-      -50%
-    ) !important; /* Center the video within its container */
-    object-fit: scale-down !important; /* Ensure video maintains aspect ratio without zooming in */
-  }
-  .index-page .homepage-header-content {
-    color: white; /* Ensure text is readable */
-    background-color: transparent; /* Add a background color for contrast */
-    padding-top: 10vh; /* Adjust padding if needed */
-    padding-bottom: 5rem;
-  }
-}
-@media (max-width: 768px) {
-  .index-page .header-welcome-text {
-    font-size: 2.15rem;
-  }
-  .index-page .homepage-header-lead-text {
-    font-size: 1.5rem; /* Adjusted for smaller screens */
-  }
-  .index-page .homepage-campus-card p {
-    font-size: 1rem; /* Slightly smaller font size for card text on smaller screens */
-  }
-  .index-page .homepage-giving-section {
-    margin-top: -15px;
-  }
-}
-
-/* Responsive adjustments for Map and Calendar - NEW STYLES */
 @media (max-width: 768px) {
   .calendar-container iframe {
-    height: 400px; /* Reduce height on smaller screens - unchanged from your new styles */
+    height: 300px; /* Further reduced height on smaller screens */
   }
 
   .homepage-map-text-container {
@@ -521,7 +533,7 @@ body.navbar-open .homepage-header-video-container {
   .index-page .homepage-map-container {
     width: 80%; /* Make map wider on smaller screens */
     margin-right: 0; /* Remove right margin when stacked */
-    margin-bottom: 20px; /* Add bottom margin to separate map and text */
+    margin-bottom: 10px; /* Reduced bottom margin */
   }
   .index-page .homepage-map-text {
     width: 80%; /* Make text area wider on smaller screens */
@@ -540,7 +552,7 @@ body.navbar-open .homepage-header-video-container {
 /* Style for paragraphs on about-apostle-aikins.html */
 .about-apostle-page .brief-history-about {
   color: white; /* Text color from inline style */
-  font-size: clamp(1.7rem, 2.5vw, 2rem); /* Fluid font size for paragraphs */
+  font-size: clamp(1.5rem, 2.5vw, 1.8rem); /* Slightly reduced font size */
 }
 
 /* Slideshow container for about-apostle-aikins.html */
@@ -571,7 +583,7 @@ body.navbar-open .homepage-header-video-container {
 .about-apostle-page .content-overlay {
   position: relative; /* From inline style */
   z-index: 1; /* From inline style */
-  padding: 20px; /* From inline style */
+  padding: 15px; /* Reduced padding */
   color: white; /* From inline style */
   backdrop-filter: blur(1px); /* From inline style */
   background-color: hsla(0, 100%, 20%, 0.3);
@@ -581,39 +593,43 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for contact-us.html page                                      */
 /* -------------------------------------------------------------------------- */
 .contact-page main {
-  margin-top: -25px;
-  margin-bottom: -40px;
+  margin-top: -15px; /* Reduced negative margin */
+  margin-bottom: -20px; /* Reduced negative margin */
 }
 
 /* Contact Container */
 .contact-page .contact-container {
-  padding: 4rem 0; /* Add padding around the contact section */
+  padding: 2rem 0; /* Reduced padding */
 }
 
 /* Contact Heading */
 .contact-page h1 {
   font-size: clamp(
-    2rem,
+    1.75rem,
     4vw,
-    2.75rem
-  ); /* Fluid font size for contact heading */
+    2.25rem
+  ); /* Slightly reduced font size for contact heading */
   font-weight: bold;
-  margin-bottom: 1.5rem; /* Spacing below heading */
+  margin-bottom: 1rem; /* Reduced spacing below heading */
   color: #333; /* Dark text for better contrast */
 }
 
 /* Contact Lead Text */
 .contact-page .lead {
-  font-size: clamp(1.6rem, 2.5vw, 2rem); /* Fluid font size for lead text */
+  font-size: clamp(
+    1.4rem,
+    2.5vw,
+    1.6rem
+  ); /* Slightly reduced font size for lead text */
   color: #555; /* Slightly muted text for body */
-  line-height: 1.6; /* Improve readability */
+  line-height: 1.5; /* Improve readability */
 }
 
 /* Contact Icons and Links */
 .contact-page .contact-icon {
-  font-size: 2.25rem; /* Larger icons */
+  font-size: 2rem; /* Slightly reduced icon size */
   color: #007bff; /* Primary color for icons */
-  margin-bottom: 0.5rem; /* Spacing below icons */
+  margin-bottom: 0.5rem; /* Reduced spacing below icons */
 }
 
 .contact-page .contact-icon:hover {
@@ -624,26 +640,26 @@ body.navbar-open .homepage-header-video-container {
   text-decoration: none; /* Remove underline from links */
   color: inherit; /* Inherit text color */
   display: block; /* Ensure links take full width */
-  margin-bottom: 1.5rem; /* Spacing between contact items */
+  margin-bottom: 1rem; /* Reduced spacing between contact items */
 }
 
 .contact-page a span {
-  font-size: 1.5rem; /* Slightly larger text for contact details */
+  font-size: 1.25rem; /* Slightly reduced text size for contact details */
   color: #333; /* Dark text for better contrast */
 }
 
 /* Responsive Adjustments for Contact Details */
 @media (max-width: 768px) {
   .contact-page .contact-icon {
-    font-size: 2rem; /* Slightly smaller icons on smaller screens */
+    font-size: 1.75rem; /* Slightly smaller icons on smaller screens */
   }
 
   .contact-page a span {
-    font-size: 1.1rem; /* Smaller text for contact details on smaller screens */
+    font-size: 1rem; /* Smaller text for contact details on smaller screens */
   }
 
   .contact-page .col-md-6 {
-    margin-bottom: 1.5rem; /* Add spacing between contact items on smaller screens */
+    margin-bottom: 1rem; /* Reduced spacing between contact items on smaller screens */
   }
 }
 
@@ -652,8 +668,8 @@ body.navbar-open .homepage-header-video-container {
   position: relative;
   overflow: hidden;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
-  margin-top: 2rem;
+  padding-top: 50%; /* Slightly reduced aspect ratio */
+  margin-top: 1rem; /* Reduced margin */
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
@@ -670,16 +686,16 @@ body.navbar-open .homepage-header-video-container {
 
 /* Contact Form */
 .contact-page #contactForm {
-  margin-top: 2rem; /* Spacing above the form */
+  margin-top: 1rem; /* Reduced spacing above the form */
 }
 
 .contact-page #contactForm .form-control {
-  margin-bottom: 1rem; /* Spacing between form fields */
+  margin-bottom: 0.5rem; /* Reduced spacing between form fields */
 }
 
 .contact-page #contactForm .btn-primary {
   width: 100%; /* Full-width button on smaller screens */
-  margin-top: 1rem; /* Spacing above the button */
+  margin-top: 0.5rem; /* Reduced spacing above the button */
 }
 
 @media (min-width: 768px) {
@@ -690,8 +706,8 @@ body.navbar-open .homepage-header-video-container {
 
 @media (max-width: 992px) {
   .index-page .homepage-carousel-section .homepage-campus-card {
-    flex-basis: calc(50% - 20px); /* 2 cards per row */
-    max-width: calc(50% - 20px);
+    flex-basis: calc(50% - 10px); /* 2 cards per row */
+    max-width: calc(50% - 10px);
   }
 }
 
@@ -708,25 +724,33 @@ body.navbar-open .homepage-header-video-container {
 /* -------------------------------------------------------------------------- */
 
 .faqs-page main {
-  margin-top: 55px; /* Adjust for fixed navbar */
-  margin-bottom: 30px;
+  margin-top: 40px; /* Adjusted for the fixed navbar */
+  margin-bottom: 20px; /* Reduced margin */
 }
 
 .faqs-page h1 {
-  font-size: clamp(2rem, 4vw, 2.5rem); /* Fluid font size for FAQ heading */
+  font-size: clamp(
+    1.75rem,
+    4vw,
+    2rem
+  ); /* Slightly reduced font size for FAQ heading */
   font-weight: bold;
   color: #333; /* Dark text for better contrast */
-  margin-bottom: 2rem; /* Spacing below heading */
+  margin-bottom: 1rem; /* Reduced spacing below heading */
 }
 
 .faqs-page .accordion-button {
-  font-size: clamp(1.25rem, 2vw, 1.5rem); /* Fluid font size for questions */
+  font-size: clamp(
+    1.1rem,
+    2vw,
+    1.25rem
+  ); /* Slightly reduced font size for questions */
   font-weight: bold;
   color: #007bff; /* Primary color for questions */
   background-color: #f8f9fa; /* Light background for accordion headers */
   border: 1px solid #ddd; /* Add border for better separation */
   border-radius: 5px; /* Rounded corners */
-  margin-bottom: 0.5rem; /* Spacing between questions */
+  margin-bottom: 0.25rem; /* Reduced spacing between questions */
   transition: all 0.3s ease; /* Smooth transitions */
 }
 
@@ -741,10 +765,14 @@ body.navbar-open .homepage-header-video-container {
 }
 
 .faqs-page .accordion-body {
-  font-size: clamp(1rem, 1.5vw, 1.1rem); /* Fluid font size for answers */
+  font-size: clamp(
+    0.9rem,
+    1.5vw,
+    1rem
+  ); /* Slightly reduced font size for answers */
   color: #555; /* Slightly muted text for answers */
-  line-height: 1.6; /* Improve readability */
-  padding: 1.5rem; /* Add padding for better spacing */
+  line-height: 1.5; /* Improve readability */
+  padding: 1rem; /* Reduced padding */
   background-color: #fff; /* White background for answers */
   border: 1px solid #ddd; /* Add border for better separation */
   border-radius: 5px; /* Rounded corners */
@@ -752,11 +780,11 @@ body.navbar-open .homepage-header-video-container {
 
 .faqs-page .accordion-body ol,
 .faqs-page .accordion-body ul {
-  padding-left: 1.5rem; /* Indent lists */
+  padding-left: 1rem; /* Reduced indent for lists */
 }
 
 .faqs-page .accordion-body li {
-  margin-bottom: 0.75rem; /* Spacing between list items */
+  margin-bottom: 0.5rem; /* Reduced spacing between list items */
 }
 
 .faqs-page .accordion-body a {
@@ -773,15 +801,15 @@ body.navbar-open .homepage-header-video-container {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .faqs-page h1 {
-    font-size: 2rem; /* Smaller heading on smaller screens */
+    font-size: 1.75rem; /* Smaller heading on smaller screens */
   }
 
   .faqs-page .accordion-button {
-    font-size: 1.1rem; /* Smaller font for questions on smaller screens */
+    font-size: 1rem; /* Smaller font for questions on smaller screens */
   }
 
   .faqs-page .accordion-body {
-    font-size: 1rem; /* Smaller font for answers on smaller screens */
+    font-size: 0.9rem; /* Smaller font for answers on smaller screens */
   }
 }
 
@@ -789,21 +817,21 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for Livestream Page  */
 /* -------------------------------------------------------------------------- */
 .livestream-page main {
-  margin-top: 1em;
+  margin-top: 0.5em; /* Reduced margin */
 }
 
 .livestream-page main h2 {
-  font-size: clamp(1.75rem, 3vw, 2rem);
-  margin-bottom: 1rem; /* Adjusted margin for better spacing */
+  font-size: clamp(1.5rem, 3vw, 1.75rem); /* Slightly reduced font size */
+  margin-bottom: 0.5rem; /* Reduced margin */
 }
 
 /* Responsive Video Container */
 .livestream-page .video-responsive {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  padding-bottom: 50%; /* Slightly reduced aspect ratio */
   height: 0;
   overflow: hidden;
-  max-width: 960px; /* Optional: Limit maximum width */
+  max-width: 800px; /* Optional: Limit maximum width */
   margin: 0 auto; /* Center the video container */
 }
 
@@ -819,16 +847,17 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for giving-kcmi Page  */
 /* -------------------------------------------------------------------------- */
 .giving-page main {
-  margin-top: 35px; /* Adjusted for the fixed navbar */
-  font-size: 1.6rem; /* Base font size */
+  margin-top: 20px; /* Adjusted for the fixed navbar */
+  font-size: 1.4rem; /* Slightly reduced base font size */
 }
 
 /* -------------------------------------------------------------------------- */
 /* ## Styles for location.html page                                        */
 /* -------------------------------------------------------------------------- */
 .page-location main {
-  margin-top: 55px;
+  margin-top: 40px; /* Adjusted for the fixed navbar */
 }
+
 .page-location .col {
   /* Target the column to ensure full height within row */
   display: flex;
@@ -843,7 +872,7 @@ body.navbar-open .homepage-header-video-container {
 
 .page-location .card img {
   object-fit: cover; /* Cover card image area, cropping if needed */
-  height: 250px; /* Fixed height for card images (adjust as needed) */
+  height: 200px; /* Reduced height for card images */
 }
 
 .page-location .card-body {
@@ -854,8 +883,8 @@ body.navbar-open .homepage-header-video-container {
 
 .page-location .card-text {
   overflow: hidden; /* Initially hide overflow content */
-  height: 7.4em; /* Fixed height for collapsed text (adjust as needed) */
-  line-height: 1.45em; /* Line height for text readability */
+  height: 6em; /* Reduced height for collapsed text */
+  line-height: 1.4em; /* Slightly reduced line height */
   transition: height 0.3s ease-out; /* Smooth transition for height */
 }
 
@@ -879,25 +908,25 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for mission-kcmi.html page                                       */
 /* -------------------------------------------------------------------------- */
 .kcmi-mission-page main {
-  margin-top: 40px;
+  margin-top: 20px; /* Adjusted for the fixed navbar */
 }
 
 /* -------------------------------------------------------------------------- */
 /* ## Styles for sermons.html page                                            */
 /* -------------------------------------------------------------------------- */
 .page-sermons main {
-  margin-top: 10px;
+  margin-top: 5px; /* Adjusted for the fixed navbar */
 }
 
 /* -------------------------------------------------------------------------- */
 /* ## Styles for services.html page                                           */
 /* -------------------------------------------------------------------------- */
 .page-services main {
-  margin-top: 5rem;
+  margin-top: 3rem; /* Adjusted for the fixed navbar */
 }
 
 /* -------------------------------------------------------------------------- */
-/* ## Footer Daily Faith Recharge Modal style                                 */
+/* Footer Daily Faith Recharge Modal style                                 */
 /* -------------------------------------------------------------------------- */
 #DFRwhatsappNumber {
   text-decoration: underline;
