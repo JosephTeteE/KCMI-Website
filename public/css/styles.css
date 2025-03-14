@@ -50,7 +50,7 @@ body main {
   top: 0;
   width: 100%;
   z-index: 1000; /* Ensure navbar stays on top */
-  background-color: #eeabeddb; /* Solid white background for navbar for better contrast */
+  background-color: #eeabeddb; /* Light purple background */
 }
 
 /* -------------------------------------------------------------------------- */
@@ -101,7 +101,7 @@ body.navbar-open .homepage-header-video-container {
   z-index: 10;
   color: white;
   text-align: center;
-  padding: 5vh 5%;
+  padding: 5.5vh 5%;
   background-color: transparent;
 }
 
@@ -114,52 +114,128 @@ body.navbar-open .homepage-header-video-container {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ## Responsive Media Queries for Header Section                            */
+/* ## Responsive Media Queries for Header Section Mobile Screens (≤768px)     */
 /* -------------------------------------------------------------------------- */
 
-@media (max-width: 992px) {
-  /* Hide the video on smaller screens */
+@media (max-width: 768px) {
+  /* Hide video */
   .index-page .homepage-header-video-container > video {
     display: none;
   }
 
-  /* Use a static fallback image for smaller screens */
-  .index-page .homepage-header-video-container {
-    background-image: url("../assets/img/welcome-to-kcmi-fallback-image.png");
-    background-size: cover;
-    background-position: center;
-    height: 65vh; /* Reduced height */
-    width: 100vw;
-    filter: brightness(0.45); /* Slightly reduce image brightness */
+  /* Gradient background instead of video */
+  .homepage-header-video-container {
+    background: linear-gradient(
+      135deg,
+      #108c1d,
+      #108c1d,
+      #b60b13,
+      #7c1963,
+      #c298b7
+    ); /* Church's colors */
+    background-size: 200% 200%;
+    animation: gradientWave 10s ease-in-out infinite;
+    height: 65vh;
+  }
+
+  .homepage-header-video-container::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle at 20% 80%,
+        rgba(16, 140, 29, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        rgba(182, 11, 19, 0.05) 0%,
+        transparent 60%
+      ),
+      linear-gradient(to bottom, transparent 60%, rgba(124, 25, 99, 0.03) 100%);
+    opacity: 0.8;
+  }
+
+  /* Header Text Adjustments */
+  .index-page .homepage-header-content {
+    color: white;
+    background-color: transparent;
+    padding-top: 10vh;
+    padding-bottom: 5rem;
+    margin-bottom: 0 !important;
+  }
+
+  /* Apply glow like this (optional): */
+  .header-welcome-text {
+    animation: textGlow 5s ease-in-out infinite;
   }
 
   /* Ensure text is readable on smaller screens */
   .index-page .homepage-header-content {
     color: white; /* Change text color for better contrast */
     background-color: transparent; /* Remove background color */
-    padding-top: 10vh;
-    padding-bottom: 5rem;
-    margin-bottom: 0px !important;
+    padding-top: 5vh; /* Reduced padding */
+    padding-bottom: 3rem; /* Reduced padding */
   }
 }
 
-@media (max-width: 768px) {
-  /* Hide the video on smaller screens */
-  .index-page .homepage-header-video-container > video {
-    display: none;
-  }
+/* -------------------------------------------------------------------------- */
+/* ## Keyframe Animations                                                    */
+/* -------------------------------------------------------------------------- */
 
-  /* Use a static fallback image for smaller screens */
-  .index-page .homepage-header-video-container {
-    display: none; /* Hide the video container */
+/* Gradient Animation */
+@keyframes gradientWave {
+  0% {
+    background-position: 0% 50%;
   }
+  25% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
 
-  /* Ensure text is readable on smaller screens */
-  .index-page .homepage-header-content {
-    color: black; /* Change text color for better contrast */
-    background-color: transparent; /* Remove background color */
-    padding-top: 5vh; /* Reduced padding */
-    padding-bottom: 3rem; /* Reduced padding */
+/* Optional Text Glow Animation (use on h1 or p if desired) */
+@keyframes textGlow {
+  0% {
+    text-shadow: 0 0 10px #fff;
+  }
+  50% {
+    text-shadow: 0 0 20px #c298b7, 0 0 30px #7c1963;
+  }
+  100% {
+    text-shadow: 0 0 10px #fff;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsive Height Queries for Header Section Mobile Screens (≤768px)      */
+/* -------------------------------------------------------------------------- */
+@media (max-height: 800px) {
+  .homepage-header-video-container {
+    height: 80vh;
+  }
+}
+
+@media (max-height: 600px) {
+  .homepage-header-video-container {
+    height: 180%;
+  }
+}
+
+@media (max-width: 768px), (max-height: 700px) {
+  .homepage-header-video-container {
+    height: 180%;
   }
 }
 
@@ -593,7 +669,7 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for contact-us.html page                                      */
 /* -------------------------------------------------------------------------- */
 .contact-page main {
-  margin-top: -15px; /* Reduced negative margin */
+  margin-top: 5px;
   margin-bottom: -20px; /* Reduced negative margin */
 }
 
@@ -855,7 +931,7 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for location.html page                                        */
 /* -------------------------------------------------------------------------- */
 .page-location main {
-  margin-top: 40px; /* Adjusted for the fixed navbar */
+  margin-top: 45px; /* Adjusted for the fixed navbar */
 }
 
 .page-location .col {
@@ -908,7 +984,7 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for mission-kcmi.html page                                       */
 /* -------------------------------------------------------------------------- */
 .kcmi-mission-page main {
-  margin-top: 20px; /* Adjusted for the fixed navbar */
+  margin-top: 35px; /* Adjusted for the fixed navbar */
 }
 
 /* -------------------------------------------------------------------------- */
@@ -969,6 +1045,10 @@ body.navbar-open .homepage-header-video-container {
     17,
     0.7
   ); /* Darker overlay for better contrast */
+}
+
+[data-bs-theme="dark"] .header-welcome-text {
+  animation: textGlow none; /* Disable text glow in dark mode */
 }
 
 [data-bs-theme="dark"] .homepage-campus-card {

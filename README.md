@@ -2,6 +2,8 @@
 
 This project is the official website for **Kingdom Covenant Ministries International (KCMI)**. It provides information about the church, its mission, leadership, sermons, services, locations, and giving. The website also features a **dynamic livestream page** and an **admin panel** for updating the livestream embed code.
 
+**Live Site:** [https://kcmi-website.vercel.app/](https://kcmi-website.vercel.app/)
+
 ## 🌟 Features
 
 - Homepage with video background and upcoming events.
@@ -87,7 +89,7 @@ This project is the official website for **Kingdom Covenant Ministries Internati
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/kcmi-website.git
+   git clone https://github.com/JosephTeteE/KCMI-Website.git
    ```
 
 2. **Install dependencies:**
@@ -102,6 +104,7 @@ This project is the official website for **Kingdom Covenant Ministries Internati
    - Add your database credentials, JWT secret, and email config.
 
 4. **Start the backend server:**
+
    ```bash
    node server/server.js
    ```
