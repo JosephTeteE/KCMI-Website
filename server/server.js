@@ -17,7 +17,7 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 
 // CORS Configuration
 const corsOptions = {
-  origin: "https://www.kcmi-rcc.org/", // Allow requests from this origin
+  origin: "https://www.kcmi-rcc.org", // Allow requests from this origin
   methods: ["GET", "POST"], // Allow these HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
 };
