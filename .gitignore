@@ -16,3 +16,7 @@ ca.txt
 .DS_Store
 public/**/.DS_Store
 server/**/.DS_Store
+
+kcmi-rcc-worker/node_modules/
+kcmi-rcc-worker/package-lock.json
+kcmi-rcc-worker/.wrangler/

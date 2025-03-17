@@ -923,7 +923,7 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for giving-kcmi Page  */
 /* -------------------------------------------------------------------------- */
 .giving-page main {
-  margin-top: 20px; /* Adjusted for the fixed navbar */
+  margin-top: 30px; /* Adjusted for the fixed navbar */
   font-size: 1.4rem; /* Slightly reduced base font size */
 }
 
@@ -931,7 +931,7 @@ body.navbar-open .homepage-header-video-container {
 /* ## Styles for location.html page                                        */
 /* -------------------------------------------------------------------------- */
 .page-location main {
-  margin-top: 45px; /* Adjusted for the fixed navbar */
+  margin-top: 55px; /* Adjusted for the fixed navbar */
 }
 
 .page-location .col {

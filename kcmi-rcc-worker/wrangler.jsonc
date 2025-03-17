@@ -1,0 +1,8 @@
+{
+	"name": "kcmi-rcc-worker",
+	"main": "src/index.js",
+	"compatibility_date": "2025-03-17",
+	"observability": {
+		"enabled": true
+	}
+}
