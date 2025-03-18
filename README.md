@@ -1,19 +1,25 @@
-# Kingdom Covenant Ministries International (KCMI) Website
+"# Kingdom Covenant Ministries International (KCMI) Website
 
-This project is the official website for **Kingdom Covenant Ministries International (KCMI)**. It provides information about the church, its mission, leadership, sermons, services, locations, and giving. The website also features a **dynamic livestream page** and an **admin panel** for updating the livestream embed code.
+Welcome to the official website project for **Kingdom Covenant Ministries International (KCMI) AKA Rehoboth Crhistian Center** — a dynamic, responsive web platform showcasing the church’s mission, leadership, sermons, events, and livestream content.
 
-**Live Site:** [https://kcmi-website.vercel.app/](https://kcmi-website.vercel.app/)
+**Live Sites:**
+
+- **Development/Staging:** [https://kcmiwebsite-vercel.app/](https://kcmiwebsite-vercel.app/)
+- **Production:** [https://www.kcmi-rcc.org/](https://www.kcmi-rcc.org/)
 
 ## 🌟 Features
 
 - Homepage with video background and upcoming events.
 - Pages for Apostle Aikins, services, sermons, giving, FAQs, and church locations.
 - Contact form with **Google reCAPTCHA v3** integration for spam prevention.
+- **WhatsApp subscription form** integrated with **Google reCAPTCHA v3**.
 - **Livestream page** that dynamically embeds **Facebook Live** videos.
 - **Admin panel** (protected with **JWT authentication**) to update the livestream embed code and its visibility status.
 - **Dark mode toggle** for user preference.
 - Fully **responsive design** for mobile, tablet, and desktop views.
 - Embedded **Google Maps** and **Google Calendar** for convenience.
+- **Contact form submissions sent via Zoho SMTP.**
+- **WhatsApp subscription link sent via Zoho SMTP.**
 
 ## 🔧 Technology Stack
 
@@ -30,7 +36,9 @@ This project is the official website for **Kingdom Covenant Ministries Internati
 - Express.js
 - MySQL (via `mysql2`)
 - dotenv (for environment variable management)
-- Nodemailer (for sending emails)
+- **Nodemailer (for sending emails via Zoho SMTP)**
+- axios (for making HTTP requests, including reCAPTCHA verification)
+- jwt (for JSON Web Token authentication)
 
 ### External Services
 
@@ -39,6 +47,7 @@ This project is the official website for **Kingdom Covenant Ministries Internati
 - Google Calendar (embedded)
 - Google Maps (embedded)
 - Facebook Live Embed
+- **Zoho SMTP (for email sending)**
 - CDNs: Bootstrap, FontAwesome, AOS
 
 ### Hosting & Deployment
@@ -56,32 +65,39 @@ This project is the official website for **Kingdom Covenant Ministries Internati
 
 ```
 ├── api/
-│   └── livestream.js # Backend API route for livestream
+│   └── livestream.js          # Backend API route for livestream
+├── kcmi-rcc-worker/
+│   ├── src/                   # Source code for the Cloudflare Worker
+│   ├── test/                  # Tests for the Cloudflare Worker
+│   └── ...                    # Other worker-related files (package.json, etc.)
+├── node_modules/              # Node.js dependencies
 ├── public/
 │   ├── admin/
-│   │   ├── index.html # Admin dashboard UI
+│   │   ├── index.html         # Admin dashboard UI
 │   │   └── js/
-│   │       └── admin.js # Admin panel logic
+│   │       └── admin.js       # Admin panel logic
 │   ├── assets/
-│   │   └── img/ # Images and videos
+│   │   └── img/               # Images and videos
 │   ├── css/
-│   │   └── styles.css # Main stylesheet
+│   │   └── styles.css         # Main stylesheet
 │   ├── js/
-│   │   └── scripts.js # Main frontend JavaScript
+│   │   └── scripts.js         # Main frontend JavaScript
 │   ├── about-apostle-aikins.html
 │   ├── contact-us.html
 │   ├── faqs.html
 │   ├── giving-kcmi.html
-│   ├── index.html # Homepage
+│   ├── index.html             # Homepage
 │   ├── livestream.html
 │   ├── location.html
 │   ├── mission-kcmi.html
 │   ├── sermons.html
 │   └── services.html
 ├── server/
-│   ├── db.js # MySQL database connection
-│   └── server.js # Main Node.js backend server
-└── .env.example # Sample env file (no secrets)
+│   ├── db.js                  # MySQL database connection
+│   ├── server.js              # Main Node.js backend server
+│   └── certs/                 # Directory for SSL certificates
+└── .env.example               # Sample env file (no secrets)
+└── README.md                  # Project documentation
 ```
 
 ## ⚙️ Installation and Setup
@@ -102,6 +118,7 @@ This project is the official website for **Kingdom Covenant Ministries Internati
 
    - Create a `.env` file in the root directory using the `.env.example` template.
    - Add your database credentials, JWT secret, and email config.
+   - Add your Google reCAPTCHA v3 site and secret keys.
 
 4. **Start the backend server:**
 

@@ -29,25 +29,19 @@ app.use(express.static(path.join(__dirname, "../public"))); // Serve static file
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // SMTP server host
-  port: Number(process.env.SMTP_PORT) || 465, // SMTP server port
-  secure: process.env.SMTP_PORT == 465, // Use SSL if port is 465
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: process.env.SMTP_ENCRYPTION === "tls",
   auth: {
-    user: process.env.SMTP_USER, // SMTP username
-    pass: process.env.SMTP_PASS, // SMTP password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 
 // reCAPTCHA Verification
-async function verifyRecaptcha(token, formType) {
+async function verifyRecaptcha(token) {
   try {
-    // Determine the correct reCAPTCHA secret key based on form type
-    const secretKey =
-      formType === "contact"
-        ? process.env.RECAPTCHA_SECRET_KEY_CONTACT
-        : process.env.RECAPTCHA_SECRET_KEY_SUBSCRIPTION;
-
-    // Make a POST request to Google's reCAPTCHA API to verify the token
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY_CONTACT;
     const response = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify`,
       null,
@@ -55,19 +49,19 @@ async function verifyRecaptcha(token, formType) {
         params: { secret: secretKey, response: token },
       }
     );
-    return response.data.success; // Return the success status from the API response
+    return response.data.success;
   } catch (error) {
     console.error("reCAPTCHA verification failed:", error);
-    return false; // Return false if verification fails
+    return false;
   }
 }
 
 // Handle Contact Form Submission
 app.post("/submit-contact", async (req, res) => {
-  const { email, phone, message, recaptchaToken } = req.body; // Extract data from request body
+  const { email, phone, message, recaptchaToken } = req.body;
 
   // Verify reCAPTCHA token
-  if (!(await verifyRecaptcha(recaptchaToken, "contact"))) {
+  if (!(await verifyRecaptcha(recaptchaToken))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
@@ -79,8 +73,9 @@ app.post("/submit-contact", async (req, res) => {
       .status(400)
       .json({ success: false, message: "Valid email required" });
   }
-  // Validate phone format (if provided)
-  if (phone && !/^\+?[0-9\s-]+$/.test(phone)) {
+
+  // Validate phone number format
+  if (phone && !/^\+?[0-9\s-]{7,15}$/.test(phone)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid phone format" });
@@ -116,10 +111,10 @@ app.post("/submit-contact", async (req, res) => {
 
 // Handle Subscription Form Submission
 app.post("/subscribe", async (req, res) => {
-  const { email, subscriptionType, recaptchaToken } = req.body; // Extract data from request body
+  const { email, subscriptionType, recaptchaToken } = req.body;
 
   // Verify reCAPTCHA token
-  if (!(await verifyRecaptcha(recaptchaToken, "subscription"))) {
+  if (!(await verifyRecaptcha(recaptchaToken))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
