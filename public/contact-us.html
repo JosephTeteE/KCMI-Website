@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="./css/styles.css" />
 
     <script
-      src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onLoadRecaptcha"
+      src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac&onload=onLoadRecaptcha"
       async
       defer
     ></script>
@@ -506,81 +506,6 @@
       <span id="lightIcon" style="display: none">☀️</span>
     </button>
 
-    <script>
-      console.log("Initializing reCAPTCHA for contact form...");
-
-      grecaptcha.ready(() => {
-        console.log("reCAPTCHA API is ready for contact form.");
-
-        grecaptcha
-          .execute("6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac", {
-            action: "contact",
-          })
-          .then((token) => {
-            console.log("Contact form reCAPTCHA token generated:", token);
-            document.getElementById("recaptchaToken").value = token;
-          })
-          .catch((error) => {
-            console.error(
-              "Error generating contact form reCAPTCHA token:",
-              error
-            );
-          });
-      });
-
-      document
-        .getElementById("contactForm")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          console.log("Contact form submission initiated.");
-
-          const submitBtn = document.getElementById("submitBtn");
-          submitBtn.disabled = true;
-          submitBtn.textContent = "Sending...";
-
-          const email = document.getElementById("email").value;
-          const phone = document.getElementById("phone").value;
-          const message = document.getElementById("message").value;
-          const recaptchaToken =
-            document.getElementById("recaptchaToken").value;
-          const statusElement = document.getElementById("formStatus");
-
-          statusElement.textContent = "Sending message...";
-          statusElement.style.color = "blue";
-
-          try {
-            console.log("Sending contact form data to server...");
-
-            const response = await fetch("/submit-contact", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, phone, message, recaptchaToken }),
-            });
-
-            console.log("Contact form response status:", response.status);
-
-            const data = await response.json();
-            console.log("Contact form response data:", data);
-
-            if (data.success) {
-              statusElement.textContent = "Message sent successfully!";
-              statusElement.style.color = "green";
-              document.getElementById("contactForm").reset();
-            } else {
-              statusElement.textContent = "Error: " + data.message;
-              statusElement.style.color = "red";
-            }
-          } catch (error) {
-            console.error("Contact form submission error:", error);
-            statusElement.textContent = "Failed to send message.";
-            statusElement.style.color = "red";
-          } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Submit";
-          }
-        });
-    </script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

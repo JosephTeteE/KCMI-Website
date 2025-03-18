@@ -15,32 +15,89 @@ function onLoadRecaptcha() {
     grecaptcha.ready(function () {
       console.log("reCAPTCHA API is ready.");
 
-      // Contact Form reCAPTCHA (handled inline in contact-us.html)
-      console.log("Contact form reCAPTCHA logic should be executed inline.");
-
-      // WhatsApp Subscription Form reCAPTCHA
-      const whatsappForm = document.getElementById("whatsappSubscriptionForm");
-
-      if (whatsappForm) {
-        console.log("Found WhatsApp subscription form. Adding event listener.");
-
-        whatsappForm.addEventListener("submit", async (event) => {
+      // --- Contact Form reCAPTCHA ---
+      const contactForm = document.getElementById("contactForm");
+      if (contactForm) {
+        console.log(
+          "Found contact form. Adding reCAPTCHA execution on submit."
+        );
+        contactForm.addEventListener("submit", async function (event) {
           event.preventDefault();
 
-          const email = document.getElementById("whatsappEmail").value;
+          console.log("Contact form submission initiated.");
+
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sending...";
+
+          const email = document.getElementById("email").value;
+          const phone = document.getElementById("phone").value;
+          const message = document.getElementById("message").value;
+          const statusElement = document.getElementById("formStatus");
+
+          statusElement.textContent = "Sending message...";
+          statusElement.style.color = "blue";
 
           try {
-            console.log("Generating reCAPTCHA token for subscription form...");
-
+            console.log("Generating reCAPTCHA token for contact form...");
             const recaptchaToken = await grecaptcha.execute(
-              "6LfJPuoqAAAAAM7yyCUHkv03T0bp8ZLguODiENFs",
+              "6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac",
+              { action: "contact" }
+            );
+            console.log(
+              "Contact form reCAPTCHA token generated:",
+              recaptchaToken
+            );
+            document.getElementById("recaptchaToken").value = recaptchaToken;
+
+            console.log("Sending contact form data to server...");
+            const response = await fetch("/submit-contact", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, phone, message, recaptchaToken }),
+            });
+            console.log("Contact form response status:", response.status);
+            const data = await response.json();
+            console.log("Contact form response data:", data);
+
+            if (data.success) {
+              statusElement.textContent = "Message sent successfully!";
+              statusElement.style.color = "green";
+              contactForm.reset();
+            } else {
+              statusElement.textContent = "Error: " + data.message;
+              statusElement.style.color = "red";
+            }
+          } catch (error) {
+            console.error("Contact form submission error:", error);
+            statusElement.textContent = "Failed to send message.";
+            statusElement.style.color = "red";
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit";
+          }
+        });
+      } else {
+        console.warn("Contact form not found.");
+      }
+
+      // --- WhatsApp Subscription Form reCAPTCHA ---
+      const whatsappForm = document.getElementById("whatsappSubscriptionForm");
+      if (whatsappForm) {
+        console.log(
+          "Found WhatsApp subscription form. Adding event listener for reCAPTCHA on submit."
+        );
+        whatsappForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const email = document.getElementById("whatsappEmail").value;
+          try {
+            console.log("Generating reCAPTCHA token for subscription form...");
+            const recaptchaToken = await grecaptcha.execute(
+              "YOUR_RECAPTCHA_SITE_KEY", // Use your consolidated site key
               { action: "submit_subscription" }
             );
-
             console.log("reCAPTCHA token generated:", recaptchaToken);
-
             console.log("Submitting subscription form data...");
-
             const response = await fetch("/subscribe", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -50,20 +107,14 @@ function onLoadRecaptcha() {
                 recaptchaToken: recaptchaToken,
               }),
             });
-
             console.log("Subscription form response status:", response.status);
-
             const data = await response.json();
-
             console.log("Subscription form response data:", data);
-
             alert(data.message);
-
             if (data.success) {
               const modal = bootstrap.Modal.getInstance(
                 document.getElementById("whatsappModal")
               );
-
               if (modal) {
                 modal.hide();
                 whatsappForm.reset();
