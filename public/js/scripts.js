@@ -51,11 +51,14 @@ function onLoadRecaptcha() {
             document.getElementById("recaptchaToken").value = recaptchaToken;
 
             console.log("Sending contact form data to server...");
-            const response = await fetch("/submit-contact", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, phone, message, recaptchaToken }),
-            });
+            const response = await fetch(
+              "https://kcmi-backend.onrender.com/submit-contact",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, phone, message, recaptchaToken }),
+              }
+            );
             console.log("Contact form response status:", response.status);
             const data = await response.json();
             console.log("Contact form response data:", data);
@@ -93,20 +96,23 @@ function onLoadRecaptcha() {
           try {
             console.log("Generating reCAPTCHA token for subscription form...");
             const recaptchaToken = await grecaptcha.execute(
-              "YOUR_RECAPTCHA_SITE_KEY", // Use your consolidated site key
+              "6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac",
               { action: "submit_subscription" }
             );
             console.log("reCAPTCHA token generated:", recaptchaToken);
             console.log("Submitting subscription form data...");
-            const response = await fetch("/subscribe", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email: email,
-                subscriptionType: "whatsapp",
-                recaptchaToken: recaptchaToken,
-              }),
-            });
+            const response = await fetch(
+              "https://kcmi-backend.onrender.com/subscribe",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: email,
+                  subscriptionType: "whatsapp",
+                  recaptchaToken: recaptchaToken,
+                }),
+              }
+            );
             console.log("Subscription form response status:", response.status);
             const data = await response.json();
             console.log("Subscription form response data:", data);
