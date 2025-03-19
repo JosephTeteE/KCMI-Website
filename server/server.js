@@ -29,12 +29,13 @@ app.use(express.static(path.join(__dirname, "../public"))); // Serve static file
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: process.env.SMTP_ENCRYPTION === "tls",
+  host: process.env.SMTP_HOST, // smtp.zoho.com
+  port: Number(process.env.SMTP_PORT), // 587
+  secure: false, // false for port 587
+  requireTLS: true, // Enforce TLS
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.SMTP_USER, // admin@kcmi-rcc.org
+    pass: process.env.SMTP_PASS, // Zoho app password
   },
 });
 
