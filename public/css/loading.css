@@ -1,4 +1,4 @@
-/* Loading Screen */
+/* Loading Animation */
 #loading-overlay {
   position: fixed;
   top: 0;
@@ -12,11 +12,39 @@
   align-items: center;
   z-index: 9999;
   font-family: "Playfair Display", serif;
+  text-align: center;
+}
+
+.crown-bg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  max-width: 700px;
+  height: 80vw;
+  max-height: 700px;
+  background: url("../assets/img/crown.png") no-repeat center;
+  background-size: contain;
+  opacity: 0.09;
+  z-index: 0;
 }
 
 .loading-content {
-  text-align: center;
-  max-width: 90%;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 90vw;
+  padding: 0 20px;
+}
+
+.name-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .loading-logo {
@@ -24,40 +52,61 @@
   height: 100px;
   border-radius: 50%;
   margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in forwards;
 }
 
-.loading-text {
-  font-size: 1.8rem;
+.typing-text {
+  font-size: clamp(1.5rem, 5vw, 1.8rem); /* Responsive font size */
   color: #108c1d;
-  margin-bottom: 10px;
+  margin: 0;
+  position: relative;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.typing-text::after {
+  content: "|";
+  position: absolute;
+  right: -8px;
+  animation: blink 1s step-end infinite;
 }
 
 .aka-text {
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 4vw, 1.3rem); /* Responsive font size */
   color: #7c1963;
   font-style: italic;
-  margin-bottom: 20px;
+  margin: 5px 0 20px;
+  text-align: center;
 }
 
-.vision-text {
-  font-size: 1.5rem;
-  color: #108c1d;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .loading-text {
-    font-size: 1.5rem;
+@keyframes blink {
+  from,
+  to {
+    opacity: 1;
   }
-  .aka-text {
-    font-size: 1.1rem;
-  }
-  .vision-text {
-    font-size: 1.3rem;
+  50% {
+    opacity: 0;
   }
 }
 
 /* Hide when loaded */
 body.loaded #loading-overlay {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s;
+  pointer-events: none;
+}
+
+body.loaded #main-content {
+  opacity: 1;
 }
