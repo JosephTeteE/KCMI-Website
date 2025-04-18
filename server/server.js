@@ -97,7 +97,7 @@ app.post("/submit-contact", async (req, res) => {
     from: process.env.SMTP_USER, // Sender address
     to: email, // Recipient address (original sender)
     subject: "Thank you for contacting KCMI!", // Email subject
-    text: "We have received your message and will get back to you shortly.\n\nBlessings,\nKCMI Team", // Email body
+    text: "We have received your message and will get back to you shortly.\n\nGod bless you!\nKCMI Team", // Email body
   };
 
   try {
@@ -130,14 +130,14 @@ app.post("/subscribe", async (req, res) => {
 
   try {
     if (subscriptionType === "whatsapp") {
-      const whatsappLink = `https://wa.me/+2348084583102?text=Subscribe`; // WhatsApp subscription link
+      const whatsappLink = `https://wa.me/+2349134448322?text=Subscribe`; // WhatsApp subscription link
 
       // Configure email options for WhatsApp subscription
       await transporter.sendMail({
         from: process.env.SMTP_USER, // Sender address
         to: email, // Recipient address
         subject: "Join Daily Faith Recharge on WhatsApp", // Email subject
-        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nThank you!\nKCMI Team`, // Email body
+        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nGod bless you!\nKCMI Team`, // Email body
       });
 
       res.json({ success: true, message: "WhatsApp subscription link sent!" }); // Send success response
