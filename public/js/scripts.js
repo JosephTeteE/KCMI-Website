@@ -186,42 +186,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ==========================================================================
-  // === Simplified Loading Screen Logic ===
-  // ==========================================================================
-  const loadingOverlay = document.getElementById("loading-overlay");
-  const mainContent = document.getElementById("main-content");
-
-  function showLoadingScreen() {
-    // Always show main content immediately (but hidden by overlay initially)
-    mainContent.style.display = "block";
-    mainContent.style.opacity = "0";
-
-    // Check if this is an initial load
-    const isInitialLoad =
-      performance.navigation.type === performance.navigation.TYPE_RELOAD ||
-      performance.navigation.type === performance.navigation.TYPE_NAVIGATE;
-
-    if (isInitialLoad) {
-      loadingOverlay.style.display = "flex";
-      setTimeout(hideLoadingScreen, 6000); // Show for 6 seconds then hide
-    } else {
-      hideLoadingScreen();
-    }
-  }
-
-  function hideLoadingScreen() {
-    document.body.classList.add("loaded");
-    mainContent.style.opacity = "1";
-  }
-
-  // Initialize
-  if (document.readyState === "complete") {
-    showLoadingScreen();
-  } else {
-    window.addEventListener("load", showLoadingScreen);
-  }
-
-  // ==========================================================================
 
   // === Navbar Toggler and Click-Outside-to-Close Logic ===
 
