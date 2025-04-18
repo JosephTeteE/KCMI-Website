@@ -1,4 +1,4 @@
-/* Simplified Loading Animation */
+/* Simplified Loading Animation - Static Text Version */
 #loading-overlay {
   position: fixed;
   top: 0;
@@ -20,7 +20,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80vw;
+  width: 90vw;
   max-width: 700px;
   height: 80vw;
   max-height: 700px;
@@ -56,20 +56,14 @@
   animation: fadeIn 0.5s ease-in forwards;
 }
 
-.typing-text {
+.static-text {
   font-size: clamp(1.5rem, 5vw, 1.8rem); /* Responsive font size */
   color: #108c1d;
   margin: 0;
-  position: relative;
   text-align: center;
-  line-height: 1.3;
-}
-
-.typing-text::after {
-  content: "|";
-  position: absolute;
-  right: -8px;
-  animation: blink 1s step-end infinite;
+  line-height: 1;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in forwards;
 }
 
 .aka-text {
@@ -78,6 +72,17 @@
   font-style: italic;
   margin: 5px 0 20px;
   text-align: center;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in 0.5s forwards;
+}
+
+/* Animation delays for staggered appearance */
+.name-container .static-text {
+  animation-delay: 0.5s;
+}
+
+.static-text:last-child {
+  animation-delay: 2s;
 }
 
 @keyframes fadeIn {
@@ -86,16 +91,6 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes blink {
-  from,
-  to {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
   }
 }
 
