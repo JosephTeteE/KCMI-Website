@@ -1,4 +1,4 @@
-/* Loading Animation */
+/* Loading Animation - CSS Only Version */
 #loading-overlay {
   position: fixed;
   top: 0;
@@ -13,6 +13,9 @@
   z-index: 9999;
   font-family: "Playfair Display", serif;
   text-align: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
 }
 
 .crown-bg {
@@ -20,7 +23,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80vw;
+  width: 95vw;
   max-width: 700px;
   height: 80vw;
   max-height: 700px;
@@ -30,16 +33,14 @@
   z-index: 0;
 }
 
-.loading-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 90vw;
-  padding: 0 20px;
+/* Hide when loaded */
+body.loaded #loading-overlay {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
+/* Typing animation container */
 .name-container {
   display: flex;
   flex-direction: column;
@@ -47,66 +48,74 @@
   margin-bottom: 10px;
 }
 
-.loading-logo {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  opacity: 0;
-  animation: fadeIn 0.5s ease-in forwards;
-}
-
+/* Typing animation - CSS only */
 .typing-text {
-  font-size: clamp(1.5rem, 5vw, 1.8rem); /* Responsive font size */
+  font-size: clamp(1.5rem, 5vw, 1.8rem);
   color: #108c1d;
   margin: 0;
   position: relative;
   text-align: center;
   line-height: 1.3;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
 }
 
-.typing-text::after {
-  content: "|";
-  position: absolute;
-  right: -8px;
-  animation: blink 1s step-end infinite;
+/* Cursor only appears during typing */
+.typing-text.typing {
+  border-right: 2px solid #108c1d;
+  animation: blink-caret 0.75s step-end infinite;
 }
 
-.aka-text {
-  font-size: clamp(1.1rem, 4vw, 1.3rem); /* Responsive font size */
+/* Different animations for each text element */
+#church-name {
+  animation: typing 2.5s steps(40, end) forwards;
+  animation-delay: 0.5s;
+}
+
+#aka-text {
+  font-size: clamp(1.1rem, 4vw, 1.3rem);
   color: #7c1963;
   font-style: italic;
-  margin: 5px 0 20px;
-  text-align: center;
+  margin: 5px 0;
+  animation: typing 1.5s steps(20, end) forwards, fadeIn 0.5s ease-in forwards;
+  animation-delay: 3s; /* Starts after first text finishes */
+}
+
+#vision-text {
+  animation: typing 2s steps(30, end) forwards;
+  animation-delay: 5s; /* Starts after AKA text finishes */
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+    border-right-color: transparent; /* Remove cursor at end */
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #108c1d;
+  }
+}
+
+/* Fade in for logo */
+.loading-logo {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in forwards;
+  animation-delay: 0.2s;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
   to {
     opacity: 1;
   }
-}
-
-@keyframes blink {
-  from,
-  to {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-/* Hide when loaded */
-body.loaded #loading-overlay {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s, visibility 0.5s;
-  pointer-events: none;
-}
-
-body.loaded #main-content {
-  opacity: 1;
 }
