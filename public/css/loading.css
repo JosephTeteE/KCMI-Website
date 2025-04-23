@@ -145,3 +145,28 @@ body.loaded #loading-overlay {
     margin: 5px 0;
   }
 }
+
+/* Dark mode styles for loading animation */
+[data-bs-theme="dark"] #loading-overlay {
+  background-color: #121212;
+}
+
+[data-bs-theme="dark"] .crown-bg {
+  filter: brightness(0.5);
+}
+
+[data-bs-theme="dark"] .typing-text {
+  color: #4caf50; /* Green text for church name */
+}
+
+[data-bs-theme="dark"] #aka-text {
+  color: #c298b7; /* Lighter purple for AKA text */
+}
+
+[data-bs-theme="dark"] #vision-text {
+  color: #e0e0e0; /* Light gray for vision text */
+}
+
+[data-bs-theme="dark"] .loading-logo {
+  filter: brightness(0.9);
+}
