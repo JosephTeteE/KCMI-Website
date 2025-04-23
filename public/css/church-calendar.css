@@ -305,3 +305,47 @@
     font-size: 0.7em;
   }
 }
+
+/* List View Improvements */
+#events-list {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.date-header {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin: 20px 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+}
+
+.more-dates-message {
+  text-align: center;
+  font-size: 0.9em;
+  padding: 10px;
+}
+
+/* Scrollbar styling */
+#events-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+#events-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+#events-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+#events-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

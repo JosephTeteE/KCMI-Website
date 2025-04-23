@@ -114,35 +114,40 @@ class ChurchCalendar {
       eventsByDate[date].push(event);
     });
 
-    // Sort dates and render
-    Object.keys(eventsByDate)
-      .sort()
-      .forEach((date) => {
-        const dateObj = new Date(date);
-        html += `
-          <div class="date-header mb-2">
-            ${dateObj.toLocaleDateString(undefined, {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-            })}
-          </div>
-        `;
+    // Sort dates
+    const sortedDates = Object.keys(eventsByDate).sort();
 
-        // Show up to 3 events per date
-        eventsByDate[date].slice(0, 3).forEach((event) => {
-          html += this.renderEventItem(event);
-        });
+    // Show only first 3 date groups
+    const datesToShow = sortedDates.slice(0, 3);
 
-        // Show "more events" indicator if there are more than 3
-        if (eventsByDate[date].length > 3) {
-          html += `
-            <div class="more-events text-muted small mb-3">
-              +${eventsByDate[date].length - 3} more events on this day
-            </div>
-          `;
-        }
+    datesToShow.forEach((date) => {
+      const dateObj = new Date(date);
+      html += `
+        <div class="date-header mb-2">
+          ${dateObj.toLocaleDateString(undefined, {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          })}
+        </div>
+      `;
+
+      // Show all events for each displayed date
+      eventsByDate[date].forEach((event) => {
+        html += this.renderEventItem(event);
       });
+    });
+
+    // Show message if there are more date groups
+    if (sortedDates.length > 3) {
+      html += `
+        <div class="more-dates-message alert alert-info mt-3">
+          Showing 3 upcoming dates. ${
+            sortedDates.length - 3
+          } more dates available.
+        </div>
+      `;
+    }
 
     return html + "</div>";
   }
