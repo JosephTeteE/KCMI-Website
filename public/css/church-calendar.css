@@ -306,7 +306,7 @@
   }
 }
 
-/* List View Improvements */
+/* List View */
 #events-list {
   max-height: 600px;
   overflow-y: auto;
@@ -348,4 +348,145 @@
 
 #events-list::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* Dark mode styles for church calendar */
+[data-bs-theme="dark"] #calendar-container {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .view-options button {
+  background: #2c2c2c;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .view-options button.active {
+  background: #388e3c; /* Darker green */
+  border-color: #388e3c;
+}
+
+[data-bs-theme="dark"] .view-options button:hover {
+  background: #3d3d3d;
+}
+
+[data-bs-theme="dark"] .event-item {
+  background-color: #1e1e1e;
+  border-left-color: #4caf50;
+}
+
+[data-bs-theme="dark"] .date-header {
+  color: #e0e0e0;
+  border-bottom-color: #444;
+}
+
+[data-bs-theme="dark"] .event-time {
+  color: #81c784; /* Lighter green */
+}
+
+[data-bs-theme="dark"] .event-title {
+  color: #ffffff;
+}
+
+[data-bs-theme="dark"] .event-description {
+  color: #b0b0b0;
+}
+
+[data-bs-theme="dark"] .event-location {
+  color: #9e9e9e;
+}
+
+[data-bs-theme="dark"] .add-to-calendar-btn {
+  background: #5c6bc0; /* Different color for better visibility */
+}
+
+[data-bs-theme="dark"] .add-to-calendar-btn:hover {
+  background: #3949ab;
+}
+
+[data-bs-theme="dark"] .month-header h3 {
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .month-header button {
+  background: #2c2c2c;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .month-header button:hover {
+  background: #3d3d3d;
+}
+
+[data-bs-theme="dark"] .day-header {
+  background: #2c2c2c;
+}
+
+[data-bs-theme="dark"] .day-cell {
+  background: #1e1e1e;
+  border-color: #333;
+}
+
+[data-bs-theme="dark"] .day-cell.today {
+  background: #333300;
+  border-color: #555500;
+}
+
+[data-bs-theme="dark"] .day-cell.empty {
+  background: #121212;
+}
+
+[data-bs-theme="dark"] .month-event {
+  background: #1b5e20; /* Dark green */
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .month-event:hover {
+  background-color: #2e7d32;
+}
+
+[data-bs-theme="dark"] #events-list::-webkit-scrollbar-track {
+  background: #2c2c2c;
+}
+
+[data-bs-theme="dark"] #events-list::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+[data-bs-theme="dark"] #events-list::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+[data-bs-theme="dark"] .date-header {
+  background: #121212;
+}
+
+[data-bs-theme="dark"] .skeleton {
+  background-color: hsl(200, 20%, 15%);
+}
+
+[data-bs-theme="dark"] .skeleton-text {
+  background-color: hsl(200, 20%, 25%);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(200, 20%, 15%);
+  }
+  100% {
+    background-color: hsl(200, 20%, 25%);
+  }
+}
+[data-bs-theme="dark"] .more-events {
+  color: #bbb;
+}
+[data-bs-theme="dark"] .more-events:hover {
+  color: #fff;
+}
+[data-bs-theme="dark"] .more-dates-message {
+  color: #bbb;
+}
+[data-bs-theme="dark"] .more-dates-message:hover {
+  color: #fff;
 }
