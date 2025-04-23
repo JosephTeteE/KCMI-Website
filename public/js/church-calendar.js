@@ -49,9 +49,25 @@ class ChurchCalendar {
       this.cachedEvents = await response.json();
       this.renderCalendar();
     } catch (error) {
-      this.showError("Failed to load events. Please try again later.");
+      console.error(
+        `Error loading events from URL: https://kcmi-backend.onrender.com/api/calendar-events`,
+        error
+      );
+      this.showError(
+        `Failed to load events: ${error.message}. Please try again later.`
+      );
+
+      // Show cached events if available
+      if (this.cachedEvents && Array.isArray(this.cachedEvents)) {
+        this.renderCalendar();
+        this.showError(
+          "Failed to load events: Showing cached data. " + error.message
+        );
+      }
     } finally {
-      this.isFetching = false;
+      if (this.cachedEvents) {
+        this.isFetching = false;
+      }
     }
   }
 
