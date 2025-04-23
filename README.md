@@ -65,39 +65,44 @@ Welcome to the official website project for **Kingdom Covenant Ministries Intern
 
 ```
 ├── api/
-│   └── livestream.js          # Backend API route for livestream
+│   └── livestream.js              # Backend API route for livestream
 ├── kcmi-rcc-worker/
-│   ├── src/                   # Source code for the Cloudflare Worker
-│   ├── test/                  # Tests for the Cloudflare Worker
-│   └── ...                    # Other worker-related files (package.json, etc.)
-├── node_modules/              # Node.js dependencies
+│   ├── src/                       # Source code for the Cloudflare Worker
+│   ├── test/                      # Tests for the Cloudflare Worker
+│   └── ...                        # Other worker-related files (package.json, etc.)
+├── node_modules/                  # Node.js dependencies
 ├── public/
 │   ├── admin/
-│   │   ├── index.html         # Admin dashboard UI
+│   │   ├── index.html             # Admin dashboard UI
 │   │   └── js/
-│   │       └── admin.js       # Admin panel logic
+│   │       └── admin.js           # Admin panel logic
 │   ├── assets/
-│   │   └── img/               # Images and videos
+│   │   └── img/                   # Images and videos
 │   ├── css/
-│   │   └── styles.css         # Main stylesheet
+│   │   ├── styles.css             # Main stylesheet
+│   │   ├── loading.css            # Homepage loading content stylesheet
+│   │   └──church-calendar.css     # Church events calendar styles
 │   ├── js/
-│   │   └── scripts.js         # Main frontend JavaScript
+│   │   ├── scripts.js             # Main frontend JavaScript
+│   │   ├── loading.js             # Homepage loading content logic
+│   │   ├── church-calendar.js     # Main calendar logic
+│   │   └── gapi-loader.js         # Google API initialization
 │   ├── about-apostle-aikins.html
 │   ├── contact-us.html
 │   ├── faqs.html
 │   ├── giving-kcmi.html
-│   ├── index.html             # Homepage
+│   ├── index.html                 # Homepage
 │   ├── livestream.html
 │   ├── location.html
 │   ├── mission-kcmi.html
 │   ├── sermons.html
 │   └── services.html
 ├── server/
-│   ├── db.js                  # MySQL database connection
-│   ├── server.js              # Main Node.js backend server
-│   └── certs/                 # Directory for SSL certificates
-└── .env.example               # Sample env file (no secrets)
-└── README.md                  # Project documentation
+│   ├── db.js                      # MySQL database connection
+│   ├── server.js                  # Main Node.js backend server
+│   └── certs/                     # Directory for SSL certificates
+└── .env.example                   # Sample env file (no secrets)
+└── README.md                      # Project documentation
 ```
 
 ## ⚙️ Installation and Setup
