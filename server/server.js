@@ -9,9 +9,28 @@ const pool = require("./db"); // Import database connection pool
 const nodemailer = require("nodemailer"); // Module for sending emails
 const axios = require("axios"); // Promise-based HTTP client for making API requests
 const jwt = require("jsonwebtoken"); // Import the jsonwebtoken library
+const NodeCache = require("node-cache"); // In-memory caching module
+const { google } = require("googleapis"); // Google APIs client library
 
 dotenv.config(); // Load environment variables
+// Check for required environment variables
+const requiredEnvVars = [
+  "SMTP_HOST",
+  "SMTP_PORT",
+  "SMTP_USER",
+  "SMTP_PASS",
+  "GOOGLE_API_KEY",
+  "CALENDAR_ID",
+  "JWT_SECRET",
+];
 
+const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
+if (missingVars.length > 0) {
+  console.error("Missing required environment variables:", missingVars);
+  process.exit(1);
+} // Exit if any required environment variable is missing
+
+// Initialize Express Application
 const app = express(); // Create an Express application instance
 app.use(express.json()); // Middleware to parse JSON request bodies
 
@@ -171,6 +190,81 @@ app.get("/api/db-check", async (req, res) => {
 const livestreamRoutes = require("../api/livestream"); // Import livestream routes
 app.use("/api/livestream", livestreamRoutes); // Mount livestream routes under '/api/livestream'
 
+// Google Calendar API Setup
+const calendarCache = new NodeCache({
+  stdTTL: 1800, // 30 minutes
+  checkperiod: 300, // 5 minutes
+  useClones: false, // Better performance
+});
+
+// Calendar API route
+app.get("/api/calendar-events", async (req, res) => {
+  try {
+    // Check cache first
+    const cachedEvents = calendarCache.get("events");
+    if (cachedEvents) {
+      res.set("X-Cache", "HIT");
+      return res.json(cachedEvents);
+    }
+
+    // Initialize Google Calendar API
+    const calendar = google.calendar({
+      version: "v3",
+      auth: process.env.GOOGLE_API_KEY, // Use API key for public access
+    });
+
+    // Fetch events
+    const now = new Date();
+    const oneMonthLater = new Date();
+    oneMonthLater.setMonth(now.getMonth() + 1);
+
+    const response = await calendar.events.list({
+      calendarId: process.env.CALENDAR_ID,
+      timeMin: now.toISOString(),
+      timeMax: oneMonthLater.toISOString(),
+      maxResults: 30,
+      singleEvents: true,
+      orderBy: "startTime",
+    });
+
+    const events = response.data.items || [];
+
+    // Cache the results
+    calendarCache.set("events", events);
+    res.set("X-Cache", "MISS");
+    res.set("Cache-Control", "public, max-age=900"); // 15 minutes client cache
+    res.json(events);
+  } catch (error) {
+    console.error("Calendar API error:", error);
+    if (error.code === 403 && error.message.includes("quota")) {
+      // Return cached events even if stale when quota exceeded
+      const staleEvents = calendarCache.get("events");
+      if (staleEvents) {
+        return res.json(staleEvents);
+      }
+    }
+    res.status(500).json({ error: "Failed to fetch calendar events" });
+  }
+});
+
+// Add rate limiting to the calendar API route
+// This will limit the number of requests to 100 per 15 minutes per IP address
+// This is useful to prevent abuse and ensure fair usage of the API
+// Rate Limiting Middleware
+const rateLimit = require("express-rate-limit");
+const calendarLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  handler: (req, res) => {
+    res.set("Retry-After", 15 * 60);
+    res.status(429).json({
+      error: "Too many requests",
+      message: "Please try again later",
+    });
+  },
+});
+app.use("/api/calendar-events", calendarLimiter);
+
 // Authentication Endpoint
 app.post("/api/auth", async (req, res) => {
   const { username, password } = req.body;
@@ -188,6 +282,10 @@ app.post("/api/auth", async (req, res) => {
 
 // Start Server
 const PORT = process.env.PORT || 5000; // Get port from environment variables or use 5000 as default
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({ error: "Internal server error" });
+});
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); // Start the server and log the port
 
 // Test Database Connection
