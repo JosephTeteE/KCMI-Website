@@ -11,6 +11,7 @@ const axios = require("axios"); // Promise-based HTTP client for making API requ
 const jwt = require("jsonwebtoken"); // Import the jsonwebtoken library
 const NodeCache = require("node-cache"); // In-memory caching module
 const { google } = require("googleapis"); // Google APIs client library
+const OAuth2 = google.auth.OAuth2; // OAuth2 client for Google APIs
 
 dotenv.config(); // Load environment variables
 // Check for required environment variables
@@ -19,9 +20,11 @@ const requiredEnvVars = [
   "SMTP_PORT",
   "SMTP_USER",
   "SMTP_PASS",
-  "GOOGLE_API_KEY",
   "CALENDAR_ID",
   "JWT_SECRET",
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "GOOGLE_REFRESH_TOKEN",
 ];
 
 const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
@@ -194,12 +197,35 @@ app.use("/api/livestream", livestreamRoutes); // Mount livestream routes under '
 const calendarCache = new NodeCache({
   stdTTL: 1800, // 30 minutes
   checkperiod: 300, // 5 minutes
-  useClones: false, // Better performance
 });
 
-// Calendar API route
+// Initialize OAuth2 client
+const oauth2Client = new OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "https://developers.google.com/oauthplayground" // Redirect URL for OAuth2
+);
+
+// Set refresh token
+oauth2Client.setCredentials({
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+});
+
+// Middleware to verify calendar authentication
+async function verifyCalendarAuth() {
+  if (
+    !oauth2Client.credentials.access_token ||
+    oauth2Client.credentials.expiry_date < Date.now()
+  ) {
+    console.log("Refreshing expired access token...");
+    await oauth2Client.refreshAccessToken();
+  }
+}
+
+// Calendar API route with OAuth 2.0
 app.get("/api/calendar-events", async (req, res) => {
   try {
+    await verifyCalendarAuth();
     // Check cache first
     const cachedEvents = calendarCache.get("events");
     if (cachedEvents) {
@@ -207,10 +233,18 @@ app.get("/api/calendar-events", async (req, res) => {
       return res.json(cachedEvents);
     }
 
-    // Initialize Google Calendar API
+    // Get new access token
+    try {
+      const { credentials } = await oauth2Client.refreshAccessToken();
+      oauth2Client.setCredentials(credentials);
+    } catch (err) {
+      console.error("Error refreshing access token:", err);
+      throw err;
+    }
+
     const calendar = google.calendar({
       version: "v3",
-      auth: process.env.GOOGLE_API_KEY, // Use API key for public access
+      auth: oauth2Client,
     });
 
     // Fetch events
@@ -222,7 +256,7 @@ app.get("/api/calendar-events", async (req, res) => {
       calendarId: process.env.CALENDAR_ID,
       timeMin: now.toISOString(),
       timeMax: oneMonthLater.toISOString(),
-      maxResults: 30,
+      maxResults: 25, // Reduced for free tier safety
       singleEvents: true,
       orderBy: "startTime",
     });
@@ -232,18 +266,30 @@ app.get("/api/calendar-events", async (req, res) => {
     // Cache the results
     calendarCache.set("events", events);
     res.set("X-Cache", "MISS");
-    res.set("Cache-Control", "public, max-age=900"); // 15 minutes client cache
+    res.set("Cache-Control", "public, max-age=900");
     res.json(events);
   } catch (error) {
     console.error("Calendar API error:", error);
-    if (error.code === 403 && error.message.includes("quota")) {
-      // Return cached events even if stale when quota exceeded
-      const staleEvents = calendarCache.get("events");
-      if (staleEvents) {
-        return res.json(staleEvents);
-      }
+    let errorMessage = "Failed to fetch calendar events";
+    if (error.code === 403) {
+      errorMessage = "Calendar API quota exceeded";
+    } else if (error.message.includes("invalid_grant")) {
+      errorMessage = "Authentication expired - needs new refresh token";
     }
-    res.status(500).json({ error: "Failed to fetch calendar events" });
+
+    // Try to return stale cache if available
+    const staleEvents = calendarCache.get("events");
+    if (staleEvents) {
+      return res.json({
+        events: staleEvents,
+        warning: "Showing cached data due to: " + errorMessage,
+      });
+    }
+
+    res.status(500).json({
+      error: errorMessage,
+      details: error.message,
+    });
   }
 });
 
@@ -251,6 +297,7 @@ app.get("/api/calendar-events", async (req, res) => {
 // This will limit the number of requests to 100 per 15 minutes per IP address
 // This is useful to prevent abuse and ensure fair usage of the API
 // Rate Limiting Middleware
+
 const rateLimit = require("express-rate-limit");
 const calendarLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

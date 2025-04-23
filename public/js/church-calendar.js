@@ -41,7 +41,9 @@ class ChurchCalendar {
     this.isFetching = true;
 
     try {
-      const response = await fetch("/api/calendar-events");
+      const response = await fetch(
+        "https://kcmi-backend.onrender.com/api/calendar-events"
+      );
       if (!response.ok) throw new Error("Network error");
 
       this.cachedEvents = await response.json();
