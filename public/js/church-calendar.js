@@ -129,9 +129,19 @@ class ChurchCalendar {
           </div>
         `;
 
-        eventsByDate[date].forEach((event) => {
+        // Show up to 3 events per date
+        eventsByDate[date].slice(0, 3).forEach((event) => {
           html += this.renderEventItem(event);
         });
+
+        // Show "more events" indicator if there are more than 3
+        if (eventsByDate[date].length > 3) {
+          html += `
+            <div class="more-events text-muted small mb-3">
+              +${eventsByDate[date].length - 3} more events on this day
+            </div>
+          `;
+        }
       });
 
     return html + "</div>";

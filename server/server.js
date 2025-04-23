@@ -256,7 +256,7 @@ app.get("/api/calendar-events", async (req, res) => {
       calendarId: process.env.CALENDAR_ID,
       timeMin: now.toISOString(),
       timeMax: oneMonthLater.toISOString(),
-      maxResults: 25, // Reduced for free tier safety
+      maxResults: 20,
       singleEvents: true,
       orderBy: "startTime",
     });
