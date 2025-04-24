@@ -1,6 +1,6 @@
 "# Kingdom Covenant Ministries International (KCMI) Website
 
-Welcome to the official website project for **Kingdom Covenant Ministries International (KCMI) AKA Rehoboth Crhistian Center** — a dynamic, responsive web platform showcasing the church’s mission, leadership, sermons, events, and livestream content.
+Welcome to the official website project for **Kingdom Covenant Ministries International (KCMI) AKA Rehoboth Christian Center** — a dynamic, responsive web platform showcasing the church's mission, leadership, sermons, events, and livestream content.
 
 **Live Sites:**
 
@@ -9,17 +9,19 @@ Welcome to the official website project for **Kingdom Covenant Ministries Intern
 
 ## 🌟 Features
 
-- Homepage with video background and upcoming events.
-- Pages for Apostle Aikins, services, sermons, giving, FAQs, and church locations.
-- Contact form with **Google reCAPTCHA v3** integration for spam prevention.
-- **WhatsApp subscription form** integrated with **Google reCAPTCHA v3**.
-- **Livestream page** that dynamically embeds **Facebook Live** videos.
-- **Admin panel** (protected with **JWT authentication**) to update the livestream embed code and its visibility status.
-- **Dark mode toggle** for user preference.
-- Fully **responsive design** for mobile, tablet, and desktop views.
-- Embedded **Google Maps** and **Google Calendar** for convenience.
-- **Contact form submissions sent via Zoho SMTP.**
-- **WhatsApp subscription link sent via Zoho SMTP.**
+- Homepage with video background and upcoming events
+- Church Events Calendar showing 3 upcoming date groups (with all events per date).
+- Pages for Apostle Aikins, services, sermons, giving, FAQs, and church locations
+- Contact form with **Google reCAPTCHA v3** integration for spam prevention
+- **WhatsApp subscription form** integrated with **Google reCAPTCHA v3**
+- **Livestream page** that dynamically embeds **Facebook Live** videos
+- **Admin panel** (protected with **JWT authentication**) to update the livestream embed code
+- **Dark mode toggle** for user preference
+- Fully **responsive design** for mobile, tablet, and desktop views
+- Embedded **Google Maps** and **Google Calendar** for convenience
+- **Contact form submissions sent via Zoho SMTP**
+- **WhatsApp subscription link sent via Zoho SMTP**
+- **Dynamic Events Promos** section pulling from Google Drive manifest file with client-side caching
 
 ## 🔧 Technology Stack
 
@@ -29,6 +31,7 @@ Welcome to the official website project for **Kingdom Covenant Ministries Intern
 - CSS3 (with **Bootstrap 5**)
 - JavaScript (ES6+)
 - **AOS (Animate On Scroll)** Library
+- **Google Calendar API** integration with optimized event display
 
 ### Backend
 
@@ -36,9 +39,10 @@ Welcome to the official website project for **Kingdom Covenant Ministries Intern
 - Express.js
 - MySQL (via `mysql2`)
 - dotenv (for environment variable management)
-- **Nodemailer (for sending emails via Zoho SMTP)**
+- Nodemailer (for sending emails via Zoho SMTP)
 - axios (for making HTTP requests, including reCAPTCHA verification)
 - jwt (for JSON Web Token authentication)
+- Google Calendar API integration
 
 ### External Services
 
@@ -86,7 +90,8 @@ Welcome to the official website project for **Kingdom Covenant Ministries Intern
 │   │   ├── scripts.js             # Main frontend JavaScript
 │   │   ├── loading.js             # Homepage loading content logic
 │   │   ├── church-calendar.js     # Main calendar logic
-│   │   └── gapi-loader.js         # Google API initialization
+│   │   ├── gapi-loader.js         # Google API initialization logic
+│   │   └── promos.js              # Church upcoming events logic (Google Drive integration)
 │   ├── about-apostle-aikins.html
 │   ├── contact-us.html
 │   ├── faqs.html
@@ -125,7 +130,12 @@ Welcome to the official website project for **Kingdom Covenant Ministries Intern
    - Add your database credentials, JWT secret, and email config.
    - Add your Google reCAPTCHA v3 site and secret keys.
 
-4. **Start the backend server:**
+4. **Configure Events Promos:**
+
+   - Create a JSON manifest file on Google Drive with your event data
+   - Update the PROMO_MANIFEST_ID in public/js/promos.js with your Google Drive file ID
+
+5. **Start the backend server:**
 
    ```bash
    node server/server.js
