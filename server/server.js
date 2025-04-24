@@ -334,7 +334,7 @@ app.get("/api/drive-file", async (req, res) => {
     const { fileId } = req.query;
     if (!fileId) return res.status(400).json({ error: "File ID required" });
 
-    await verifyCalendarAuth(); // Reuse your existing auth setup
+    await verifyCalendarAuth();
 
     const drive = google.drive({
       version: "v3",
@@ -350,6 +350,31 @@ app.get("/api/drive-file", async (req, res) => {
   } catch (error) {
     console.error("Drive API error:", error);
     res.status(500).json({ error: "Failed to fetch file" });
+  }
+});
+
+// Serve Drive manifest file
+app.get("/api/drive-manifest", async (req, res) => {
+  try {
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: "Manifest ID required" });
+
+    await verifyCalendarAuth();
+
+    const drive = google.drive({
+      version: "v3",
+      auth: oauth2Client,
+    });
+
+    const response = await drive.files.get({
+      fileId: id,
+      alt: "media",
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching manifest:", error);
+    res.status(500).json({ error: "Failed to fetch manifest" });
   }
 });
 

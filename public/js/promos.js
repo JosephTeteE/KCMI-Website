@@ -1,5 +1,5 @@
 // public/js/promos.js
-// This script handles fetching and displaying promotional content from Google Drive
+// This script handles fetching and displaying promotional content
 
 // Configuration
 const PROMO_MANIFEST_ID = "1QnJQXur7zNvqoks7TR5SRRgVqWlZdACO"; // Google Drive file ID for the JSON manifest
@@ -16,9 +16,8 @@ async function loadPromos() {
       return;
     }
 
-    // Fetch fresh data if no valid cache exists
-    const manifestUrl = `https://www.googleapis.com/drive/v3/files/${PROMO_MANIFEST_ID}?alt=media&key=${process.env.GOOGLE_API_KEY}`;
-    const response = await fetch(manifestUrl);
+    // Fetch manifest through your backend API
+    const response = await fetch(`/api/drive-manifest?id=${PROMO_MANIFEST_ID}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch manifest: ${response.status}`);
@@ -182,16 +181,7 @@ async function getFileUrl(fileId, type) {
       return `https://drive.google.com/file/d/${fileId}/preview`;
     }
 
-    // For PDFs, use the webViewLink from the API
-    const response = await fetch(`/api/drive-file?fileId=${fileId}`);
-    if (response.ok) {
-      const fileData = await response.json();
-      return (
-        fileData.webViewLink || `https://drive.google.com/file/d/${fileId}/view`
-      );
-    }
-
-    // Fallback if API fails
+    // For PDFs, use the direct view URL
     return `https://drive.google.com/file/d/${fileId}/view`;
   } catch (error) {
     console.error("Error getting file URL:", error);
