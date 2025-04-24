@@ -1,20 +1,21 @@
 // server/server.js
 
 // Import Required Modules
-const express = require("express"); // Express framework for web server
-const path = require("path"); // Node.js module for handling file paths
-const cors = require("cors"); // Enable Cross-Origin Resource Sharing
-const dotenv = require("dotenv"); // Load environment variables from .env file
-const pool = require("./db"); // Import database connection pool
-const nodemailer = require("nodemailer"); // Module for sending emails
-const axios = require("axios"); // Promise-based HTTP client for making API requests
-const jwt = require("jsonwebtoken"); // Import the jsonwebtoken library
-const NodeCache = require("node-cache"); // In-memory caching module
-const { google } = require("googleapis"); // Google APIs client library
-const OAuth2 = google.auth.OAuth2; // OAuth2 client for Google APIs
-const fetch = require("node-fetch"); // Fetch API for making HTTP requests
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const pool = require("./db");
+const nodemailer = require("nodemailer");
+const axios = require("axios");
+const jwt = require("jsonwebtoken");
+const NodeCache = require("node-cache");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
+const rateLimit = require("express-rate-limit");
 
-dotenv.config(); // Load environment variables
+dotenv.config();
+
 // Check for required environment variables
 const requiredEnvVars = [
   "SMTP_HOST",
@@ -33,33 +34,33 @@ const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
 if (missingVars.length > 0) {
   console.error("Missing required environment variables:", missingVars);
   process.exit(1);
-} // Exit if any required environment variable is missing
+}
 
 // Initialize Express Application
-const app = express(); // Create an Express application instance
-app.use(express.json()); // Middleware to parse JSON request bodies
+const app = express();
+app.use(express.json());
 
 // CORS Configuration
 const corsOptions = {
-  origin: "https://www.kcmi-rcc.org", // Allow requests from this origin
-  methods: ["GET", "POST"], // Allow these HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
+  origin: "https://www.kcmi-rcc.org",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
-app.use(cors(corsOptions)); // Apply CORS middleware with the specified options
-app.options("*", cors(corsOptions)); // Handle preflight requests for all routes
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Serve static files
-app.use(express.static(path.join(__dirname, "../public"))); // Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "../public")));
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // smtp.zoho.com
-  port: Number(process.env.SMTP_PORT), // 587
-  secure: false, // false for port 587
-  requireTLS: true, // Enforce TLS
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
+  requireTLS: true,
   auth: {
-    user: process.env.SMTP_USER, // admin@kcmi-rcc.org
-    pass: process.env.SMTP_PASS, // Zoho app password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 
@@ -85,52 +86,47 @@ async function verifyRecaptcha(token) {
 app.post("/submit-contact", async (req, res) => {
   const { email, phone, message, recaptchaToken } = req.body;
 
-  // Verify reCAPTCHA token
   if (!(await verifyRecaptcha(recaptchaToken))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
-  // Validate email format
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
       .json({ success: false, message: "Valid email required" });
   }
 
-  // Validate phone number format
   if (phone && !/^\+?[0-9\s-]{7,15}$/.test(phone)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid phone format" });
   }
 
-  // Configure email options
   const mailOptions = {
-    from: process.env.SMTP_USER, // Sender address
-    to: "kcmi.forms@gmail.com", // Recipient address
-    subject: "New Contact-Us Form Request", // Email subject
+    from: process.env.SMTP_USER,
+    to: "kcmi.forms@gmail.com",
+    subject: "New Contact-Us Form Request",
     text: `Email: ${email}\nPhone: ${phone || "Not provided"}\nMessage: ${
       message || "No message provided"
-    }`, // Email body
+    }`,
   };
 
-  // Configure auto-reply email options
   const autoReplyMailOptions = {
-    from: process.env.SMTP_USER, // Sender address
-    to: email, // Recipient address (original sender)
-    subject: "Thank you for contacting KCMI!", // Email subject
-    text: "We have received your message and will get back to you shortly.\n\nGod bless you!\nKCMI Team", // Email body
+    from: process.env.SMTP_USER,
+    to: email,
+    subject: "Thank you for contacting KCMI!",
+    text: "We have received your message and will get back to you shortly.\n\nGod bless you!\nKCMI Team",
   };
 
   try {
-    await transporter.sendMail(mailOptions); // Send the main email
-    await transporter.sendMail(autoReplyMailOptions); // Send the auto-reply email
-    res.json({ success: true, message: "Message sent successfully!" }); // Send success response
+    await transporter.sendMail(mailOptions);
+    await transporter.sendMail(autoReplyMailOptions);
+    res.json({ success: true, message: "Message sent successfully!" });
   } catch (error) {
-    console.error("Email failed:", error); // Log email sending error
-    res.status(500).json({ success: false, message: "Error sending message" }); // Send error response
+    console.error("Email failed:", error);
+    res.status(500).json({ success: false, message: "Error sending message" });
   }
 });
 
@@ -138,14 +134,12 @@ app.post("/submit-contact", async (req, res) => {
 app.post("/subscribe", async (req, res) => {
   const { email, subscriptionType, recaptchaToken } = req.body;
 
-  // Verify reCAPTCHA token
   if (!(await verifyRecaptcha(recaptchaToken))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
-  // Validate email format
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
@@ -154,63 +148,63 @@ app.post("/subscribe", async (req, res) => {
 
   try {
     if (subscriptionType === "whatsapp") {
-      const whatsappLink = `https://wa.me/+2349134448322?text=Subscribe`; // WhatsApp subscription link
-
-      // Configure email options for WhatsApp subscription
+      const whatsappLink = `https://wa.me/+2349134448322?text=Subscribe`;
       await transporter.sendMail({
-        from: process.env.SMTP_USER, // Sender address
-        to: email, // Recipient address
-        subject: "Join Daily Faith Recharge on WhatsApp", // Email subject
-        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nGod bless you!\nKCMI Team`, // Email body
+        from: process.env.SMTP_USER,
+        to: email,
+        subject: "Join Daily Faith Recharge on WhatsApp",
+        text: `Click here to join our WhatsApp broadcast: ${whatsappLink}\n\nGod bless you!\nKCMI Team`,
       });
-
-      res.json({ success: true, message: "WhatsApp subscription link sent!" }); // Send success response
+      res.json({ success: true, message: "WhatsApp subscription link sent!" });
     } else {
       res
         .status(400)
-        .json({ success: false, message: "Invalid subscription type" }); // Send error response for invalid subscription type
+        .json({ success: false, message: "Invalid subscription type" });
     }
   } catch (error) {
-    console.error("Subscription failed:", error); // Log subscription error
-    res.status(500).json({ success: false, message: "Error subscribing" }); // Send error response
+    console.error("Subscription failed:", error);
+    res.status(500).json({ success: false, message: "Error subscribing" });
   }
 });
 
 // Database Connection Check
 app.get("/api/db-check", async (req, res) => {
   try {
-    const connection = await pool.getConnection(); // Get a database connection from the pool
-    await connection.ping(); // Ping the database to check the connection
-    connection.release(); // Release the connection back to the pool
-    res.json({ success: true, message: "Database connection successful!" }); // Send success response
+    const connection = await pool.getConnection();
+    await connection.ping();
+    connection.release();
+    res.json({ success: true, message: "Database connection successful!" });
   } catch (error) {
-    console.error("Database connection failed:", error); // Log database connection error
+    console.error("Database connection failed:", error);
     res
       .status(500)
-      .json({ success: false, message: "Database connection error" }); // Send error response
+      .json({ success: false, message: "Database connection error" });
   }
 });
 
 // Livestream Routes
-const livestreamRoutes = require("../api/livestream"); // Import livestream routes
-app.use("/api/livestream", livestreamRoutes); // Mount livestream routes under '/api/livestream'
+const livestreamRoutes = require("../api/livestream");
+app.use("/api/livestream", livestreamRoutes);
 
 // Google Calendar API Setup
 const calendarCache = new NodeCache({
-  stdTTL: 1800, // 30 minutes
-  checkperiod: 300, // 5 minutes
+  stdTTL: 1800,
+  checkperiod: 300,
 });
 
-// Initialize OAuth2 client
+// Initialize OAuth2 client with proper scopes
 const oauth2Client = new OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  "https://developers.google.com/oauthplayground" // Redirect URL for OAuth2
+  "https://developers.google.com/oauthplayground"
 );
 
-// Set refresh token
 oauth2Client.setCredentials({
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+  scope: [
+    "https://www.googleapis.com/auth/calendar.readonly",
+    "https://www.googleapis.com/auth/drive.readonly",
+  ].join(" "),
 });
 
 // Middleware to verify calendar authentication
@@ -219,22 +213,9 @@ async function verifyCalendarAuth() {
     !oauth2Client.credentials.access_token ||
     oauth2Client.credentials.expiry_date < Date.now()
   ) {
-    console.log("Refreshing expired access token...");
-    await oauth2Client.refreshAccessToken();
-  }
-}
-
-// Define the getTokenInfo function
-async function getTokenInfo(accessToken) {
-  const url = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`;
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log("TokenInfo Response:", data); // Log the TokenInfo response
-    return data;
-  } catch (error) {
-    console.error("Error fetching TokenInfo:", error);
-    return null;
+    console.log("Refreshing access token...");
+    const { credentials } = await oauth2Client.refreshAccessToken();
+    oauth2Client.setCredentials(credentials);
   }
 }
 
@@ -242,20 +223,11 @@ async function getTokenInfo(accessToken) {
 app.get("/api/calendar-events", async (req, res) => {
   try {
     await verifyCalendarAuth();
-    // Check cache first
+
     const cachedEvents = calendarCache.get("events");
     if (cachedEvents) {
       res.set("X-Cache", "HIT");
       return res.json(cachedEvents);
-    }
-
-    // Get new access token
-    try {
-      const { credentials } = await oauth2Client.refreshAccessToken();
-      oauth2Client.setCredentials(credentials);
-    } catch (err) {
-      console.error("Error refreshing access token:", err);
-      throw err;
     }
 
     const calendar = google.calendar({
@@ -263,7 +235,6 @@ app.get("/api/calendar-events", async (req, res) => {
       auth: oauth2Client,
     });
 
-    // Fetch events
     const now = new Date();
     const oneMonthLater = new Date();
     oneMonthLater.setMonth(now.getMonth() + 1);
@@ -278,43 +249,27 @@ app.get("/api/calendar-events", async (req, res) => {
     });
 
     const events = response.data.items || [];
-
-    // Cache the results
     calendarCache.set("events", events);
     res.set("X-Cache", "MISS");
     res.set("Cache-Control", "public, max-age=900");
     res.json(events);
   } catch (error) {
     console.error("Calendar API error:", error);
-    let errorMessage = "Failed to fetch calendar events";
-    if (error.code === 403) {
-      errorMessage = "Calendar API quota exceeded";
-    } else if (error.message.includes("invalid_grant")) {
-      errorMessage = "Authentication expired - needs new refresh token";
-    }
-
-    // Try to return stale cache if available
     const staleEvents = calendarCache.get("events");
     if (staleEvents) {
       return res.json({
         events: staleEvents,
-        warning: "Showing cached data due to: " + errorMessage,
+        warning: "Showing cached data due to API error",
       });
     }
-
     res.status(500).json({
-      error: errorMessage,
+      error: "Failed to fetch calendar events",
       details: error.message,
     });
   }
 });
 
-// Add rate limiting to the calendar API route
-// This will limit the number of requests to 100 per 15 minutes per IP address
-// This is useful to prevent abuse and ensure fair usage of the API
-// Rate Limiting Middleware
-
-const rateLimit = require("express-rate-limit");
+// Rate Limiting
 const calendarLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -333,42 +288,16 @@ app.post("/api/auth", async (req, res) => {
   const { username, password } = req.body;
 
   if (username === process.env.AD_USER && password === process.env.AD_PASS) {
-    // Generate JWT with expiration time (1 minute)
     const token = jwt.sign({ username }, process.env.JWT_SECRET, {
       expiresIn: "1m",
-    }); // Updated expiration time
+    });
     res.json({ token });
   } else {
     res.status(401).json({ message: "Invalid credentials" });
   }
 });
 
-// Google Drive API route
-app.get("/api/drive-file", async (req, res) => {
-  try {
-    const { fileId } = req.query;
-    if (!fileId) return res.status(400).json({ error: "File ID required" });
-
-    await verifyCalendarAuth();
-
-    const drive = google.drive({
-      version: "v3",
-      auth: oauth2Client,
-    });
-
-    const response = await drive.files.get({
-      fileId,
-      fields: "webViewLink,webContentLink,name,mimeType",
-    });
-
-    res.json(response.data);
-  } catch (error) {
-    console.error("Drive API error:", error);
-    res.status(500).json({ error: "Failed to fetch file" });
-  }
-});
-
-// Serve Drive manifest file
+// Google Drive Manifest Endpoint (Fixed Version)
 app.get("/api/drive-manifest", async (req, res) => {
   try {
     const { id } = req.query;
@@ -381,42 +310,63 @@ app.get("/api/drive-manifest", async (req, res) => {
       auth: oauth2Client,
     });
 
-    // Get the access token from the oauth2Client
-    const accessToken = await oauth2Client.getAccessToken();
-
-    // Call the TokenInfo endpoint and log the response
-    const tokenInfo = await getTokenInfo(accessToken.token);
-
-    // Now, try to access the Google Drive file
-    const manifestResponse = await drive.files.get({
-      fileId: "1QnJQXur7zNvqoks7TR5SRRgVqWlZdACO",
-      alt: "media",
+    // First verify we can access the file
+    await drive.files.get({
+      fileId: id,
+      fields: "id,name",
     });
 
-    res.json(manifestResponse.data);
+    // Then get the file content
+    const response = await drive.files.get(
+      {
+        fileId: id,
+        alt: "media",
+      },
+      { responseType: "json" }
+    );
+
+    res.json(response.data);
   } catch (error) {
     console.error("Error fetching manifest:", error);
-    res.status(500).send("Error fetching manifest");
+
+    // More detailed error handling
+    let statusCode = 500;
+    let errorMessage = "Error fetching manifest";
+
+    if (error.code === 403) {
+      statusCode = 403;
+      errorMessage = "Insufficient permissions to access the manifest file";
+    } else if (error.code === 404) {
+      statusCode = 404;
+      errorMessage = "Manifest file not found";
+    }
+
+    res.status(statusCode).json({
+      error: errorMessage,
+      details: error.message,
+      ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+    });
   }
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000; // Get port from environment variables or use 5000 as default
+const PORT = process.env.PORT || 5000;
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({ error: "Internal server error" });
 });
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); // Start the server and log the port
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Test Database Connection
 async function testDB() {
   try {
     console.log("Testing database connection...");
-    const [rows] = await pool.execute("SELECT 1"); // Execute a simple query to test the connection
-    console.log("✅ Database connected successfully!", rows); // Log success message
+    const [rows] = await pool.execute("SELECT 1");
+    console.log("✅ Database connected successfully!", rows);
   } catch (error) {
-    console.error("❌ Database connection failed!", error); // Log connection error
+    console.error("❌ Database connection failed!", error);
   }
 }
 
-testDB(); // Call the function to test the database connection
+testDB();
