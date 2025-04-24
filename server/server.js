@@ -25,6 +25,7 @@ const requiredEnvVars = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "GOOGLE_REFRESH_TOKEN",
+  "GOOGLE_API_KEY",
 ];
 
 const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
@@ -324,6 +325,31 @@ app.post("/api/auth", async (req, res) => {
     res.json({ token });
   } else {
     res.status(401).json({ message: "Invalid credentials" });
+  }
+});
+
+// Google Drive API route
+app.get("/api/drive-file", async (req, res) => {
+  try {
+    const { fileId } = req.query;
+    if (!fileId) return res.status(400).json({ error: "File ID required" });
+
+    await verifyCalendarAuth(); // Reuse your existing auth setup
+
+    const drive = google.drive({
+      version: "v3",
+      auth: oauth2Client,
+    });
+
+    const response = await drive.files.get({
+      fileId,
+      fields: "webViewLink,webContentLink,name,mimeType",
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Drive API error:", error);
+    res.status(500).json({ error: "Failed to fetch file" });
   }
 });
 
