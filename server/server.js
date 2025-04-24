@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken"); // Import the jsonwebtoken library
 const NodeCache = require("node-cache"); // In-memory caching module
 const { google } = require("googleapis"); // Google APIs client library
 const OAuth2 = google.auth.OAuth2; // OAuth2 client for Google APIs
+const fetch = require("node-fetch"); // Fetch API for making HTTP requests
 
 dotenv.config(); // Load environment variables
 // Check for required environment variables
@@ -223,6 +224,20 @@ async function verifyCalendarAuth() {
   }
 }
 
+// Define the getTokenInfo function
+async function getTokenInfo(accessToken) {
+  const url = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("TokenInfo Response:", data); // Log the TokenInfo response
+    return data;
+  } catch (error) {
+    console.error("Error fetching TokenInfo:", error);
+    return null;
+  }
+}
+
 // Calendar API route with OAuth 2.0
 app.get("/api/calendar-events", async (req, res) => {
   try {
@@ -340,22 +355,6 @@ app.get("/api/drive-file", async (req, res) => {
       version: "v3",
       auth: oauth2Client,
     });
-
-    const { google } = require("googleapis");
-    const fetch = require("node-fetch");
-
-    async function getTokenInfo(accessToken) {
-      const url = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`;
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log("TokenInfo Response:", data); // Log the TokenInfo response
-        return data;
-      } catch (error) {
-        console.error("Error fetching TokenInfo:", error);
-        return null;
-      }
-    }
 
     const response = await drive.files.get({
       fileId,
