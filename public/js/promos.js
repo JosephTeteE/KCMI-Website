@@ -16,8 +16,10 @@ async function loadPromos() {
       return;
     }
 
-    // Fetch manifest through your backend API
-    const response = await fetch(`/api/drive-manifest?id=${PROMO_MANIFEST_ID}`);
+    // Fetch manifest through backend API
+    const response = await fetch(
+      `https://kcmi-backend.onrender.com/api/drive-manifest?id=${PROMO_MANIFEST_ID}`
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to fetch manifest: ${response.status}`);
