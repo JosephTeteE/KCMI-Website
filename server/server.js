@@ -192,7 +192,7 @@ const calendarCache = new NodeCache({
   checkperiod: 300,
 });
 
-// Initialize OAuth2 client with proper scopes
+// Initialize OAuth2 client
 const oauth2Client = new OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -297,26 +297,30 @@ app.post("/api/auth", async (req, res) => {
   }
 });
 
-// Google Drive Manifest Endpoint (Fixed Version)
+// Google Drive Manifest Endpoint
 app.get("/api/drive-manifest", async (req, res) => {
   try {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: "Manifest ID required" });
 
-    await verifyCalendarAuth();
+    // Refresh token if needed
+    if (oauth2Client.isTokenExpiring()) {
+      const { credentials } = await oauth2Client.refreshAccessToken();
+      oauth2Client.setCredentials(credentials);
+    }
 
     const drive = google.drive({
       version: "v3",
       auth: oauth2Client,
     });
 
-    // First verify we can access the file
+    // Verify access first
     await drive.files.get({
       fileId: id,
       fields: "id,name",
     });
 
-    // Then get the file content
+    // Get file content
     const response = await drive.files.get(
       {
         fileId: id,
@@ -327,18 +331,18 @@ app.get("/api/drive-manifest", async (req, res) => {
 
     res.json(response.data);
   } catch (error) {
-    console.error("Error fetching manifest:", error);
+    console.error("Drive API Error:", error);
 
-    // More detailed error handling
+    // Detailed error response
     let statusCode = 500;
-    let errorMessage = "Error fetching manifest";
+    let errorMessage = "Failed to load manifest";
 
     if (error.code === 403) {
       statusCode = 403;
-      errorMessage = "Insufficient permissions to access the manifest file";
+      errorMessage = "Missing required permissions to access the file";
     } else if (error.code === 404) {
       statusCode = 404;
-      errorMessage = "Manifest file not found";
+      errorMessage = "File not found";
     }
 
     res.status(statusCode).json({
