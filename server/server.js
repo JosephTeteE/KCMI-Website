@@ -341,6 +341,22 @@ app.get("/api/drive-file", async (req, res) => {
       auth: oauth2Client,
     });
 
+    const { google } = require("googleapis");
+    const fetch = require("node-fetch");
+
+    async function getTokenInfo(accessToken) {
+      const url = `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("TokenInfo Response:", data); // Log the TokenInfo response
+        return data;
+      } catch (error) {
+        console.error("Error fetching TokenInfo:", error);
+        return null;
+      }
+    }
+
     const response = await drive.files.get({
       fileId,
       fields: "webViewLink,webContentLink,name,mimeType",
@@ -366,15 +382,22 @@ app.get("/api/drive-manifest", async (req, res) => {
       auth: oauth2Client,
     });
 
-    const response = await drive.files.get({
-      fileId: id,
+    // Get the access token from the oauth2Client
+    const accessToken = await oauth2Client.getAccessToken();
+
+    // Call the TokenInfo endpoint and log the response
+    const tokenInfo = await getTokenInfo(accessToken.token);
+
+    // Now, try to access the Google Drive file
+    const manifestResponse = await drive.files.get({
+      fileId: "1QnJQXur7zNvqoks7TR5SRRgVqWlZdACO",
       alt: "media",
     });
 
-    res.json(response.data);
+    res.json(manifestResponse.data);
   } catch (error) {
     console.error("Error fetching manifest:", error);
-    res.status(500).json({ error: "Failed to fetch manifest" });
+    res.status(500).send("Error fetching manifest");
   }
 });
 
