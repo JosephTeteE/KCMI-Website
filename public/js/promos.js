@@ -79,10 +79,11 @@ function cachePromos(data) {
 // Render the list of events in the UI
 async function renderEvents(events) {
   const container = document.getElementById("promos-container");
+  const gridContainer = container.querySelector(".promos-grid") || container;
 
   // Handle empty events list
   if (!events || !events.length) {
-    container.innerHTML = `
+    gridContainer.innerHTML = `
       <div class="col-12 text-center">
         <p class="text-muted">No upcoming events at this time.</p>
         <p>Check back later for updates!</p>
@@ -95,11 +96,33 @@ async function renderEvents(events) {
     const eventHTML = await Promise.all(
       events.map((event) => createEventCard(event))
     );
-    container.innerHTML = eventHTML.join("");
+    gridContainer.innerHTML = eventHTML.join("");
+    initCarousel(); // Initialize carousel after rendering
   } catch (error) {
     console.error("Render error:", error);
     showErrorUI("Error displaying events");
   }
+}
+
+// Format phone number for display
+function formatPhoneNumber(phoneNumber) {
+  if (!phoneNumber) return "";
+
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, "");
+
+  // Format Nigerian phone numbers
+  if (cleaned.length === 11 && cleaned.startsWith("0")) {
+    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3");
+  }
+
+  // Format international numbers with country code
+  if (cleaned.length > 10) {
+    return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3");
+  }
+
+  // Default formatting
+  return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
 }
 
 // Create an HTML card for a single event
@@ -227,12 +250,13 @@ function formatEventDates(startDate, endDate) {
       return `${start.toLocaleDateString(undefined, {
         month: "long",
         day: "numeric",
-      })} - 
-              ${end.toLocaleDateString(undefined, options)}`;
+      })} - ${end.toLocaleDateString(undefined, { day: "numeric" })}`;
     }
 
-    return `${start.toLocaleDateString(undefined, options)} - 
-            ${end.toLocaleDateString(undefined, options)}`;
+    return `${start.toLocaleDateString(
+      undefined,
+      options
+    )} - ${end.toLocaleDateString(undefined, options)}`;
   } catch (error) {
     return startDate;
   }
@@ -300,55 +324,53 @@ function showErrorUI(
     </div>`;
 }
 
-// Initialize the promo loading and carousel navigation
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("promos-container")) {
-    loadPromos(); // Load promos when the page is ready
-  }
-
-  // Carousel navigation logic
+// Initialize the carousel navigation
+function initCarousel() {
   const promosGrid = document.querySelector(".promos-grid");
   const prevBtn = document.getElementById("prevPromo");
   const nextBtn = document.getElementById("nextPromo");
+
+  if (!promosGrid || !prevBtn || !nextBtn) return;
+
   let currentIndex = 0;
+  const promoCards = document.querySelectorAll(".promo-card");
+  if (!promoCards.length) return;
 
   // Update the carousel position and button states
   function updateCarousel() {
-    if (!promosGrid) return;
-
-    const cardWidth =
-      document.querySelector(".promo-card")?.offsetWidth + 24 || 0;
+    const cardWidth = promoCards[0].offsetWidth + 24;
     promosGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
 
     prevBtn.disabled = currentIndex === 0;
 
     const visibleCards =
       window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
-    const totalCards = document.querySelectorAll(".promo-card").length;
-    nextBtn.disabled = currentIndex >= totalCards - visibleCards;
+    nextBtn.disabled = currentIndex >= promoCards.length - visibleCards;
   }
 
-  // Add event listeners for carousel navigation buttons
-  if (prevBtn && nextBtn && promosGrid) {
-    prevBtn.addEventListener("click", () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateCarousel();
-      }
-    });
+  prevBtn.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCarousel();
+    }
+  });
 
-    nextBtn.addEventListener("click", () => {
-      const visibleCards =
-        window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
-      const totalCards = document.querySelectorAll(".promo-card").length;
+  nextBtn.addEventListener("click", () => {
+    const visibleCards =
+      window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
+    if (currentIndex < promoCards.length - visibleCards) {
+      currentIndex++;
+      updateCarousel();
+    }
+  });
 
-      if (currentIndex < totalCards - visibleCards) {
-        currentIndex++;
-        updateCarousel();
-      }
-    });
+  window.addEventListener("resize", updateCarousel);
+  updateCarousel(); // Initial setup
+}
 
-    window.addEventListener("resize", updateCarousel);
-    updateCarousel(); // Initial setup
+// Initialize the promo loading when DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("promos-container")) {
+    loadPromos(); // Load promos when the page is ready
   }
 });
