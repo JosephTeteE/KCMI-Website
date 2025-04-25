@@ -453,11 +453,13 @@ body.navbar-open .homepage-header-video-container {
   color: #7c1963;
   margin-bottom: 0.5rem;
   font-weight: 600;
+  font-size: 1.5rem;
 }
 
 .promos-section p.text-center {
   color: #555;
   margin-bottom: 1.5rem;
+  font-size: 1rem;
 }
 
 #promos-container {
@@ -514,6 +516,7 @@ body.navbar-open .homepage-header-video-container {
 
 .promo-content {
   padding: 1.25rem;
+  text-align: center;
 }
 
 .promo-card .event-title {
@@ -522,6 +525,7 @@ body.navbar-open .homepage-header-video-container {
   font-weight: 600;
   margin-bottom: 0.5rem;
   text-align: center;
+  padding-top: 1rem;
 }
 
 .promo-content .event-description {
@@ -540,6 +544,7 @@ body.navbar-open .homepage-header-video-container {
   font-size: 0.9rem;
   color: #555;
   margin: 0.4rem 0;
+  justify-content: center;
 }
 
 .promo-date i,
@@ -604,11 +609,24 @@ body.navbar-open .homepage-header-video-container {
   .promo-card {
     flex: 0 0 calc(50% - 1rem);
   }
+  .promos-section h2 {
+    font-size: 1.25rem;
+  }
+  .promos-section p.text-center {
+    font-size: 0.9rem;
+  }
 }
 
 @media (min-width: 992px) {
   .promo-card {
     flex: 0 0 calc(33.333% - 1rem);
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .promo-content {
+    flex-grow: 1;
   }
 }
 
