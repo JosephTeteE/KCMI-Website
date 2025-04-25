@@ -108,6 +108,23 @@ async function createEventCard(event) {
     const fileUrl = await getFileUrl(event.fileId, event.type);
     const thumbnailUrl = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
 
+    // Define mediaHTML based on the type of media
+    const mediaHTML =
+      event.type === "video"
+        ? `<div class="video-container">
+          <iframe src="${fileUrl}" 
+                  frameborder="0" 
+                  allowfullscreen
+                  loading="lazy"></iframe>
+          <div class="video-caption">Watch this invitation</div>
+        </div>`
+        : `<a href="${fileUrl}" target="_blank" rel="noopener noreferrer">
+          <img src="${thumbnailUrl}" 
+               alt="${escapeHtml(event.title)}" 
+               loading="lazy">
+          <div class="image-caption">Click to view details</div>
+        </a>`;
+
     // Return the HTML structure for the event card
     return `
       <div class="promo-card" aria-labelledby="event-title-${event.fileId}">
@@ -174,7 +191,6 @@ async function createEventCard(event) {
     `;
   } catch (error) {
     console.error("Card creation error:", error);
-    // Return an error card if the event fails to load
     return `
       <div class="promo-card error-card">
         <h3 class="event-title">${escapeHtml(event.title)}</h3>
