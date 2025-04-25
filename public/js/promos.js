@@ -92,12 +92,29 @@ async function renderEvents(events) {
   }
 
   try {
+    // Add single-event class if only one event
+    if (events.length === 1) {
+      container.classList.add("single-event");
+      // Hide carousel nav buttons for single event
+      const carouselNav = document.querySelector(".carousel-nav");
+      if (carouselNav) carouselNav.style.display = "none";
+    } else {
+      container.classList.remove("single-event");
+      // Show carousel nav buttons for multiple events
+      const carouselNav = document.querySelector(".carousel-nav");
+      if (carouselNav) carouselNav.style.display = "flex";
+    }
+
     // Generate HTML for each event and render them
     const eventHTML = await Promise.all(
       events.map((event) => createEventCard(event))
     );
     gridContainer.innerHTML = eventHTML.join("");
-    initCarousel(); // Initialize carousel after rendering
+
+    // Only initialize carousel if more than one event
+    if (events.length > 1) {
+      initCarousel();
+    }
   } catch (error) {
     console.error("Render error:", error);
     showErrorUI("Error displaying events");
@@ -135,27 +152,27 @@ async function createEventCard(event) {
     const mediaHTML =
       event.type === "video"
         ? `<div class="video-container">
-          <iframe src="${fileUrl}" 
-                  frameborder="0" 
-                  allowfullscreen
-                  loading="lazy"></iframe>
-          <div class="video-caption">Watch this invitation</div>
-        </div>`
+            <iframe src="${fileUrl}" 
+                    frameborder="0" 
+                    allowfullscreen
+                    loading="lazy"></iframe>
+            <div class="video-caption">Watch this invitation</div>
+          </div>`
         : `<a href="${fileUrl}" target="_blank" rel="noopener noreferrer">
-          <img src="${thumbnailUrl}" 
-               alt="${escapeHtml(event.title)}" 
-               loading="lazy">
-          <div class="image-caption">Click to view details</div>
-        </a>`;
+            <img src="${thumbnailUrl}" 
+                 alt="${escapeHtml(event.title)}" 
+                 loading="lazy">
+            <div class="image-caption">Click to view details</div>
+          </a>`;
 
     // Return the HTML structure for the event card
     return `
       <div class="promo-card" aria-labelledby="event-title-${event.fileId}">
-        <h3 class="event-title" id="event-title-${event.fileId}">${escapeHtml(
-      event.title
-    )}</h3>
         ${mediaHTML}
         <div class="promo-content">
+          <h3 class="event-title" id="event-title-${event.fileId}">${escapeHtml(
+      event.title
+    )}</h3>
           <p class="event-description">${escapeHtml(event.description)}</p>
           
           <div class="event-dates" aria-label="Event dates and times">
@@ -203,7 +220,7 @@ async function createEventCard(event) {
               : ""
           }
           
-          <div class="text-center mt-3">
+          <div class="text-center mt-2">
             <a href="${fileUrl}" class="btn btn-primary" target="_blank" 
                aria-label="View details for ${escapeHtml(event.title)}">
               ${event.type === "video" ? "Watch Video" : "View Details"}
@@ -216,8 +233,8 @@ async function createEventCard(event) {
     console.error("Card creation error:", error);
     return `
       <div class="promo-card error-card">
-        <h3 class="event-title">${escapeHtml(event.title)}</h3>
         <div class="promo-content">
+          <h3 class="event-title">${escapeHtml(event.title)}</h3>
           <p>Unable to load this event. Please try again later.</p>
         </div>
       </div>
@@ -336,16 +353,21 @@ function initCarousel() {
   const promoCards = document.querySelectorAll(".promo-card");
   if (!promoCards.length) return;
 
+  // Calculate how many cards are visible based on screen size
+  function getVisibleCards() {
+    if (window.innerWidth < 576) return 1; // Mobile - 1 card
+    if (window.innerWidth < 768) return 2; // Tablet - 2 cards
+    if (window.innerWidth < 1200) return 3; // Desktop - 3 cards
+    return 3; // Large desktop - max 3 cards (as requested)
+  }
+
   // Update the carousel position and button states
   function updateCarousel() {
-    const cardWidth = promoCards[0].offsetWidth + 24;
+    const cardWidth = promoCards[0].offsetWidth + 24; // Include gap
     promosGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
 
     prevBtn.disabled = currentIndex === 0;
-
-    const visibleCards =
-      window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
-    nextBtn.disabled = currentIndex >= promoCards.length - visibleCards;
+    nextBtn.disabled = currentIndex >= promoCards.length - getVisibleCards();
   }
 
   prevBtn.addEventListener("click", () => {
@@ -356,8 +378,7 @@ function initCarousel() {
   });
 
   nextBtn.addEventListener("click", () => {
-    const visibleCards =
-      window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
+    const visibleCards = getVisibleCards();
     if (currentIndex < promoCards.length - visibleCards) {
       currentIndex++;
       updateCarousel();

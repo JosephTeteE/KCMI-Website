@@ -446,22 +446,25 @@ body.navbar-open .homepage-header-video-container {
 
 .promos-section .container {
   padding: 0 1rem;
-  max-width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .promos-section h2 {
   color: #7c1963;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-size: clamp(1.5rem, 4vw, 1.8rem);
   line-height: 1.3;
+  text-align: center;
 }
 
 .promos-section p.text-center {
   color: #555;
-  margin-bottom: 1.25rem;
-  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  margin-bottom: 1rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
   line-height: 1.4;
+  text-align: center;
 }
 
 #promos-container {
@@ -471,9 +474,20 @@ body.navbar-open .homepage-header-video-container {
   padding: 0.5rem 0;
 }
 
+/* Single event styling */
+#promos-container.single-event .promos-grid {
+  justify-content: center;
+}
+
+#promos-container.single-event .promo-card {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .promos-grid {
   display: flex;
-  transition: transform 0.5s ease;
+  transition: transform 0.3s ease;
   gap: 1rem;
   padding: 0 0.5rem;
 }
@@ -488,7 +502,7 @@ body.navbar-open .homepage-header-video-container {
   margin: 0 0.5rem;
   display: flex;
   flex-direction: column;
-  min-height: 500px;
+  min-height: 450px;
 }
 
 .promo-card:hover {
@@ -499,19 +513,19 @@ body.navbar-open .homepage-header-video-container {
 .promo-card img,
 .promo-card .video-container {
   width: 100%;
-  height: auto; /* Let height adjust naturally */
-  min-height: 250px; /* Minimum height for media */
-  max-height: 60vh; /* Maximum height to prevent excessive size */
-  object-fit: contain; /* Show entire media without cropping */
+  height: auto;
+  min-height: 180px;
+  max-height: 40vh;
+  object-fit: contain;
   display: block;
 }
 
 .promo-card .video-container iframe {
   width: 100%;
   height: 100%;
-  min-height: 250px;
+  min-height: 180px;
   border: none;
-  aspect-ratio: 16/9; /* Maintain aspect ratio for videos */
+  aspect-ratio: 16/9;
 }
 
 .video-caption,
@@ -527,23 +541,22 @@ body.navbar-open .homepage-header-video-container {
   padding: 1rem;
   padding-bottom: 0.5rem;
   text-align: center;
-  flex-grow: 1; /* Allow content to grow and push button to bottom */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
 .promo-card .event-title {
   color: #7c1963;
-  font-size: clamp(1.1rem, 3vw, 1.4rem); /* Responsive font size */
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
   font-weight: 600;
   margin-bottom: 0.5rem;
   text-align: center;
-  padding-top: 0.5rem;
 }
 
 .promo-content .event-description {
   color: #333;
-  font-size: clamp(0.95rem, 2.5vw, 1.1rem); /* Responsive font size */
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   line-height: 1.4;
   margin-bottom: 0.75rem;
 }
@@ -554,9 +567,9 @@ body.navbar-open .homepage-header-video-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: clamp(0.85rem, 2.5vw, 1rem); /* Responsive font size */
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
   color: #555;
-  margin: 0.3rem 0;
+  margin: 0.25rem 0;
   justify-content: center;
 }
 
@@ -564,32 +577,9 @@ body.navbar-open .homepage-header-video-container {
 .event-location i,
 .event-contact i {
   color: #7c1963;
-  font-size: clamp(0.9rem, 2.5vw, 1.1rem); /* Responsive icon size */
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
 }
 
-.promo-card .btn-primary {
-  background-color: #7c1963;
-  border-color: #7c1963;
-  margin-top: auto; /* Push button to bottom */
-  font-size: clamp(0.9rem, 2.5vw, 1.1rem); /* Responsive button text */
-  padding: 0.5rem 1rem;
-}
-
-.promo-card .btn-primary:hover {
-  background-color: #6a1554;
-  border-color: #6a1554;
-}
-
-.loading-spinner {
-  text-align: center;
-  padding: 1.5rem;
-  color: #7c1963;
-  font-style: italic;
-  width: 100%;
-  font-size: clamp(1rem, 2.5vw, 1.2rem); /* Responsive font size */
-}
-
-/* Date and Time Styling */
 .event-dates {
   margin-bottom: 0.5rem;
 }
@@ -599,7 +589,7 @@ body.navbar-open .homepage-header-video-container {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
   color: #555;
   margin: 0.3rem 0;
 }
@@ -623,7 +613,28 @@ body.navbar-open .homepage-header-video-container {
   color: #7c1963;
 }
 
-/* Accessibility */
+.promo-card .btn-primary {
+  background-color: #7c1963;
+  border-color: #7c1963;
+  margin-top: auto;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  padding: 0.5rem 1rem;
+}
+
+.promo-card .btn-primary:hover {
+  background-color: #6a1554;
+  border-color: #6a1554;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 1.5rem;
+  color: #7c1963;
+  font-style: italic;
+  width: 100%;
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -636,7 +647,11 @@ body.navbar-open .homepage-header-video-container {
   border-width: 0;
 }
 
-/* Carousel Navigation for Promos section */
+/* Carousel Navigation - hide when only one event */
+#promos-container.single-event .carousel-nav {
+  display: none;
+}
+
 .carousel-nav {
   display: flex;
   justify-content: center;
@@ -668,7 +683,7 @@ body.navbar-open .homepage-header-video-container {
   cursor: not-allowed;
 }
 
-/* Responsive Styles for Promos Section */
+/* Responsive Styles */
 @media (min-width: 576px) {
   .promo-card {
     flex: 0 0 calc(50% - 1rem);
@@ -676,7 +691,7 @@ body.navbar-open .homepage-header-video-container {
 
   .promo-card img,
   .promo-card .video-container {
-    min-height: 300px;
+    min-height: 200px;
   }
 }
 
@@ -686,23 +701,19 @@ body.navbar-open .homepage-header-video-container {
   }
 
   .promo-card {
-    min-height: 550px;
+    flex: 0 0 calc(33.333% - 1rem);
+    min-height: 500px;
   }
 }
 
 @media (min-width: 992px) {
-  .promo-card {
-    flex: 0 0 calc(33.333% - 1rem);
-    min-height: 600px;
-  }
-
   .promo-card img,
   .promo-card .video-container {
-    min-height: 350px;
+    min-height: 220px;
   }
 }
 
-/* Dark Theme Styles for Promos section */
+/* Dark Theme Styles */
 [data-bs-theme="dark"] .promos-section {
   background-color: #1a1a1a;
 }
