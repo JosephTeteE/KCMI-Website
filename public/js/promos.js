@@ -1,20 +1,26 @@
 // public/js/promos.js
+
+// Constants for promo manifest ID, cache key, and cache time-to-live (TTL)
 const PROMO_MANIFEST_ID = "1QnJQXur7zNvqoks7TR5SRRgVqWlZdACO";
 const CACHE_KEY = "kcmi_events_cache";
-const CACHE_TTL = 30 * 60 * 1000;
+const CACHE_TTL = 30 * 60 * 1000; // Cache duration: 30 minutes
 
+// Main function to load promotional events
 async function loadPromos() {
   try {
+    // Check if cached data is available and valid
     const cachedData = getCachedPromos();
     if (cachedData) {
-      renderEvents(cachedData);
+      renderEvents(cachedData); // Render cached events if available
       return;
     }
 
+    // Fetch promo data from the backend API
     const response = await fetch(
       `https://kcmi-backend.onrender.com/api/drive-manifest?id=${PROMO_MANIFEST_ID}`
     );
 
+    // Handle non-OK responses
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       throw new Error(errorData?.error || `Server error: ${response.status}`);
@@ -22,17 +28,19 @@ async function loadPromos() {
 
     const events = await response.json();
 
+    // Validate the response format
     if (!Array.isArray(events)) {
       throw new Error("Invalid data format from server");
     }
 
+    // Cache the fetched data and render the events
     cachePromos(events);
     renderEvents(events);
   } catch (error) {
     console.error("Promos loading error:", error);
     showErrorUI(error.message || "Failed to load promotional content");
 
-    // Attempt to show cached data even if error occurs
+    // Fallback: Render cached data if available
     const cachedData = getCachedPromos();
     if (cachedData) {
       renderEvents(cachedData);
@@ -40,12 +48,14 @@ async function loadPromos() {
   }
 }
 
+// Retrieve cached promo data from localStorage
 function getCachedPromos() {
   const cached = localStorage.getItem(CACHE_KEY);
   if (!cached) return null;
 
   try {
     const { data, timestamp } = JSON.parse(cached);
+    // Check if the cache is still valid
     if (Date.now() - timestamp < CACHE_TTL) {
       return data;
     }
@@ -55,6 +65,7 @@ function getCachedPromos() {
   return null;
 }
 
+// Cache promo data in localStorage with a timestamp
 function cachePromos(data) {
   localStorage.setItem(
     CACHE_KEY,
@@ -65,9 +76,11 @@ function cachePromos(data) {
   );
 }
 
+// Render the list of events in the UI
 async function renderEvents(events) {
   const container = document.getElementById("promos-container");
 
+  // Handle empty events list
   if (!events || !events.length) {
     container.innerHTML = `
       <div class="col-12 text-center">
@@ -78,6 +91,7 @@ async function renderEvents(events) {
   }
 
   try {
+    // Generate HTML for each event and render them
     const eventHTML = await Promise.all(
       events.map((event) => createEventCard(event))
     );
@@ -88,11 +102,13 @@ async function renderEvents(events) {
   }
 }
 
+// Create an HTML card for a single event
 async function createEventCard(event) {
   try {
     const fileUrl = await getFileUrl(event.fileId, event.type);
     const thumbnailUrl = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
 
+    // Return the HTML structure for the event card
     return `
       <div class="promo-card">
         <h3 class="event-title">${escapeHtml(event.title)}</h3>
@@ -146,6 +162,7 @@ async function createEventCard(event) {
     `;
   } catch (error) {
     console.error("Card creation error:", error);
+    // Return an error card if the event fails to load
     return `
       <div class="promo-card error-card">
         <h3 class="event-title">${escapeHtml(event.title)}</h3>
@@ -157,12 +174,14 @@ async function createEventCard(event) {
   }
 }
 
+// Generate the appropriate file URL based on the event type
 async function getFileUrl(fileId, type) {
   return type === "video"
     ? `https://drive.google.com/file/d/${fileId}/preview`
     : `https://drive.google.com/file/d/${fileId}/view`;
 }
 
+// Format a date string into a human-readable format
 function formatDate(dateString) {
   try {
     const date = new Date(dateString);
@@ -177,10 +196,11 @@ function formatDate(dateString) {
           minute: "2-digit",
         });
   } catch (error) {
-    return dateString;
+    return dateString; // Fallback to the original string if formatting fails
   }
 }
 
+// Escape HTML to prevent XSS attacks
 function escapeHtml(text) {
   if (!text) return "";
   const div = document.createElement("div");
@@ -188,6 +208,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Display an error message in the UI
 function showErrorUI(
   message = "We're currently unable to load our upcoming events."
 ) {
@@ -200,9 +221,55 @@ function showErrorUI(
     </div>`;
 }
 
-// Initialize
+// Initialize the promo loading and carousel navigation
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("promos-container")) {
-    loadPromos();
+    loadPromos(); // Load promos when the page is ready
+  }
+
+  // Carousel navigation logic
+  const promosGrid = document.querySelector(".promos-grid");
+  const prevBtn = document.getElementById("prevPromo");
+  const nextBtn = document.getElementById("nextPromo");
+  let currentIndex = 0;
+
+  // Update the carousel position and button states
+  function updateCarousel() {
+    if (!promosGrid) return;
+
+    const cardWidth =
+      document.querySelector(".promo-card")?.offsetWidth + 24 || 0;
+    promosGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+
+    prevBtn.disabled = currentIndex === 0;
+
+    const visibleCards =
+      window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
+    const totalCards = document.querySelectorAll(".promo-card").length;
+    nextBtn.disabled = currentIndex >= totalCards - visibleCards;
+  }
+
+  // Add event listeners for carousel navigation buttons
+  if (prevBtn && nextBtn && promosGrid) {
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      const visibleCards =
+        window.innerWidth < 576 ? 1 : window.innerWidth < 992 ? 2 : 3;
+      const totalCards = document.querySelectorAll(".promo-card").length;
+
+      if (currentIndex < totalCards - visibleCards) {
+        currentIndex++;
+        updateCarousel();
+      }
+    });
+
+    window.addEventListener("resize", updateCarousel);
+    updateCarousel(); // Initial setup
   }
 });
