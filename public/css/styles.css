@@ -453,13 +453,13 @@ body.navbar-open .homepage-header-video-container {
   color: #7c1963;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 .promos-section p.text-center {
   color: #555;
   margin-bottom: 1.5rem;
-  font-size: 1rem;
+  font-size: 1.5rem;
 }
 
 #promos-container {
@@ -516,6 +516,7 @@ body.navbar-open .homepage-header-video-container {
 
 .promo-content {
   padding: 1.25rem;
+  padding-bottom: 0.25rem;
   text-align: center;
 }
 
@@ -615,11 +616,14 @@ body.navbar-open .homepage-header-video-container {
   .promos-section p.text-center {
     font-size: 0.9rem;
   }
+  .promo-card img,
+  .promo-card .video-container {
+    height: 250px;
+  }
 }
 
 @media (min-width: 992px) {
   .promo-card {
-    flex: 0 0 calc(33.333% - 1rem);
     min-height: 700px;
     display: flex;
     flex-direction: column;
@@ -627,6 +631,21 @@ body.navbar-open .homepage-header-video-container {
 
   .promo-content {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .promo-card img,
+  .promo-card .video-container {
+    height: 300px;
+  }
+
+  .promo-card .video-container iframe {
+    height: 100%;
+  }
+
+  .promo-card .btn-primary {
+    margin-top: auto;
   }
 }
 
