@@ -589,6 +589,53 @@ body.navbar-open .homepage-header-video-container {
   font-size: clamp(1rem, 2.5vw, 1.2rem); /* Responsive font size */
 }
 
+/* Date and Time Styling */
+.event-dates {
+  margin-bottom: 0.5rem;
+}
+
+.event-time,
+.event-times {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: #555;
+  margin: 0.3rem 0;
+}
+
+.time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.time-slot {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.session-name {
+  font-weight: 500;
+}
+
+.session-time {
+  color: #7c1963;
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Carousel Navigation for Promos section */
 .carousel-nav {
   display: flex;
@@ -720,6 +767,15 @@ body.navbar-open .homepage-header-video-container {
 
 [data-bs-theme="dark"] .carousel-nav button:hover {
   background-color: #8a2d71;
+}
+
+[data-bs-theme="dark"] .session-time {
+  color: #c298b7;
+}
+
+[data-bs-theme="dark"] .event-time,
+[data-bs-theme="dark"] .event-times {
+  color: #b0b0b0;
 }
 
 /* -------------------------------------------------------------------------- */
