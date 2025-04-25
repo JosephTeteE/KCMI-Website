@@ -1,20 +1,20 @@
 /* public/css/church-calendar.css */
 
 /* Church Calendar Styles */
-#calendar-container {
+#church-events-calendar-section #calendar-container {
   font-family: Arial, sans-serif;
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
 }
 
-.view-options {
+#church-events-calendar-section .view-options {
   margin-bottom: 20px;
   display: flex;
   justify-content: center;
 }
 
-.view-options button {
+#church-events-calendar-section .view-options button {
   padding: 8px 16px;
   margin: 0 5px;
   background: #f0f0f0;
@@ -24,17 +24,17 @@
   transition: all 0.3s ease;
 }
 
-.view-options button.active {
+#church-events-calendar-section .view-options button.active {
   background: #4caf50;
   color: white;
   border-color: #4caf50;
 }
 
-.view-options button:hover {
+#church-events-calendar-section .view-options button:hover {
   background: #e0e0e0;
 }
 
-.event-item {
+#church-events-calendar-section .event-item {
   border-left: 4px solid #4caf50;
   padding: 15px;
   margin-bottom: 15px;
@@ -42,7 +42,7 @@
   border-radius: 0 4px 4px 0;
 }
 
-.date-header {
+#church-events-calendar-section .date-header {
   font-size: 1.2em;
   font-weight: bold;
   margin: 20px 0 10px 0;
@@ -51,32 +51,32 @@
   color: #333;
 }
 
-.event-time {
+#church-events-calendar-section .event-time {
   font-weight: bold;
   color: #4caf50;
   margin-bottom: 5px;
 }
 
-.event-title {
+#church-events-calendar-section .event-title {
   font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 5px;
   color: #222;
 }
 
-.event-description {
+#church-events-calendar-section .event-description {
   color: #555;
   margin-bottom: 5px;
   line-height: 1.4;
 }
 
-.event-location {
+#church-events-calendar-section .event-location {
   color: #666;
   font-style: italic;
   margin-bottom: 10px;
 }
 
-.add-to-calendar-btn {
+#church-events-calendar-section .add-to-calendar-btn {
   background: #4285f4;
   color: white;
   border: none;
@@ -88,29 +88,29 @@
   transition: background 0.3s ease;
 }
 
-.add-to-calendar-btn:hover {
+#church-events-calendar-section .add-to-calendar-btn:hover {
   background: #3367d6;
 }
 
 /* Month view styles */
-#month-view {
+#church-events-calendar-section #month-view {
   margin-top: 20px;
 }
 
-.month-header {
+#church-events-calendar-section .month-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.month-header h3 {
+#church-events-calendar-section .month-header h3 {
   margin: 0;
   font-size: 1.3em;
   color: #333;
 }
 
-.month-header button {
+#church-events-calendar-section .month-header button {
   background: #f0f0f0;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -119,17 +119,17 @@
   transition: background 0.3s ease;
 }
 
-.month-header button:hover {
+#church-events-calendar-section .month-header button:hover {
   background: #e0e0e0;
 }
 
-.month-grid {
+#church-events-calendar-section .month-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
 }
 
-.day-header {
+#church-events-calendar-section .day-header {
   text-align: center;
   font-weight: bold;
   padding: 8px 5px;
@@ -137,7 +137,7 @@
   font-size: 0.9em;
 }
 
-.day-cell {
+#church-events-calendar-section .day-cell {
   min-height: 80px;
   border: 1px solid #eee;
   padding: 5px;
@@ -145,27 +145,27 @@
   font-size: 0.9em;
 }
 
-.day-cell.today {
+#church-events-calendar-section .day-cell.today {
   background: #fff8e1;
   border: 1px solid #ffd54f;
 }
 
-.day-cell.empty {
+#church-events-calendar-section .day-cell.empty {
   background: #f9f9f9;
   border: none;
 }
 
-.day-number {
+#church-events-calendar-section .day-number {
   font-weight: bold;
   margin-bottom: 3px;
   text-align: right;
 }
 
-.day-events {
+#church-events-calendar-section .day-events {
   font-size: 0.8em;
 }
 
-.month-event {
+#church-events-calendar-section .month-event {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -176,32 +176,32 @@
 }
 
 /* Loading and error messages */
-#loading-message,
-#no-events-message,
-#error-message {
+#church-events-calendar-section #loading-message,
+#church-events-calendar-section #no-events-message,
+#church-events-calendar-section #error-message {
   text-align: center;
   padding: 20px;
   font-size: 1.1em;
 }
 
-#error-message {
+#church-events-calendar-section #error-message {
   color: #d32f2f;
 }
 
 /* Skeleton loading states */
-.skeleton {
+#church-events-calendar-section .skeleton {
   animation: skeleton-loading 1s linear infinite alternate;
   opacity: 0.7;
   border-radius: 4px;
 }
 
-.skeleton-text {
+#church-events-calendar-section .skeleton-text {
   width: 100%;
   height: 1em;
   margin-bottom: 0.5em;
 }
 
-.skeleton-text:last-child {
+#church-events-calendar-section .skeleton-text:last-child {
   margin-bottom: 0;
   width: 80%;
 }
@@ -216,49 +216,49 @@
 }
 
 /* Calendar controls */
-.calendar-controls {
+#church-events-calendar-section .calendar-controls {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
 }
 
-#refresh-btn {
+#church-events-calendar-section #refresh-btn {
   padding: 5px 10px;
 }
 
-#refresh-icon {
+#church-events-calendar-section #refresh-icon {
   transition: transform 0.3s ease;
 }
 
-#refresh-btn.refreshing #refresh-icon {
+#church-events-calendar-section #refresh-btn.refreshing #refresh-icon {
   transform: rotate(360deg);
 }
 
 /* Month view event clickable */
-.month-event {
+#church-events-calendar-section .month-event {
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.month-event:hover {
+#church-events-calendar-section .month-event:hover {
   background-color: #dcedc8;
 }
 
 /* Improved Month View Styles */
-.month-view {
+#church-events-calendar-section .month-view {
   width: 100%;
   overflow-x: auto;
   padding-bottom: 10px;
 }
 
-.month-grid {
+#church-events-calendar-section .month-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 5px;
   min-width: 700px;
 }
 
-.day-cell {
+#church-events-calendar-section .day-cell {
   min-height: 80px;
   border: 1px solid #eee;
   padding: 5px;
@@ -267,12 +267,12 @@
   overflow: hidden;
 }
 
-.day-cell.today {
+#church-events-calendar-section .day-cell.today {
   background: #fff8e1;
   border: 1px solid #ffd54f;
 }
 
-.month-event {
+#church-events-calendar-section .month-event {
   white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -285,7 +285,7 @@
   line-height: 1.3;
 }
 
-.more-events {
+#church-events-calendar-section .more-events {
   padding-left: 10px;
   color: #666;
   font-style: italic;
@@ -293,27 +293,27 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .month-grid {
+  #church-events-calendar-section .month-grid {
     min-width: 100%;
   }
 
-  .day-cell {
+  #church-events-calendar-section .day-cell {
     min-height: 60px;
   }
 
-  .month-event {
+  #church-events-calendar-section .month-event {
     font-size: 0.7em;
   }
 }
 
 /* List View */
-#events-list {
+#church-events-calendar-section #events-list {
   max-height: 600px;
   overflow-y: auto;
   padding-right: 10px;
 }
 
-.date-header {
+#church-events-calendar-section .date-header {
   font-size: 1.1em;
   font-weight: bold;
   margin: 20px 0 10px 0;
@@ -326,147 +326,164 @@
   z-index: 1;
 }
 
-.more-dates-message {
+#church-events-calendar-section .more-dates-message {
   text-align: center;
   font-size: 0.9em;
   padding: 10px;
 }
 
 /* Scrollbar styling */
-#events-list::-webkit-scrollbar {
+#church-events-calendar-section #events-list::-webkit-scrollbar {
   width: 8px;
 }
 
-#events-list::-webkit-scrollbar-track {
+#church-events-calendar-section #events-list::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-#events-list::-webkit-scrollbar-thumb {
+#church-events-calendar-section #events-list::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
 }
 
-#events-list::-webkit-scrollbar-thumb:hover {
+#church-events-calendar-section #events-list::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
 /* Dark mode styles for church calendar */
-[data-bs-theme="dark"] #calendar-container {
+[data-bs-theme="dark"] #church-events-calendar-section #calendar-container {
   background-color: #121212;
   color: #e0e0e0;
 }
 
-[data-bs-theme="dark"] .view-options button {
+[data-bs-theme="dark"] #church-events-calendar-section .view-options button {
   background: #2c2c2c;
   border-color: #444;
   color: #e0e0e0;
 }
 
-[data-bs-theme="dark"] .view-options button.active {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  .view-options
+  button.active {
   background: #388e3c; /* Darker green */
   border-color: #388e3c;
 }
 
-[data-bs-theme="dark"] .view-options button:hover {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  .view-options
+  button:hover {
   background: #3d3d3d;
 }
 
-[data-bs-theme="dark"] .event-item {
+[data-bs-theme="dark"] #church-events-calendar-section .event-item {
   background-color: #1e1e1e;
   border-left-color: #4caf50;
 }
 
-[data-bs-theme="dark"] .date-header {
+[data-bs-theme="dark"] #church-events-calendar-section .date-header {
   color: #e0e0e0;
   border-bottom-color: #444;
 }
 
-[data-bs-theme="dark"] .event-time {
+[data-bs-theme="dark"] #church-events-calendar-section .event-time {
   color: #81c784; /* Lighter green */
 }
 
-[data-bs-theme="dark"] .event-title {
+[data-bs-theme="dark"] #church-events-calendar-section .event-title {
   color: #ffffff;
 }
 
-[data-bs-theme="dark"] .event-description {
+[data-bs-theme="dark"] #church-events-calendar-section .event-description {
   color: #b0b0b0;
 }
 
-[data-bs-theme="dark"] .event-location {
+[data-bs-theme="dark"] #church-events-calendar-section .event-location {
   color: #9e9e9e;
 }
 
-[data-bs-theme="dark"] .add-to-calendar-btn {
+[data-bs-theme="dark"] #church-events-calendar-section .add-to-calendar-btn {
   background: #5c6bc0; /* Different color for better visibility */
 }
 
-[data-bs-theme="dark"] .add-to-calendar-btn:hover {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  .add-to-calendar-btn:hover {
   background: #3949ab;
 }
 
-[data-bs-theme="dark"] .month-header h3 {
+[data-bs-theme="dark"] #church-events-calendar-section .month-header h3 {
   color: #e0e0e0;
 }
 
-[data-bs-theme="dark"] .month-header button {
+[data-bs-theme="dark"] #church-events-calendar-section .month-header button {
   background: #2c2c2c;
   border-color: #444;
   color: #e0e0e0;
 }
 
-[data-bs-theme="dark"] .month-header button:hover {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  .month-header
+  button:hover {
   background: #3d3d3d;
 }
 
-[data-bs-theme="dark"] .day-header {
+[data-bs-theme="dark"] #church-events-calendar-section .day-header {
   background: #2c2c2c;
 }
 
-[data-bs-theme="dark"] .day-cell {
+[data-bs-theme="dark"] #church-events-calendar-section .day-cell {
   background: #1e1e1e;
   border-color: #333;
 }
 
-[data-bs-theme="dark"] .day-cell.today {
+[data-bs-theme="dark"] #church-events-calendar-section .day-cell.today {
   background: #333300;
   border-color: #555500;
 }
 
-[data-bs-theme="dark"] .day-cell.empty {
+[data-bs-theme="dark"] #church-events-calendar-section .day-cell.empty {
   background: #121212;
 }
 
-[data-bs-theme="dark"] .month-event {
+[data-bs-theme="dark"] #church-events-calendar-section .month-event {
   background: #1b5e20; /* Dark green */
   color: #e0e0e0;
 }
 
-[data-bs-theme="dark"] .month-event:hover {
+[data-bs-theme="dark"] #church-events-calendar-section .month-event:hover {
   background-color: #2e7d32;
 }
 
-[data-bs-theme="dark"] #events-list::-webkit-scrollbar-track {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  #events-list::-webkit-scrollbar-track {
   background: #2c2c2c;
 }
 
-[data-bs-theme="dark"] #events-list::-webkit-scrollbar-thumb {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  #events-list::-webkit-scrollbar-thumb {
   background: #555;
 }
 
-[data-bs-theme="dark"] #events-list::-webkit-scrollbar-thumb:hover {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  #events-list::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
 
-[data-bs-theme="dark"] .date-header {
+[data-bs-theme="dark"] #church-events-calendar-section .date-header {
   background: #121212;
 }
 
-[data-bs-theme="dark"] .skeleton {
+[data-bs-theme="dark"] #church-events-calendar-section .skeleton {
   background-color: hsl(200, 20%, 15%);
 }
 
-[data-bs-theme="dark"] .skeleton-text {
+[data-bs-theme="dark"] #church-events-calendar-section .skeleton-text {
   background-color: hsl(200, 20%, 25%);
 }
 
@@ -478,15 +495,17 @@
     background-color: hsl(200, 20%, 25%);
   }
 }
-[data-bs-theme="dark"] .more-events {
+[data-bs-theme="dark"] #church-events-calendar-section .more-events {
   color: #bbb;
 }
-[data-bs-theme="dark"] .more-events:hover {
+[data-bs-theme="dark"] #church-events-calendar-section .more-events:hover {
   color: #fff;
 }
-[data-bs-theme="dark"] .more-dates-message {
+[data-bs-theme="dark"] #church-events-calendar-section .more-dates-message {
   color: #bbb;
 }
-[data-bs-theme="dark"] .more-dates-message:hover {
+[data-bs-theme="dark"]
+  #church-events-calendar-section
+  .more-dates-message:hover {
   color: #fff;
 }
