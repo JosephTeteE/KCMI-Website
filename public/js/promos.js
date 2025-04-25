@@ -110,50 +110,62 @@ async function createEventCard(event) {
 
     // Return the HTML structure for the event card
     return `
-      <div class="promo-card">
-        <h3 class="event-title">${escapeHtml(event.title)}</h3>
-        ${
-          event.type === "video"
-            ? `<div class="video-container">
-                <iframe src="${fileUrl}" 
-                        frameborder="0" 
-                        allowfullscreen
-                        loading="lazy"></iframe>
-                <div class="video-caption">Watch this invitation</div>
-              </div>`
-            : `<a href="${fileUrl}" target="_blank" rel="noopener noreferrer">
-                <img src="${thumbnailUrl}" 
-                     alt="${escapeHtml(event.title)}" 
-                     loading="lazy">
-                <div class="image-caption">Click to view details</div>
-              </a>`
-        }
+      <div class="promo-card" aria-labelledby="event-title-${event.fileId}">
+        <h3 class="event-title" id="event-title-${event.fileId}">${escapeHtml(
+      event.title
+    )}</h3>
+        ${mediaHTML}
         <div class="promo-content">
           <p class="event-description">${escapeHtml(event.description)}</p>
-          <div class="promo-date">
-            <i class="fas fa-calendar-alt"></i> ${formatDate(event.date)}
+          
+          <div class="event-dates" aria-label="Event dates and times">
+            <div class="promo-date">
+              <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+              ${formatEventDates(event.date, event.endDate)}
+            </div>
+            ${formatEventTimes(event.times)}
           </div>
+          
           ${
             event.location
-              ? `<div class="event-location">
-                  <i class="fas fa-map-marker-alt"></i> ${escapeHtml(
-                    event.location
-                  )}
-                </div>`
+              ? `
+            <div class="event-location">
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <span>${escapeHtml(event.location)}</span>
+            </div>
+          `
               : ""
           }
+          
           ${
             event.contact
-              ? `<p class="event-contact">
-                  <i class="fas fa-phone"></i> ${escapeHtml(event.contact)}
-                </p>`
+              ? `
+            <div class="event-contact">
+              <i class="fas fa-phone" aria-hidden="true"></i>
+              <span class="sr-only">Contact: </span>
+              <a href="tel:${event.contact.number.replace(/\D/g, "")}" 
+                 aria-label="Contact number: ${escapeHtml(
+                   event.contact.number
+                 )}">
+                ${formatPhoneNumber(event.contact.number)}
+              </a>
+              ${
+                event.contact.instructions
+                  ? `
+                <span class="contact-instructions">
+                  (${escapeHtml(event.contact.instructions)})
+                </span>
+              `
+                  : ""
+              }
+            </div>
+          `
               : ""
           }
+          
           <div class="text-center mt-3">
-            <a href="${fileUrl}" 
-               class="btn btn-primary" 
-               target="_blank"
-               rel="noopener noreferrer">
+            <a href="${fileUrl}" class="btn btn-primary" target="_blank" 
+               aria-label="View details for ${escapeHtml(event.title)}">
               ${event.type === "video" ? "Watch Video" : "View Details"}
             </a>
           </div>
@@ -181,23 +193,74 @@ async function getFileUrl(fileId, type) {
     : `https://drive.google.com/file/d/${fileId}/view`;
 }
 
-// Format a date string into a human-readable format
-function formatDate(dateString) {
+// Format a date range into a human-readable format
+function formatEventDates(startDate, endDate) {
   try {
-    const date = new Date(dateString);
-    return isNaN(date.getTime())
-      ? dateString
-      : date.toLocaleDateString(undefined, {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime())) return startDate;
+
+    const options = { year: "numeric", month: "long", day: "numeric" };
+
+    if (!endDate || isNaN(end.getTime()) || startDate === endDate) {
+      return start.toLocaleDateString(undefined, options);
+    }
+
+    if (start.getMonth() === end.getMonth()) {
+      return `${start.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric",
+      })} - 
+              ${end.toLocaleDateString(undefined, options)}`;
+    }
+
+    return `${start.toLocaleDateString(undefined, options)} - 
+            ${end.toLocaleDateString(undefined, options)}`;
   } catch (error) {
-    return dateString; // Fallback to the original string if formatting fails
+    return startDate;
   }
+}
+
+function formatEventTimes(times) {
+  if (!times) return "";
+
+  if (typeof times === "string") {
+    return `
+      <div class="event-time">
+        <i class="fas fa-clock" aria-hidden="true"></i>
+        <span>Time: ${escapeHtml(times)}</span>
+      </div>
+    `;
+  }
+
+  if (typeof times === "object") {
+    return `
+      <div class="event-times">
+        <i class="fas fa-clock" aria-hidden="true"></i>
+        <div class="time-slots">
+          ${Object.entries(times)
+            .map(
+              ([session, time]) => `
+            <div class="time-slot">
+              <span class="session-name">${capitalizeFirstLetter(
+                session
+              )}:</span>
+              <span class="session-time">${escapeHtml(time)}</span>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  return "";
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // Escape HTML to prevent XSS attacks
