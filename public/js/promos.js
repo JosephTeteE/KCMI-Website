@@ -183,11 +183,12 @@ function createDateHTML(event) {
     <div class="promo-date">
       <i class="fas fa-calendar-alt"></i>
       ${start.toLocaleDateString(undefined, {
+        year: "numeric",
         month: "short",
         day: "numeric",
       })} - 
       ${end.toLocaleDateString(undefined, {
-        year: start.getFullYear() !== end.getFullYear() ? "numeric" : undefined,
+        year: "numeric",
         month: "short",
         day: "numeric",
       })}
