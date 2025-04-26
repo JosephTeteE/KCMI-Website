@@ -518,7 +518,7 @@ body.navbar-open .homepage-header-video-container {
 #kcmi-promos-section .promo-media-container {
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 #kcmi-promos-section .promo-card img,
@@ -547,28 +547,33 @@ body.navbar-open .homepage-header-video-container {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+}
+
+#kcmi-promos-section .promo-card .text-center.mt-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  order: 1;
 }
 
 #kcmi-promos-section .promo-card .event-title {
   color: #7c1963;
   font-size: clamp(1.1rem, 3vw, 1.3rem);
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   text-align: center;
-  order: 1;
+  order: 2;
 }
 
 #kcmi-promos-section .promo-content .event-description {
   color: #333;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
   line-height: 1.4;
-  margin-bottom: 0.75rem;
-  order: 2;
+  margin-bottom: 0.5rem;
+  order: 3;
 }
 
 #kcmi-promos-section .event-details {
-  order: 3;
+  order: 4;
 }
 
 #kcmi-promos-section .promo-media-container .video-caption,
@@ -649,10 +654,9 @@ body.navbar-open .homepage-header-video-container {
 #kcmi-promos-section .promo-card .btn-primary {
   background-color: #7c1963;
   border-color: #7c1963;
-  margin-top: 0.5rem;
+  margin-top: 0;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
   padding: 0.5rem 1rem;
-  order: 4;
 }
 
 #kcmi-promos-section .promo-card .btn-primary:hover {
