@@ -148,7 +148,6 @@ function createMediaHTML(event) {
     return `
       <div class="video-container">
         <iframe src="${url}" frameborder="0" allowfullscreen></iframe>
-        <div class="video-caption">Watch invitation</div>
       </div>
     `;
   }
