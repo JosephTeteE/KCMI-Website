@@ -353,6 +353,94 @@ app.get("/api/drive-manifest", async (req, res) => {
   }
 });
 
+// Google Drive File Download Endpoint
+app.get("/api/sheets-events", async (req, res) => {
+  try {
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: "Sheet ID required" });
+
+    // Refresh token if needed
+    if (oauth2Client.isTokenExpiring()) {
+      const { credentials } = await oauth2Client.refreshAccessToken();
+      oauth2Client.setCredentials(credentials);
+    }
+
+    const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+
+    // Get all data from first sheet
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: id,
+      range: "A1:N100", // Columns A-N, up to 100 rows
+    });
+
+    const rows = response.data.values;
+    if (!rows || rows.length < 2) return res.json([]); // Empty if no data
+
+    // Process into event objects
+    const events = [];
+    const headers = rows[0].map((h) => h.toLowerCase().replace(/\s+/g, ""));
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row[0]) continue; // Skip empty rows
+
+      // Build times object from time columns
+      const times = {};
+      if (row[6] && row[6].toLowerCase() === "yes") {
+        times.allday = true;
+      } else {
+        if (row[7]) times.morning = formatTime(row[7]);
+        if (row[8]) times.afternoon = formatTime(row[8]);
+        if (row[9]) times.evening = formatTime(row[9]);
+      }
+
+      const event = {
+        title: row[0] || "",
+        type: (row[1] || "pdf").toLowerCase(),
+        fileId: row[2] || "",
+        description: row[3] || "",
+        date: formatDate(row[4]),
+        endDate: row[5] ? formatDate(row[5]) : formatDate(row[4]),
+        times: Object.keys(times).length > 0 ? times : null,
+        location: row[10] || "",
+        contact: {
+          number: row[11] || "",
+          instructions: row[12] || "",
+        },
+        notes: row[13] || "",
+      };
+
+      events.push(event);
+    }
+
+    res.json(events);
+
+    // Helper functions
+    function formatDate(dateString) {
+      if (!dateString) return "";
+      // Try to parse various date formats
+      const date = new Date(dateString);
+      return isNaN(date.getTime())
+        ? dateString
+        : date.toISOString().split("T")[0];
+    }
+
+    function formatTime(timeString) {
+      if (!timeString) return "";
+      // Convert "9am" to "9:00 AM" etc.
+      return timeString
+        .replace(/(\d+)([ap]m)/i, "$1:00 $2")
+        .replace(/([ap]m)/i, (match) => match.toUpperCase());
+    }
+  } catch (error) {
+    console.error("Sheets API Error:", error);
+    res.status(500).json({
+      error: "Failed to load events",
+      details: process.env.NODE_ENV === "development" ? error.message : "",
+    });
+  }
+});
+
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.use((err, req, res, next) => {

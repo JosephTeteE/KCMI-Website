@@ -1,71 +1,57 @@
 // public/js/promos.js
+// This script handles the loading and rendering of promotional events from a Google Sheet.
+// It includes caching, error handling, and responsive design features.
+// Constants
 
-// Constants for promo manifest ID, cache key, and cache time-to-live (TTL)
-const PROMO_MANIFEST_ID = "1QnJQXur7zNvqoks7TR5SRRgVqWlZdACO";
+const PROMO_SHEET_ID = "1RCk_BhG_uv791dIVUmLHxhW4Ok0hPfvXLNp3QFUiaQo";
 const CACHE_KEY = "kcmi_events_cache";
-const CACHE_TTL = 30 * 60 * 1000; // Cache duration: 30 minutes
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
-// Main function to load promotional events
+// Main loading function
 async function loadPromos() {
   try {
-    // Check if cached data is available and valid
-    const cachedData = getCachedPromos();
-    if (cachedData) {
-      renderEvents(cachedData); // Render cached events if available
-      return;
-    }
-
-    // Fetch promo data from the backend API
-    const response = await fetch(
-      `https://kcmi-backend.onrender.com/api/drive-manifest?id=${PROMO_MANIFEST_ID}`
-    );
-
-    // Handle non-OK responses
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.error || `Server error: ${response.status}`);
-    }
-
-    const events = await response.json();
-
-    // Validate the response format
-    if (!Array.isArray(events)) {
-      throw new Error("Invalid data format from server");
-    }
-
-    // Cache the fetched data and render the events
-    cachePromos(events);
-    renderEvents(events);
-  } catch (error) {
-    console.error("Promos loading error:", error);
-    showErrorUI(error.message || "Failed to load promotional content");
-
-    // Fallback: Render cached data if available
     const cachedData = getCachedPromos();
     if (cachedData) {
       renderEvents(cachedData);
+      // Refresh data in background
+      setTimeout(fetchAndCachePromos, 1000);
+      return;
+    }
+    await fetchAndCachePromos();
+  } catch (error) {
+    console.error("Promos loading error:", error);
+    const cachedData = getCachedPromos();
+    if (cachedData) {
+      renderEvents(cachedData);
+    } else {
+      showErrorUI();
     }
   }
 }
 
-// Retrieve cached promo data from localStorage
+async function fetchAndCachePromos() {
+  const response = await fetch(
+    `https://kcmi-backend.onrender.com/api/sheets-events?id=${PROMO_SHEET_ID}`
+  );
+  if (!response.ok) throw new Error("Network error");
+  const events = await response.json();
+  cachePromos(events);
+  renderEvents(events);
+}
+
+// Cache functions (same as before)
 function getCachedPromos() {
   const cached = localStorage.getItem(CACHE_KEY);
   if (!cached) return null;
-
   try {
     const { data, timestamp } = JSON.parse(cached);
-    // Check if the cache is still valid
-    if (Date.now() - timestamp < CACHE_TTL) {
-      return data;
-    }
+    if (Date.now() - timestamp < CACHE_TTL) return data;
   } catch (e) {
     console.warn("Cache parse error:", e);
   }
   return null;
 }
 
-// Cache promo data in localStorage with a timestamp
 function cachePromos(data) {
   localStorage.setItem(
     CACHE_KEY,
@@ -76,251 +62,237 @@ function cachePromos(data) {
   );
 }
 
-// Render the list of events in the UI
-async function renderEvents(events) {
+// Enhanced rendering
+function renderEvents(events) {
   const container = document.getElementById("promos-container");
-  const gridContainer = container.querySelector(".promos-grid") || container;
+  const gridContainer = container.querySelector(".promos-grid");
 
-  // Handle empty events list
-  if (!events || !events.length) {
-    gridContainer.innerHTML = `
-      <div class="col-12 text-center">
-        <p class="text-muted">No upcoming events at this time.</p>
-        <p>Check back later for updates!</p>
-      </div>`;
+  if (!events || events.length === 0) {
+    gridContainer.innerHTML = noEventsHTML();
     return;
   }
 
-  try {
-    // Add single-event class if only one event
-    if (events.length === 1) {
-      container.classList.add("single-event");
-      // Hide carousel nav buttons for single event
-      const carouselNav = document.querySelector(".carousel-nav");
-      if (carouselNav) carouselNav.style.display = "none";
-    } else {
-      container.classList.remove("single-event");
-      // Show carousel nav buttons for multiple events
-      const carouselNav = document.querySelector(".carousel-nav");
-      if (carouselNav) carouselNav.style.display = "flex";
-    }
+  // Handle single/multiple events
+  container.classList.toggle("single-event", events.length === 1);
+  document.querySelector(".carousel-nav").style.display =
+    events.length > 1 ? "flex" : "none";
 
-    // Generate HTML for each event and render them
-    const eventHTML = await Promise.all(
-      events.map((event) => createEventCard(event))
-    );
-    gridContainer.innerHTML = eventHTML.join("");
+  // Render all events
+  gridContainer.innerHTML = events
+    .map((event) => createEventCard(event))
+    .join("");
 
-    // Only initialize carousel if more than one event
-    if (events.length > 1) {
-      initCarousel();
-    }
-  } catch (error) {
-    console.error("Render error:", error);
-    showErrorUI("Error displaying events");
-  }
+  if (events.length > 1) initCarousel();
 }
 
-// Format phone number for display
-function formatPhoneNumber(phoneNumber) {
-  if (!phoneNumber) return "";
-
-  // Remove all non-digit characters
-  const cleaned = phoneNumber.replace(/\D/g, "");
-
-  // Format Nigerian phone numbers
-  if (cleaned.length === 11 && cleaned.startsWith("0")) {
-    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3");
-  }
-
-  // Format international numbers with country code
-  if (cleaned.length > 10) {
-    return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3");
-  }
-
-  // Default formatting
-  return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+function noEventsHTML() {
+  return `
+    <div class="col-12 text-center">
+      <p class="text-muted">No upcoming events scheduled.</p>
+      <p>Check back soon for updates!</p>
+    </div>`;
 }
 
-// Create an HTML card for a single event
-async function createEventCard(event) {
-  try {
-    const fileUrl = await getFileUrl(event.fileId, event.type);
-    const thumbnailUrl = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
+// Enhanced event card creation
+function createEventCard(event) {
+  const mediaHTML = createMediaHTML(event);
+  const dateHTML = createDateHTML(event);
+  const timeHTML = createTimeHTML(event);
+  const contactHTML = createContactHTML(event);
 
-    // Define mediaHTML based on the type of media
-    const mediaHTML =
-      event.type === "video"
-        ? `<div class="video-container">
-            <iframe src="${fileUrl}" 
-                    frameborder="0" 
-                    allowfullscreen
-                    loading="lazy"></iframe>
-            <div class="video-caption">Watch this invitation</div>
-          </div>`
-        : `<a href="${fileUrl}" target="_blank" rel="noopener noreferrer">
-            <img src="${thumbnailUrl}" 
-                 alt="${escapeHtml(event.title)}" 
-                 loading="lazy">
-            <div class="image-caption">Click to view details</div>
-          </a>`;
-
-    // Return the HTML structure for the event card
-    return `
-      <div class="promo-card" aria-labelledby="event-title-${event.fileId}">
-        ${mediaHTML}
-        <div class="promo-content">
-          <h3 class="event-title" id="event-title-${event.fileId}">${escapeHtml(
-      event.title
-    )}</h3>
+  return `
+    <div class="promo-card">
+      ${mediaHTML}
+      <div class="promo-content">
+        <h3 class="event-title">${escapeHtml(event.title)}</h3>
+        ${
+          event.description
+            ? `
           <p class="event-description">${escapeHtml(event.description)}</p>
-          
-          <div class="event-dates" aria-label="Event dates and times">
-            <div class="promo-date">
-              <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-              ${formatEventDates(event.date, event.endDate)}
-            </div>
-            ${formatEventTimes(event.times)}
-          </div>
-          
+        `
+            : ""
+        }
+        
+        <div class="event-details">
+          ${dateHTML}
+          ${timeHTML}
           ${
             event.location
               ? `
             <div class="event-location">
-              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <i class="fas fa-map-marker-alt"></i>
               <span>${escapeHtml(event.location)}</span>
             </div>
           `
               : ""
           }
-          
-          ${
-            event.contact
-              ? `
-            <div class="event-contact">
-              <i class="fas fa-phone" aria-hidden="true"></i>
-              <span class="sr-only">Contact: </span>
-              <a href="tel:${event.contact.number.replace(/\D/g, "")}" 
-                 aria-label="Contact number: ${escapeHtml(
-                   event.contact.number
-                 )}">
-                ${formatPhoneNumber(event.contact.number)}
-              </a>
-              ${
-                event.contact.instructions
-                  ? `
-                <span class="contact-instructions">
-                  (${escapeHtml(event.contact.instructions)})
-                </span>
-              `
-                  : ""
-              }
-            </div>
-          `
-              : ""
-          }
-          
-          <div class="text-center mt-2">
-            <a href="${fileUrl}" class="btn btn-primary" target="_blank" 
-               aria-label="View details for ${escapeHtml(event.title)}">
-              ${event.type === "video" ? "Watch Video" : "View Details"}
-            </a>
-          </div>
+          ${contactHTML}
+        </div>
+        
+        <div class="text-center mt-2">
+          <a href="${getFileUrl(
+            event
+          )}" class="btn btn-primary" target="_blank">
+            ${getActionText(event.type)}
+          </a>
         </div>
       </div>
-    `;
-  } catch (error) {
-    console.error("Card creation error:", error);
+    </div>
+  `;
+}
+
+// Helper components
+function createMediaHTML(event) {
+  const url = getFileUrl(event);
+  const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
+
+  if (event.type === "video") {
     return `
-      <div class="promo-card error-card">
-        <div class="promo-content">
-          <h3 class="event-title">${escapeHtml(event.title)}</h3>
-          <p>Unable to load this event. Please try again later.</p>
-        </div>
+      <div class="video-container">
+        <iframe src="${url}" frameborder="0" allowfullscreen></iframe>
+        <div class="video-caption">Watch invitation</div>
       </div>
     `;
   }
+
+  return `
+    <a href="${url}" target="_blank" rel="noopener noreferrer">
+      <img src="${thumbnail}" alt="${escapeHtml(event.title)}" loading="lazy">
+      <div class="image-caption">Click to view details</div>
+    </a>
+  `;
 }
 
-// Generate the appropriate file URL based on the event type
-async function getFileUrl(fileId, type) {
-  return type === "video"
-    ? `https://drive.google.com/file/d/${fileId}/preview`
-    : `https://drive.google.com/file/d/${fileId}/view`;
-}
+function createDateHTML(event) {
+  const start = new Date(event.date);
+  const end = new Date(event.endDate);
+  const isSameDay = start.toDateString() === end.toDateString();
 
-// Format a date range into a human-readable format
-function formatEventDates(startDate, endDate) {
-  try {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (isNaN(start.getTime())) return startDate;
-
-    const options = { year: "numeric", month: "long", day: "numeric" };
-
-    if (!endDate || isNaN(end.getTime()) || startDate === endDate) {
-      return start.toLocaleDateString(undefined, options);
-    }
-
-    if (start.getMonth() === end.getMonth()) {
-      return `${start.toLocaleDateString(undefined, {
-        month: "long",
-        day: "numeric",
-      })} - ${end.toLocaleDateString(undefined, { day: "numeric" })}`;
-    }
-
-    return `${start.toLocaleDateString(
-      undefined,
-      options
-    )} - ${end.toLocaleDateString(undefined, options)}`;
-  } catch (error) {
-    return startDate;
+  if (isSameDay) {
+    return `
+      <div class="promo-date">
+        <i class="fas fa-calendar-alt"></i>
+        ${start.toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </div>
+    `;
   }
+
+  return `
+    <div class="promo-date">
+      <i class="fas fa-calendar-alt"></i>
+      ${start.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      })} - 
+      ${end.toLocaleDateString(undefined, {
+        year: start.getFullYear() !== end.getFullYear() ? "numeric" : undefined,
+        month: "short",
+        day: "numeric",
+      })}
+    </div>
+  `;
 }
 
-function formatEventTimes(times) {
-  if (!times) return "";
+function createTimeHTML(event) {
+  if (!event.times) return "";
 
-  if (typeof times === "string") {
+  if (event.times.allday) {
     return `
       <div class="event-time">
-        <i class="fas fa-clock" aria-hidden="true"></i>
-        <span>Time: ${escapeHtml(times)}</span>
+        <i class="fas fa-clock"></i>
+        <span>All Day Event</span>
       </div>
     `;
   }
 
-  if (typeof times === "object") {
+  const timeSlots = [];
+  if (event.times.morning) timeSlots.push(`Morning: ${event.times.morning}`);
+  if (event.times.afternoon)
+    timeSlots.push(`Afternoon: ${event.times.afternoon}`);
+  if (event.times.evening) timeSlots.push(`Evening: ${event.times.evening}`);
+
+  if (timeSlots.length === 1) {
     return `
-      <div class="event-times">
-        <i class="fas fa-clock" aria-hidden="true"></i>
-        <div class="time-slots">
-          ${Object.entries(times)
-            .map(
-              ([session, time]) => `
-            <div class="time-slot">
-              <span class="session-name">${capitalizeFirstLetter(
-                session
-              )}:</span>
-              <span class="session-time">${escapeHtml(time)}</span>
-            </div>
-          `
-            )
-            .join("")}
-        </div>
+      <div class="event-time">
+        <i class="fas fa-clock"></i>
+        <span>${timeSlots[0].split(": ")[1]}</span>
       </div>
     `;
   }
 
-  return "";
+  return `
+    <div class="event-times">
+      <i class="fas fa-clock"></i>
+      <div class="time-slots">
+        ${timeSlots
+          .map(
+            (slot) => `
+          <div class="time-slot">
+            <span class="session-name">${slot.split(":")[0]}:</span>
+            <span class="session-time">${slot.split(": ")[1]}</span>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
 }
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+function createContactHTML(event) {
+  if (!event.contact?.number) return "";
+
+  return `
+    <div class="event-contact">
+      <i class="fas fa-phone"></i>
+      <a href="tel:${event.contact.number.replace(/\D/g, "")}">
+        ${formatPhoneNumber(event.contact.number)}
+      </a>
+      ${
+        event.contact.instructions
+          ? `
+        <span class="contact-instructions">
+          (${escapeHtml(event.contact.instructions)})
+        </span>
+      `
+          : ""
+      }
+    </div>
+  `;
 }
 
-// Escape HTML to prevent XSS attacks
+// Utility functions
+function getFileUrl(event) {
+  if (event.type === "video") {
+    return `https://drive.google.com/file/d/${event.fileId}/preview`;
+  }
+  return `https://drive.google.com/file/d/${event.fileId}/view`;
+}
+
+function getActionText(type) {
+  switch (type) {
+    case "video":
+      return "Watch Video";
+    case "image":
+      return "View Image";
+    default:
+      return "View Details";
+  }
+}
+
+function formatPhoneNumber(number) {
+  if (!number) return "";
+  const cleaned = number.replace(/\D/g, "");
+  if (cleaned.length === 11 && cleaned.startsWith("0")) {
+    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3");
+  }
+  return number;
+}
+
 function escapeHtml(text) {
   if (!text) return "";
   const div = document.createElement("div");
@@ -328,16 +300,12 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Display an error message in the UI
-function showErrorUI(
-  message = "We're currently unable to load our upcoming events."
-) {
+function showErrorUI() {
   const container = document.getElementById("promos-container");
   container.innerHTML = `
     <div class="col-12 text-center">
-      <p class="text-danger">${message}</p>
-      <p>Please try again later or contact us for information.</p>
-      <a href="/contact-us.html" class="btn btn-outline-primary">Contact Us</a>
+      <p class="text-danger">We're having trouble loading events.</p>
+      <p>Please try again later.</p>
     </div>`;
 }
 
