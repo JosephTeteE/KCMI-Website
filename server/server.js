@@ -14,6 +14,7 @@ const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const rateLimit = require("express-rate-limit");
 
+// Load environment variables from .env file
 dotenv.config();
 
 // Check for required environment variables
@@ -38,25 +39,25 @@ if (missingVars.length > 0) {
 
 // Initialize Express Application
 const app = express();
-app.use(express.json());
+app.use(express.json()); // Parse incoming JSON requests
 
 // CORS Configuration
 const corsOptions = {
-  origin: "https://www.kcmi-rcc.org",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: "https://www.kcmi-rcc.org", // Allow requests from this origin
+  methods: ["GET", "POST"], // Allowed HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
 };
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests
 
-// Serve static files
+// Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "../public")));
 
-// Nodemailer Transporter
+// Nodemailer Transporter for sending emails
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
-  secure: false,
+  secure: false, // Use TLS
   requireTLS: true,
   auth: {
     user: process.env.SMTP_USER,
@@ -75,7 +76,7 @@ async function verifyRecaptcha(token) {
         params: { secret: secretKey, response: token },
       }
     );
-    return response.data.success;
+    return response.data.success; // Return true if verification succeeds
   } catch (error) {
     console.error("reCAPTCHA verification failed:", error);
     return false;
@@ -86,24 +87,28 @@ async function verifyRecaptcha(token) {
 app.post("/submit-contact", async (req, res) => {
   const { email, phone, message, recaptchaToken } = req.body;
 
+  // Verify reCAPTCHA token
   if (!(await verifyRecaptcha(recaptchaToken))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
+  // Validate email format
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
       .json({ success: false, message: "Valid email required" });
   }
 
+  // Validate phone format (if provided)
   if (phone && !/^\+?[0-9\s-]{7,15}$/.test(phone)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid phone format" });
   }
 
+  // Email options for admin and auto-reply
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: "kcmi.forms@gmail.com",
@@ -121,6 +126,7 @@ app.post("/submit-contact", async (req, res) => {
   };
 
   try {
+    // Send emails
     await transporter.sendMail(mailOptions);
     await transporter.sendMail(autoReplyMailOptions);
     res.json({ success: true, message: "Message sent successfully!" });
@@ -134,12 +140,14 @@ app.post("/submit-contact", async (req, res) => {
 app.post("/subscribe", async (req, res) => {
   const { email, subscriptionType, recaptchaToken } = req.body;
 
+  // Verify reCAPTCHA token
   if (!(await verifyRecaptcha(recaptchaToken))) {
     return res
       .status(400)
       .json({ success: false, message: "reCAPTCHA failed" });
   }
 
+  // Validate email format
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res
       .status(400)
@@ -148,6 +156,7 @@ app.post("/subscribe", async (req, res) => {
 
   try {
     if (subscriptionType === "whatsapp") {
+      // Send WhatsApp subscription link via email
       const whatsappLink = `https://wa.me/+2349134448322?text=Subscribe`;
       await transporter.sendMail({
         from: process.env.SMTP_USER,
@@ -171,7 +180,7 @@ app.post("/subscribe", async (req, res) => {
 app.get("/api/db-check", async (req, res) => {
   try {
     const connection = await pool.getConnection();
-    await connection.ping();
+    await connection.ping(); // Check if the database is reachable
     connection.release();
     res.json({ success: true, message: "Database connection successful!" });
   } catch (error) {
@@ -188,11 +197,11 @@ app.use("/api/livestream", livestreamRoutes);
 
 // Google Calendar API Setup
 const calendarCache = new NodeCache({
-  stdTTL: 1800,
-  checkperiod: 300,
+  stdTTL: 1800, // Cache events for 30 minutes
+  checkperiod: 300, // Check for expired cache every 5 minutes
 });
 
-// Initialize OAuth2 client
+// Initialize OAuth2 client for Google APIs
 const oauth2Client = new OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -225,6 +234,7 @@ app.get("/api/calendar-events", async (req, res) => {
   try {
     await verifyCalendarAuth();
 
+    // Check if events are cached
     const cachedEvents = calendarCache.get("events");
     if (cachedEvents) {
       res.set("X-Cache", "HIT");
@@ -240,6 +250,7 @@ app.get("/api/calendar-events", async (req, res) => {
     const oneMonthLater = new Date();
     oneMonthLater.setMonth(now.getMonth() + 1);
 
+    // Fetch events from Google Calendar
     const response = await calendar.events.list({
       calendarId: process.env.CALENDAR_ID,
       timeMin: now.toISOString(),
@@ -250,9 +261,9 @@ app.get("/api/calendar-events", async (req, res) => {
     });
 
     const events = response.data.items || [];
-    calendarCache.set("events", events);
+    calendarCache.set("events", events); // Cache the events
     res.set("X-Cache", "MISS");
-    res.set("Cache-Control", "public, max-age=900");
+    res.set("Cache-Control", "public, max-age=900"); // Cache-Control header
     res.json(events);
   } catch (error) {
     console.error("Calendar API error:", error);
@@ -270,12 +281,12 @@ app.get("/api/calendar-events", async (req, res) => {
   }
 });
 
-// Rate Limiting
+// Rate Limiting for Calendar API
 const calendarLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15-minute window
+  max: 100, // Limit each IP to 100 requests per window
   handler: (req, res) => {
-    res.set("Retry-After", 15 * 60);
+    res.set("Retry-After", 15 * 60); // Retry after 15 minutes
     res.status(429).json({
       error: "Too many requests",
       message: "Please try again later",
@@ -288,9 +299,10 @@ app.use("/api/calendar-events", calendarLimiter);
 app.post("/api/auth", async (req, res) => {
   const { username, password } = req.body;
 
+  // Validate credentials
   if (username === process.env.AD_USER && password === process.env.AD_PASS) {
     const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "1m", // Token expires in 1 minute
     });
     res.json({ token });
   } else {
@@ -315,7 +327,7 @@ app.get("/api/drive-manifest", async (req, res) => {
       auth: oauth2Client,
     });
 
-    // Verify access first
+    // Verify access to the file
     await drive.files.get({
       fileId: id,
       fields: "id,name",
@@ -334,7 +346,7 @@ app.get("/api/drive-manifest", async (req, res) => {
   } catch (error) {
     console.error("Drive API Error:", error);
 
-    // Detailed error response
+    // Handle specific error codes
     let statusCode = 500;
     let errorMessage = "Failed to load manifest";
 
@@ -368,16 +380,16 @@ app.get("/api/sheets-events", async (req, res) => {
 
     const sheets = google.sheets({ version: "v4", auth: oauth2Client });
 
-    // Get all data from first sheet
+    // Get all data from the first sheet
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: id,
       range: "A1:N100", // Columns A-N, up to 100 rows
     });
 
     const rows = response.data.values;
-    if (!rows || rows.length < 2) return res.json([]); // Empty if no data
+    if (!rows || rows.length < 2) return res.json([]); // Return empty if no data
 
-    // Process into event objects
+    // Process rows into event objects
     const events = [];
     const headers = rows[0].map((h) => h.toLowerCase().replace(/\s+/g, ""));
 

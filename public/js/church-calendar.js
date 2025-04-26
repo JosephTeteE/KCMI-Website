@@ -3,41 +3,44 @@
 
 class ChurchCalendar {
   constructor() {
-    this.cachedEvents = null;
-    this.isFetching = false;
-    this.currentView = "list"; // 'list' or 'month'
-    this.currentMonth = new Date().getMonth();
-    this.currentYear = new Date().getFullYear();
-    this.modal = new bootstrap.Modal(document.getElementById("eventModal"));
+    // Initialize state variables
+    this.cachedEvents = null; // Cache for fetched events
+    this.isFetching = false; // Prevent multiple simultaneous fetches
+    this.currentView = "list"; // Current view mode ('list' or 'month')
+    this.currentMonth = new Date().getMonth(); // Current month for the calendar
+    this.currentYear = new Date().getFullYear(); // Current year for the calendar
+    this.modal = new bootstrap.Modal(document.getElementById("eventModal")); // Bootstrap modal for event details
   }
 
   async init() {
+    // Initialize the calendar by setting up event listeners and loading events
     this.setupEventListeners();
     await this.loadEvents();
   }
 
   setupEventListeners() {
-    // Event delegation for all calendar interactions
+    // Attach event listeners for user interactions
     document
       .getElementById("calendar-container")
       .addEventListener("click", (e) => {
-        if (e.target.id === "refresh-btn") this.loadEvents();
-        if (e.target.id === "list-view-btn") this.switchView("list");
-        if (e.target.id === "month-view-btn") this.switchView("month");
-        if (e.target.id === "prev-month") this.changeMonth(-1);
-        if (e.target.id === "next-month") this.changeMonth(1);
-        if (e.target.id === "addToCalendarBtn") this.downloadCurrentEvent();
+        if (e.target.id === "refresh-btn") this.loadEvents(); // Refresh events
+        if (e.target.id === "list-view-btn") this.switchView("list"); // Switch to list view
+        if (e.target.id === "month-view-btn") this.switchView("month"); // Switch to month view
+        if (e.target.id === "prev-month") this.changeMonth(-1); // Navigate to previous month
+        if (e.target.id === "next-month") this.changeMonth(1); // Navigate to next month
+        if (e.target.id === "addToCalendarBtn") this.downloadCurrentEvent(); // Download event as ICS
         if (e.target.closest(".event-item"))
           this.showEventDetails(
             e.target.closest(".event-item").dataset.eventId
-          );
+          ); // Show event details in modal
       });
   }
 
   async loadEvents() {
-    if (this.isFetching) return;
+    // Fetch events from the backend and render the calendar
+    if (this.isFetching) return; // Prevent duplicate fetches
 
-    this.showLoading();
+    this.showLoading(); // Show loading indicator
     this.isFetching = true;
 
     try {
@@ -46,8 +49,8 @@ class ChurchCalendar {
       );
       if (!response.ok) throw new Error("Network error");
 
-      this.cachedEvents = await response.json();
-      this.renderCalendar();
+      this.cachedEvents = await response.json(); // Cache fetched events
+      this.renderCalendar(); // Render the calendar with fetched events
     } catch (error) {
       console.error(
         `Error loading events from URL: https://kcmi-backend.onrender.com/api/calendar-events`,
@@ -57,7 +60,7 @@ class ChurchCalendar {
         `Failed to load events: ${error.message}. Please try again later.`
       );
 
-      // Show cached events if available
+      // If fetch fails, show cached events if available
       if (this.cachedEvents && Array.isArray(this.cachedEvents)) {
         this.renderCalendar();
         this.showError(
@@ -66,12 +69,13 @@ class ChurchCalendar {
       }
     } finally {
       if (this.cachedEvents) {
-        this.isFetching = false;
+        this.isFetching = false; // Reset fetching state
       }
     }
   }
 
   renderCalendar() {
+    // Render the calendar container with the current view (list or month)
     const container = document.getElementById("calendar-container");
     container.innerHTML = `
         <div class="view-options mb-3">
@@ -91,13 +95,14 @@ class ChurchCalendar {
         </div>
         ${
           this.currentView === "list"
-            ? this.renderListView()
-            : this.renderMonthView()
+            ? this.renderListView() // Render list view
+            : this.renderMonthView() // Render month view
         }
       `;
   }
 
   renderListView() {
+    // Render the list view of events
     if (!this.cachedEvents?.length) {
       return '<div class="alert alert-info">No upcoming events found.</div>';
     }
@@ -153,6 +158,7 @@ class ChurchCalendar {
   }
 
   renderEventItem(event) {
+    // Render a single event item in the list view
     const start = event.start.dateTime || event.start.date;
     const end = event.end.dateTime || event.end.date;
 
@@ -175,12 +181,13 @@ class ChurchCalendar {
   }
 
   renderMonthView() {
-    const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+    // Render the month view of the calendar
+    const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay(); // Day of the week for the 1st of the month
     const daysInMonth = new Date(
       this.currentYear,
       this.currentMonth + 1,
       0
-    ).getDate();
+    ).getDate(); // Total days in the current month
 
     let html = `
         <div class="month-view">
@@ -257,6 +264,7 @@ class ChurchCalendar {
   }
 
   showEventDetails(eventId) {
+    // Show event details in a modal
     const event = this.cachedEvents?.find((e) => e.id === eventId);
     if (!event) return;
 
@@ -283,12 +291,14 @@ class ChurchCalendar {
   }
 
   downloadCurrentEvent() {
+    // Download the currently selected event as an ICS file
     const eventId = document.getElementById("eventModal").dataset.currentEvent;
     const event = this.cachedEvents?.find((e) => e.id === eventId);
     if (event) this.downloadICS(event);
   }
 
   downloadICS(event) {
+    // Generate and download an ICS file for the event
     const start = event.start.dateTime || event.start.date;
     const end = event.end.dateTime || event.end.date;
     const icsStart = start.includes("T")
@@ -321,6 +331,7 @@ class ChurchCalendar {
   }
 
   formatTime(start, end) {
+    // Format the start and end times for display
     if (!start.includes("T")) return "All Day";
 
     const startDate = new Date(start);
@@ -348,11 +359,13 @@ class ChurchCalendar {
   }
 
   switchView(view) {
+    // Switch between list and month views
     this.currentView = view;
     this.renderCalendar();
   }
 
   changeMonth(offset) {
+    // Change the current month by the given offset
     this.currentMonth += offset;
     if (this.currentMonth > 11) {
       this.currentMonth = 0;
@@ -365,11 +378,13 @@ class ChurchCalendar {
   }
 
   showLoading() {
+    // Show the loading message
     document.getElementById("loading-message").style.display = "block";
     document.getElementById("error-message").style.display = "none";
   }
 
   showError(message) {
+    // Show an error message
     document.getElementById("loading-message").style.display = "none";
     const errorEl = document.getElementById("error-message");
     errorEl.style.display = "block";

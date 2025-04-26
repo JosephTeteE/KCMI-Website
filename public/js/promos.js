@@ -1,57 +1,58 @@
 // public/js/promos.js
 // This script handles the loading and rendering of promotional events from a Google Sheet.
 // It includes caching, error handling, and responsive design features.
-// Constants
 
-const PROMO_SHEET_ID = "1RCk_BhG_uv791dIVUmLHxhW4Ok0hPfvXLNp3QFUiaQo";
-const CACHE_KEY = "kcmi_events_cache";
-const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+// Constants
+const PROMO_SHEET_ID = "1RCk_BhG_uv791dIVUmLHxhW4Ok0hPfvXLNp3QFUiaQo"; // Google Sheet ID for fetching events
+const CACHE_KEY = "kcmi_events_cache"; // Local storage key for caching events
+const CACHE_TTL = 30 * 60 * 1000; // Cache time-to-live (30 minutes)
 
 // Main loading function
 async function loadPromos() {
   try {
-    const cachedData = getCachedPromos();
+    const cachedData = getCachedPromos(); // Check if cached data exists
     if (cachedData) {
-      renderEvents(cachedData);
-      // Refresh data in background
-      setTimeout(fetchAndCachePromos, 1000);
+      renderEvents(cachedData); // Render cached events
+      setTimeout(fetchAndCachePromos, 1000); // Refresh data in the background
       return;
     }
-    await fetchAndCachePromos();
+    await fetchAndCachePromos(); // Fetch and cache promos if no cached data
   } catch (error) {
     console.error("Promos loading error:", error);
     const cachedData = getCachedPromos();
     if (cachedData) {
-      renderEvents(cachedData);
+      renderEvents(cachedData); // Fallback to cached data on error
     } else {
-      showErrorUI();
+      showErrorUI(); // Show error UI if no cached data is available
     }
   }
 }
 
+// Fetch events from the backend and cache them
 async function fetchAndCachePromos() {
   const response = await fetch(
     `https://kcmi-backend.onrender.com/api/sheets-events?id=${PROMO_SHEET_ID}`
   );
   if (!response.ok) throw new Error("Network error");
   const events = await response.json();
-  cachePromos(events);
-  renderEvents(events);
+  cachePromos(events); // Cache the fetched events
+  renderEvents(events); // Render the fetched events
 }
 
-// Cache functions (same as before)
+// Retrieve cached events from local storage
 function getCachedPromos() {
   const cached = localStorage.getItem(CACHE_KEY);
   if (!cached) return null;
   try {
     const { data, timestamp } = JSON.parse(cached);
-    if (Date.now() - timestamp < CACHE_TTL) return data;
+    if (Date.now() - timestamp < CACHE_TTL) return data; // Check if cache is still valid
   } catch (e) {
     console.warn("Cache parse error:", e);
   }
   return null;
 }
 
+// Cache events in local storage
 function cachePromos(data) {
   localStorage.setItem(
     CACHE_KEY,
@@ -62,29 +63,30 @@ function cachePromos(data) {
   );
 }
 
-// Enhanced rendering
+// Render events in the UI
 function renderEvents(events) {
   const container = document.getElementById("promos-container");
   const gridContainer = container.querySelector(".promos-grid");
 
   if (!events || events.length === 0) {
-    gridContainer.innerHTML = noEventsHTML();
+    gridContainer.innerHTML = noEventsHTML(); // Show "no events" message if no events exist
     return;
   }
 
-  // Handle single/multiple events
+  // Adjust layout for single or multiple events
   container.classList.toggle("single-event", events.length === 1);
   document.querySelector(".carousel-nav").style.display =
     events.length > 1 ? "flex" : "none";
 
-  // Render all events
+  // Render event cards
   gridContainer.innerHTML = events
     .map((event) => createEventCard(event))
     .join("");
 
-  if (events.length > 1) initCarousel();
+  if (events.length > 1) initCarousel(); // Initialize carousel for multiple events
 }
 
+// HTML for "no events" message
 function noEventsHTML() {
   return `
     <div class="col-12 text-center">
@@ -93,12 +95,12 @@ function noEventsHTML() {
     </div>`;
 }
 
-// Enhanced event card creation
+// Create an event card with event details
 function createEventCard(event) {
-  const mediaHTML = createMediaHTML(event);
-  const dateHTML = createDateHTML(event);
-  const timeHTML = createTimeHTML(event);
-  const contactHTML = createContactHTML(event);
+  const mediaHTML = createMediaHTML(event); // Media (image/video) section
+  const dateHTML = createDateHTML(event); // Date section
+  const timeHTML = createTimeHTML(event); // Time section
+  const contactHTML = createContactHTML(event); // Contact section
 
   return `
     <div class="promo-card">
@@ -107,28 +109,24 @@ function createEventCard(event) {
         <h3 class="event-title">${escapeHtml(event.title)}</h3>
         ${
           event.description
-            ? `
-          <p class="event-description">${escapeHtml(event.description)}</p>
-        `
+            ? `<p class="event-description">${escapeHtml(
+                event.description
+              )}</p>`
             : ""
         }
-        
         <div class="event-details">
           ${dateHTML}
           ${timeHTML}
           ${
             event.location
-              ? `
-            <div class="event-location">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>${escapeHtml(event.location)}</span>
-            </div>
-          `
+              ? `<div class="event-location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>${escapeHtml(event.location)}</span>
+                </div>`
               : ""
           }
           ${contactHTML}
         </div>
-        
         <div class="text-center mt-2">
           <a href="${getFileUrl(
             event
@@ -141,7 +139,7 @@ function createEventCard(event) {
   `;
 }
 
-// Helper components
+// Create media section (image or video)
 function createMediaHTML(event) {
   const url = getFileUrl(event);
   const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
@@ -163,6 +161,7 @@ function createMediaHTML(event) {
   `;
 }
 
+// Create date section
 function createDateHTML(event) {
   const start = new Date(event.date);
   const end = new Date(event.endDate);
@@ -197,6 +196,7 @@ function createDateHTML(event) {
   `;
 }
 
+// Create time section
 function createTimeHTML(event) {
   if (!event.times) return "";
 
@@ -243,6 +243,7 @@ function createTimeHTML(event) {
   `;
 }
 
+// Create contact section
 function createContactHTML(event) {
   if (!event.contact?.number) return "";
 
@@ -254,18 +255,16 @@ function createContactHTML(event) {
       </a>
       ${
         event.contact.instructions
-          ? `
-        <span class="contact-instructions">
-          (${escapeHtml(event.contact.instructions)})
-        </span>
-      `
+          ? `<span class="contact-instructions">
+              (${escapeHtml(event.contact.instructions)})
+            </span>`
           : ""
       }
     </div>
   `;
 }
 
-// Utility functions
+// Utility functions for URLs, formatting, and escaping HTML
 function getFileUrl(event) {
   if (event.type === "video") {
     return `https://drive.google.com/file/d/${event.fileId}/preview`;
@@ -300,6 +299,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Show error UI when events fail to load
 function showErrorUI() {
   const container = document.getElementById("promos-container");
   container.innerHTML = `
@@ -309,7 +309,7 @@ function showErrorUI() {
     </div>`;
 }
 
-// Initialize the carousel navigation
+// Initialize carousel navigation for multiple events
 function initCarousel() {
   const promosGrid = document.querySelector(".promos-grid");
   const prevBtn = document.getElementById("prevPromo");

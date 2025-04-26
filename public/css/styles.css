@@ -442,6 +442,7 @@ body.navbar-open .homepage-header-video-container {
   padding: 1.5rem 0;
   background-color: #f8f9fa;
   width: 100%;
+  margin-bottom: 0px !important;
 }
 
 #kcmi-promos-section .container {
@@ -505,7 +506,7 @@ body.navbar-open .homepage-header-video-container {
   margin: 0 0.5rem;
   display: flex;
   flex-direction: column;
-  min-height: 450px;
+  min-height: auto;
   scroll-snap-align: start;
 }
 
@@ -515,15 +516,16 @@ body.navbar-open .homepage-header-video-container {
 }
 
 #kcmi-promos-section .promo-media-container {
-  padding: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0.5rem;
   border-bottom: 1px solid #eee;
+  margin-bottom: 0.5rem;
 }
 
 #kcmi-promos-section .promo-card img,
 #kcmi-promos-section .promo-card .video-container {
   width: 100%;
   height: auto;
-  min-height: 180px;
+  min-height: auto;
   max-height: 40vh;
   object-fit: contain;
   display: block;
@@ -538,15 +540,6 @@ body.navbar-open .homepage-header-video-container {
   aspect-ratio: 16/9;
 }
 
-#kcmi-promos-section .video-caption,
-#kcmi-promos-section .image-caption {
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
 #kcmi-promos-section .promo-content {
   padding: 1rem;
   padding-bottom: 0.5rem;
@@ -554,6 +547,7 @@ body.navbar-open .homepage-header-video-container {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 #kcmi-promos-section .promo-card .event-title {
@@ -562,6 +556,7 @@ body.navbar-open .homepage-header-video-container {
   font-weight: 600;
   margin-bottom: 0.5rem;
   text-align: center;
+  order: 1;
 }
 
 #kcmi-promos-section .promo-content .event-description {
@@ -569,6 +564,20 @@ body.navbar-open .homepage-header-video-container {
   font-size: clamp(0.9rem, 2.5vw, 1rem);
   line-height: 1.4;
   margin-bottom: 0.75rem;
+  order: 2;
+}
+
+#kcmi-promos-section .event-details {
+  order: 3;
+}
+
+#kcmi-promos-section .promo-media-container .video-caption,
+#kcmi-promos-section .promo-media-container .image-caption {
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 #kcmi-promos-section .promo-date,
@@ -640,9 +649,10 @@ body.navbar-open .homepage-header-video-container {
 #kcmi-promos-section .promo-card .btn-primary {
   background-color: #7c1963;
   border-color: #7c1963;
-  margin-top: auto;
+  margin-top: 0.5rem;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
   padding: 0.5rem 1rem;
+  order: 4;
 }
 
 #kcmi-promos-section .promo-card .btn-primary:hover {
