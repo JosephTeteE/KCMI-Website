@@ -1,7 +1,53 @@
 <!-- public/faqs.html -->
+<!-- 
+
+This HTML file represents the "Frequently Asked Questions" (FAQs) page for the Kingdom Covenant Ministries International (KCMI) website. 
+It includes a responsive design with Bootstrap, animations using AOS (Animate On Scroll), and interactive elements like an accordion for FAQs.
+
+Key Sections:
+1. Head Section:
+  - Meta tags for character encoding, viewport settings, and SEO description.
+  - Links to external stylesheets (Google Fonts, Bootstrap, Font Awesome, AOS) and a custom stylesheet.
+  - Favicon links for branding.
+  - Google reCAPTCHA script for security.
+
+2. Body Section:
+  - Navbar:
+    - A responsive navigation bar with links to various pages and resources.
+    - Includes a search form with navigation buttons for search results.
+
+  - Main Content:
+    - A container with a heading and an accordion for FAQs.
+    - Each FAQ is an accordion item with a question as the header and the answer as the collapsible content.
+    - Links to external resources and forms are included for user interaction.
+
+  - Footer:
+    - Contains quick links, social media icons, and subscription options for Spotify and WhatsApp.
+    - Includes copyright information and branding.
+
+  - Modal:
+    - A modal dialog for joining the WhatsApp broadcast for daily faith recharge.
+
+  - Dark Mode Toggle:
+    - A button to toggle between light and dark themes.
+
+3. Scripts:
+  - AOS initialization for scroll animations.
+  - Smooth scrolling for FAQ links.
+  - Bootstrap and AOS JavaScript libraries for functionality.
+  - A fallback for the Bootstrap script in case of loading errors.
+  - A custom JavaScript file for additional interactivity.
+
+Additional Notes:
+- The file uses semantic HTML5 elements for better accessibility and SEO.
+- External resources are loaded via CDNs with integrity checks for security.
+- Inline styles and classes are used for responsive design and consistent styling.
+-->
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
   <head>
+    <!-- Meta Information -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Frequently Asked Questions - KCMI</title>
@@ -9,7 +55,12 @@
       name="description"
       content="Find answers to frequently asked questions about KCMI, including information about services, giving, prayer requests, and contacting us."
     />
+    <meta
+      name="keywords"
+      content="KCMI FAQs, frequently asked questions, church questions, services, giving, prayer request, contact KCMI, born again, church attendance, online services, past sermons"
+    />
 
+    <!-- Favicon Links -->
     <link
       rel="apple-touch-icon"
       sizes="180x180"
@@ -29,6 +80,11 @@
     />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical" href="https://www.kcmi-rcc.org/faqs.html" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -36,6 +92,7 @@
       rel="stylesheet"
     />
 
+    <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -43,6 +100,7 @@
       crossorigin="anonymous"
     />
 
+    <!-- Font Awesome Icons -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -51,6 +109,7 @@
       referrerpolicy="no-referrer"
     />
 
+    <!-- AOS (Animate On Scroll) CSS -->
     <link
       href="https://unpkg.com/aos@2.3.1/dist/aos.css"
       rel="stylesheet"
@@ -58,18 +117,85 @@
       crossorigin="anonymous"
     />
 
+    <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="./css/styles.css" />
 
+    <!-- Google reCAPTCHA Script -->
     <script
       src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac&onload=onLoadRecaptcha"
       async
       defer
     ></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How can I be born again?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Being born again is a spiritual rebirth, a transformation that happens when you accept Jesus Christ as your Lord and Savior. Here are the steps: 1. Acknowledge... (full answer from your page)"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I attend a KCMI service?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We'd love to have you join us! You can attend a service at any of our KCMI branches. Please visit our <a href=\"./location.html\">Locations</a> page..."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I watch KCMI services online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "We provide online service viewing through these platforms: ... (full answer from your page)"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I give to KCMI?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can give to KCMI in several ways: In Person, Online (visit our <a href=\"./giving-kcmi.html\">Giving</a> page...), Bank Transfer..."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I submit a prayer request?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can submit a prayer request through our online form Click the \"Submit Prayer Request\" button below... (<div class=\"d-flex align-items-center justify-content-center\"><a href=\"https://forms.gle/gKTwNc9gNiVCWWrJ6\" class=\"btn-primary btn text-white\">Submit Prayer Request</a></div>)"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I contact KCMI?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can reach us through the following methods: Email (<a href=\"mailto:kingdomcovenantministriesinter@gmail.com\">kingdomcovenantministriesinter@gmail.com</a>), Phone (+234 9134 44 8322), Contact Form (visit our <a href=\"./contact-us.html\">Contact Us</a> page...), Visit (visit our <a href=\"./location.html\">Locations</a> page.)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Where can I find past sermons?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can find past sermons on our: <a href=\"https://www.youtube.com/@rehoboth-tv\" target=\"_blank\">YouTube</a> channel, <a href=\"https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1\" target=\"_blank\">TikTok</a> page, Silverbird TV: Fridays, 8:00 PM."
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body class="d-flex flex-column min-vh-100 faqs-page">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div class="container-fluid">
+        <!-- Brand Logo -->
         <a class="navbar-brand" href="./index.html">
           <img
             src="./assets/img/kcmi-logo.jpeg"
@@ -79,6 +205,7 @@
           />
           KCMI
         </a>
+        <!-- Navbar Toggler for Mobile View -->
         <button
           class="navbar-toggler"
           type="button"
@@ -90,8 +217,10 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+        <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- Navigation Links -->
             <li class="nav-item">
               <a class="nav-link active" href="./index.html">Home</a>
             </li>
@@ -101,6 +230,7 @@
             <li class="nav-item">
               <a class="nav-link" href="./location.html">Location</a>
             </li>
+            <!-- Dropdown Menu for Resources -->
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -152,6 +282,7 @@
               </ul>
             </li>
           </ul>
+          <!-- Search Form -->
           <form id="search-form" class="d-flex align-items-center">
             <input
               id="search-input"
@@ -163,6 +294,7 @@
             <button class="btn btn-outline-success" type="submit">
               Search
             </button>
+            <!-- Navigation Buttons for Search Results -->
             <button
               id="prev-match"
               class="btn btn-outline-secondary mx-1"
@@ -520,9 +652,11 @@
     >
       <div class="container py-5">
         <div class="row">
+          <!-- Quick Links Section -->
           <div class="col-6 col-md-2 mb-3">
             <h5>Quick Links</h5>
             <ul class="nav flex-column">
+              <!-- Links to important pages -->
               <li class="nav-item mb-2">
                 <a href="./index.html" class="nav-link p-0 text-white">Home</a>
               </li>
@@ -547,12 +681,14 @@
             </ul>
           </div>
 
+          <!-- Daily Faith Recharge Section -->
           <div class="col-md-5 offset-md-1 mb-3">
             <p>
               Daily Faith Recharge:<br />
               Subscribe to receive daily faith inspiration <br />
               Choose how
             </p>
+            <!-- Spotify Subscription Button -->
             <div class="mb-2">
               <a
                 href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
@@ -568,6 +704,7 @@
                 />
               </a>
             </div>
+            <!-- WhatsApp Broadcast Subscription Button -->
             <div>
               <button
                 class="btn btn-outline-light w-100"
@@ -580,9 +717,11 @@
           </div>
         </div>
 
+        <!-- Footer Bottom Section -->
         <div
           class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
         >
+          <!-- Copyright Information -->
           <p class="d-flex align-items-center">
             <img
               src="./assets/img/kcmi-logo.jpeg"
@@ -592,7 +731,9 @@
             />
             © 2025 Kingdom Covenant Ministries International
           </p>
+          <!-- Social Media Links -->
           <div class="d-flex justify-content-center">
+            <!-- YouTube -->
             <a
               href="https://www.youtube.com/@rehoboth-tv"
               target="_blank"
@@ -605,6 +746,7 @@
                 height="30"
               />
             </a>
+            <!-- TikTok -->
             <a
               href="https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
               target="_blank"
@@ -618,6 +760,7 @@
                 class="rounded-circle"
               />
             </a>
+            <!-- Facebook -->
             <a
               href="https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d"
               target="_blank"
@@ -630,6 +773,7 @@
                 height="30"
               />
             </a>
+            <!-- Instagram -->
             <a
               href="https://www.instagram.com/kcmiworldwide?igsh=MWdlazQwejJ0dmpzbQ%3D%3D&utm_source=qr"
               target="_blank"
@@ -642,6 +786,7 @@
                 height="30"
               />
             </a>
+            <!-- Twitter -->
             <a
               href="https://twitter.com/kcmi_official"
               target="_blank"
@@ -654,6 +799,7 @@
                 height="30"
               />
             </a>
+            <!-- WhatsApp -->
             <a href="#" target="_blank" class="mx-2">
               <img
                 src="./assets/img/WhatsApp.svg.webp"
@@ -666,6 +812,8 @@
         </div>
       </div>
     </footer>
+
+    <!-- WhatsApp Modal -->
     <div
       class="modal fade"
       id="whatsappModal"
@@ -675,6 +823,7 @@
     >
       <div class="modal-dialog">
         <div class="modal-content bg-danger text-white">
+          <!-- Modal Header -->
           <div class="modal-header">
             <h5 class="modal-title" id="whatsappModalLabel">
               Join Daily Faith Recharge WhatsApp Broadcast
@@ -686,6 +835,7 @@
               aria-label="Close"
             ></button>
           </div>
+          <!-- Modal Body -->
           <div class="modal-body">
             <p>
               To join our WhatsApp broadcast, please send a message to
@@ -695,6 +845,7 @@
             <p>
               Or enter your email below, to receive a WhatsApp subscription link
             </p>
+            <!-- Subscription Form -->
             <form id="whatsappSubscriptionForm">
               <div class="mb-3">
                 <label for="whatsappEmail" class="form-label"

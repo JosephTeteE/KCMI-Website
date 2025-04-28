@@ -6,12 +6,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Livestream</title>
+    <!-- Link to custom stylesheet -->
     <link rel="stylesheet" href="../css/styles.css" />
+    <!-- Link to Bootstrap CSS for styling -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     />
     <style>
+      /* General body styling */
       body {
         font-family: Arial, sans-serif;
         text-align: center;
@@ -19,6 +22,7 @@
         background-color: #f8f9fa; /* Add a background color */
       }
 
+      /* Styling for the container */
       .container {
         background-color: #ffffff; /* Add a white background to the container */
         padding: 30px;
@@ -26,6 +30,7 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
       }
 
+      /* Styling for the textarea */
       textarea {
         width: 100%; /* Make the textarea take full width */
         height: 150px;
@@ -35,10 +40,12 @@
         resize: vertical; /* Allow vertical resizing only */
       }
 
+      /* Styling for the checkbox container */
       .form-check {
         margin-bottom: 20px;
       }
 
+      /* Styling for the checkbox label */
       .form-check-label {
         font-weight: bold; /* Make the checkbox label bold */
       }
@@ -48,25 +55,33 @@
     <div class="container mt-5">
       <h1>Admin Panel</h1>
 
+      <!-- Login form -->
       <form id="loginForm">
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
+          <!-- Input field for username -->
           <input type="text" class="form-control" id="username" required />
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
+          <!-- Input field for password -->
           <input type="password" class="form-control" id="password" required />
         </div>
+        <!-- Submit button for login -->
         <button type="submit" class="btn btn-primary">Login</button>
+        <!-- Placeholder for login error messages -->
         <p id="loginMessage" class="text-danger"></p>
       </form>
 
+      <!-- Admin content section, hidden by default -->
       <div id="adminContent" style="display: none">
+        <!-- Textarea for embedding Facebook Live code -->
         <textarea
           id="embedCode"
           placeholder="Paste Facebook Live Embed Code here"
         ></textarea>
 
+        <!-- Checkbox to indicate if livestream is active -->
         <div
           class="form-check d-flex align-items-center justify-content-center"
         >
@@ -80,25 +95,31 @@
           </label>
         </div>
 
+        <!-- Button to save/update livestream embed code -->
         <button id="saveEmbed" class="btn btn-primary">
           Update Livestream
         </button>
+        <!-- Placeholder for status messages -->
         <p id="statusMessage"></p>
       </div>
     </div>
 
     <script>
+      // Get references to DOM elements
       const loginForm = document.getElementById("loginForm");
       const loginMessage = document.getElementById("loginMessage");
       const adminContent = document.getElementById("adminContent");
 
+      // Event listener for login form submission
       loginForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default form submission behavior
 
+        // Get username and password values
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
 
         try {
+          // Send login request to the backend API
           const response = await fetch(
             "https://kcmi-backend.onrender.com/api/auth",
             {
@@ -109,16 +130,19 @@
           );
 
           if (response.ok) {
+            // If login is successful, store the token and show admin content
             const data = await response.json();
             localStorage.setItem("token", data.token);
-            loginForm.style.display = "none";
-            adminContent.style.display = "block";
+            loginForm.style.display = "none"; // Hide login form
+            adminContent.style.display = "block"; // Show admin content
           } else {
+            // If login fails, display error message
             const errorData = await response.json();
             loginMessage.textContent =
               errorData.message || "Authentication failed";
           }
         } catch (error) {
+          // Handle network or other errors
           console.error("Authentication error:", error);
           loginMessage.textContent = "An error occurred during authentication.";
         }
@@ -128,28 +152,33 @@
       const token = localStorage.getItem("token");
       if (token) {
         try {
+          // Decode the token to check its validity
           const decodedToken = jwt_decode(token);
           if (decodedToken.exp < Date.now() / 1000) {
-            // Check if token is expired
+            // If token is expired, remove it and show login form
             localStorage.removeItem("token");
-            loginForm.style.display = "block"; // Show login form if token is expired
+            loginForm.style.display = "block";
             adminContent.style.display = "none";
           } else {
+            // If token is valid, show admin content
             loginForm.style.display = "none";
             adminContent.style.display = "block";
           }
         } catch (error) {
+          // Handle invalid token errors
           console.error("JWT decode error:", error);
           localStorage.removeItem("token");
           loginForm.style.display = "block"; // Show login form if token is invalid
           adminContent.style.display = "none";
         }
       } else {
-        loginForm.style.display = "block"; // Show login form if no token is found
+        // Show login form if no token is found
+        loginForm.style.display = "block";
         adminContent.style.display = "none";
       }
     </script>
 
+    <!-- Link to external JavaScript file -->
     <script src="./js/admin.js"></script>
   </body>
 </html>

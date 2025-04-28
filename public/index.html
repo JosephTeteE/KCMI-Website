@@ -1,8 +1,159 @@
 <!-- public/index.html -->
+<!-- 
+  Header Section:
+  This section contains the metadata, stylesheets, and scripts required for the webpage.
+  - Meta Information: Includes character set, viewport settings, and SEO meta tags.
+  - Favicon Links: Links to the website's favicon in various sizes.
+  - Google Fonts: Links to external fonts used on the website.
+  - Bootstrap CSS: Includes the Bootstrap framework for responsive design.
+  - AOS CSS: Adds scroll animations to elements.
+  - Custom Stylesheets: Links to the website's custom CSS files.
+  - Google reCAPTCHA: Adds reCAPTCHA functionality for security.
+  - Schema.org Structured Data: Provides structured data for SEO purposes.
+    -->
+
+<!-- 
+  Loading Overlay:
+  A full-screen overlay displayed while the page is loading.
+  - Includes the church logo, name, and vision statement.
+  - Styled with animations for a smooth user experience.
+    -->
+
+<!-- 
+  Navigation Bar:
+  A responsive navigation bar at the top of the page.
+  - Includes the church logo, brand name, and navigation links.
+  - Features a search form with navigation buttons for search results.
+  - Dropdown menu for accessing additional resources.
+    -->
+
+<!-- 
+  Video Header Section:
+  A video background section at the top of the homepage.
+  - Displays a looping video with fallback image support.
+  - Includes a hero content section with a welcome message and mission statement.
+    -->
+
+<!-- 
+  Carousel Section:
+  A section showcasing various aspects of the church.
+  - Includes cards for branches, cell fellowships, service teams, about us, and sermons.
+  - Features an auto-scrolling carousel with responsive design.
+    -->
+
+<!-- 
+  Pastor Slideshow Section:
+  A slideshow highlighting the lead pastor.
+  - Displays rotating background images with overlay content.
+  - Includes a call-to-action button to learn more about the pastor.
+    -->
+
+<!-- 
+  Church Events Calendar Section:
+  A section displaying the church's event calendar.
+  - Includes a loading spinner and error message for dynamic content loading.
+  - Features a modal for viewing event details and adding them to a calendar.
+    -->
+
+<!-- 
+  Promos Section:
+  A section for showcasing upcoming programs and events.
+  - Includes a grid layout for promotional content.
+  - Features navigation buttons for scrolling through promos.
+    -->
+
+<!-- 
+  Map Section:
+  A section displaying the church's location on a map.
+  - Includes an embedded Google Map with a text description.
+  - Provides directions for visitors to find the church.
+    -->
+
+<!-- 
+  Giving Section:
+  A section encouraging visitors to donate to the church.
+  - Includes a Bible verse and a call-to-action button for giving.
+    -->
+
+<!-- 
+  Prayer Requests Section:
+  A section inviting visitors to submit prayer requests.
+  - Includes a Bible verse and a call-to-action button for submitting requests.
+    -->
+
+<!-- 
+  Footer Section:
+  This section contains the footer of the website, styled with Bootstrap classes.
+  It includes quick links, a subscription section, and social media links.
+    -->
+
+<!-- 
+  Quick Links:
+  A list of navigation links to important pages on the website, styled as a vertical column.
+    -->
+
+<!-- 
+  Daily Faith Recharge Section:
+  Provides options for users to subscribe to daily faith inspiration via Spotify or WhatsApp.
+  - Spotify Button: Links to the Spotify podcast.
+  - WhatsApp Button: Opens a modal for WhatsApp subscription instructions.
+    -->
+
+<!-- 
+  Social Media Links:
+  Displays icons linking to various social media platforms (YouTube, TikTok, Facebook, Instagram, Twitter, WhatsApp).
+  Each link opens in a new tab.
+    -->
+
+<!-- 
+  WhatsApp Modal:
+  A modal dialog that provides instructions for joining the WhatsApp broadcast.
+  Includes an email subscription form for receiving a WhatsApp subscription link.
+    -->
+
+<!-- 
+  Dark Mode Toggle Button:
+  A button to toggle between dark mode and light mode.
+  - 🌙 Icon: Represents dark mode.
+  - ☀️ Icon: Represents light mode.
+    -->
+
+<!-- 
+  About Pastor Slideshow Script:
+  A script to manage the slideshow for the "About Pastor" section.
+  - Automatically cycles through slides every 5 seconds.
+  - Uses the `active` class to show/hide slides.
+    -->
+
+<!-- 
+  Carousel Script:
+  A script to manage the homepage carousel for campus cards.
+  - Dynamically adjusts the number of visible cards based on screen size.
+  - Automatically scrolls through cards every 3 seconds.
+  - Pauses auto-scroll when the user interacts with a card.
+  - Resumes auto-scroll when interaction ends.
+    -->
+
+<!-- 
+  Bootstrap and AOS Scripts:
+  - Bootstrap: Provides responsive design and interactive components.
+  - AOS (Animate On Scroll): Adds scroll animations to elements.
+  - Includes fallback for Bootstrap in case the CDN fails.
+    -->
+
+<!-- 
+  Additional Scripts:
+  - gapi-loader.js: Loads Google API for calendar integration.
+  - church-calendar.js: Manages the church calendar functionality.
+  - scripts.js: Contains custom JavaScript for the website.
+  - loading.js: Handles loading animations.
+  - promos.js: Manages promotional content.
+    -->
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
   <head>
+    <!-- Meta Information -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
@@ -13,6 +164,8 @@
       name="description"
       content="Welcome to Kingdom Covenant Ministries International (KCMI) AKA Rehoboth Christian Center, a vibrant church community in Port Harcourt, Rivers State, Nigeria. Join us for services, events, and fellowship."
     />
+
+    <!-- Favicon Links -->
     <link
       rel="apple-touch-icon"
       sizes="180x180"
@@ -37,7 +190,10 @@
       name="keywords"
       content="KCMI, Rehoboth Christian Center, RCC, Port Harcourt church, Nigeria churches, Kingdom Covenant Ministries, KCMI Nigeria"
     />
-    <link rel="canonical" href="https://kcmi-rcc.org/" />
+    <meta name="author" content="Kingdom Covenant Ministries International" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph Meta Tags for Social Media -->
     <meta
       property="og:title"
       content="Kingdom Covenant Ministries International (Rehoboth Christian Center) - Port Harcourt"
@@ -54,6 +210,10 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- Canonical Link for SEO -->
+    <link rel="canonical" href="https://www.kcmi-rcc.org/" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -61,6 +221,7 @@
       rel="stylesheet"
     />
 
+    <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -68,6 +229,7 @@
       crossorigin="anonymous"
     />
 
+    <!-- AOS (Animate on Scroll) CSS -->
     <link
       href="https://unpkg.com/aos@2.3.1/dist/aos.css"
       rel="stylesheet"
@@ -75,17 +237,19 @@
       crossorigin="anonymous"
     />
 
+    <!-- Custom Stylesheets -->
     <link rel="stylesheet" href="./css/styles.css" />
     <link rel="stylesheet" href="./css/loading.css" />
     <link rel="stylesheet" href="./css/church-calendar.css" />
 
+    <!-- Google reCAPTCHA -->
     <script
       src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac&onload=onLoadRecaptcha"
       async
       defer
     ></script>
 
-    <!-- Schema.org markup for Google -->
+    <!-- Schema.org Structured Data for SEO -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -122,10 +286,10 @@
   </head>
   <body class="d-flex flex-column min-vh-100 index-page">
     <!-- Loading Overlay -->
-
     <div id="loading-overlay">
       <div class="crown-bg"></div>
       <div class="loading-content">
+        <!-- Logo and Church Name -->
         <img
           src="./assets/img/kcmi-logo.jpeg"
           alt="KCMI Logo"
@@ -145,10 +309,12 @@
       </div>
     </div>
 
-    <!-- Main Content (initially transparent but takes space) -->
+    <!-- Main Content -->
     <div id="main-content">
+      <!-- Navigation Bar -->
       <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
         <div class="container-fluid">
+          <!-- Logo and Brand Name -->
           <a class="navbar-brand" href="./index.html">
             <img
               src="./assets/img/kcmi-logo.jpeg"
@@ -158,6 +324,7 @@
             />
             KCMI
           </a>
+          <!-- Mobile Menu Toggle -->
           <button
             class="navbar-toggler"
             type="button"
@@ -169,6 +336,7 @@
           >
             <span class="navbar-toggler-icon"></span>
           </button>
+          <!-- Navigation Links -->
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
@@ -232,6 +400,7 @@
                 </ul>
               </li>
             </ul>
+            <!-- Search Form -->
             <form id="search-form" class="d-flex align-items-center">
               <input
                 id="search-input"
@@ -243,6 +412,7 @@
               <button class="btn btn-outline-success" type="submit">
                 Search
               </button>
+              <!-- Navigation Buttons for Search -->
               <button
                 id="prev-match"
                 class="btn btn-outline-secondary mx-1"
@@ -273,6 +443,7 @@
       </nav>
     </div>
     <main>
+      <!-- Video Header Section -->
       <div class="homepage-header-video-container">
         <video
           id="largeScreenVideo"
@@ -286,6 +457,7 @@
           controlsList="nodownload nofullscreen noplaybackrate"
           onloadeddata="this.play();"
         >
+          <!-- Video sources for different formats -->
           <source
             src="./assets/img/KCMI-background-reel.mp4"
             type="video/mp4"
@@ -294,6 +466,7 @@
             src="./assets/img/KCMI-background-reel.webm"
             type="video/webm"
           />
+          <!-- Fallback image if video fails to load -->
           <img
             src="./assets/img/welcome-to-kcmi-fallback-image.png"
             alt="Welcome to KCMI"
@@ -301,6 +474,7 @@
         </video>
       </div>
 
+      <!-- Hero Content Section -->
       <div class="container-fluid" id="index-page-hero-content">
         <div class="homepage-header-content">
           <h1 class="display-4 fw-bold header-welcome-text">
@@ -315,6 +489,7 @@
             >
           </p>
 
+          <!-- Watch Live Button (conditionally displayed) -->
           <div
             class="container text-center mt-3"
             id="watch-live-container"
@@ -325,6 +500,7 @@
         </div>
       </div>
 
+      <!-- Carousel Section -->
       <section class="container-fluid homepage-carousel-section bg-light">
         <div class="container-fluid">
           <div class="row">
@@ -338,9 +514,11 @@
             </div>
           </div>
 
+          <!-- Carousel Cards -->
           <div class="row">
             <div class="col-12 homepage-carousel-wrapper">
               <div class="homepage-carousel-container">
+                <!-- Card 1: Branches -->
                 <div class="homepage-campus-card">
                   <img
                     src="./assets/img/kcmi-church-view.jpg"
@@ -358,6 +536,7 @@
                     >
                   </div>
                 </div>
+                <!-- Card 2: Cell Fellowships -->
                 <div class="homepage-campus-card">
                   <img
                     src="./assets/img/cell-fellowship-photo.jpeg"
@@ -377,6 +556,7 @@
                     >
                   </div>
                 </div>
+                <!-- Card 3: Service Teams -->
                 <div class="homepage-campus-card">
                   <img
                     src="./assets/img/kcmi-women-photo.jpg"
@@ -396,6 +576,7 @@
                     >
                   </div>
                 </div>
+                <!-- Card 4: About Us -->
                 <div class="homepage-campus-card">
                   <img
                     src="./assets/img/kcmi-crowd-photo-3.jpg"
@@ -413,6 +594,7 @@
                     >
                   </div>
                 </div>
+                <!-- Card 5: Sermons & Media -->
                 <div class="homepage-campus-card">
                   <img
                     src="./assets/img/kcmi-crowd-photo-5.jpg"
@@ -437,10 +619,12 @@
         </div>
       </section>
 
+      <!-- Pastor Slideshow Section -->
       <section
         class="container-fluid homepage-pastor-slideshow-section homepage-about-apostle-aikins"
       >
         <div class="container-fluid homepage-pastor-slideshow">
+          <!-- Slideshow Images -->
           <div class="homepage-pastor-slide active slide1"></div>
           <div class="homepage-pastor-slide slide2"></div>
           <div class="homepage-pastor-slide slide3"></div>
@@ -448,6 +632,7 @@
           <div class="homepage-pastor-slide slide5"></div>
           <div class="homepage-pastor-slide slide6"></div>
         </div>
+        <!-- Overlay Content -->
         <div
           class="container text-center py-5 text-white homepage-content-overlay"
         >
@@ -810,6 +995,8 @@
           </div>
         </div>
       </div>
+
+      <!-- Footer Section -->
     </footer>
     <div
       class="modal fade"

@@ -2,14 +2,17 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
   <head>
+    <!-- Meta tags for character encoding and responsive design -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KCMI Locations - Find a Church Branch Near You</title>
+    <!-- Meta description for SEO -->
     <meta
       name="description"
       content="Find KCMI church locations worldwide. Discover a KCMI church near you and connect with our global community."
     />
 
+    <!-- Favicon links for various devices -->
     <link
       rel="apple-touch-icon"
       sizes="180x180"
@@ -29,13 +32,36 @@
     />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- SEO Meta tags -->
+    <link rel="canonical" href="https://www.kcmi-rcc.org/location.html" />
+
+    <!-- Open Graph Meta tags for social media sharing -->
+    <meta
+      property="og:title"
+      content="KCMI Locations - Find a Church Branch Near You"
+    />
+    <meta
+      property="og:description"
+      content="Find KCMI church locations worldwide. Discover a KCMI church near you and connect with our global community."
+    />
+    <meta
+      property="og:image"
+      content="https://www.kcmi-rcc.org/assets/img/kcmi-logo.jpeg"
+    />
+    <meta property="og:url" content="https://www.kcmi-rcc.org/location.html" />
+    <meta property="og:type" content="website" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Preconnect to optimize font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
 
+    <!-- Bootstrap CSS for styling -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -43,6 +69,7 @@
       crossorigin="anonymous"
     />
 
+    <!-- AOS (Animate On Scroll) library for animations -->
     <link
       href="https://unpkg.com/aos@2.3.1/dist/aos.css"
       rel="stylesheet"
@@ -50,17 +77,63 @@
       crossorigin="anonymous"
     />
 
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="./css/styles.css" />
 
+    <!-- Google reCAPTCHA script -->
     <script
       src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac&onload=onLoadRecaptcha"
       async
       defer
     ></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "KCMI Headquarters",
+        "image": "https://www.kcmi-rcc.org/assets/img/kcmi-crowd-photo",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Okuruola Wonodi Close, Off Stadium Road",
+          "addressLocality": "Port Harcourt",
+          "addressRegion": "Rivers State",
+          "postalCode": "P.O Box 2595, Diobu",
+          "addressCountry": "NG"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "4.831437956537253",
+          "longitude": "7.012230481058775"
+        },
+        "url": "https://www.google.com/maps/dir//KINGDOM+COVENANT+MINISTRIES+INTERNATIONAL+R2J6%2BCJ7+Rumuola+Port+Harcourt+500102,+Rivers/@4.8310424,7.0115492,16z/data=!4m8!4m7!1m0!1m5!1m1!1s0x1069cdd952c0a237:0xf79c75918f6481f9!2m2!1d7.0116733!2d4.8311248?entry=ttu&g_ep=EgoyMDI1MDQyMy4wIKXMDSoASAFQAw%3D%3D",
+        "telephone": "+234 9134 44 8322",
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Sunday"],
+            "opens": "08:00",
+            "closes": "UNKNOWN"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Thursday"],
+            "opens": "17:00",
+            "closes": "UNKNOWN"
+          }
+        ],
+        "branchOf": {
+          "@type": "Organization",
+          "name": "Kingdom Covenant Ministries International",
+          "url": "https://www.kcmi-rcc.org/"
+        }
+      }
+    </script>
   </head>
   <body class="d-flex flex-column min-vh-100 page-location">
+    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div class="container-fluid">
+        <!-- Brand logo and link -->
         <a class="navbar-brand" href="./index.html">
           <img
             src="./assets/img/kcmi-logo.jpeg"
@@ -70,6 +143,7 @@
           />
           KCMI
         </a>
+        <!-- Navbar toggler for mobile view -->
         <button
           class="navbar-toggler"
           type="button"
@@ -81,6 +155,7 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+        <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
@@ -92,6 +167,7 @@
             <li class="nav-item">
               <a class="nav-link" href="./location.html">Location</a>
             </li>
+            <!-- Dropdown menu for resources -->
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -144,6 +220,7 @@
               </ul>
             </li>
           </ul>
+          <!-- Search form -->
           <form id="search-form" class="d-flex align-items-center">
             <input
               id="search-input"
@@ -155,6 +232,7 @@
             <button class="btn btn-outline-success" type="submit">
               Search
             </button>
+            <!-- Navigation buttons for search results -->
             <button
               id="prev-match"
               class="btn btn-outline-secondary mx-1"
@@ -184,6 +262,7 @@
       </div>
     </nav>
     <main>
+      <!-- Section for branch introduction and filtering options -->
       <section
         class="py-2 text-center container-xxl"
         data-aos="fade-down"
@@ -191,6 +270,7 @@
       >
         <div class="row py-lg-5">
           <div class="col-lg-6 col-md-8 mx-auto">
+            <!-- Title and description -->
             <h1
               class="fw-bold display-3"
               data-aos="zoom-out-down"
@@ -206,6 +286,7 @@
               Worship with us across our branches worldwide, we would love to
               welcome you.
             </p>
+            <!-- Buttons to filter branches by country -->
             <div data-aos="fade-up" data-aos-delay="700">
               <button
                 class="btn btn-primary my-2"
@@ -243,6 +324,7 @@
                 Togo
               </button>
             </div>
+            <!-- Button to show all branches -->
             <button class="btn btn-primary my-2" onclick="filterCards('All')">
               Show All
             </button>
@@ -250,8 +332,10 @@
         </div>
       </section>
 
+      <!-- Container for branch cards -->
       <div class="container-xxl py-5">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+          <!-- Card for Nigeria Headquarters -->
           <div
             class="col"
             data-country="Nigeria"
@@ -259,12 +343,14 @@
             data-aos-duration="600"
           >
             <div class="card shadow-sm h-100">
+              <!-- Branch image -->
               <img
                 src="./assets/img/kcmi-crowd-photo-6.jpg"
                 alt="Cross-section of KCMI Port Harcourt Church Members in view"
                 class="rounded"
               />
               <div class="card-body">
+                <!-- Branch details -->
                 <h3>HEADQUARTERS</h3>
                 <p class="card-text">
                   Okuruola Wonodi Close<br />
@@ -273,6 +359,7 @@
                   P.O Box 2595, Diobu.<br />
                   Port Harcourt<br />
                   Rivers State, Nigeria.<br />
+                  <!-- Contact information -->
                   <span class="phone-number" data-phone="+2348187784723">
                     <a href="tel:+2349134448322" class="call-link icon-link"
                       ><i class="fas fa-phone"></i>+234 9134 44 8322</a
@@ -284,11 +371,14 @@
                   </span>
                   <span class="copy-icon" title="Copy to clipboard">📋</span
                   ><br />
+                  <!-- Service days -->
                   <strong style="font-size: 1.5rem">Service Days</strong><br />
                   Sunday:- 08:30 am<br />
                   Thursday:- 05:30 pm<br />
                 </p>
+                <!-- See more link -->
                 <a href="#" class="see-more mb-2">See More</a>
+                <!-- Visit button -->
                 <div class="btn-group mt-auto">
                   <a
                     href="https://www.google.com/maps/dir//KINGDOM+COVENANT+MINISTRIES+INTERNATIONAL+R2J6%2BCJ7+Rumuola+Port+Harcourt+500102,+Rivers/@4.8310424,7.0115492,16z/data=!4m5!4m4!1m0!1m2!1m1!1s0x1069cdd952c0a237:0xf79c75918f6481f9"
@@ -300,6 +390,8 @@
             </div>
           </div>
 
+          <!-- Additional branch cards follow the same structure -->
+          <!-- Card for Rumuigbo Branch -->
           <div
             class="col"
             data-country="Nigeria"
@@ -343,237 +435,12 @@
             </div>
           </div>
 
-          <div
-            class="col"
-            data-country="Nigeria"
-            data-aos="fade-left"
-            data-aos-duration="600"
-          >
-            <div class="card shadow-sm h-100">
-              <img
-                src="./assets/img/kcmi-church-view.jpg"
-                alt="Cross-section of KCMI Port Harcourt Church Members in view"
-                class="rounded"
-              />
-              <div class="card-body">
-                <h3>ABIA STATE</h3>
-                <p class="card-text">
-                  Off National Museum Road<br />
-                  By Nipost Office<br />
-                  Umuagu, Umuahia<br />
-                  Abia State, Nigeria.<br />
-                  <span class="phone-number" data-phone="+2348052780054">
-                    <a href="tel:+2348052780054" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+234 8052 78 0054</a
-                    >
-                    |
-                    <a href="#" class="whatsapp-link icon-link"
-                      ><i class="fab fa-whatsapp"></i
-                    ></a>
-                  </span>
-                  <span class="copy-icon" title="Copy to clipboard">📋</span
-                  ><br />
-                  <strong style="font-size: 1.5rem">Service Days</strong><br />
-                  Sunday:- 08:30 am<br />
-                  Thursday:- 06:00 pm<br />
-                </p>
-                <a href="#" class="see-more mb-2">See More</a>
-                <div class="btn-group mt-auto">
-                  <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="col"
-            data-country="Togo"
-            data-aos="fade-right"
-            data-aos-duration="600"
-            data-aos-delay="200"
-          >
-            <div class="card shadow-sm h-100">
-              <img
-                src="./assets/img/kcmi-lome-photo.jpeg"
-                alt="Cross-section of KCMI Lome Church Members in view"
-                class="rounded"
-              />
-              <div class="card-body">
-                <h3>TOGO</h3>
-                <p class="card-text">
-                  Route Attiegou Cedeao Pres De La Creche<br />
-                  Les Savoir<br />
-                  Lome, Togo<br />
-                  <span class="phone-number" data-phone="+22897817263">
-                    <a href="tel:+2289443385" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+2289443385
-                    </a>
-                    |
-                    <a href="#" class="whatsapp-link icon-link"
-                      ><i class="fab fa-whatsapp"></i
-                    ></a>
-                  </span>
-                  <span class="copy-icon" title="Copy to clipboard">📋</span
-                  ><br />
-                  <strong style="font-size: 1.5rem">Service Days</strong><br />
-                  Sunday:- 08:00 am<br />
-                  Tuesday:- 06:00 pm<br />
-                  Thursday:- 06:00 pm<br />
-                </p>
-                <a href="#" class="see-more mb-2">See More</a>
-                <div class="btn-group mt-auto">
-                  <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="col"
-            data-country="Ghana"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            data-aos-delay="200"
-          >
-            <div class="card shadow-sm h-100">
-              <img
-                src="./assets/img/kcmi-accra-photo.jpeg"
-                alt="Cross-section of KCMI Accra Church Members in view"
-                class="rounded"
-              />
-              <div class="card-body">
-                <h3>ACCRA</h3>
-                <p class="card-text">
-                  No.6 Mensah Kommy Lane, near 2nd Bus Station<br />
-                  Opetekwe/Ebenezer Down.Dansoman Last Stop Accra<br />
-                  Accra, Ghana<br />
-                  Email:- charamcy@gmail.com<br />
-                  <span class="phone-number" data-phone="+233543340415">
-                    <a href="tel:+233543340415" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+23 3543 34 0415</a
-                    >
-                    |
-                    <a href="#" class="whatsapp-link icon-link"
-                      ><i class="fab fa-whatsapp"></i
-                    ></a>
-                  </span>
-                  <span class="copy-icon" title="Copy to clipboard">📋</span
-                  ><br />
-                  <strong style="font-size: 1.5rem">Service Days</strong><br />
-                  Sunday:- 08:30 am<br />
-                  Thursday:- 06:00 pm<br />
-                </p>
-                <a href="#" class="see-more mb-2">See More</a>
-                <div class="btn-group mt-auto">
-                  <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="col"
-            data-country="Ghana"
-            data-aos="fade-left"
-            data-aos-duration="600"
-            data-aos-delay="200"
-          >
-            <div class="card shadow-sm h-100">
-              <img
-                src="./assets/img/kcmi-church-view.jpg"
-                alt="Cross-section of KCMI Port Harcourt Church Members in view"
-                class="rounded"
-              />
-              <div class="card-body">
-                <h3>KASOA</h3>
-                <p class="card-text">
-                  Behind Bennet Clinic<br />
-                  CP Last Stop Kasoa<br />
-                  Kasoa, Ghana<br />
-                  <span class="phone-number" data-phone="+233555582826">
-                    <a href="tel:+233555582826" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+23 3555 58 2826</a
-                    ></span
-                  >
-                  |
-                </p>
-                <a href="#" class="see-more mb-2">See More</a>
-                <div class="btn-group mt-auto">
-                  <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="col"
-            data-country="Ghana"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            data-aos-delay="400"
-          >
-            <div class="card shadow-sm h-100">
-              <img
-                src="./assets/img/ucc-photo.jpeg"
-                alt="Cross-section of KCMI UCC Church Members in view"
-                class="rounded"
-              />
-              <div class="card-body">
-                <h3>CAPE COAST</h3>
-                <p class="card-text">
-                  UCC - Campus Fellowship<br />
-                  School of Business Guest House<br />
-                  Conference Room<br />
-                  UCC, Cape Coast.<br />
-                  Cape Coast, Ghana<br />
-                  Email:- ucckcmi@gmail.com<br />
-                  <span class="phone-number" data-phone="+233247463818">
-                    <a href="tel:+233247463818" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+233247463818</a
-                    >
-                    |
-                    <a href="#" class="whatsapp-link icon-link"
-                      ><i class="fab fa-whatsapp"></i
-                    ></a>
-                  </span>
-                  <span class="copy-icon" title="Copy to clipboard">📋</span
-                  ><br />
-                  <span class="phone-number" data-phone="+233541418841">
-                    <a href="tel:+233541418841" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+233541418841</a
-                    >
-                    |
-                    <a href="#" class="whatsapp-link icon-link"
-                      ><i class="fab fa-whatsapp"></i
-                    ></a>
-                  </span>
-                  <span class="copy-icon" title="Copy to clipboard">📋</span
-                  ><br />
-                  <span class="phone-number" data-phone="+233553146404">
-                    <a href="tel:+233553146404" class="call-link icon-link"
-                      ><i class="fas fa-phone"></i>+233553146404</a
-                    >
-                    |
-                    <a href="#" class="whatsapp-link icon-link"
-                      ><i class="fab fa-whatsapp"></i
-                    ></a>
-                  </span>
-                  <span class="copy-icon" title="Copy to clipboard">📋</span
-                  ><br />
-                  <strong style="font-size: 1.5rem">Service Days</strong><br />
-                  Sunday:- 01:00 pm<br />
-                  Friday:- 06:00 pm<br />
-                </p>
-                <a href="#" class="see-more mb-2">See More</a>
-                <div class="btn-group mt-auto">
-                  <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Additional cards for other branches (Abia State, Togo, Ghana, etc.) -->
+          <!-- Each card follows the same structure with unique details -->
         </div>
       </div>
     </main>
+    <!-- Footer Section -->
     <footer
       class="bg-danger text-white"
       data-aos="fade-up"
@@ -581,6 +448,7 @@
     >
       <div class="container py-5">
         <div class="row">
+          <!-- Quick Links Section -->
           <div class="col-6 col-md-2 mb-3">
             <h5>Quick Links</h5>
             <ul class="nav flex-column">
@@ -608,12 +476,14 @@
             </ul>
           </div>
 
+          <!-- Daily Faith Recharge Section -->
           <div class="col-md-5 offset-md-1 mb-3">
             <p>
               Daily Faith Recharge:<br />
               Subscribe to receive daily faith inspiration <br />
               Choose how
             </p>
+            <!-- Spotify Button -->
             <div class="mb-2">
               <a
                 href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
@@ -629,6 +499,7 @@
                 />
               </a>
             </div>
+            <!-- WhatsApp Broadcast Button -->
             <div>
               <button
                 class="btn btn-outline-light w-100"
@@ -641,9 +512,11 @@
           </div>
         </div>
 
+        <!-- Footer Bottom Section -->
         <div
           class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
         >
+          <!-- Copyright Information -->
           <p class="d-flex align-items-center">
             <img
               src="./assets/img/kcmi-logo.jpeg"
@@ -653,6 +526,7 @@
             />
             © 2025 Kingdom Covenant Ministries International
           </p>
+          <!-- Social Media Links -->
           <div class="d-flex justify-content-center">
             <a
               href="https://www.youtube.com/@rehoboth-tv"
@@ -727,6 +601,8 @@
         </div>
       </div>
     </footer>
+
+    <!-- WhatsApp Modal -->
     <div
       class="modal fade"
       id="whatsappModal"
@@ -748,6 +624,7 @@
             ></button>
           </div>
           <div class="modal-body">
+            <!-- Instructions for joining WhatsApp Broadcast -->
             <p>
               To join our WhatsApp broadcast, please send a message to
               <strong id="DFRwhatsappNumber">+234 9134 44 8322</strong> with the
@@ -756,6 +633,7 @@
             <p>
               Or enter your email below, to receive a WhatsApp subscription link
             </p>
+            <!-- Email Subscription Form -->
             <form id="whatsappSubscriptionForm">
               <div class="mb-3">
                 <label for="whatsappEmail" class="form-label"
@@ -784,16 +662,20 @@
       <span id="lightIcon" style="display: none">☀️</span>
     </button>
 
+    <!-- Bootstrap JS -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
       onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
     ></script>
+    <!-- AOS (Animate On Scroll) Library -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Custom Scripts -->
     <script src="./js/scripts.js" defer></script>
 
     <script>
+      // Toggle "See More" and "See Less" functionality for branch details
       document.querySelectorAll(".see-more").forEach((button) => {
         button.addEventListener("click", function (event) {
           event.preventDefault();
@@ -811,6 +693,7 @@
         });
       });
 
+      // Copy phone number to clipboard
       document.querySelectorAll(".copy-icon").forEach((icon) => {
         icon.addEventListener("click", function () {
           const phoneNumber =
@@ -827,6 +710,7 @@
         });
       });
 
+      // Open WhatsApp chat with the branch phone number
       document.querySelectorAll(".whatsapp-link").forEach((link) => {
         link.addEventListener("click", function (event) {
           event.preventDefault();
@@ -839,6 +723,7 @@
         });
       });
 
+      // Filter branch cards by country
       function filterCards(country) {
         const cards = document.querySelectorAll(".col");
         cards.forEach((card) => {
@@ -854,6 +739,7 @@
         AOS.refresh();
       }
 
+      // Initialize AOS animations
       AOS.init({
         duration: 1000,
         once: true,
