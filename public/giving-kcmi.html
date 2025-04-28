@@ -2,14 +2,16 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
   <head>
+    <!-- Meta Information -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Giving to KCMI - Support Our Ministry</title>
+    <title>Giving to KCMI - KCMI Online Giving</title>
     <meta
       name="description"
-      content="Support the mission of KCMI by giving generously. Learn about different ways to contribute to our church and make a difference."
+      content="Support Kingdom Covenant Ministries International's mission through online giving. Discover secure and easy ways to donate and make a real difference in our community."
     />
 
+    <!-- Favicon Links -->
     <link
       rel="apple-touch-icon"
       sizes="180x180"
@@ -29,6 +31,32 @@
     />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- SEO Meta Tags -->
+    <meta
+      name="keywords"
+      content="donate, giving, church donations, online giving, KCMI donations, support ministry, financial contribution"
+    />
+
+    <meta property="og:title" content="Giving to KCMI - KCMI Online Giving" />
+    <meta
+      property="og:description"
+      content="Support Kingdom Covenant Ministries International's mission through online giving. Discover secure and easy ways to donate and make a real difference in our community."
+    />
+    <meta
+      property="og:image"
+      content="https://www.kcmi-rcc.org/assets/img/kcmi-logo.jpeg"
+    />
+    <meta
+      property="og:url"
+      content="https://www.kcmi-rcc.org/giving-kcmi.html"
+    />
+    <meta property="og:type" content="website" />
+
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical" href="https://www.kcmi-rcc.org/giving-kcmi.html" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -36,6 +64,7 @@
       rel="stylesheet"
     />
 
+    <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -43,6 +72,7 @@
       crossorigin="anonymous"
     />
 
+    <!-- AOS Animation Library -->
     <link
       href="https://unpkg.com/aos@2.3.1/dist/aos.css"
       rel="stylesheet"
@@ -50,8 +80,10 @@
       crossorigin="anonymous"
     />
 
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="./css/styles.css" />
 
+    <!-- Google reCAPTCHA -->
     <script
       src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac&onload=onLoadRecaptcha"
       async
@@ -62,6 +94,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
       <div class="container-fluid">
+        <!-- Brand Logo -->
         <a class="navbar-brand" href="./index.html">
           <img
             src="./assets/img/kcmi-logo.jpeg"
@@ -71,6 +104,7 @@
           />
           KCMI
         </a>
+        <!-- Navbar Toggler for Mobile View -->
         <button
           class="navbar-toggler"
           type="button"
@@ -82,6 +116,7 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+        <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
@@ -93,6 +128,7 @@
             <li class="nav-item">
               <a class="nav-link" href="./location.html">Location</a>
             </li>
+            <!-- Dropdown Menu for Resources -->
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -127,7 +163,6 @@
                     >Celebrations</a
                   >
                 </li>
-
                 <li>
                   <a
                     class="dropdown-item"
@@ -145,6 +180,7 @@
               </ul>
             </li>
           </ul>
+          <!-- Search Form -->
           <form id="search-form" class="d-flex align-items-center">
             <input
               id="search-input"
@@ -156,6 +192,7 @@
             <button class="btn btn-outline-success" type="submit">
               Search
             </button>
+            <!-- Navigation Buttons for Search Results -->
             <button
               id="prev-match"
               class="btn btn-outline-secondary mx-1"
@@ -184,9 +221,11 @@
         </div>
       </div>
     </nav>
+    <!-- Main Content -->
     <main>
       <div class="container-lg pt-4 header-content">
         <div class="row">
+          <!-- Giving Information Section -->
           <div class="col-lg-6" data-aos="fade-right">
             <h1 class="text-danger display-4 mt-2">Giving</h1>
             <p>
@@ -204,6 +243,7 @@
               Your gift will make a difference in the lives of many people.
             </p>
           </div>
+          <!-- Video Section -->
           <div
             class="col-lg-6 my-3 d-flex flex-column align-items-center"
             data-aos="fade-left"
@@ -212,6 +252,7 @@
               id="video-container"
               class="w-100 d-flex justify-content-center"
             >
+              <!-- Video Element -->
               <video
                 class="w-100"
                 id="my-video"
@@ -226,13 +267,15 @@
                 onloadeddata="this.play();"
                 poster="./assets/img/kcmi-giving-fallback-image.png"
               >
+                <!-- Video Sources -->
                 <source src="./assets/img/giving-kcmi.webm" type="video/webm" />
                 <source src="./assets/img/giving-kcmi.MP4" type="video/mp4" />
+                <!-- Fallback Content for Unsupported Browsers -->
                 <div class="video-fallback">
                   <p>Your browser does not support the video tag.</p>
                   <img
                     src="./assets/img/kcmi-giving-fallback-image.png"
-                    alt="Ecobank Logo"
+                    alt="Ecobank Account Details for KCMI Giving"
                   />
                   <br />
                   <p>ACCOUNT NAME: KINGDOM COVENANT MINISTRIES INTERNATIONAL</p>
@@ -240,6 +283,7 @@
                 </div>
               </video>
             </div>
+            <!-- Copy Account Number Link -->
             <div class="text-center mt-3">
               <a href="#" id="copy-link" data-account-number="1602002211"
                 >Click to Copy 1602002211</a
@@ -257,9 +301,11 @@
     >
       <div class="container py-5">
         <div class="row">
+          <!-- Quick Links Section -->
           <div class="col-6 col-md-2 mb-3">
             <h5>Quick Links</h5>
             <ul class="nav flex-column">
+              <!-- Navigation links to various pages -->
               <li class="nav-item mb-2">
                 <a href="./index.html" class="nav-link p-0 text-white">Home</a>
               </li>
@@ -284,12 +330,14 @@
             </ul>
           </div>
 
+          <!-- Daily Faith Recharge Section -->
           <div class="col-md-5 offset-md-1 mb-3">
             <p>
               Daily Faith Recharge:<br />
               Subscribe to receive daily faith inspiration <br />
               Choose how
             </p>
+            <!-- Spotify Button -->
             <div class="mb-2">
               <a
                 href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
@@ -305,6 +353,7 @@
                 />
               </a>
             </div>
+            <!-- WhatsApp Broadcast Button -->
             <div>
               <button
                 class="btn btn-outline-light w-100"
@@ -317,9 +366,11 @@
           </div>
         </div>
 
+        <!-- Footer Bottom Section -->
         <div
           class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
         >
+          <!-- Copyright Information -->
           <p class="d-flex align-items-center">
             <img
               src="./assets/img/kcmi-logo.jpeg"
@@ -329,6 +380,7 @@
             />
             © 2025 Kingdom Covenant Ministries International
           </p>
+          <!-- Social Media Links -->
           <div class="d-flex justify-content-center">
             <a
               href="https://www.youtube.com/@rehoboth-tv"
@@ -403,6 +455,8 @@
         </div>
       </div>
     </footer>
+
+    <!-- WhatsApp Modal -->
     <div
       class="modal fade"
       id="whatsappModal"
@@ -432,6 +486,7 @@
             <p>
               Or enter your email below, to receive a WhatsApp subscription link
             </p>
+            <!-- WhatsApp Subscription Form -->
             <form id="whatsappSubscriptionForm">
               <div class="mb-3">
                 <label for="whatsappEmail" class="form-label"
@@ -460,22 +515,27 @@
       <span id="lightIcon" style="display: none">☀️</span>
     </button>
 
+    <!-- Bootstrap JS -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
       onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
     ></script>
+    <!-- AOS Animation Library -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Custom Scripts -->
     <script src="./js/scripts.js" defer></script>
 
     <script>
+      // Handle video errors
       const video = document.getElementById("my-video");
 
       video.addEventListener("error", (error) => {
         console.error("Video error:", error);
       });
 
+      // Copy account number to clipboard
       document
         .getElementById("copy-link")
         .addEventListener("click", function (event) {

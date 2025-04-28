@@ -2,9 +2,18 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
   <head>
+    <!-- Meta tags for character encoding and responsive design -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KCMI's Vision and Mission</title>
+
+    <!-- Meta description for SEO -->
+    <meta
+      name="description"
+      content="Discover the vision and mission of Kingdom Covenant Ministries International (KCMI): Raising Kings to build the Kingdom. Learn about our purpose to bring people to Christ and the leadership of our Lead Pastor, Apostle Philemon Frank Aikins."
+    />
+
+    <!-- Favicon links for various devices -->
     <link
       rel="apple-touch-icon"
       sizes="180x180"
@@ -24,13 +33,46 @@
     />
     <link rel="manifest" href="/site.webmanifest" />
 
+    <!-- SEO Meta Tags -->
+    <meta
+      name="keywords"
+      content="KCMI vision, KCMI mission, Kingdom Covenant Ministries International, Apostle Frank Aikins, church vision, church mission, Christian ministry, Port Harcourt church"
+    />
+    <meta
+      name="author"
+      content="Kingdom Covenant Ministries International (KCMI)"
+    />
+
+    <!-- Open Graph Meta Tags for social media sharing -->
+    <meta property="og:title" content="KCMI's Vision and Mission" />
+    <meta
+      property="og:description"
+      content="Discover the vision and mission of Kingdom Covenant Ministries International (KCMI): Raising Kings to build the Kingdom. Learn about our purpose to bring people to Christ and the leadership of our Lead Pastor, Apostle Philemon Frank Aikins."
+    />
+    <meta
+      property="og:image"
+      content="https://www.kcmi-rcc.org/assets/img/kcmi-logo.jpeg"
+    />
+    <meta
+      property="og:url"
+      content="https://www.kcmi-rcc.org/mission-kcmi.html"
+    />
+    <meta property="og:type" content="website" />
+
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical" href="https://www.kcmi-rcc.org/mission-kcmi.html" />
+
+    <!-- Preconnect for faster font loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
 
+    <!-- Font Awesome for icons -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -39,6 +81,7 @@
       referrerpolicy="no-referrer"
     />
 
+    <!-- Bootstrap CSS for styling -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -46,6 +89,7 @@
       crossorigin="anonymous"
     />
 
+    <!-- AOS (Animate On Scroll) library for animations -->
     <link
       href="https://unpkg.com/aos@2.3.1/dist/aos.css"
       rel="stylesheet"
@@ -53,20 +97,47 @@
       crossorigin="anonymous"
     />
 
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="./css/styles.css" />
 
+    <!-- Google reCAPTCHA script -->
     <script
       src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac&onload=onLoadRecaptcha"
       async
       defer
     ></script>
+
+    <!-- JSON-LD structured data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Kingdom Covenant Ministries International",
+        "url": "https://www.kcmi-rcc.org/",
+        "logo": "https://www.kcmi-rcc.org/assets/img/kcmi-logo.jpeg",
+        "description": "Kingdom Covenant Ministries International (KCMI) is dedicated to raising kings to build the Kingdom through biblical teaching, discipleship, and community outreach.",
+        "founder": {
+          "@type": "Person",
+          "name": "Apostle Philemon Frank Aikins"
+        },
+        "sameAs": [
+          "https://www.facebook.com/share/18bfxXA9Sj/?mibextid=LQQJ4d",
+          "https://www.instagram.com/kcmiworldwide?igsh=MWdlazQwejJ0dmpzbQ%3D%3D&utm_source=qr",
+          "https://twitter.com/kcmi_official",
+          "https://youtube.com/@rehoboth-tv?feature=shared",
+          "https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1"
+        ]
+      }
+    </script>
   </head>
   <body class="d-flex flex-column min-vh-100 kcmi-mission-page">
+    <!-- Navigation bar -->
     <nav
       class="navbar navbar-expand-lg fixed-top bg-body-tertiary"
       data-aos="fade-down"
     >
       <div class="container-fluid">
+        <!-- Brand logo -->
         <a class="navbar-brand" href="./index.html">
           <img
             src="./assets/img/kcmi-logo.jpeg"
@@ -76,6 +147,7 @@
           />
           KCMI
         </a>
+        <!-- Navbar toggler for mobile view -->
         <button
           class="navbar-toggler"
           type="button"
@@ -87,6 +159,7 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+        <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
@@ -103,6 +176,7 @@
             <li class="nav-item">
               <a class="nav-link" href="./location.html">Location</a>
             </li>
+            <!-- Dropdown menu for resources -->
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -156,6 +230,7 @@
               </ul>
             </li>
           </ul>
+          <!-- Search form -->
           <form id="search-form" class="d-flex align-items-center">
             <input
               id="search-input"
@@ -167,6 +242,7 @@
             <button class="btn btn-outline-success" type="submit">
               Search
             </button>
+            <!-- Navigation buttons for search results -->
             <button
               id="prev-match"
               class="btn btn-outline-secondary mx-1"
@@ -197,8 +273,10 @@
     </nav>
 
     <main>
+      <!-- Section for KCMI's Vision -->
       <section class="mission-kcmi py-2 text-center">
         <div class="container">
+          <!-- KCMI Logo -->
           <img
             src="./assets/img/kcmi-logo.jpeg"
             alt="KCMI Logo"
@@ -207,6 +285,7 @@
             data-aos="zoom-in"
             data-aos-delay="300"
           />
+          <!-- Vision Title -->
           <h1 class="display-4 fw-bold" data-aos="fade-down">Our Vision</h1>
         </div>
         <div
@@ -214,16 +293,19 @@
           data-aos="fade-up"
           data-aos-delay="500"
         >
+          <!-- Vision Statement -->
           <p>Raising Kings To Build The Kingdom</p>
         </div>
         <hr data-aos="zoom-in" data-aos-duration="3500" />
         <div>
+          <!-- Mission Title -->
           <h1 class="display-4 fw-bold" data-aos="fade-down">Our Mission</h1>
           <div
             class="container text-dark"
             data-aos="fade-up"
             data-aos-delay="500"
           >
+            <!-- Mission Statement -->
             <p>
               Use all creative biblical means to bring people into relationship
               with Christ.
@@ -240,9 +322,12 @@
         </div>
       </section>
       <hr data-aos="fade-in" data-aos-duration="600" />
+
+      <!-- Section about Apostle Aikins -->
       <section class="about-apostle-aikins py-5 text-center">
         <div class="container">
           <div class="row align-items-center">
+            <!-- Image of Apostle Aikins -->
             <div
               class="col-md-6 order-md-2"
               data-aos="fade-left"
@@ -255,6 +340,7 @@
               />
             </div>
             <div class="col-md-6 order-md-1">
+              <!-- KCMI Logo -->
               <img
                 src="./assets/img/kcmi-logo.jpeg"
                 alt="KCMI Logo"
@@ -263,6 +349,7 @@
                 data-aos="fade-right"
                 data-aos-duration="800"
               />
+              <!-- Lead Pastor Title -->
               <h2
                 class="fw-bold text-uppercase"
                 data-aos="fade-down-right"
@@ -277,6 +364,7 @@
                 data-aos-duration="1000"
                 data-aos-delay="400"
               >
+                <!-- Information about Apostle Aikins -->
                 <p class="lead">
                   Apostle Philemon Frank Aikins is the Senior Pastor and Founder
                   of Kingdom Covenant Ministries International (Rehoboth
@@ -290,6 +378,7 @@
                   International Churches, during which he pioneered, grew, and
                   oversaw several churches...
                 </p>
+                <!-- Link to read more about Apostle Aikins -->
                 <a
                   href="./about-apostle-aikins.html"
                   class="btn btn-primary mt-3"
@@ -305,6 +394,7 @@
       </section>
     </main>
 
+    <!-- Footer Section -->
     <footer
       class="bg-danger text-white"
       data-aos="fade-up"
@@ -312,6 +402,7 @@
     >
       <div class="container py-5">
         <div class="row">
+          <!-- Quick Links Section -->
           <div class="col-6 col-md-2 mb-3">
             <h5>Quick Links</h5>
             <ul class="nav flex-column">
@@ -339,6 +430,7 @@
             </ul>
           </div>
 
+          <!-- Daily Faith Recharge Section -->
           <div class="col-md-5 offset-md-1 mb-3">
             <p>
               Daily Faith Recharge:<br />
@@ -346,6 +438,7 @@
               Choose how
             </p>
             <div class="mb-2">
+              <!-- Spotify Link -->
               <a
                 href="https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq"
                 target="_blank"
@@ -361,6 +454,7 @@
               </a>
             </div>
             <div>
+              <!-- WhatsApp Broadcast Button -->
               <button
                 class="btn btn-outline-light w-100"
                 data-bs-toggle="modal"
@@ -372,9 +466,11 @@
           </div>
         </div>
 
+        <!-- Footer Bottom Section -->
         <div
           class="d-flex flex-column flex-sm-row justify-content-between py-4 my-4 border-top"
         >
+          <!-- Copyright Information -->
           <p class="d-flex align-items-center">
             <img
               src="./assets/img/kcmi-logo.jpeg"
@@ -384,6 +480,7 @@
             />
             © 2025 Kingdom Covenant Ministries International
           </p>
+          <!-- Social Media Links -->
           <div class="d-flex justify-content-center">
             <a
               href="https://www.youtube.com/@rehoboth-tv"
@@ -458,6 +555,8 @@
         </div>
       </div>
     </footer>
+
+    <!-- WhatsApp Modal -->
     <div
       class="modal fade"
       id="whatsappModal"
@@ -479,6 +578,7 @@
             ></button>
           </div>
           <div class="modal-body">
+            <!-- WhatsApp Subscription Instructions -->
             <p>
               To join our WhatsApp broadcast, please send a message to
               <strong id="DFRwhatsappNumber">+234 9134 44 8322</strong> with the
@@ -487,6 +587,7 @@
             <p>
               Or enter your email below, to receive a WhatsApp subscription link
             </p>
+            <!-- WhatsApp Subscription Form -->
             <form id="whatsappSubscriptionForm">
               <div class="mb-3">
                 <label for="whatsappEmail" class="form-label"
@@ -515,13 +616,16 @@
       <span id="lightIcon" style="display: none">☀️</span>
     </button>
 
+    <!-- Bootstrap JS -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
       onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
     ></script>
+    <!-- AOS Library -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Custom Scripts -->
     <script src="./js/scripts.js" defer></script>
   </body>
 </html>
