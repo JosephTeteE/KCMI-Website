@@ -155,7 +155,6 @@ function createMediaHTML(event) {
   return `
     <a href="${url}" target="_blank" rel="noopener noreferrer">
       <img src="${thumbnail}" alt="${escapeHtml(event.title)}" loading="lazy">
-      <div class="image-caption">Click to view details</div>
     </a>
   `;
 }

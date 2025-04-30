@@ -1375,7 +1375,7 @@ body.navbar-open .homepage-header-video-container {
 .page-location .card-text {
   overflow: hidden; /* Initially hide overflow content */
   height: 6em; /* Reduced height for collapsed text */
-  line-height: 1.4em; /* Slightly reduced line height */
+  line-height: 1.5em; /* Slightly reduced line height */
   transition: height 0.3s ease-out; /* Smooth transition for height */
 }
 
