@@ -367,6 +367,60 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ==========================================================================
+// Map Logic
+// ==========================================================================
+// This code initializes a Google Map and handles the loading state of the map on contact-page & index-page
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Common coordinates
+  const churchCoords = {
+    lat: 4.831148938457418,
+    lng: 7.01167364093468,
+  };
+
+  // Initialize homepage map
+  const initMap = (mapId, placeholderClass) => {
+    const placeholder = document.querySelector(placeholderClass);
+    const map = document.getElementById(mapId);
+
+    if (!map || !placeholder) return;
+
+    setTimeout(() => {
+      map.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.490292089824!2d${churchCoords.lng}!3d${churchCoords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDgnNTYuMiJOIDfCsDAyJzU5LjQiRQ!5e0!3m2!1sen!2sng!4v1620000000000!5m2!1sen!2sng`;
+
+      map.onload = function () {
+        placeholder.style.display = "none";
+        map.style.display = "block";
+      };
+
+      setTimeout(() => {
+        if (map.style.display === "none") {
+          placeholder.querySelector("p").textContent =
+            "Map failed to load. Please try again.";
+        }
+      }, 5000);
+    }, 1000);
+  };
+
+  // Initialize both maps
+  initMap("churchMap", ".homepage-map-container .map-loading-placeholder");
+  initMap("contactPageMap", ".contact-page .map-loading-placeholder");
+
+  // Button functionality (homepage only)
+  document.getElementById("openInMaps")?.addEventListener("click", () => {
+    window.open(
+      `https://www.google.com/maps?q=${churchCoords.lat},${churchCoords.lng}`
+    );
+  });
+
+  document.getElementById("getDirections")?.addEventListener("click", () => {
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${churchCoords.lat},${churchCoords.lng}`
+    );
+  });
+});
+
+// ==========================================================================
 // Navbar Video Container Logic
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", function () {

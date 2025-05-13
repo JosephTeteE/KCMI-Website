@@ -467,10 +467,17 @@
             type="video/webm"
           />
           <!-- Fallback image if video fails to load -->
-          <img
-            src="./assets/img/welcome-to-kcmi-fallback-image.png"
-            alt="Welcome to KCMI"
-          />
+          <picture>
+            <source
+              srcset="./assets/img/welcome-to-kcmi-fallback-image.webp"
+              type="image/webp"
+              alt="Welcome to KCMI fallback image"
+            />
+            <img
+              src="./assets/img/welcome-to-kcmi-fallback-image.png"
+              alt="Welcome to KCMI fallback image"
+            />
+          </picture>
         </video>
       </div>
 
@@ -679,7 +686,6 @@
       </section>
 
       <!-- Church Events Calendar Section -->
-
       <div class="container" data-aos="fade-up" data-aos-duration="1000">
         <div
           id="church-events-calendar-section"
@@ -687,11 +693,12 @@
         >
           <h2>Church Events Calendar</h2>
           <div id="calendar-container">
-            <div id="loading-message" class="text-center py-1">
+            <!-- Loading State -->
+            <div id="loading-message" class="calendar-loading text-center py-4">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
-              <p class="mt-1">Loading calendar events...</p>
+              <p class="mt-2">Loading upcoming events...</p>
             </div>
             <div
               id="error-message"
@@ -779,20 +786,34 @@
         data-aos-duration="1000"
       >
         <div class="homepage-map-text-container">
-          <div class="homepage-map-container" id="KCMI-PH">
+          <div class="map-container" id="KCMI-PH">
+            <div class="map-loading-placeholder">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading map...</span>
+              </div>
+              <p>Loading church location...</p>
+            </div>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509364!2d144.9537353153167!3d-37.817209979751575!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1069cdd952c0a237%3A0xf79c75918f6481f9!2sLocation!5e0!3m2!1sen!2sng!4v1706900000000!5m2!1sen!2sng"
-              allowfullscreen=""
+              id="churchMap"
+              style="display: none"
               loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
+
           <div class="homepage-map-text">
             <h2>You can find us here</h2>
             <p>
               Are you in Port Harcourt? Come and worship with us! Click on the
               map for directions.
             </p>
+            <div class="map-buttons mt-3">
+              <button id="openInMaps" class="btn btn-primary me-2">
+                <i class="fas fa-map-marked-alt"></i> Open in Google Maps
+              </button>
+              <button id="getDirections" class="btn btn-outline-primary">
+                <i class="fas fa-directions"></i> Get Directions
+              </button>
+            </div>
           </div>
         </div>
       </div>
