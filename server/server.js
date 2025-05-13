@@ -454,6 +454,27 @@ app.get("/api/sheets-events", async (req, res) => {
   }
 });
 
+// Google Maps endpoint
+app.get("/api/config", (req, res) => {
+  res.json({
+    googleApiKey: process.env.GOOGLE_API_KEY || "",
+  });
+});
+
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "img-src 'self' data: https://*.googleapis.com https://*.gstatic.com; " +
+      "connect-src 'self' https://*.googleapis.com; " +
+      "frame-src 'self' https://www.google.com; " +
+      "font-src 'self' https://fonts.gstatic.com"
+  );
+  next();
+});
+
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.use((err, req, res, next) => {

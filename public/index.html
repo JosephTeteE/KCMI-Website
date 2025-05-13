@@ -691,7 +691,7 @@
           id="church-events-calendar-section"
           class="calendar-container church-calendar"
         >
-          <h2>Church Events Calendar</h2>
+          <h2 class="text-center mt-2 fw-bold">Church Events Calendar</h2>
           <div id="calendar-container">
             <!-- Loading State -->
             <div id="loading-message" class="calendar-loading text-center py-4">
@@ -779,38 +779,22 @@
       </section>
 
       <!-- Map Section -->
-      <div
-        class="homepage-map-section container"
-        id="location"
-        data-aos="fade-up"
-        data-aos-duration="1000"
-      >
+      <div class="homepage-map-section container" id="location">
         <div class="homepage-map-text-container">
-          <div class="map-container" id="KCMI-PH">
+          <div class="homepage-map-container" id="KCMI-PH">
+            <div id="churchMap"></div>
             <div class="map-loading-placeholder">
               <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading map...</span>
               </div>
               <p>Loading church location...</p>
             </div>
-            <iframe
-              id="churchMap"
-              style="display: none"
-              loading="lazy"
-            ></iframe>
           </div>
-
           <div class="homepage-map-text">
             <h2>You can find us here</h2>
-            <p>
-              Are you in Port Harcourt? Come and worship with us! Click on the
-              map for directions.
-            </p>
-            <div class="map-buttons mt-3">
-              <button id="openInMaps" class="btn btn-primary me-2">
-                <i class="fas fa-map-marked-alt"></i> Open in Google Maps
-              </button>
-              <button id="getDirections" class="btn btn-outline-primary">
+            <p>Are you in Port Harcourt? Come and worship with us!</p>
+            <div class="map-buttons">
+              <button class="btn btn-primary get-directions-btn">
                 <i class="fas fa-directions"></i> Get Directions
               </button>
             </div>
