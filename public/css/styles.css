@@ -916,18 +916,11 @@ body.navbar-open .homepage-header-video-container {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Map Section - NEW STYLES */
+/* Map Section                                                                */
 /* -------------------------------------------------------------------------- */
-.homepage-map-section {
-  padding: 1rem 0; /* Add spacing around the map section */
+.index-page .homepage-map-section {
+  padding: 2rem 0;
   margin-top: 1rem;
-}
-
-.homepage-map-text-container {
-  display: flex;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
-  align-items: center;
-  gap: 0.5rem; /* Spacing between map and text */
 }
 
 .index-page .homepage-map-container {
@@ -939,33 +932,63 @@ body.navbar-open .homepage-header-video-container {
   margin-bottom: 1rem;
 }
 
-.index-page .homepage-map-container iframe {
+.index-page #churchMap {
+  height: 100%;
+  width: 100%;
+}
+
+.index-page .map-loading-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  z-index: 10;
 }
 
-.homepage-map-text {
-  flex: 1; /* Allow text to grow and take available space */
-  min-width: 280px; /* Slightly reduced minimum width for text */
-  text-align: center; /* Center-align text */
+.index-page .map-loading-placeholder .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+  color: #7c1963;
+  margin-bottom: 1rem;
 }
 
-.homepage-map-text h2 {
-  font-size: clamp(
-    1.75rem,
-    4vw,
-    2.25rem
-  ); /* Slightly reduced font size for map heading */
-  font-weight: bold;
-  margin-bottom: 0.5rem; /* Reduced spacing below heading */
-  color: #333; /* Dark text for better contrast */
+.index-page .map-loading-placeholder p {
+  font-size: 1.1rem;
+  color: #555;
 }
 
-.homepage-map-text p {
-  font-size: 1.1rem; /* Slightly smaller text */
-  color: #555; /* Slightly muted text for body */
-  line-height: 1.5; /* Improve readability */
+.index-page .homepage-map-text {
+  padding: 1rem;
+  text-align: center;
+}
+
+.index-page .homepage-map-text h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #7c1963;
+  margin-bottom: 0.5rem;
+}
+
+.index-page .homepage-map-text p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.index-page .get-directions-btn {
+  background-color: #7c1963;
+  border-color: #7c1963;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -973,9 +996,20 @@ body.navbar-open .homepage-header-video-container {
 /* -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
-  .index-page .homepage-map-container,
-  .contact-page .contact-page-map-container {
+  .index-page .homepage-map-container {
     height: 350px;
+  }
+
+  .index-page .homepage-map-text {
+    padding: 0.5rem;
+  }
+
+  .index-page .homepage-map-text h2 {
+    font-size: 1.5rem;
+  }
+
+  .index-page .homepage-map-text p {
+    font-size: 1rem;
   }
 
   .homepage-map-text-container {
@@ -1128,28 +1162,28 @@ body.navbar-open .homepage-header-video-container {
 }
 
 /* Map Container */
-.contact-page .contact-page-map-container {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 400px;
-  margin-top: 1rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+.contact-page .contact-map-section {
+  padding: 2rem 0;
 }
 
-/* Map Iframe */
-.contact-page .contact-page-map-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+.contact-page .contact-page-map-container {
+  position: relative;
+  height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+}
+
+.contact-page #contactPageMap {
   height: 100%;
-  border: 0;
+  width: 100%;
 }
 
 .contact-page .contact-map-loading-placeholder {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
@@ -1157,7 +1191,7 @@ body.navbar-open .homepage-header-video-container {
   align-items: center;
   justify-content: center;
   background-color: #f8f9fa;
-  z-index: 1;
+  z-index: 10;
 }
 
 .contact-page .contact-map-loading-placeholder .spinner-border {
@@ -1165,12 +1199,29 @@ body.navbar-open .homepage-header-video-container {
   height: 3rem;
   border-width: 0.25em;
   color: #7c1963;
+  margin-bottom: 1rem;
 }
 
 .contact-page .contact-map-loading-placeholder p {
   font-size: 1.1rem;
-  margin-top: 1rem;
   color: #555;
+}
+
+.contact-page .contact-map-text {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.contact-page .contact-map-text h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #7c1963;
+  margin-bottom: 0.5rem;
+}
+
+.contact-page .contact-map-text p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1rem;
 }
 
 /* Contact Form */
@@ -1505,33 +1556,39 @@ body.navbar-open .homepage-header-video-container {
 /* Dark Mode for Both Maps */
 [data-bs-theme="dark"] .index-page .homepage-map-container,
 [data-bs-theme="dark"] .contact-page .contact-page-map-container {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-[data-bs-theme="dark"] .index-page .homepage-map-loading-placeholder,
+[data-bs-theme="dark"] .index-page .map-loading-placeholder,
 [data-bs-theme="dark"] .contact-page .contact-map-loading-placeholder {
   background-color: #2c2c2c;
 }
 
-[data-bs-theme="dark"]
-  .index-page
-  .homepage-map-loading-placeholder
-  .spinner-border,
-[data-bs-theme="dark"]
-  .contact-page
-  .contact-map-loading-placeholder
-  .spinner-border {
-  color: #c298b7;
-}
-
-[data-bs-theme="dark"] .index-page .homepage-map-loading-placeholder p,
+[data-bs-theme="dark"] .index-page .map-loading-placeholder p,
 [data-bs-theme="dark"] .contact-page .contact-map-loading-placeholder p {
   color: #e0e0e0;
 }
 
-[data-bs-theme="dark"] .index-page .homepage-map-container iframe,
-[data-bs-theme="dark"] .contact-page .contact-page-map-container iframe {
-  filter: brightness(0.8) contrast(1.2);
+[data-bs-theme="dark"] .index-page .homepage-map-text h2,
+[data-bs-theme="dark"] .contact-page .contact-map-text h2 {
+  color: #c298b7;
+}
+
+[data-bs-theme="dark"] .index-page .homepage-map-text p,
+[data-bs-theme="dark"] .contact-page .contact-map-text p {
+  color: #b0b0b0;
+}
+
+[data-bs-theme="dark"] .index-page .get-directions-btn,
+[data-bs-theme="dark"] .contact-page .get-directions-btn {
+  background-color: #9a3d81;
+  border-color: #9a3d81;
+}
+
+[data-bs-theme="dark"] .index-page .get-directions-btn:hover,
+[data-bs-theme="dark"] .contact-page .get-directions-btn:hover {
+  background-color: #8a2d71;
+  border-color: #8a2d71;
 }
 
 [data-bs-theme="dark"] footer {

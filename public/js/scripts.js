@@ -367,58 +367,140 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ==========================================================================
-// Map Logic
+// Google Maps JavaScript API Implementation
 // ==========================================================================
 // This code initializes a Google Map and handles the loading state of the map on contact-page & index-page
+// It also includes a function to handle the "Get Directions" button click event.
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Common coordinates
-  const churchCoords = {
-    lat: 4.831148938457418,
-    lng: 7.01167364093468,
-  };
+// Church location coordinates
+const churchLocation = {
+  lat: 4.831148938457418,
+  lng: 7.01167364093468,
+};
 
-  // Initialize homepage map
-  const initMap = (mapId, placeholderClass) => {
-    const placeholder = document.querySelector(placeholderClass);
-    const map = document.getElementById(mapId);
+// Initialize maps for both pages
+function initMaps() {
+  // Initialize index page map if exists
+  const indexMapElement = document.getElementById("churchMap");
+  if (indexMapElement) {
+    initMap("churchMap", ".map-loading-placeholder");
+  }
 
-    if (!map || !placeholder) return;
+  // Initialize contact page map if exists
+  const contactMapElement = document.getElementById("contactPageMap");
+  if (contactMapElement) {
+    initMap("contactPageMap", ".contact-map-loading-placeholder");
+  }
+}
 
-    setTimeout(() => {
-      map.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.490292089824!2d${churchCoords.lng}!3d${churchCoords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDgnNTYuMiJOIDfCsDAyJzU5LjQiRQ!5e0!3m2!1sen!2sng!4v1620000000000!5m2!1sen!2sng`;
+// Initialize a single map
+function initMap(mapId, placeholderSelector) {
+  const mapElement = document.getElementById(mapId);
+  const placeholder = document.querySelector(placeholderSelector);
 
-      map.onload = function () {
-        placeholder.style.display = "none";
-        map.style.display = "block";
-      };
+  if (!mapElement || !placeholder) {
+    console.error(`Map elements not found for ${mapId}`);
+    return;
+  }
 
-      setTimeout(() => {
-        if (map.style.display === "none") {
-          placeholder.querySelector("p").textContent =
-            "Map failed to load. Please try again.";
-        }
-      }, 5000);
-    }, 1000);
-  };
+  try {
+    const map = new google.maps.Map(mapElement, {
+      center: churchLocation,
+      zoom: 16,
+      mapTypeId: "roadmap",
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }],
+        },
+      ],
+    });
 
-  // Initialize both maps
-  initMap("churchMap", ".homepage-map-container .map-loading-placeholder");
-  initMap("contactPageMap", ".contact-page .map-loading-placeholder");
+    new google.maps.Marker({
+      position: churchLocation,
+      map: map,
+      title: "Kingdom Covenant Ministries International",
+    });
 
-  // Button functionality (homepage only)
-  document.getElementById("openInMaps")?.addEventListener("click", () => {
-    window.open(
-      `https://www.google.com/maps?q=${churchCoords.lat},${churchCoords.lng}`
-    );
-  });
+    placeholder.style.display = "none";
+  } catch (error) {
+    console.error(`Error initializing ${mapId}:`, error);
+    const errorText = placeholder.querySelector("p");
+    const spinner = placeholder.querySelector(".spinner-border");
 
-  document.getElementById("getDirections")?.addEventListener("click", () => {
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${churchCoords.lat},${churchCoords.lng}`
-    );
-  });
+    if (errorText)
+      errorText.textContent = "Failed to load map. Please try again later.";
+    if (spinner) spinner.style.display = "none";
+  }
+}
+
+// Main initialization
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    const response = await fetch("/api/config");
+    const config = await response.json();
+    window.GOOGLE_API_KEY = config.googleApiKey;
+
+    await new Promise((resolve, reject) => {
+      if (window.google?.maps) return resolve();
+
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${window.GOOGLE_API_KEY}&callback=initMaps`;
+      script.async = true;
+      script.defer = true;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+
+    // Setup direction buttons after maps load
+    document.querySelectorAll(".get-directions-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        window.open(
+          `https://www.google.com/maps/dir/?api=1&destination=${churchLocation.lat},${churchLocation.lng}&travelmode=driving`,
+          "_blank"
+        );
+      });
+    });
+  } catch (error) {
+    console.error("Map initialization failed:", error);
+    handleMapError();
+  }
 });
+
+function handleMapError() {
+  // Handle errors for both placeholders
+  document
+    .querySelectorAll(
+      ".map-loading-placeholder p, .contact-map-loading-placeholder p"
+    )
+    .forEach((el) => {
+      el.textContent =
+        "Unable to load maps. Please refresh or try again later.";
+    });
+
+  document
+    .querySelectorAll(
+      ".map-loading-placeholder .spinner-border, .contact-map-loading-placeholder .spinner-border"
+    )
+    .forEach((el) => {
+      el.style.display = "none";
+    });
+
+  // Add fallback links
+  const fallbackLink = document.createElement("a");
+  fallbackLink.href = `https://www.google.com/maps?q=${churchLocation.lat},${churchLocation.lng}`;
+  fallbackLink.textContent = "Open in Google Maps";
+  fallbackLink.className = "btn btn-secondary mt-2";
+
+  document
+    .querySelectorAll(
+      ".map-loading-placeholder, .contact-map-loading-placeholder"
+    )
+    .forEach((el) => {
+      el.appendChild(fallbackLink.cloneNode(true));
+    });
+}
 
 // ==========================================================================
 // Navbar Video Container Logic
