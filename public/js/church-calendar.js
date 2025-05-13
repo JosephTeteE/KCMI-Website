@@ -1,6 +1,33 @@
 // public/js/church-calendar.js
 // This script handles the church calendar functionality, including fetching events, rendering views, and handling user interactions.
 
+// ==========================================================================
+// Church Calendar Logic
+// ==========================================================================
+// This code handles the loading state and error handling for the church calendar.
+document.addEventListener("DOMContentLoaded", function () {
+  const loadingMessage = document.getElementById("loading-message");
+  const errorMessage = document.getElementById("error-message");
+
+  // Show loading message
+  function showLoading() {
+    loadingMessage.style.display = "block";
+    errorMessage.style.display = "none";
+  }
+
+  // Hide loading message
+  function hideLoading() {
+    loadingMessage.style.display = "none";
+  }
+
+  // Fetch calendar data
+  function showError(message) {
+    loadingMessage.style.display = "none";
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
+  }
+});
+
 class ChurchCalendar {
   constructor() {
     // Initialize state variables
