@@ -417,7 +417,7 @@ function initMap(mapId, placeholderSelector) {
       ],
     });
 
-    new google.maps.Marker({
+    new google.maps.marker.AdvancedMarkerElement({
       position: churchLocation,
       map: map,
       title: "Kingdom Covenant Ministries International",
@@ -448,7 +448,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (window.google?.maps) return resolve();
 
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${window.GOOGLE_API_KEY}&callback=initMaps`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${window.GOOGLE_API_KEY}&callback=initMaps&loading=async`;
       script.async = true;
       script.defer = true;
       script.onerror = reject;
