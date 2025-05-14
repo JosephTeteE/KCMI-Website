@@ -920,16 +920,22 @@ body.navbar-open .homepage-header-video-container {
 /* -------------------------------------------------------------------------- */
 .index-page .homepage-map-section {
   padding: 2rem 0;
-  margin-top: 1rem;
+  padding-top: 0;
+  margin-top: 0;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .index-page .homepage-map-container {
   position: relative;
   height: 400px;
+  width: 100%;
+  max-width: 1000px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: 1rem;
+  margin: 0 auto;
 }
 
 .index-page #churchMap {
@@ -964,9 +970,18 @@ body.navbar-open .homepage-header-video-container {
   color: #555;
 }
 
+.index-page .homepage-map-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .index-page .homepage-map-text {
-  padding: 1rem;
+  padding: 0.25rem;
   text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .index-page .homepage-map-text h2 {
@@ -1020,21 +1035,6 @@ body.navbar-open .homepage-header-video-container {
   .homepage-map-container {
     width: 100%; /* Full width for map on smaller screens */
     margin-bottom: 0.5rem; /* Spacing below map */
-  }
-}
-
-@media (max-width: 992px) {
-  .index-page .homepage-map-text-container {
-    flex-direction: column; /* Stack map and text vertically on smaller screens */
-    text-align: center; /* Center align text when stacked */
-  }
-  .index-page .homepage-map-container {
-    width: 80%; /* Make map wider on smaller screens */
-    margin-right: 0; /* Remove right margin when stacked */
-    margin-bottom: 10px; /* Reduced bottom margin */
-  }
-  .index-page .homepage-map-text {
-    width: 80%; /* Make text area wider on smaller screens */
   }
 }
 

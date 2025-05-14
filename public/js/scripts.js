@@ -438,7 +438,9 @@ function initMap(mapId, placeholderSelector) {
 // Main initialization
 document.addEventListener("DOMContentLoaded", async function () {
   try {
-    const response = await fetch("/api/config");
+    const response = await fetch(
+      "https://kcmi-backend.onrender.com/api/config"
+    );
     const config = await response.json();
     window.GOOGLE_API_KEY = config.googleApiKey;
 
