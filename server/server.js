@@ -28,7 +28,7 @@ const requiredEnvVars = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "GOOGLE_REFRESH_TOKEN",
-  "GOOGLE_API_KEY",
+  "GOOGLE_API_KEY", // Required for Google Maps integration
 ];
 
 const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
@@ -53,7 +53,10 @@ app.options("*", cors(corsOptions)); // Handle preflight requests
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "../public")));
 
-// Nodemailer Transporter for sending emails
+// ==========================================================================
+// Nodemailer Configuration
+// Purpose: Setup for sending emails through SMTP
+// ==========================================================================
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
@@ -65,7 +68,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// ==========================================================================
 // reCAPTCHA Verification
+// Purpose: Validates reCAPTCHA tokens submitted with forms
+// ==========================================================================
 async function verifyRecaptcha(token) {
   try {
     const secretKey = process.env.RECAPTCHA_SECRET_KEY_CONTACT;
@@ -83,7 +89,10 @@ async function verifyRecaptcha(token) {
   }
 }
 
-// Handle Contact Form Submission
+// ==========================================================================
+// Contact Form Submission Handler
+// Purpose: Processes contact form submissions with validation and email sending
+// ==========================================================================
 app.post("/submit-contact", async (req, res) => {
   const { email, phone, message, recaptchaToken } = req.body;
 
@@ -136,7 +145,10 @@ app.post("/submit-contact", async (req, res) => {
   }
 });
 
-// Handle Subscription Form Submission
+// ==========================================================================
+// Subscription Form Handler
+// Purpose: Manages newsletter and WhatsApp subscription requests
+// ==========================================================================
 app.post("/subscribe", async (req, res) => {
   const { email, subscriptionType, recaptchaToken } = req.body;
 
@@ -176,7 +188,10 @@ app.post("/subscribe", async (req, res) => {
   }
 });
 
-// Database Connection Check
+// ==========================================================================
+// Database Health Check
+// Purpose: Provides an endpoint to verify database connectivity
+// ==========================================================================
 app.get("/api/db-check", async (req, res) => {
   try {
     const connection = await pool.getConnection();
@@ -191,11 +206,17 @@ app.get("/api/db-check", async (req, res) => {
   }
 });
 
+// ==========================================================================
 // Livestream Routes
+// Purpose: Handles livestream-related functionality
+// ==========================================================================
 const livestreamRoutes = require("../api/livestream");
 app.use("/api/livestream", livestreamRoutes);
 
+// ==========================================================================
 // Google Calendar API Setup
+// Purpose: Configures OAuth2 for Google Calendar and implements caching
+// ==========================================================================
 const calendarCache = new NodeCache({
   stdTTL: 1800, // Cache events for 30 minutes
   checkperiod: 300, // Check for expired cache every 5 minutes
@@ -295,7 +316,10 @@ const calendarLimiter = rateLimit({
 });
 app.use("/api/calendar-events", calendarLimiter);
 
+// ==========================================================================
 // Authentication Endpoint
+// Purpose: Handles admin authentication with JWT
+// ==========================================================================
 app.post("/api/auth", async (req, res) => {
   const { username, password } = req.body;
 
@@ -310,7 +334,10 @@ app.post("/api/auth", async (req, res) => {
   }
 });
 
+// ==========================================================================
 // Google Drive Manifest Endpoint
+// Purpose: Retrieves manifest files from Google Drive
+// ==========================================================================
 app.get("/api/drive-manifest", async (req, res) => {
   try {
     const { id } = req.query;
@@ -366,7 +393,10 @@ app.get("/api/drive-manifest", async (req, res) => {
   }
 });
 
-// Google Drive File Download Endpoint
+// ==========================================================================
+// Google Sheets Events Endpoint
+// Purpose: Retrieves and processes event data from Google Sheets
+// ==========================================================================
 app.get("/api/sheets-events", async (req, res) => {
   try {
     const { id } = req.query;
@@ -454,13 +484,61 @@ app.get("/api/sheets-events", async (req, res) => {
   }
 });
 
-// Google Maps endpoint
-app.get("/api/config", (req, res) => {
-  res.json({
-    googleApiKey: process.env.GOOGLE_API_KEY || "",
-  });
+// ==========================================================================
+// Google Maps Proxy Endpoint
+// Purpose: Provides secure access to Google Maps configuration with caching
+// Security: Uses server-side proxying to protect API key
+// Performance: Implements caching to reduce API calls
+// ==========================================================================
+
+// Initialize cache for map configuration
+const mapCache = new NodeCache({
+  stdTTL: 3600, // Cache for 1 hour
+  checkperiod: 600, // Check every 10 minutes
 });
 
+// Rate limiting for maps endpoint
+const mapLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many map requests, please try again later",
+});
+
+app.get("/api/maps-proxy", mapLimiter, async (req, res) => {
+  const cacheKey = "mapConfig";
+  const cachedData = mapCache.get(cacheKey);
+
+  if (cachedData) {
+    res.set("X-Cache", "HIT");
+    return res.json(cachedData);
+  }
+
+  try {
+    const mapConfig = {
+      churchLocation: {
+        lat: 4.831148938457418,
+        lng: 7.01167364093468,
+      },
+      zoom: 16,
+      apiKey: process.env.GOOGLE_API_KEY,
+    };
+
+    mapCache.set(cacheKey, mapConfig);
+    res.set("X-Cache", "MISS");
+    res.json(mapConfig);
+  } catch (error) {
+    console.error("Map proxy error:", error);
+    res.status(500).json({
+      error: "Failed to load map data",
+      details: process.env.NODE_ENV === "development" ? error.message : "",
+    });
+  }
+});
+
+// ==========================================================================
+// Security Middleware
+// Purpose: Enhances security with Content Security Policy headers
+// ==========================================================================
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
@@ -468,14 +546,16 @@ app.use((req, res, next) => {
       "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com; " +
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "img-src 'self' data: https://*.googleapis.com https://*.gstatic.com; " +
-      "connect-src 'self' https://*.googleapis.com; " +
+      "connect-src 'self' https://*.googleapis.com https://kcmi-backend.onrender.com; " +
       "frame-src 'self' https://www.google.com; " +
       "font-src 'self' https://fonts.gstatic.com"
   );
   next();
 });
 
-// Start Server
+// ==========================================================================
+// Server Startup and Error Handling
+// ==========================================================================
 const PORT = process.env.PORT || 5000;
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
@@ -484,7 +564,10 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Test Database Connection
+// ==========================================================================
+// Database Connection Test
+// Purpose: Verifies database connectivity on startup
+// ==========================================================================
 async function testDB() {
   try {
     console.log("Testing database connection...");
