@@ -392,6 +392,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // ==========================================================================
 // Church location coordinates
 const churchLocation = {
+  mapId: "3d8b3c0ff08fcc80a84accd3",
   lat: 4.831148938457418,
   lng: 7.01167364093468,
 };
@@ -435,6 +436,10 @@ function initMap(mapId, placeholderSelector) {
           stylers: [{ visibility: "off" }],
         },
       ],
+      zoomControl: false,
+      mapTypeControl: true,
+      scaleControl: true,
+      streetViewControl: true,
     });
 
     // Create an Advanced Marker
