@@ -428,6 +428,7 @@ function initMap(mapId, placeholderSelector) {
     const map = new google.maps.Map(mapElement, {
       center: churchLocation,
       zoom: 16,
+      mapId: "3d8b3c0ff08fcc80a84accd3",
       mapTypeId: "roadmap",
       styles: [
         {
