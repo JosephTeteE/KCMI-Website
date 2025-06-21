@@ -12,18 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let isSubmitting = false;
 
-  // No longer needed for invisible reCAPTCHA if grecaptcha.execute is called directly
-  // window.onRecaptchaSuccess and window.onRecaptchaExpired will not be called automatically by the div.
-  // Instead, the token will be received directly via the promise from grecaptcha.execute().
+  // Account Number Copy Functionality
 
-  // --- Account Number Copy Functionality ---
-  // Ensure you update IDs if you duplicated them (e.g., accountNumber and accountNumberBottom)
-  // For simplicity, I'm assuming you will have one clickable ID for account number.
-  // If you kept both, you'll need two separate blocks or a more generic handler.
-  const accountNumberSpan = document.getElementById("accountNumber"); // Original
-  const copyConfirmationDiv = document.getElementById("copyConfirmation"); // Original
+  const accountNumberSpan = document.getElementById("accountNumber");
+  const copyConfirmationDiv = document.getElementById("copyConfirmation");
 
-  // If you have a second one for the bottom of the instructions:
   const accountNumberSpanBottom = document.getElementById(
     "accountNumberBottom"
   );
@@ -35,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function setupCopyFunctionality(spanElement, confirmationElement) {
     if (spanElement) {
       spanElement.addEventListener("click", async function () {
-        const accountNumber = this.childNodes[0].textContent.trim(); // Assumes number is first text node
+        const accountNumber = this.childNodes[0].textContent.trim();
 
         try {
           await navigator.clipboard.writeText(accountNumber);
@@ -70,11 +63,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   setupCopyFunctionality(accountNumberSpan, copyConfirmationDiv);
-  setupCopyFunctionality(accountNumberSpanBottom, copyConfirmationDivBottom); // For the second instance
+  setupCopyFunctionality(accountNumberSpanBottom, copyConfirmationDivBottom);
+  // End Account Number Copy Functionality
 
-  // --- End Account Number Copy Functionality ---
-
-  // --- Start Receipt Upload Enhancement (Paste & Drag-Drop) ---
+  // --- Start Receipt Upload Enhancement ---
   const paymentReceiptInput = document.getElementById("paymentReceipt");
   const dropPasteZone = document.getElementById("dropPasteZone");
   const fileNameDisplay = document.getElementById("fileNameDisplay");
@@ -321,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "image/gif",
         "application/pdf",
       ];
-      const allowedExts = ["jpg", "jpeg", "png", "gif", "pdf"]; // Check file extension as well
+      const allowedExts = ["jpg", "jpeg", "png", "gif", "pdf"];
       const maxFileSize = 5 * 1024 * 1024;
       const fileExt = paymentReceipt.name.split(".").pop().toLowerCase();
 
@@ -353,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!isValid) {
       formStatus.textContent = "Please correct the errors in the form.";
       formStatus.style.color = "red";
-      return; // Stop submission if client-side validation fails
+      return;
     }
 
     // All client-side validation passed. Now execute reCAPTCHA.
@@ -365,16 +357,12 @@ document.addEventListener("DOMContentLoaded", function () {
     formStatus.style.color = "blue";
 
     try {
-      // Execute invisible reCAPTCHA
-      // Replace 'YOUR_SITE_KEY' with your actual reCAPTCHA site key
-      // The 'action' parameter helps reCAPTCHA learn about your traffic.
       const recaptchaToken = await grecaptcha.execute(
         "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
         { action: "camp_registration_submit" }
       );
-      recaptchaTokenInput.value = recaptchaToken; // Set the token in the hidden input
+      recaptchaTokenInput.value = recaptchaToken;
 
-      // reCAPTCHA verification successful, proceed with form submission
       submitFormWithData();
     } catch (error) {
       console.error("reCAPTCHA execution failed:", error);
@@ -387,11 +375,10 @@ document.addEventListener("DOMContentLoaded", function () {
       isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.innerHTML = "Register for Camp";
-      grecaptcha.reset(); // Reset reCAPTCHA for another attempt
+      grecaptcha.reset();
     }
   });
 
-  // Separate function for actual form submission via AJAX
   function submitFormWithData() {
     submitBtn.innerHTML =
       '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...';
@@ -407,7 +394,7 @@ document.addEventListener("DOMContentLoaded", function () {
     progressBar.className = "upload-progress mt-3";
     progressBar.style.height = "10px";
     progressBar.style.background = "#ccc";
-    progressBar.style.borderRadius = "5_px"; // Typo here, should be "5px"
+    progressBar.style.borderRadius = "5px";
     progressBar.style.overflow = "hidden";
     formStatus.appendChild(progressBar);
 
@@ -433,17 +420,17 @@ document.addEventListener("DOMContentLoaded", function () {
           formStatus.textContent = "";
           form.style.display = "none";
           successMessage.style.display = "block";
-          grecaptcha.reset(); // Reset reCAPTCHA after successful submission
+          grecaptcha.reset();
         } else {
           formStatus.textContent =
             "Error: " + (data.message || "Something went wrong.");
           formStatus.style.color = "red";
-          grecaptcha.reset(); // Reset reCAPTCHA on server-side error
+          grecaptcha.reset();
         }
       } catch (e) {
         formStatus.textContent = "Unexpected response from server.";
         formStatus.style.color = "red";
-        grecaptcha.reset(); // Reset reCAPTCHA on parsing error
+        grecaptcha.reset();
       } finally {
         isSubmitting = false;
         submitBtn.disabled = false;
@@ -457,7 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
     xhr.onerror = function () {
       formStatus.textContent = "Network error. Please try again.";
       formStatus.style.color = "red";
-      grecaptcha.reset(); // Reset reCAPTCHA on network error
+      grecaptcha.reset();
       isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.innerHTML = "Register for Camp";

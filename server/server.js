@@ -107,7 +107,7 @@ oauth2Client.setCredentials({
 
   scope: [
     "https://www.googleapis.com/auth/calendar.readonly",
-    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/spreadsheets",
   ].join(" "),
 });
@@ -132,7 +132,7 @@ async function verifyGoogleAuth() {
 }
 
 // ==========================================================================
-// reCAPTCHA Verification Functions (Now two distinct ones)
+// reCAPTCHA Verification Functions
 // ==========================================================================
 async function verifyRecaptchaContact(token) {
   try {
@@ -153,7 +153,7 @@ async function verifyRecaptchaContact(token) {
 
 async function verifyRecaptchaCamp(token) {
   try {
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY_YOUTH; // This is the new one for camp form
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY_YOUTH;
     const response = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify`,
       null,

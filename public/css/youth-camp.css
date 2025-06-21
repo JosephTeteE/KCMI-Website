@@ -7,7 +7,7 @@
 /* General Page Styles */
 .youth-camp-page {
   background-color: #f8f9fa;
-  color: #333; /* Default text color for the page in light mode */
+  color: #333;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -83,7 +83,7 @@
 /* Form Styles - Focused on Camp Registration Form Text */
 .youth-camp-form .form-label {
   font-weight: 600;
-  color: #000; /* Black text for labels in light mode */
+  color: #000;
 }
 
 .youth-camp-form .form-control {
@@ -91,7 +91,7 @@
   border-radius: 8px;
   border: 1px solid #ddd;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  color: #000; /* Black text for input content in light mode */
+  color: #000;
 }
 
 .youth-camp-form .form-control:focus {
@@ -100,40 +100,39 @@
 }
 
 .youth-camp-form .invalid-feedback {
-  color: #dc3545; /* Red for error messages in light mode */
+  color: #dc3545;
   font-size: 0.9rem;
 }
 
 .youth-camp-form .form-text {
-  /* For helper text below inputs like "Accepted formats..." */
-  color: #6c757d; /* Muted grey for helper text in light mode */
+  color: #6c757d;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
 .drop-paste-zone {
-  border: 2px dashed #007bff; /* Primary color dashed border */
+  border: 2px dashed #007bff;
   padding: 2rem;
   text-align: center;
 
-  background-color: #f8f9fa; /* Light background */
+  background-color: #f8f9fa;
   transition: all 0.2s ease-in-out;
-  min-height: 120px; /* Ensure it has some height */
+  min-height: 120px;
 }
 
 .drop-paste-zone.highlight {
-  border-color: #28a745; /* Green border when dragging over */
-  background-color: #e6ffe6; /* Light green background */
+  border-color: #28a745;
+  background-color: #e6ffe6;
 }
 
 .drop-paste-zone .browse-link {
-  cursor: pointer; /* Pointer only for the clickable text */
-  text-decoration: underline; /* Add underline to indicate clickability */
-  transition: color 0.2s ease-in-out; /* Smooth transition for hover color */
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease-in-out;
 }
 
 .drop-paste-zone .browse-link:hover {
-  color: #0056b3 !important; /* Darker primary color on hover (use !important if needed due to Bootstrap conflict) */
+  color: #0056b3 !important;
 }
 
 /* Button Styles */
@@ -258,13 +257,13 @@
 
 /* Dark Mode Form Styles - Camp Registration Form Text */
 [data-bs-theme="dark"] .youth-camp-form .form-label {
-  color: #fff; /* White text for labels in dark mode */
+  color: #fff;
 }
 
 [data-bs-theme="dark"] .youth-camp-form .form-control {
-  background-color: #2c2c2c; /* Maintain dark input background */
-  border-color: #444; /* Maintain dark input border */
-  color: #fff; /* White text for input content in dark mode */
+  background-color: #2c2c2c;
+  border-color: #444;
+  color: #fff;
 }
 
 [data-bs-theme="dark"] .youth-camp-form .form-control:focus {
@@ -273,12 +272,11 @@
 }
 
 [data-bs-theme="dark"] .youth-camp-form .invalid-feedback {
-  color: #ff8a80; /* Brighter red for errors in dark mode for legibility */
+  color: #ff8a80;
 }
 
 [data-bs-theme="dark"] .youth-camp-form .form-text {
-  /* For helper text below inputs */
-  color: #a0a0a0; /* Lighter grey for helper text in dark mode */
+  color: #a0a0a0;
 }
 
 [data-bs-theme="dark"] .drop-paste-zone {
