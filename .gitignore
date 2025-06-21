@@ -20,3 +20,6 @@ server/**/.DS_Store
 kcmi-rcc-worker/node_modules/
 kcmi-rcc-worker/package-lock.json
 kcmi-rcc-worker/.wrangler/
+
+# Multer uploads
+uploads/
