@@ -13,9 +13,13 @@ const NodeCache = require("node-cache");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const rateLimit = require("express-rate-limit");
+const multer = require("multer");
+const fs = require("fs");
+const crypto = require("crypto");
 
-// Load environment variables from .env file
 dotenv.config();
+
+const app = express();
 
 // Check for required environment variables
 const requiredEnvVars = [
@@ -28,7 +32,12 @@ const requiredEnvVars = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "GOOGLE_REFRESH_TOKEN",
-  "GOOGLE_API_KEY", // Required for Google Maps integration
+  "GOOGLE_API_KEY",
+  "RECAPTCHA_SECRET_KEY_YOUTH",
+  "RECAPTCHA_SECRET_KEY_CONTACT",
+  "GOOGLE_DRIVE_RECEIPTS_FOLDER_ID",
+  "GOOGLE_SHEET_REGISTRATIONS_ID",
+  "KCMI_ADMIN_EMAIL",
 ];
 
 const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
@@ -37,18 +46,20 @@ if (missingVars.length > 0) {
   process.exit(1);
 }
 
-// Initialize Express Application
-const app = express();
-app.use(express.json()); // Parse incoming JSON requests
-
+// ==========================================================================
 // CORS Configuration
+// Allow requests from frontend domains. Crucial for security.
+// ==========================================================================
 const corsOptions = {
-  origin: "https://www.kcmi-rcc.org", // Allow requests from this origin
-  methods: ["GET", "POST"], // Allowed HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  origin: ["https://www.kcmi-rcc.org", "https://kcmi-rcc.org"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
+app.options("*", cors(corsOptions)); // Handle preflight requests for all routes
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "../public")));
@@ -60,19 +71,70 @@ app.use(express.static(path.join(__dirname, "../public")));
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
-  secure: false, // Use TLS
+  secure: false,
   requireTLS: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  tls: {
+    ciphers: "SSLv3",
+    rejectUnauthorized: false,
+  },
+});
+
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error("Nodemailer transporter verification failed:", error);
+  } else {
+    console.log("Nodemailer transporter ready to send emails.");
+  }
 });
 
 // ==========================================================================
-// reCAPTCHA Verification
-// Purpose: Validates reCAPTCHA tokens submitted with forms
+// Google OAuth2 Client Configuration
+// Ensures refresh token has permissions for Drive (file) and Sheets (spreadsheet) scopes.
 // ==========================================================================
-async function verifyRecaptcha(token) {
+const oauth2Client = new OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI ||
+    "https://developers.google.com/oauthplayground"
+);
+
+oauth2Client.setCredentials({
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+
+  scope: [
+    "https://www.googleapis.com/auth/calendar.readonly",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/spreadsheets",
+  ].join(" "),
+});
+
+// Function to verify and refresh Google API token (used by multiple routes)
+async function verifyGoogleAuth() {
+  try {
+    if (
+      !oauth2Client.credentials.access_token ||
+      oauth2Client.credentials.expiry_date < Date.now()
+    ) {
+      console.log("Refreshing Google API access token...");
+      const { credentials } = await oauth2Client.refreshAccessToken();
+      oauth2Client.setCredentials(credentials);
+      console.log("Google API token refreshed successfully.");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error refreshing Google API token:", error.message);
+    throw new Error("Authentication with Google API failed.");
+  }
+}
+
+// ==========================================================================
+// reCAPTCHA Verification Functions (Now two distinct ones)
+// ==========================================================================
+async function verifyRecaptchaContact(token) {
   try {
     const secretKey = process.env.RECAPTCHA_SECRET_KEY_CONTACT;
     const response = await axios.post(
@@ -82,25 +144,43 @@ async function verifyRecaptcha(token) {
         params: { secret: secretKey, response: token },
       }
     );
-    return response.data.success; // Return true if verification succeeds
+    return response.data.success;
   } catch (error) {
-    console.error("reCAPTCHA verification failed:", error);
+    console.error("Contact Form reCAPTCHA verification failed:", error);
+    return false;
+  }
+}
+
+async function verifyRecaptchaCamp(token) {
+  try {
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY_YOUTH; // This is the new one for camp form
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: { secret: secretKey, response: token },
+      }
+    );
+
+    return response.data.success;
+  } catch (error) {
+    console.error("Camp Form reCAPTCHA verification failed:", error);
     return false;
   }
 }
 
 // ==========================================================================
-// Contact Form Submission Handler
-// Purpose: Processes contact form submissions with validation and email sending
+// Contact Form Submission Handler (Using verifyRecaptchaContact)
 // ==========================================================================
 app.post("/submit-contact", async (req, res) => {
   const { email, phone, message, recaptchaToken } = req.body;
 
-  // Verify reCAPTCHA token
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return res
-      .status(400)
-      .json({ success: false, message: "reCAPTCHA failed" });
+  if (!(await verifyRecaptchaContact(recaptchaToken))) {
+    // Use specific function
+    return res.status(400).json({
+      success: false,
+      message: "reCAPTCHA verification failed. Please try again.",
+    });
   }
 
   // Validate email format
@@ -152,11 +232,12 @@ app.post("/submit-contact", async (req, res) => {
 app.post("/subscribe", async (req, res) => {
   const { email, subscriptionType, recaptchaToken } = req.body;
 
-  // Verify reCAPTCHA token
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return res
-      .status(400)
-      .json({ success: false, message: "reCAPTCHA failed" });
+  if (!(await verifyRecaptchaContact(recaptchaToken))) {
+    // Use specific function
+    return res.status(400).json({
+      success: false,
+      message: "reCAPTCHA verification failed. Please try again.",
+    });
   }
 
   // Validate email format
@@ -214,6 +295,25 @@ const livestreamRoutes = require("../api/livestream");
 app.use("/api/livestream", livestreamRoutes);
 
 // ==========================================================================
+// Authentication Endpoint
+// Purpose: Handles admin authentication with JWT
+// ==========================================================================
+
+app.post("/api/auth", async (req, res) => {
+  const { username, password } = req.body;
+
+  // Validate credentials
+  if (username === process.env.AD_USER && password === process.env.AD_PASS) {
+    const token = jsonwebtoken.sign({ username }, process.env.JWT_SECRET, {
+      expiresIn: "1m", // Token expires in 1 minute
+    });
+    res.json({ token });
+  } else {
+    res.status(401).json({ message: "Invalid credentials" });
+  }
+});
+
+// ==========================================================================
 // Google Calendar API Setup
 // Purpose: Configures OAuth2 for Google Calendar and implements caching
 // ==========================================================================
@@ -222,40 +322,12 @@ const calendarCache = new NodeCache({
   checkperiod: 300, // Check for expired cache every 5 minutes
 });
 
-// Initialize OAuth2 client for Google APIs
-const oauth2Client = new OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  "https://developers.google.com/oauthplayground"
-);
-
-oauth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-  scope: [
-    "https://www.googleapis.com/auth/calendar.readonly",
-    "https://www.googleapis.com/auth/drive.readonly",
-    "https://www.googleapis.com/auth/spreadsheets.readonly",
-  ].join(" "),
-});
-
-// Middleware to verify calendar authentication
-async function verifyCalendarAuth() {
-  if (
-    !oauth2Client.credentials.access_token ||
-    oauth2Client.credentials.expiry_date < Date.now()
-  ) {
-    console.log("Refreshing access token...");
-    const { credentials } = await oauth2Client.refreshAccessToken();
-    oauth2Client.setCredentials(credentials);
-  }
-}
-
-// Calendar API route with OAuth 2.0
+// Use verifyGoogleAuth for this route
 app.get("/api/calendar-events", async (req, res) => {
   try {
-    await verifyCalendarAuth();
+    await verifyGoogleAuth(); // Ensure OAuth2 token is valid before making API calls
 
-    // Check if events are cached
+    // Check cache first
     const cachedEvents = calendarCache.get("events");
     if (cachedEvents) {
       res.set("X-Cache", "HIT");
@@ -271,7 +343,6 @@ app.get("/api/calendar-events", async (req, res) => {
     const oneMonthLater = new Date();
     oneMonthLater.setMonth(now.getMonth() + 1);
 
-    // Fetch events from Google Calendar
     const response = await calendar.events.list({
       calendarId: process.env.CALENDAR_ID,
       timeMin: now.toISOString(),
@@ -282,9 +353,9 @@ app.get("/api/calendar-events", async (req, res) => {
     });
 
     const events = response.data.items || [];
-    calendarCache.set("events", events); // Cache the events
+    calendarCache.set("events", events);
     res.set("X-Cache", "MISS");
-    res.set("Cache-Control", "public, max-age=900"); // Cache-Control header
+    res.set("Cache-Control", "public, max-age=900");
     res.json(events);
   } catch (error) {
     console.error("Calendar API error:", error);
@@ -304,10 +375,10 @@ app.get("/api/calendar-events", async (req, res) => {
 
 // Rate Limiting for Calendar API
 const calendarLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15-minute window
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   handler: (req, res) => {
-    res.set("Retry-After", 15 * 60); // Retry after 15 minutes
+    res.set("Retry-After", 15 * 60);
     res.status(429).json({
       error: "Too many requests",
       message: "Please try again later",
@@ -315,24 +386,6 @@ const calendarLimiter = rateLimit({
   },
 });
 app.use("/api/calendar-events", calendarLimiter);
-
-// ==========================================================================
-// Authentication Endpoint
-// Purpose: Handles admin authentication with JWT
-// ==========================================================================
-app.post("/api/auth", async (req, res) => {
-  const { username, password } = req.body;
-
-  // Validate credentials
-  if (username === process.env.AD_USER && password === process.env.AD_PASS) {
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "1m", // Token expires in 1 minute
-    });
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: "Invalid credentials" });
-  }
-});
 
 // ==========================================================================
 // Google Drive Manifest Endpoint
@@ -343,24 +396,18 @@ app.get("/api/drive-manifest", async (req, res) => {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: "Manifest ID required" });
 
-    // Refresh token if needed
-    if (oauth2Client.isTokenExpiring()) {
-      const { credentials } = await oauth2Client.refreshAccessToken();
-      oauth2Client.setCredentials(credentials);
-    }
+    await verifyGoogleAuth();
 
     const drive = google.drive({
       version: "v3",
       auth: oauth2Client,
     });
 
-    // Verify access to the file
     await drive.files.get({
       fileId: id,
       fields: "id,name",
     });
 
-    // Get file content
     const response = await drive.files.get(
       {
         fileId: id,
@@ -373,7 +420,6 @@ app.get("/api/drive-manifest", async (req, res) => {
   } catch (error) {
     console.error("Drive API Error:", error);
 
-    // Handle specific error codes
     let statusCode = 500;
     let errorMessage = "Failed to load manifest";
 
@@ -536,6 +582,245 @@ app.get("/api/maps-proxy", mapLimiter, async (req, res) => {
 });
 
 // ==========================================================================
+// Multer Configuration for File Uploads
+// ==========================================================================
+const upload = multer({
+  dest: "uploads/", // Temporary directory for storing files
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB file size limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/pdf",
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          "Invalid file type. Only images (JPG, PNG, GIF) and PDFs are allowed."
+        ),
+        false
+      );
+    }
+  },
+});
+
+// ==========================================================================
+// Youth Camp Registration Handler (NEW)
+// Purpose: Processes youth camp registrations including file upload to Google Drive
+// and data storage in Google Sheets.
+// ==========================================================================
+app.post(
+  "/api/camp-registration",
+  upload.single("paymentReceipt"),
+  async (req, res) => {
+    const { fullName, email, phoneNumber, numPeople, recaptchaToken } =
+      req.body;
+    const file = req.file;
+
+    // --- Initial Validation & reCAPTCHA ---
+    if (!fullName || !email || !phoneNumber || !numPeople || !file) {
+      if (file) fs.unlinkSync(file.path);
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required, including payment receipt.",
+      });
+    }
+
+    const parsedNumPeople = parseInt(numPeople);
+    if (isNaN(parsedNumPeople) || parsedNumPeople < 1) {
+      if (file) fs.unlinkSync(file.path);
+      return res.status(400).json({
+        success: false,
+        message: "Number of people must be at least 1.",
+      });
+    }
+
+    if (parsedNumPeople > 10) {
+      if (file) fs.unlinkSync(file.path);
+      return res.status(400).json({
+        success: false,
+        message:
+          "Maximum 10 people per registration. For larger groups, please contact us.",
+      });
+    }
+
+    if (!(await verifyRecaptchaCamp(recaptchaToken))) {
+      // Use the NEW reCAPTCHA function
+      if (file) fs.unlinkSync(file.path);
+      return res.status(400).json({
+        success: false,
+        message: "reCAPTCHA verification failed. Please try again.",
+      });
+    }
+
+    let driveFileUrl = null;
+    const submissionId = crypto.randomBytes(10).toString("hex"); // Generate a unique ID
+
+    try {
+      // --- Google Drive Upload ---
+      await verifyGoogleAuth(); // Ensure OAuth2 token is refreshed for Drive
+
+      const drive = google.drive({ version: "v3", auth: oauth2Client });
+
+      const fileMetadata = {
+        name: `${new Date().toISOString().slice(0, 10)}_${fullName.replace(
+          /\s/g,
+          "_"
+        )}_Receipt_${submissionId}.${file.originalname.split(".").pop()}`,
+        parents: [process.env.GOOGLE_DRIVE_RECEIPTS_FOLDER_ID],
+      };
+
+      const media = {
+        mimeType: file.mimetype,
+        body: fs.createReadStream(file.path),
+      };
+
+      const driveResponse = await drive.files.create({
+        resource: fileMetadata,
+        media: media,
+        fields: "id,webViewLink",
+      });
+
+      driveFileUrl = driveResponse.data.webViewLink;
+      console.log(
+        `File uploaded to Google Drive: ${driveFileUrl} for submission ID: ${submissionId}`
+      );
+
+      // --- Google Sheets Insertion (Duplicate Check First) ---
+      const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+      const sheetId = process.env.GOOGLE_SHEET_REGISTRATIONS_ID;
+
+      // Fetch existing data for duplicate check (checking email and full name)
+      const existingDataResponse = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: "Sheet1!B:C",
+      });
+      const existingRows = existingDataResponse.data.values || [];
+
+      const isDuplicate = existingRows.some(
+        (row) => row[0] === email && row[1] === fullName
+      );
+
+      if (isDuplicate) {
+        console.warn(
+          `Duplicate registration attempt detected for ${email} - ${fullName}. Deleting uploaded file.`
+        );
+        await drive.files.delete({ fileId: driveResponse.data.id });
+        return res.status(409).json({
+          success: false,
+          message:
+            "You have already registered for this camp with these details. If you believe this is an error, please contact us.",
+        });
+      }
+
+      const registrationTimestamp = new Date().toLocaleString("en-NG", {
+        timeZone: "Africa/Lagos",
+      });
+
+      const rowData = [
+        registrationTimestamp,
+        fullName,
+        email,
+        phoneNumber,
+        parsedNumPeople,
+        driveFileUrl,
+        submissionId,
+      ];
+
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: sheetId,
+        range: "Sheet1!A1",
+        valueInputOption: "RAW",
+        resource: {
+          values: [rowData],
+        },
+      });
+      console.log("Registration saved to Google Sheet.");
+
+      // --- Send Confirmation Email to User ---
+      const mailOptionsUser = {
+        from: process.env.SMTP_USER,
+        to: email,
+        subject:
+          "KCMI Youth Camp 2025 Registration Confirmation - Unleashing Purpose",
+        html: `
+        <p>Dear ${fullName},</p>
+        <p>Thank you for registering for the KCMI Youth Camp 2025: <strong>"Unleashing Purpose"</strong>!</p>
+        <p>We have received your registration for <strong>${parsedNumPeople} person(s)</strong>.</p>
+        <p>Your unique Submission ID is: <strong>${submissionId}</strong></p>
+        <p>You can view your uploaded payment receipt here: <a href="${driveFileUrl}">${driveFileUrl}</a></p>
+        <p>We are excited to have you join us for a transformative experience filled with faith, fun, and fellowship!</p>
+        <p>More details regarding the camp schedule and what to bring will be sent closer to the camp date.</p>
+        <p>God bless you,</p>
+        <p><strong>The KCMI Youth Team</strong></p>
+        <hr>
+        <p><small>This is an automated email, please do not reply.</small></p>
+      `,
+      };
+
+      // --- Send Notification Email to Admin ---
+      const mailOptionsAdmin = {
+        from: process.env.SMTP_USER,
+        to: process.env.KCMI_ADMIN_EMAIL,
+        subject: `NEW Youth Camp Registration: ${fullName} (${email}) - ${parsedNumPeople} people`,
+        html: `
+            <p>A new KCMI Youth Camp registration has been submitted:</p>
+            <ul>
+                <li><strong>Full Name:</strong> ${fullName}</li>
+                <li><strong>Email:</strong> ${email}</li>
+                <li><strong>Phone Number:</strong> ${phoneNumber}</li>
+                <li><strong>Number of People:</strong> ${parsedNumPeople}</li>
+                <li><strong>Payment Receipt:</strong> <a href="${driveFileUrl}">${driveFileUrl}</a></li>
+                <li><strong>Submission ID:</strong> ${submissionId}</li>
+                <li><strong>Registration Date:</strong> ${registrationTimestamp}</li>
+            </ul>
+            <p>Please log in to the Google Sheet to view full details and manage registrations.</p>
+            <p>Google Sheet Link: <a href="https://docs.google.com/spreadsheets/d/${process.env.GOOGLE_SHEET_REGISTRATIONS_ID}/edit">Youth Camp Registrations Sheet</a></p>
+        `,
+      };
+
+      await transporter.sendMail(mailOptionsUser);
+      await transporter.sendMail(mailOptionsAdmin);
+      console.log("Confirmation and admin notification emails sent.");
+
+      res.json({ success: true, message: "Registration successful!" });
+    } catch (error) {
+      console.error("Camp registration error:", error);
+
+      if (error instanceof multer.MulterError) {
+        return res.status(400).json({
+          success: false,
+          message: `File upload error: ${error.message}`,
+        });
+      }
+      if (error.message.includes("Authentication with Google API failed")) {
+        return res.status(500).json({
+          success: false,
+          message:
+            "Server configuration error: Google API authentication failed. Please contact support.",
+        });
+      }
+      res.status(500).json({
+        success: false,
+        message: "Failed to complete registration. Please try again later.",
+      });
+    } finally {
+      if (file && fs.existsSync(file.path)) {
+        fs.unlink(file.path, (err) => {
+          if (err) console.error("Error deleting temp file:", err);
+          else console.log("Temporary file deleted:", file.path);
+        });
+      }
+    }
+  }
+);
+
+// ==========================================================================
 // Security Middleware
 // Purpose: Enhances security with Content Security Policy headers
 // ==========================================================================
@@ -543,10 +828,10 @@ app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
     "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com; " +
+      "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com https://www.google.com https://www.gstatic.com; " + // Added Google reCAPTCHA domains
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "img-src 'self' data: https://*.googleapis.com https://*.gstatic.com; " +
-      "connect-src 'self' https://*.googleapis.com https://kcmi-backend.onrender.com; " +
+      "connect-src 'self' https://*.googleapis.com https://kcmi-backend.onrender.com https://www.google.com; " + // Added Google reCAPTCHA domain for API call
       "frame-src 'self' https://www.google.com; " +
       "font-src 'self' https://fonts.gstatic.com"
   );
@@ -559,6 +844,16 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
+  if (req.file && fs.existsSync(req.file.path)) {
+    // Clean up temp file on unhandled error too
+    fs.unlink(req.file.path, (unlinkErr) => {
+      if (unlinkErr)
+        console.error(
+          "Error deleting temp file on unhandled error:",
+          unlinkErr
+        );
+    });
+  }
   res.status(500).json({ error: "Internal server error" });
 });
 

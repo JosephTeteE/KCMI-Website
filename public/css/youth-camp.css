@@ -1,0 +1,351 @@
+/* public/css/youth-camp.css */
+
+/* -------------------------------------------------------------------------- */
+/* ## Youth Camp Registration Page Specific Styles                           */
+/* -------------------------------------------------------------------------- */
+
+/* General Page Styles */
+.youth-camp-page {
+  background-color: #f8f9fa;
+  color: #333; /* Default text color for the page in light mode */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.youth-camp-page main {
+  flex: 1;
+  padding-top: 50px;
+}
+
+/* Header Styles */
+.youth-camp-header {
+  background: linear-gradient(135deg, #7c1963, #9a3d81);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.youth-camp-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+      circle at 20% 80%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(182, 11, 19, 0.05) 0%,
+      transparent 60%
+    );
+  opacity: 0.8;
+}
+
+.youth-camp-header h1 {
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.youth-camp-header .lead {
+  font-weight: 300;
+  position: relative;
+}
+
+/* Card Styles */
+.youth-camp-card {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.youth-camp-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.youth-camp-card-header {
+  background-color: white;
+  color: #7c1963;
+  font-weight: 600;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Form Styles - Focused on Camp Registration Form Text */
+.youth-camp-form .form-label {
+  font-weight: 600;
+  color: #000; /* Black text for labels in light mode */
+}
+
+.youth-camp-form .form-control {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  color: #000; /* Black text for input content in light mode */
+}
+
+.youth-camp-form .form-control:focus {
+  border-color: #7c1963;
+  box-shadow: 0 0 0 0.25rem rgba(124, 25, 99, 0.25);
+}
+
+.youth-camp-form .invalid-feedback {
+  color: #dc3545; /* Red for error messages in light mode */
+  font-size: 0.9rem;
+}
+
+.youth-camp-form .form-text {
+  /* For helper text below inputs like "Accepted formats..." */
+  color: #6c757d; /* Muted grey for helper text in light mode */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.drop-paste-zone {
+  border: 2px dashed #007bff; /* Primary color dashed border */
+  padding: 2rem;
+  text-align: center;
+
+  background-color: #f8f9fa; /* Light background */
+  transition: all 0.2s ease-in-out;
+  min-height: 120px; /* Ensure it has some height */
+}
+
+.drop-paste-zone.highlight {
+  border-color: #28a745; /* Green border when dragging over */
+  background-color: #e6ffe6; /* Light green background */
+}
+
+.drop-paste-zone .browse-link {
+  cursor: pointer; /* Pointer only for the clickable text */
+  text-decoration: underline; /* Add underline to indicate clickability */
+  transition: color 0.2s ease-in-out; /* Smooth transition for hover color */
+}
+
+.drop-paste-zone .browse-link:hover {
+  color: #0056b3 !important; /* Darker primary color on hover (use !important if needed due to Bootstrap conflict) */
+}
+
+/* Button Styles */
+.youth-camp-btn-primary {
+  background-color: #7c1963;
+  border-color: #7c1963;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.youth-camp-btn-primary:hover {
+  background-color: #6a1554;
+  border-color: #6a1554;
+  transform: translateY(-2px);
+}
+
+.youth-camp-btn-outline {
+  background-color: transparent;
+  border-color: #7c1963;
+  color: #7c1963;
+  font-weight: 600;
+}
+
+.youth-camp-btn-outline:hover {
+  background-color: #7c1963;
+  color: white;
+}
+
+/* Success Message */
+.youth-camp-success-message {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Footer Styles */
+.youth-camp-footer {
+  background-color: #300630;
+  color: white;
+}
+
+.youth-camp-footer a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.youth-camp-footer a:hover {
+  color: #c298b7;
+}
+
+.youth-camp-footer .social-icon {
+  transition: transform 0.3s ease;
+}
+
+.youth-camp-footer .social-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Modal Styles */
+.youth-camp-modal .modal-content {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.youth-camp-modal .modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.youth-camp-modal .modal-body {
+  padding: 1.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .youth-camp-header {
+    padding: 1.5rem 0;
+  }
+
+  .youth-camp-header h1 {
+    font-size: 2rem;
+  }
+
+  .youth-camp-card {
+    border-radius: 8px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* ## Dark Mode Styles                                                      */
+/* -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] .youth-camp-page {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .youth-camp-header {
+  background: linear-gradient(135deg, #5a1349, #7c1963);
+}
+
+[data-bs-theme="dark"] .youth-camp-card {
+  background-color: #1e1e1e;
+  border-color: #444;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .youth-camp-card-header {
+  background-color: #2c2c2c;
+  color: #c298b7;
+  border-bottom-color: #444;
+}
+
+/* Dark Mode Form Styles - Camp Registration Form Text */
+[data-bs-theme="dark"] .youth-camp-form .form-label {
+  color: #fff; /* White text for labels in dark mode */
+}
+
+[data-bs-theme="dark"] .youth-camp-form .form-control {
+  background-color: #2c2c2c; /* Maintain dark input background */
+  border-color: #444; /* Maintain dark input border */
+  color: #fff; /* White text for input content in dark mode */
+}
+
+[data-bs-theme="dark"] .youth-camp-form .form-control:focus {
+  border-color: #9a3d81;
+  box-shadow: 0 0 0 0.25rem rgba(154, 61, 129, 0.25);
+}
+
+[data-bs-theme="dark"] .youth-camp-form .invalid-feedback {
+  color: #ff8a80; /* Brighter red for errors in dark mode for legibility */
+}
+
+[data-bs-theme="dark"] .youth-camp-form .form-text {
+  /* For helper text below inputs */
+  color: #a0a0a0; /* Lighter grey for helper text in dark mode */
+}
+
+[data-bs-theme="dark"] .drop-paste-zone {
+  border: 2px dashed #4e92ff;
+  background-color: #343a40;
+}
+
+[data-bs-theme="dark"] .drop-paste-zone.highlight {
+  border-color: #20c997;
+  background-color: #1a4a3e;
+}
+
+[data-bs-theme="dark"] .drop-paste-zone .browse-link:hover {
+  color: #72a9ff !important;
+}
+
+[data-bs-theme="dark"] .youth-camp-btn-primary {
+  background-color: #9a3d81;
+  border-color: #9a3d81;
+}
+
+[data-bs-theme="dark"] .youth-camp-btn-primary:hover {
+  background-color: #8a2d71;
+  border-color: #8a2d71;
+}
+
+[data-bs-theme="dark"] .youth-camp-btn-outline {
+  border-color: #9a3d81;
+  color: #9a3d81;
+}
+
+[data-bs-theme="dark"] .youth-camp-btn-outline:hover {
+  background-color: #9a3d81;
+  color: white;
+}
+
+[data-bs-theme="dark"] .youth-camp-footer {
+  background-color: #1a061a;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ## Utility Classes                                                       */
+/* -------------------------------------------------------------------------- */
+.youth-camp-text-primary {
+  color: #7c1963 !important;
+}
+
+[data-bs-theme="dark"] .youth-camp-text-primary {
+  color: #c298b7 !important;
+}
+
+.youth-camp-bg-light {
+  background-color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .youth-camp-bg-light {
+  background-color: #1e1e1e !important;
+}
+
+.youth-camp-rounded-lg {
+  border-radius: 12px;
+}
+
+.youth-camp-shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="dark"] .youth-camp-shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

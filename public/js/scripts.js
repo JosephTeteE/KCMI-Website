@@ -430,13 +430,6 @@ function initMap(mapId, placeholderSelector) {
       zoom: 16,
       mapId: "3d8b3c0ff08fcc80a84accd3",
       mapTypeId: "roadmap",
-      styles: [
-        {
-          featureType: "poi",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-      ],
       zoomControl: false,
       mapTypeControl: true,
       scaleControl: true,
