@@ -12,20 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let isSubmitting = false;
 
-  // Account Number Copy Functionality
-
-  const accountNumberSpan = document.getElementById("accountNumber");
-  const copyConfirmationDiv = document.getElementById("copyConfirmation");
-
-  const accountNumberSpanBottom = document.getElementById(
-    "accountNumberBottom"
-  );
-  const copyConfirmationDivBottom = document.getElementById(
-    "copyConfirmationBottom"
-  );
-
-  // Function to handle copying, to avoid repetition
-  function setupCopyFunctionality(spanElement, confirmationElement) {
+  // Initialize all copy functionality
+  const setupCopyFunctionality = (spanElement, confirmationElement) => {
     if (spanElement) {
       spanElement.addEventListener("click", async function () {
         const accountNumber = this.childNodes[0].textContent.trim();
@@ -35,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("Account number copied:", accountNumber);
 
           confirmationElement.style.display = "block";
+          confirmationElement.style.animation = "fadeIn 0.3s ease-in-out";
           spanElement.style.cursor = "default";
 
           const iconElement = spanElement.querySelector("i");
@@ -53,18 +42,78 @@ document.addEventListener("DOMContentLoaded", function () {
           }, 2000);
         } catch (err) {
           console.error("Failed to copy account number:", err);
-          alert(
-            "Failed to copy account number. Please copy it manually: " +
-              accountNumber
+          const errorMsg = document.createElement("div");
+          errorMsg.className = "alert alert-danger mt-2";
+          errorMsg.style.fontSize = "0.9em";
+          errorMsg.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> Failed to copy. Please copy manually: ${accountNumber}`;
+          spanElement.parentNode.insertBefore(
+            errorMsg,
+            spanElement.nextSibling
           );
+
+          setTimeout(() => {
+            errorMsg.remove();
+          }, 5000);
         }
       });
     }
-  }
+  };
 
-  setupCopyFunctionality(accountNumberSpan, copyConfirmationDiv);
-  setupCopyFunctionality(accountNumberSpanBottom, copyConfirmationDivBottom);
-  // End Account Number Copy Functionality
+  // Set up all account number copy elements
+  const accountNumbers = [
+    {
+      element: document.getElementById("youthCampDonationAccountNumber"),
+      confirmation: document.getElementById(
+        "youthCampDonationCopyConfirmation"
+      ),
+    },
+    {
+      element: document.getElementById("accountNumber"),
+      confirmation: document.getElementById("copyConfirmation"),
+    },
+    {
+      element: document.getElementById("accountNumberBottom"),
+      confirmation: document.getElementById("copyConfirmationBottom"),
+    },
+  ];
+
+  accountNumbers.forEach(({ element, confirmation }) => {
+    setupCopyFunctionality(element, confirmation);
+  });
+
+  // Add hover effects to donation benefits
+  const benefitItems = document.querySelectorAll(
+    ".youth-camp-donation-benefits .list-group-item"
+  );
+  benefitItems.forEach((item) => {
+    item.addEventListener("mouseenter", function () {
+      const icon = this.querySelector("i");
+      if (icon) {
+        icon.style.transform = "scale(1.2)";
+      }
+    });
+
+    item.addEventListener("mouseleave", function () {
+      const icon = this.querySelector("i");
+      if (icon) {
+        icon.style.transform = "scale(1)";
+      }
+    });
+  });
+
+  // Pulse animation for donation icon
+  const donationIcon = document.querySelector(".youth-camp-donation-icon i");
+  if (donationIcon) {
+    setInterval(() => {
+      donationIcon.style.transform = "rotate(-5deg)";
+      setTimeout(() => {
+        donationIcon.style.transform = "rotate(5deg)";
+      }, 1000);
+      setTimeout(() => {
+        donationIcon.style.transform = "rotate(0deg)";
+      }, 2000);
+    }, 8000);
+  }
 
   // --- Start Receipt Upload Enhancement ---
   const paymentReceiptInput = document.getElementById("paymentReceipt");
@@ -456,3 +505,20 @@ document.addEventListener("DOMContentLoaded", function () {
     xhr.send(formData);
   }
 });
+
+// If you need to add any new functionality for the donation section:
+function highlightDonationSection() {
+  const donationSection = document.querySelector(
+    ".youth-camp-donation-prompt-prominent"
+  );
+  if (donationSection) {
+    donationSection.style.boxShadow = "0 0 0 3px rgba(124, 25, 99, 0.3)";
+    setTimeout(() => {
+      donationSection.style.boxShadow = "";
+    }, 1000);
+  }
+}
+
+// Call this function if you want to draw attention to the donation section
+// For example, you could call it after page loads or after registration
+setTimeout(highlightDonationSection, 1500);

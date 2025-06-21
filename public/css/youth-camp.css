@@ -135,6 +135,145 @@
   color: #0056b3 !important;
 }
 
+.youth-camp-donation-prompt-prominent {
+  background-color: #fff;
+  border-top: 4px solid #7c1963;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.youth-camp-donation-prompt-prominent:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.youth-camp-donation-prompt-prominent::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 80% 20%,
+    rgba(154, 61, 129, 0.05) 0%,
+    transparent 30%
+  );
+}
+
+.youth-camp-donation-icon {
+  animation: pulse 2s infinite;
+}
+
+.youth-camp-donation-benefits .list-group-item {
+  border-left: none;
+  border-right: none;
+  padding-left: 0;
+  transition: all 0.2s ease;
+}
+
+.youth-camp-donation-benefits .list-group-item:hover {
+  background-color: rgba(124, 25, 99, 0.05);
+}
+
+.youth-camp-donation-benefits .list-group-item:first-child {
+  border-top: none;
+}
+
+.youth-camp-donation-benefits .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.youth-camp-donation-cta {
+  border-left: 4px solid #7c1963;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.youth-camp-donation-cta:hover {
+  transform: scale(1.01);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.youth-camp-account-number {
+  color: #7c1963;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.youth-camp-account-number:hover {
+  color: #9a3d81;
+  text-decoration: underline;
+}
+
+.youth-camp-account-number::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #7c1963;
+  transition: width 0.3s ease;
+}
+
+.youth-camp-account-number:hover::after {
+  width: 100%;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.account-number-clickable {
+  color: #7c1963;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.account-number-clickable:hover {
+  color: #9a3d81;
+  text-decoration: underline;
+}
+
+.account-number-clickable::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #7c1963;
+  transition: width 0.3s ease;
+}
+
+.account-number-clickable:hover::after {
+  width: 100%;
+}
+
 /* Button Styles */
 .youth-camp-btn-primary {
   background-color: #7c1963;
@@ -346,4 +485,60 @@
 
 [data-bs-theme="dark"] .youth-camp-shadow-sm {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .youth-camp-donation-prompt-prominent {
+  background-color: #1e1e1e;
+  border-top-color: #9a3d81;
+}
+
+[data-bs-theme="dark"] .youth-camp-donation-prompt-prominent::before {
+  background: radial-gradient(
+    circle at 80% 20%,
+    rgba(154, 61, 129, 0.1) 0%,
+    transparent 30%
+  );
+}
+
+[data-bs-theme="dark"] .youth-camp-donation-benefits .list-group-item {
+  background-color: transparent;
+}
+
+[data-bs-theme="dark"] .youth-camp-donation-benefits .list-group-item:hover {
+  background-color: rgba(154, 61, 129, 0.1);
+}
+
+[data-bs-theme="dark"] .youth-camp-donation-cta {
+  border-left-color: #9a3d81;
+}
+
+[data-bs-theme="dark"] .youth-camp-account-number {
+  color: #c298b7;
+}
+
+[data-bs-theme="dark"] .youth-camp-account-number:hover {
+  color: #d8b3cc;
+}
+
+[data-bs-theme="dark"] .account-number-clickable {
+  color: #c298b7;
+}
+
+[data-bs-theme="dark"] .account-number-clickable:hover {
+  color: #d8b3cc;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .youth-camp-donation-prompt-prominent {
+    margin-top: 1rem;
+  }
+
+  .youth-camp-donation-icon {
+    font-size: 2.5rem;
+  }
+
+  .youth-camp-donation-benefits .list-group-item {
+    padding: 0.75rem 0;
+  }
 }
