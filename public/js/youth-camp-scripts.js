@@ -1,7 +1,17 @@
 // public/js/youth-camp-scripts.js
 
 // Initialize camp-specific reCAPTCHA v2
-function onCampRecaptchaLoad() {
+function initializeCampRecaptcha() {
+  console.log("Initializing camp reCAPTCHA");
+
+  const campForm = document.getElementById("campRegistrationForm");
+  const submitBtn = document.getElementById("submitCampFormBtn");
+
+  if (!campForm || !submitBtn) {
+    console.error("Camp form elements not found");
+    return;
+  }
+
   if (typeof grecaptcha === "undefined") {
     console.error("reCAPTCHA not loaded");
     const formStatus = document.getElementById("formStatus");
@@ -13,11 +23,8 @@ function onCampRecaptchaLoad() {
     return;
   }
 
-  const campForm = document.getElementById("campRegistrationForm");
-  if (!campForm) return;
-
   // Render v2 invisible recaptcha
-  const recaptchaWidgetId = grecaptcha.render("submitCampFormBtn", {
+  const recaptchaWidgetId = grecaptcha.render(submitBtn, {
     sitekey: "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
     size: "invisible",
     badge: "bottomright",
@@ -30,9 +37,12 @@ function onCampRecaptchaLoad() {
   // Camp form submission logic
   campForm.addEventListener("submit", function (e) {
     e.preventDefault();
+    // Execute reCAPTCHA
     grecaptcha.execute(recaptchaWidgetId);
   });
 }
+
+// Rest of your existing code remains the same...
 
 // Camp form submission handler
 function submitCampForm() {
