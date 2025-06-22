@@ -1,6 +1,6 @@
 // public/js/youth-camp-scripts.js
 
-window.onRecaptchaLoad = function () {
+grecaptcha.ready(function () {
   recaptchaWidgetId = grecaptcha.render("submitCampFormBtn", {
     sitekey: "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
     size: "invisible",
@@ -10,7 +10,7 @@ window.onRecaptchaLoad = function () {
       submitFormWithData();
     },
   });
-};
+});
 
 if (typeof grecaptcha === "undefined") {
   console.error("reCAPTCHA not loaded");
