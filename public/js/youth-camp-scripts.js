@@ -1,6 +1,18 @@
 // public/js/youth-camp-scripts.js
-// Youth Camp Registration Form Script
-// This script handles the youth camp registration form submission, validation, and reCAPTCHA integration.
+
+let recaptchaWidgetId;
+
+function onRecaptchaLoad() {
+  recaptchaWidgetId = grecaptcha.render("submitCampFormBtn", {
+    sitekey: "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
+    size: "invisible",
+    badge: "bottomright",
+    callback: function (token) {
+      document.getElementById("recaptchaToken").value = token;
+      submitFormWithData();
+    },
+  });
+}
 
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("campRegistrationForm");
@@ -8,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const formStatus = document.getElementById("formStatus");
   const successMessage = document.getElementById("successMessage");
   const recaptchaTokenInput = document.getElementById("recaptchaToken");
-  const recaptchaErrorDiv = document.getElementById("recaptchaError");
 
   let isSubmitting = false;
 
@@ -71,14 +82,12 @@ document.addEventListener("DOMContentLoaded", function () {
       element: document.getElementById("accountNumber"),
       confirmation: document.getElementById("copyConfirmation"),
     },
-    {
-      element: document.getElementById("accountNumberBottom"),
-      confirmation: document.getElementById("copyConfirmationBottom"),
-    },
   ];
 
   accountNumbers.forEach(({ element, confirmation }) => {
-    setupCopyFunctionality(element, confirmation);
+    if (element && confirmation) {
+      setupCopyFunctionality(element, confirmation);
+    }
   });
 
   // Add hover effects to donation benefits
@@ -88,16 +97,12 @@ document.addEventListener("DOMContentLoaded", function () {
   benefitItems.forEach((item) => {
     item.addEventListener("mouseenter", function () {
       const icon = this.querySelector("i");
-      if (icon) {
-        icon.style.transform = "scale(1.2)";
-      }
+      if (icon) icon.style.transform = "scale(1.2)";
     });
 
     item.addEventListener("mouseleave", function () {
       const icon = this.querySelector("i");
-      if (icon) {
-        icon.style.transform = "scale(1)";
-      }
+      if (icon) icon.style.transform = "scale(1)";
     });
   });
 
@@ -115,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 8000);
   }
 
-  // --- Start Receipt Upload Enhancement ---
+  // --- Receipt Upload Enhancement ---
   const paymentReceiptInput = document.getElementById("paymentReceipt");
   const dropPasteZone = document.getElementById("dropPasteZone");
   const fileNameDisplay = document.getElementById("fileNameDisplay");
@@ -125,12 +130,9 @@ document.addEventListener("DOMContentLoaded", function () {
     "paymentReceiptInvalidFeedback"
   );
 
-  // Function to set a file to the input and update display
   function setReceiptFile(file) {
     const dataTransfer = new DataTransfer();
-    if (file) {
-      dataTransfer.items.add(file);
-    }
+    if (file) dataTransfer.items.add(file);
     paymentReceiptInput.files = dataTransfer.files;
 
     const fileStatusIcon = document.getElementById("fileStatusIcon");
@@ -149,8 +151,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       paymentReceiptInput.classList.remove("is-invalid");
       paymentReceiptInvalidFeedback.style.display = "none";
-      paymentReceiptInvalidFeedback.textContent =
-        "Please upload a valid payment receipt (image or PDF, max 5MB).";
     } else {
       selectedFileNameSpan.textContent = "";
       fileNameDisplay.style.display = "none";
@@ -164,34 +164,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  const browseLink = dropPasteZone
-    ? dropPasteZone.querySelector(".browse-link")
-    : null;
+  // Setup file input handlers
+  if (paymentReceiptInput && dropPasteZone) {
+    const browseLink = dropPasteZone.querySelector(".browse-link");
+    if (browseLink) {
+      browseLink.addEventListener("click", (event) => {
+        event.stopPropagation();
+        paymentReceiptInput.click();
+      });
+    }
 
-  if (browseLink) {
-    browseLink.addEventListener("click", (event) => {
-      event.stopPropagation();
-      paymentReceiptInput.click();
-    });
-  }
-
-  if (paymentReceiptInput) {
     paymentReceiptInput.addEventListener("change", function () {
-      if (this.files.length > 0) {
-        setReceiptFile(this.files[0]);
-      } else {
-        setReceiptFile(null);
-      }
+      setReceiptFile(this.files.length > 0 ? this.files[0] : null);
     });
-  }
 
-  if (dropPasteZone) {
     dropPasteZone.addEventListener("dragover", (event) => {
       event.preventDefault();
       dropPasteZone.classList.add("highlight");
     });
 
-    dropPasteZone.addEventListener("dragleave", (event) => {
+    dropPasteZone.addEventListener("dragleave", () => {
       dropPasteZone.classList.remove("highlight");
     });
 
@@ -212,17 +204,10 @@ document.addEventListener("DOMContentLoaded", function () {
         if (allowedTypes.includes(file.type) && file.size <= maxFileSize) {
           setReceiptFile(file);
         } else {
-          setReceiptFile(null);
           paymentReceiptInput.classList.add("is-invalid");
           paymentReceiptInvalidFeedback.style.display = "block";
           paymentReceiptInvalidFeedback.textContent =
             "Invalid file. Only JPG, PNG, GIF, or PDF (max 5MB) are allowed.";
-          console.warn(
-            "Invalid file dropped:",
-            file.name,
-            file.type,
-            file.size
-          );
         }
       }
     });
@@ -231,36 +216,15 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("paste", (event) => {
     if (
       dropPasteZone &&
-      window.getComputedStyle(dropPasteZone).display !== "none" &&
-      document.activeElement !== paymentReceiptInput
+      window.getComputedStyle(dropPasteZone).display !== "none"
     ) {
       const items = event.clipboardData.items;
-      let pastedFile = null;
-
       for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (item.kind === "file") {
-          const file = item.getAsFile();
-          if (file) {
-            const allowedTypes = [
-              "image/jpeg",
-              "image/png",
-              "image/gif",
-              "application/pdf",
-            ];
-            const maxFileSize = 5 * 1024 * 1024;
-
-            if (allowedTypes.includes(file.type) && file.size <= maxFileSize) {
-              pastedFile = file;
-              break;
-            }
-          }
+        if (items[i].kind === "file") {
+          const file = items[i].getAsFile();
+          if (file) setReceiptFile(file);
+          break;
         }
-      }
-
-      if (pastedFile) {
-        event.preventDefault();
-        setReceiptFile(pastedFile);
       }
     }
   });
@@ -270,51 +234,23 @@ document.addEventListener("DOMContentLoaded", function () {
       setReceiptFile(null);
       paymentReceiptInput.classList.remove("is-invalid");
       paymentReceiptInvalidFeedback.style.display = "none";
-      paymentReceiptInvalidFeedback.textContent =
-        "Please upload a valid payment receipt (image or PDF, max 5MB).";
     });
   }
-
-  // --- End Receipt Upload Enhancement ---
 
   // --- Main Form Submission Logic ---
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    if (isSubmitting) {
-      console.log("Form already submitting.");
-      return;
-    }
-
-    const lastSubmissionTime = localStorage.getItem("lastCampSubmission");
-    if (lastSubmissionTime && Date.now() - lastSubmissionTime < 300000) {
-      formStatus.textContent =
-        "Please wait at least 5 minutes before submitting again.";
-      formStatus.style.color = "orange";
-      return;
-    }
+    if (isSubmitting) return;
 
     formStatus.textContent = "";
     formStatus.className = "mt-3 text-center fw-bold fs-5";
     Array.from(form.elements).forEach((el) =>
       el.classList.remove("is-invalid")
     );
-    recaptchaErrorDiv.style.display = "none";
 
-    const numPeopleHelp = form.querySelector("#numPeople + .form-text");
-    if (numPeopleHelp && !numPeopleHelp.dataset.originalText) {
-      numPeopleHelp.dataset.originalText = numPeopleHelp.textContent;
-    }
-    const paymentReceiptHelp = form.querySelector(
-      "#paymentReceipt + .form-text"
-    );
-    if (paymentReceiptHelp && !paymentReceiptHelp.dataset.originalText) {
-      paymentReceiptHelp.dataset.originalText = paymentReceiptHelp.textContent;
-    }
-
-    // Perform all client-side validation *before* executing reCAPTCHA
+    // Client-side validation
     let isValid = true;
-
     const fullName = form.elements["fullName"].value.trim();
     const email = form.elements["email"].value.trim();
     const phoneNumber = form.elements["phoneNumber"].value.trim();
@@ -339,56 +275,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (isNaN(numPeople) || numPeople < 1 || numPeople > 10) {
       form.elements["numPeople"].classList.add("is-invalid");
       isValid = false;
-      if (numPeopleHelp) {
-        numPeopleHelp.textContent =
-          "You can register up to 10 people. For larger groups, please contact us.";
-      }
-    } else {
-      if (numPeopleHelp && numPeopleHelp.dataset.originalText) {
-        numPeopleHelp.textContent = numPeopleHelp.dataset.originalText;
-      }
     }
 
     if (!paymentReceipt) {
       form.elements["paymentReceipt"].classList.add("is-invalid");
-      isValid = false;
       paymentReceiptInvalidFeedback.style.display = "block";
-      paymentReceiptInvalidFeedback.textContent =
-        "Please upload a payment receipt.";
-    } else {
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "application/pdf",
-      ];
-      const allowedExts = ["jpg", "jpeg", "png", "gif", "pdf"];
-      const maxFileSize = 5 * 1024 * 1024;
-      const fileExt = paymentReceipt.name.split(".").pop().toLowerCase();
-
-      if (
-        !allowedTypes.includes(paymentReceipt.type) &&
-        !allowedExts.includes(fileExt)
-      ) {
-        form.elements["paymentReceipt"].classList.add("is-invalid");
-        isValid = false;
-        paymentReceiptInvalidFeedback.style.display = "block";
-        paymentReceiptInvalidFeedback.textContent =
-          "Invalid file type. Only JPG, PNG, GIF, or PDF.";
-      } else if (paymentReceipt.size > maxFileSize) {
-        form.elements["paymentReceipt"].classList.add("is-invalid");
-        isValid = false;
-        paymentReceiptInvalidFeedback.style.display = "block";
-        paymentReceiptInvalidFeedback.textContent =
-          "File size exceeds 5MB limit.";
-      } else {
-        if (paymentReceiptHelp && paymentReceiptHelp.dataset.originalText) {
-          paymentReceiptHelp.textContent =
-            paymentReceiptHelp.dataset.originalText;
-        }
-        paymentReceiptInput.classList.remove("is-invalid");
-        paymentReceiptInvalidFeedback.style.display = "none";
-      }
+      isValid = false;
     }
 
     if (!isValid) {
@@ -397,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // All client-side validation passed. Now execute reCAPTCHA.
+    // All validation passed - trigger reCAPTCHA
     isSubmitting = true;
     submitBtn.disabled = true;
     submitBtn.innerHTML =
@@ -405,27 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formStatus.textContent = "Verifying with reCAPTCHA...";
     formStatus.style.color = "blue";
 
-    try {
-      const recaptchaToken = await grecaptcha.execute(
-        "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
-        { action: "camp_registration_submit" }
-      );
-      recaptchaTokenInput.value = recaptchaToken;
-
-      submitFormWithData();
-    } catch (error) {
-      console.error("reCAPTCHA execution failed:", error);
-      recaptchaErrorDiv.style.display = "block";
-      recaptchaErrorDiv.textContent =
-        "reCAPTCHA verification failed. Please try again.";
-      formStatus.textContent = "Registration failed: reCAPTCHA error.";
-      formStatus.style.color = "red";
-      // Reset button state and submission flag
-      isSubmitting = false;
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = "Register for Camp";
-      grecaptcha.reset();
-    }
+    grecaptcha.execute(recaptchaWidgetId);
   });
 
   function submitFormWithData() {
@@ -435,7 +307,6 @@ document.addEventListener("DOMContentLoaded", function () {
     formStatus.style.color = "blue";
 
     const formData = new FormData(form);
-
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "https://kcmi-backend.onrender.com/api/camp-registration");
 
@@ -469,21 +340,19 @@ document.addEventListener("DOMContentLoaded", function () {
           formStatus.textContent = "";
           form.style.display = "none";
           successMessage.style.display = "block";
-          grecaptcha.reset();
         } else {
           formStatus.textContent =
             "Error: " + (data.message || "Something went wrong.");
           formStatus.style.color = "red";
-          grecaptcha.reset();
         }
       } catch (e) {
         formStatus.textContent = "Unexpected response from server.";
         formStatus.style.color = "red";
-        grecaptcha.reset();
       } finally {
         isSubmitting = false;
         submitBtn.disabled = false;
         submitBtn.innerHTML = "Register for Camp";
+        grecaptcha.reset();
         if (progressBar.parentNode === formStatus) {
           formStatus.removeChild(progressBar);
         }
@@ -493,10 +362,10 @@ document.addEventListener("DOMContentLoaded", function () {
     xhr.onerror = function () {
       formStatus.textContent = "Network error. Please try again.";
       formStatus.style.color = "red";
-      grecaptcha.reset();
       isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.innerHTML = "Register for Camp";
+      grecaptcha.reset();
       if (progressBar.parentNode === formStatus) {
         formStatus.removeChild(progressBar);
       }
@@ -504,21 +373,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     xhr.send(formData);
   }
-});
 
-// If you need to add any new functionality for the donation section:
-function highlightDonationSection() {
-  const donationSection = document.querySelector(
-    ".youth-camp-donation-prompt-prominent"
-  );
-  if (donationSection) {
-    donationSection.style.boxShadow = "0 0 0 3px rgba(124, 25, 99, 0.3)";
-    setTimeout(() => {
-      donationSection.style.boxShadow = "";
-    }, 1000);
+  // Highlight donation section
+  function highlightDonationSection() {
+    const donationSection = document.querySelector(
+      ".youth-camp-donation-prompt-prominent"
+    );
+    if (donationSection) {
+      donationSection.style.boxShadow = "0 0 0 3px rgba(124, 25, 99, 0.3)";
+      setTimeout(() => (donationSection.style.boxShadow = ""), 1000);
+    }
   }
-}
-
-// Call this function if you want to draw attention to the donation section
-// For example, you could call it after page loads or after registration
-setTimeout(highlightDonationSection, 1500);
+  setTimeout(highlightDonationSection, 1500);
+});
