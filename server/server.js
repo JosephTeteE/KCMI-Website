@@ -747,17 +747,17 @@ app.post(
         from: process.env.SMTP_USER,
         to: email,
         subject:
-          "KCMI Youth Camp 2025 Registration Confirmation - Unleashing Purpose",
+          "KCMI Youth/Teens Camp 2025 Registration Confirmation - LEVEL UP",
         html: `
         <p>Dear ${fullName},</p>
-        <p>Thank you for registering for the KCMI Youth Camp 2025: <strong>"Unleashing Purpose"</strong>!</p>
+        <p>Thank you for registering for the KCMI Youth/Teens Camp 2025: <strong>"LEVEL UP"</strong>!</p>
         <p>We have received your registration for <strong>${parsedNumPeople} person(s)</strong>.</p>
         <p>Your unique Submission ID is: <strong>${submissionId}</strong></p>
         <p>You can view your uploaded payment receipt here: <a href="${driveFileUrl}">${driveFileUrl}</a></p>
         <p>We are excited to have you join us for a transformative experience filled with faith, fun, and fellowship!</p>
         <p>More details regarding the camp schedule and what to bring will be sent closer to the camp date.</p>
         <p>God bless you,</p>
-        <p><strong>The KCMI Youth Team</strong></p>
+        <p><strong>The KCMI Youth/Teens Team</strong></p>
         <hr>
         <p><small>This is an automated email, please do not reply.</small></p>
       `,
@@ -767,9 +767,9 @@ app.post(
       const mailOptionsAdmin = {
         from: process.env.SMTP_USER,
         to: process.env.KCMI_ADMIN_EMAIL,
-        subject: `NEW Youth Camp Registration: ${fullName} (${email}) - ${parsedNumPeople} people`,
+        subject: `NEW Youth/Teens Camp Registration: ${fullName} (${email}) - ${parsedNumPeople} people`,
         html: `
-            <p>A new KCMI Youth Camp registration has been submitted:</p>
+            <p>A new KCMI Youth/Teens Camp registration has been submitted:</p>
             <ul>
                 <li><strong>Full Name:</strong> ${fullName}</li>
                 <li><strong>Email:</strong> ${email}</li>
