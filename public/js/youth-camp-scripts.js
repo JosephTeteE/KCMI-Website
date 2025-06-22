@@ -1,8 +1,6 @@
 // public/js/youth-camp-scripts.js
 
-let recaptchaWidgetId;
-
-function onRecaptchaLoad() {
+window.onRecaptchaLoad = function () {
   recaptchaWidgetId = grecaptcha.render("submitCampFormBtn", {
     sitekey: "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
     size: "invisible",
@@ -12,6 +10,14 @@ function onRecaptchaLoad() {
       submitFormWithData();
     },
   });
+};
+
+if (typeof grecaptcha === "undefined") {
+  console.error("reCAPTCHA not loaded");
+
+  document.getElementById("formStatus").textContent =
+    "Security verification failed to load. Please refresh the page.";
+  document.getElementById("formStatus").style.color = "red";
 }
 
 document.addEventListener("DOMContentLoaded", function () {
