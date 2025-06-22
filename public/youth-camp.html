@@ -83,6 +83,35 @@
     <link rel="stylesheet" href="./css/styles.css" />
 
     <link rel="stylesheet" href="./css/youth-camp.css" />
+
+    <!-- reCAPTCHA v3 (for contact/subscription forms) -->
+    <script
+      src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac"
+      async
+      defer
+    ></script>
+
+    <!-- reCAPTCHA v2 (for camp registration) - Loaded conditionally -->
+    <script>
+      // Load v2 only when needed
+      function loadV2Recaptcha() {
+        var script = document.createElement("script");
+        script.src =
+          "https://www.google.com/recaptcha/api.js?render=explicit&onload=onCampRecaptchaLoad";
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+
+      // Load v2 after v3 is ready
+      if (typeof grecaptcha === "undefined") {
+        window.onload = function () {
+          loadV2Recaptcha();
+        };
+      } else {
+        loadV2Recaptcha();
+      }
+    </script>
   </head>
   <body class="d-flex flex-column min-vh-100 youth-camp-page">
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
@@ -970,11 +999,6 @@
     ></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="./js/scripts.js" defer></script>
-    <script
-      src="https://www.google.com/recaptcha/api.js?render=explicit"
-      async
-      defer
-    ></script>
     <script src="./js/youth-camp-scripts.js" defer></script>
   </body>
 </html>
