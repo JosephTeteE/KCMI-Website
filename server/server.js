@@ -304,7 +304,7 @@ app.post("/api/auth", async (req, res) => {
 
   // Validate credentials
   if (username === process.env.AD_USER && password === process.env.AD_PASS) {
-    const token = jsonwebtoken.sign({ username }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
       expiresIn: "1m", // Token expires in 1 minute
     });
     res.json({ token });

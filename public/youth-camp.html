@@ -80,7 +80,11 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
 
-    <script src="https://www.google.com/recaptcha/api.js?render=6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk"></script>
+    <script
+      src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit"
+      async
+      defer
+    ></script>
 
     <link rel="stylesheet" href="./css/styles.css" />
 
@@ -704,13 +708,6 @@
                       id="recaptchaToken"
                       name="recaptchaToken"
                     />
-                    <div
-                      class="invalid-feedback d-block youth-camp-form-invalid-feedback"
-                      id="recaptchaError"
-                      style="display: none"
-                    >
-                      Please complete the reCAPTCHA.
-                    </div>
                   </div>
 
                   <div
@@ -979,7 +976,7 @@
     ></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="./js/scripts.js" defer></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <script src="./js/youth-camp-scripts.js" defer></script>
   </body>
 </html>
