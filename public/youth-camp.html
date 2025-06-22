@@ -4,10 +4,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KCMI Youth Camp 2025 Registration - Unleashing Purpose</title>
+    <title>KCMI Youth Camp 2025 Registration - Level Up</title>
     <meta
       name="description"
-      content="Register for KCMI Youth Camp 2025 - 'Unleashing Purpose'. Join us for an exciting spiritual experience with Kingdom Covenant Ministries International in Port Harcourt, Nigeria."
+      content="Register for KCMI Youth Camp 2025 - 'Level Up'. Join us for an exciting spiritual experience with Kingdom Covenant Ministries International in Port Harcourt, Nigeria."
     />
 
     <link
@@ -31,18 +31,18 @@
 
     <meta
       name="keywords"
-      content="KCMI Youth Camp, Rehoboth Christian Center, Youth Camp 2025, Christian youth camp, Port Harcourt youth event, Unleashing Purpose"
+      content="KCMI Youth Camp, Rehoboth Christian Center, Youth Camp 2025, Christian youth camp, Port Harcourt youth event, Level Up"
     />
     <meta name="author" content="Kingdom Covenant Ministries International" />
     <meta name="robots" content="index, follow" />
 
     <meta
       property="og:title"
-      content="KCMI Youth Camp 2025 Registration - Unleashing Purpose"
+      content="KCMI Youth Camp 2025 Registration - Level Up"
     />
     <meta
       property="og:description"
-      content="Register for KCMI Youth Camp 2025 - 'Unleashing Purpose'. Join us for an exciting spiritual experience with Kingdom Covenant Ministries International."
+      content="Register for KCMI Youth Camp 2025 - 'Level Up'. Join us for an exciting spiritual experience with Kingdom Covenant Ministries International."
     />
     <meta
       property="og:image"
@@ -85,32 +85,34 @@
     <link rel="stylesheet" href="./css/youth-camp.css" />
 
     <!-- reCAPTCHA v3 (for contact/subscription forms) -->
-    <script
-      src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac"
-      async
-      defer
-    ></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcRdOsqAAAAAMzghoNjWqpTB3AjOBayn8KIpxac"></script>
 
     <!-- reCAPTCHA v2 (for camp registration) - Loaded conditionally -->
     <script>
-      // Load v2 only when needed
+      // Define the callback function first
+      window.onCampRecaptchaLoad = function () {
+        console.log("reCAPTCHA v2 loaded");
+        initializeCampRecaptcha();
+      };
+
       function loadV2Recaptcha() {
-        var script = document.createElement("script");
-        script.src =
-          "https://www.google.com/recaptcha/api.js?render=explicit&onload=onCampRecaptchaLoad";
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
+        if (typeof grecaptcha === "undefined") {
+          var script = document.createElement("script");
+          script.src =
+            "https://www.google.com/recaptcha/api.js?onload=onCampRecaptchaLoad&render=explicit";
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        } else {
+          // If grecaptcha is already loaded (from v3), just initialize
+          onCampRecaptchaLoad();
+        }
       }
 
-      // Load v2 after v3 is ready
-      if (typeof grecaptcha === "undefined") {
-        window.onload = function () {
-          loadV2Recaptcha();
-        };
-      } else {
+      // Load v2 when DOM is ready
+      document.addEventListener("DOMContentLoaded", function () {
         loadV2Recaptcha();
-      }
+      });
     </script>
   </head>
   <body class="d-flex flex-column min-vh-100 youth-camp-page">
@@ -242,8 +244,8 @@
     <main class="d-flex flex-column flex-grow-1 youth-camp-page-main">
       <header class="bg-primary text-white text-center py-4 youth-camp-header">
         <div class="container">
-          <h1 class="display-4 fw-bold mb-1">KCMI Youth Camp 2025</h1>
-          <p class="lead">"Unleashing Purpose"</p>
+          <h1 class="display-4 fw-bold mb-1">KCMI Youth and Teens Camp 2025</h1>
+          <p class="lead">"Level Up"</p>
         </div>
       </header>
 
@@ -267,7 +269,7 @@
                   <strong class="youth-camp-text-primary"
                     >KCMI Youth and Teens Camp 2025</strong
                   >
-                  — <em>"Unleashing Purpose"</em> <br />
+                  — <em>"Level Up"</em> <br />
                   While registration confirms your attendance, your
                   <strong>additional support</strong> is incredibly valuable and
                   directly helps us in these key areas:
@@ -278,12 +280,6 @@
                     <ul
                       class="list-group list-group-flush text-start youth-camp-donation-benefits"
                     >
-                      <li
-                        class="list-group-item bg-transparent d-flex align-items-start"
-                      >
-                        <i class="fas fa-utensils text-primary me-2 mt-1"></i>
-                        <span>Provide nourishing meals for all campers</span>
-                      </li>
                       <li
                         class="list-group-item bg-transparent d-flex align-items-start"
                       >
@@ -308,6 +304,12 @@
                         <span
                           >Sponsor campers who cannot afford the full fee</span
                         >
+                      </li>
+                      <li
+                        class="list-group-item bg-transparent d-flex align-items-start"
+                      >
+                        <i class="fas fa-utensils text-primary me-2 mt-1"></i>
+                        <span>Provide nourishing meals for all campers</span>
                       </li>
                     </ul>
                   </div>
@@ -528,7 +530,7 @@
                   </li>
                   <li class="mb-2">
                     <i class="fas fa-book-open text-primary me-2"></i>
-                    Scriptural Focus: 1 Peter 5:15
+                    Scriptural Focus: 1 Peter 3:18
                   </li>
                   <li class="mb-2">
                     <i class="fas fa-church text-primary me-2"></i>
@@ -991,14 +993,9 @@
       <span id="lightIcon" style="display: none">☀️</span>
     </button>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-      onerror="this.onerror=null;this.src='./js/bootstrap.bundle.min.js';"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="./js/scripts.js" defer></script>
-    <script src="./js/youth-camp-scripts.js" defer></script>
+    <script src="./js/scripts.js"></script>
+    <script src="./js/youth-camp-scripts.js"></script>
   </body>
 </html>
