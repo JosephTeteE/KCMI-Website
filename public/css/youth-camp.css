@@ -55,8 +55,11 @@
 }
 
 .youth-camp-header .lead {
-  font-weight: 300;
+  font-weight: 650;
+  font-size: 1.5rem;
   position: relative;
+  margin-bottom: -10px;
+  padding-bottom: -10px;
 }
 
 /* Card Styles */
@@ -317,44 +320,6 @@
   }
 }
 
-/* Footer Styles */
-.youth-camp-footer {
-  background-color: #300630;
-  color: white;
-}
-
-.youth-camp-footer a {
-  color: white;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.youth-camp-footer a:hover {
-  color: #c298b7;
-}
-
-.youth-camp-footer .social-icon {
-  transition: transform 0.3s ease;
-}
-
-.youth-camp-footer .social-icon:hover {
-  transform: scale(1.1);
-}
-
-/* Modal Styles */
-.youth-camp-modal .modal-content {
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.youth-camp-modal .modal-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.youth-camp-modal .modal-body {
-  padding: 1.5rem;
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .youth-camp-header {
@@ -452,10 +417,6 @@
   color: white;
 }
 
-[data-bs-theme="dark"] .youth-camp-footer {
-  background-color: #1a061a;
-}
-
 /* -------------------------------------------------------------------------- */
 /* ## Utility Classes                                                       */
 /* -------------------------------------------------------------------------- */
@@ -473,10 +434,6 @@
 
 [data-bs-theme="dark"] .youth-camp-bg-light {
   background-color: #1e1e1e !important;
-}
-
-.youth-camp-rounded-lg {
-  border-radius: 12px;
 }
 
 .youth-camp-shadow-sm {
@@ -541,4 +498,25 @@
   .youth-camp-donation-benefits .list-group-item {
     padding: 0.75rem 0;
   }
+}
+
+#registrationInfo .card-body {
+  padding: 0.5rem !important;
+}
+
+@media (min-width: 992px) {
+  #registrationInfo .card-body {
+    padding: 1rem !important;
+  }
+}
+
+/* Accordion transitions to maintain screen view*/
+.accordion-collapse {
+  transition: height 0.05s cubic-bezier(0.25, 0.1, 0.25, 1);
+  overflow: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 200px;
 }

@@ -443,6 +443,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Add smooth scroll to opened accordion items
+  document.querySelectorAll(".accordion").forEach((accordion) => {
+    accordion.addEventListener("shown.bs.collapse", function (e) {
+      const openedItem = e.target;
+      const currentScroll = window.scrollY;
+
+      requestAnimationFrame(() => {
+        const itemOffset =
+          openedItem.getBoundingClientRect().top + currentScroll;
+
+        window.scrollTo({
+          top: itemOffset - 200,
+          behavior: "smooth",
+        });
+      });
+    });
+  });
+
   // Highlight donation section
   function highlightDonationSection() {
     const donationSection = document.querySelector(
