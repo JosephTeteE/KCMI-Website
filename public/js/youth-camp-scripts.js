@@ -1,36 +1,141 @@
 // public/js/youth-camp-scripts.js
 
-grecaptcha.ready(function () {
-  recaptchaWidgetId = grecaptcha.render("submitCampFormBtn", {
+// Initialize camp-specific reCAPTCHA v2
+function onCampRecaptchaLoad() {
+  if (typeof grecaptcha === "undefined") {
+    console.error("reCAPTCHA not loaded");
+    const formStatus = document.getElementById("formStatus");
+    if (formStatus) {
+      formStatus.textContent =
+        "Security verification failed to load. Please refresh the page.";
+      formStatus.style.color = "red";
+    }
+    return;
+  }
+
+  const campForm = document.getElementById("campRegistrationForm");
+  if (!campForm) return;
+
+  // Render v2 invisible recaptcha
+  const recaptchaWidgetId = grecaptcha.render("submitCampFormBtn", {
     sitekey: "6LdcG2grAAAAAKp6kKoG58Nmu0-6NPHcj7rkd6Zk",
     size: "invisible",
     badge: "bottomright",
     callback: function (token) {
       document.getElementById("recaptchaToken").value = token;
-      submitFormWithData();
+      submitCampForm();
     },
   });
-});
 
-if (typeof grecaptcha === "undefined") {
-  console.error("reCAPTCHA not loaded");
-
-  const formStatus = document.getElementById("formStatus");
-  if (formStatus) {
-    formStatus.textContent =
-      "Security verification failed to load. Please refresh the page.";
-    formStatus.style.color = "red";
-  }
+  // Camp form submission logic
+  campForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    grecaptcha.execute(recaptchaWidgetId);
+  });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+// Camp form submission handler
+function submitCampForm() {
   const form = document.getElementById("campRegistrationForm");
   const submitBtn = document.getElementById("submitCampFormBtn");
   const formStatus = document.getElementById("formStatus");
   const successMessage = document.getElementById("successMessage");
-  const recaptchaTokenInput = document.getElementById("recaptchaToken");
 
+  submitBtn.innerHTML =
+    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...';
+  if (formStatus) {
+    formStatus.textContent = "Processing your registration...";
+    formStatus.style.color = "blue";
+
+    const progressBar = document.createElement("div");
+    progressBar.className = "upload-progress mt-3";
+    progressBar.style.height = "10px";
+    progressBar.style.background = "#ccc";
+    progressBar.style.borderRadius = "5px";
+    progressBar.style.overflow = "hidden";
+    formStatus.appendChild(progressBar);
+
+    const fill = document.createElement("div");
+    fill.style.height = "100%";
+    fill.style.width = "0%";
+    fill.style.background = "green";
+    fill.style.transition = "width 0.3s ease";
+    progressBar.appendChild(fill);
+  }
+
+  const formData = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "https://kcmi-backend.onrender.com/api/camp-registration");
+
+  xhr.upload.onprogress = function (event) {
+    if (event.lengthComputable && formStatus) {
+      const progressBar = formStatus.querySelector(".upload-progress");
+      if (progressBar) {
+        const fill = progressBar.querySelector("div");
+        if (fill) {
+          const percent = (event.loaded / event.total) * 100;
+          fill.style.width = percent + "%";
+        }
+      }
+    }
+  };
+
+  xhr.onload = function () {
+    try {
+      const data = JSON.parse(xhr.responseText);
+      if (xhr.status === 200 && data.success) {
+        localStorage.setItem("lastCampSubmission", Date.now().toString());
+        if (formStatus) formStatus.textContent = "";
+        if (form) form.style.display = "none";
+        if (successMessage) successMessage.style.display = "block";
+      } else if (formStatus) {
+        formStatus.textContent =
+          "Error: " + (data.message || "Something went wrong.");
+        formStatus.style.color = "red";
+      }
+    } catch (e) {
+      if (formStatus) {
+        formStatus.textContent = "Unexpected response from server.";
+        formStatus.style.color = "red";
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = "Register for Camp";
+      grecaptcha.reset();
+      if (formStatus) {
+        const progressBar = formStatus.querySelector(".upload-progress");
+        if (progressBar && progressBar.parentNode === formStatus) {
+          formStatus.removeChild(progressBar);
+        }
+      }
+    }
+  };
+
+  xhr.onerror = function () {
+    if (formStatus) {
+      formStatus.textContent = "Network error. Please try again.";
+      formStatus.style.color = "red";
+    }
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = "Register for Camp";
+    grecaptcha.reset();
+    if (formStatus) {
+      const progressBar = formStatus.querySelector(".upload-progress");
+      if (progressBar && progressBar.parentNode === formStatus) {
+        formStatus.removeChild(progressBar);
+      }
+    }
+  };
+
+  xhr.send(formData);
+}
+
+// Initialize when DOM is ready
+document.addEventListener("DOMContentLoaded", function () {
   let isSubmitting = false;
+  const form = document.getElementById("campRegistrationForm");
+  const submitBtn = document.getElementById("submitCampFormBtn");
+  const formStatus = document.getElementById("formStatus");
 
   // Initialize all copy functionality
   const setupCopyFunctionality = (spanElement, confirmationElement) => {
@@ -254,167 +359,78 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // --- Main Form Submission Logic ---
-  form.addEventListener("submit", async function (event) {
-    event.preventDefault();
+  // Form validation
+  if (form) {
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-    if (isSubmitting) return;
+      if (isSubmitting) return;
 
-    if (formStatus) {
-      formStatus.textContent = "";
-      formStatus.className = "mt-3 text-center fw-bold fs-5";
-    }
-    Array.from(form.elements).forEach((el) =>
-      el.classList.remove("is-invalid")
-    );
-
-    // Client-side validation
-    let isValid = true;
-    const fullName = form.elements["fullName"].value.trim();
-    const email = form.elements["email"].value.trim();
-    const phoneNumber = form.elements["phoneNumber"].value.trim();
-    const numPeople = parseInt(form.elements["numPeople"].value);
-    const paymentReceipt = form.elements["paymentReceipt"].files[0];
-
-    if (!fullName) {
-      form.elements["fullName"].classList.add("is-invalid");
-      isValid = false;
-    }
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      form.elements["email"].classList.add("is-invalid");
-      isValid = false;
-    }
-
-    if (!phoneNumber || !/^\+?[0-9\s-]{7,15}$/.test(phoneNumber)) {
-      form.elements["phoneNumber"].classList.add("is-invalid");
-      isValid = false;
-    }
-
-    if (isNaN(numPeople) || numPeople < 1 || numPeople > 10) {
-      form.elements["numPeople"].classList.add("is-invalid");
-      isValid = false;
-    }
-
-    if (!paymentReceipt) {
-      form.elements["paymentReceipt"].classList.add("is-invalid");
-      if (paymentReceiptInvalidFeedback) {
-        paymentReceiptInvalidFeedback.style.display = "block";
-      }
-      isValid = false;
-    }
-
-    if (!isValid) {
       if (formStatus) {
-        formStatus.textContent = "Please correct the errors in the form.";
-        formStatus.style.color = "red";
+        formStatus.textContent = "";
+        formStatus.className = "mt-3 text-center fw-bold fs-5";
       }
-      return;
-    }
+      Array.from(form.elements).forEach((el) =>
+        el.classList.remove("is-invalid")
+      );
 
-    // All validation passed - trigger reCAPTCHA
-    isSubmitting = true;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML =
-      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
-    if (formStatus) {
-      formStatus.textContent = "Verifying with reCAPTCHA...";
-      formStatus.style.color = "blue";
-    }
+      // Client-side validation
+      let isValid = true;
+      const fullName = form.elements["fullName"].value.trim();
+      const email = form.elements["email"].value.trim();
+      const phoneNumber = form.elements["phoneNumber"].value.trim();
+      const numPeople = parseInt(form.elements["numPeople"].value);
+      const paymentReceipt = form.elements["paymentReceipt"].files[0];
 
-    grecaptcha.execute(recaptchaWidgetId);
-  });
+      if (!fullName) {
+        form.elements["fullName"].classList.add("is-invalid");
+        isValid = false;
+      }
 
-  function submitFormWithData() {
-    submitBtn.innerHTML =
-      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Registering...';
-    if (formStatus) {
-      formStatus.textContent = "Processing your registration...";
-      formStatus.style.color = "blue";
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        form.elements["email"].classList.add("is-invalid");
+        isValid = false;
+      }
 
-      const progressBar = document.createElement("div");
-      progressBar.className = "upload-progress mt-3";
-      progressBar.style.height = "10px";
-      progressBar.style.background = "#ccc";
-      progressBar.style.borderRadius = "5px";
-      progressBar.style.overflow = "hidden";
-      formStatus.appendChild(progressBar);
+      if (!phoneNumber || !/^\+?[0-9\s-]{7,15}$/.test(phoneNumber)) {
+        form.elements["phoneNumber"].classList.add("is-invalid");
+        isValid = false;
+      }
 
-      const fill = document.createElement("div");
-      fill.style.height = "100%";
-      fill.style.width = "0%";
-      fill.style.background = "green";
-      fill.style.transition = "width 0.3s ease";
-      progressBar.appendChild(fill);
-    }
+      if (isNaN(numPeople) || numPeople < 1 || numPeople > 10) {
+        form.elements["numPeople"].classList.add("is-invalid");
+        isValid = false;
+      }
 
-    const formData = new FormData(form);
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://kcmi-backend.onrender.com/api/camp-registration");
-
-    xhr.upload.onprogress = function (event) {
-      if (event.lengthComputable && formStatus) {
-        const progressBar = formStatus.querySelector(".upload-progress");
-        if (progressBar) {
-          const fill = progressBar.querySelector("div");
-          if (fill) {
-            const percent = (event.loaded / event.total) * 100;
-            fill.style.width = percent + "%";
-          }
+      if (!paymentReceipt) {
+        form.elements["paymentReceipt"].classList.add("is-invalid");
+        if (paymentReceiptInvalidFeedback) {
+          paymentReceiptInvalidFeedback.style.display = "block";
         }
+        isValid = false;
       }
-    };
 
-    xhr.onload = function () {
-      try {
-        const data = JSON.parse(xhr.responseText);
-        if (xhr.status === 200 && data.success) {
-          localStorage.setItem("lastCampSubmission", Date.now().toString());
-          if (formStatus) formStatus.textContent = "";
-          if (form) form.style.display = "none";
-          if (successMessage) successMessage.style.display = "block";
-        } else if (formStatus) {
-          formStatus.textContent =
-            "Error: " + (data.message || "Something went wrong.");
+      if (!isValid) {
+        if (formStatus) {
+          formStatus.textContent = "Please correct the errors in the form.";
           formStatus.style.color = "red";
         }
-      } catch (e) {
-        if (formStatus) {
-          formStatus.textContent = "Unexpected response from server.";
-          formStatus.style.color = "red";
-        }
-      } finally {
-        isSubmitting = false;
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = "Register for Camp";
-        grecaptcha.reset();
-        if (formStatus) {
-          const progressBar = formStatus.querySelector(".upload-progress");
-          if (progressBar && progressBar.parentNode === formStatus) {
-            formStatus.removeChild(progressBar);
-          }
-        }
+        return;
       }
-    };
 
-    xhr.onerror = function () {
+      // All validation passed - trigger reCAPTCHA
+      isSubmitting = true;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML =
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Verifying...';
       if (formStatus) {
-        formStatus.textContent = "Network error. Please try again.";
-        formStatus.style.color = "red";
+        formStatus.textContent = "Verifying with reCAPTCHA...";
+        formStatus.style.color = "blue";
       }
-      isSubmitting = false;
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = "Register for Camp";
-      grecaptcha.reset();
-      if (formStatus) {
-        const progressBar = formStatus.querySelector(".upload-progress");
-        if (progressBar && progressBar.parentNode === formStatus) {
-          formStatus.removeChild(progressBar);
-        }
-      }
-    };
 
-    xhr.send(formData);
+      // The actual reCAPTCHA execution will be handled by the onCampRecaptchaLoad function
+      // which is called when the reCAPTCHA v2 script loads
+    });
   }
 
   // Highlight donation section
