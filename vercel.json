@@ -10,5 +10,17 @@
       "destination": "https://camp.kcmi-rcc.org",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/camp/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "camp.kcmi-rcc.org"
+        }
+      ]
+    }
   ]
 }
