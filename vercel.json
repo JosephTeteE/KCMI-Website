@@ -4,23 +4,28 @@
       "source": "/youth-camp.html",
       "destination": "https://camp.kcmi-rcc.org",
       "permanent": true
-    },
-    {
-      "source": "/camp/youth-camp.html",
-      "destination": "https://camp.kcmi-rcc.org",
-      "permanent": true
     }
   ],
   "rewrites": [
     {
-      "source": "/:path*",
-      "destination": "/camp/:path*",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "camp.kcmi-rcc.org"
         }
-      ]
+      ],
+      "destination": "/camp/youth-camp.html"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "camp.kcmi-rcc.org"
+        }
+      ],
+      "destination": "/camp/:path*"
     }
   ]
 }
