@@ -18,14 +18,14 @@
       "destination": "/camp/youth-camp.html"
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "camp.kcmi-rcc.org"
         }
       ],
-      "destination": "/camp/:path*"
+      "destination": "/camp/$1"
     }
   ]
 }
