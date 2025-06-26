@@ -1,238 +1,147 @@
 # Kingdom Covenant Ministries International (KCMI) Website
 
-Welcome to the official website project for Kingdom Covenant Ministries International (KCMI), also known as Rehoboth Christian Center. This dynamic, responsive web platform showcases the church's mission, leadership, sermons, events, and livestream content.
+**Official Website for Kingdom Covenant Ministries International (KCMI) / Rehoboth Christian Center**
 
-## Live Sites
-
-- **Development/Staging**: [https://kcmiwebsite-vercel.app/](https://kcmiwebsite-vercel.app/)
-- **Production**: [https://www.kcmi-rcc.org/](https://www.kcmi-rcc.org/)
+A dynamic, responsive web platform showcasing the church's mission, leadership, sermons, events, and livestream content.
 
 ---
 
-## 🌟 Features
+## 🌐 Live Sites
 
-- **Homepage** with video background and upcoming events
-- **Church Events Calendar** showing 3 upcoming date groups (with all events per date)
-- Pages for **Apostle Aikins**, services, sermons, giving, FAQs, and church locations
-- **Contact form** with Google reCAPTCHA v3 integration for spam prevention
-- **WhatsApp subscription form** integrated with Google reCAPTCHA v3
-- **Livestream page** dynamically embedding Facebook Live videos
-- **Admin panel** (protected with JWT authentication) to update the livestream embed code
-- **Dark mode toggle** for user preference
-- Fully responsive design for mobile, tablet, and desktop views
-- Embedded **Google Maps** and **Google Calendar** for convenience
-- Contact form submissions sent via **Zoho SMTP**
-- WhatsApp subscription link sent via **Zoho SMTP**
-- **Dynamic Events Promos** section pulling from a Google Drive manifest file with client-side caching
+- **Production:** [kcmi-rcc.org](https://www.kcmi-rcc.org/)
+- **Staging:** [kcmiwebsite-vercel.app](https://kcmiwebsite-vercel.app/)
 
 ---
 
-## 🔧 Technology Stack
+## ✨ Features
 
-### Frontend
+### Ministry Presentation
 
-- HTML5
-- CSS3 (with Bootstrap 5)
-- JavaScript (ES6+)
-- AOS (Animate On Scroll) Library
-- Google Calendar API integration with optimized event display
+- Homepage with video background and upcoming events
+- Dedicated pages for Apostle Aikins, services, sermons, and locations
+- Mission statement and FAQ sections
 
-### Backend
+### Engagement Tools
 
-- Node.js
-- Express.js
-- MySQL (via mysql2)
-- dotenv (for environment variable management)
-- Nodemailer (for sending emails via Zoho SMTP)
-- axios (for making HTTP requests, including reCAPTCHA verification)
-- jwt (for JSON Web Token authentication)
-- Google Calendar API integration
+- Events calendar (shows 3 upcoming date groups)
+- Youth Camp page with registration
+- Contact form and WhatsApp subscription (Google reCAPTCHA v3)
+- Livestream page with dynamic Facebook Live embed
 
-### External Services
+### Administrative Features
 
-- Google reCAPTCHA v3
-- Google Fonts
-- Google Calendar (embedded)
-- Google Maps (embedded)
-- Facebook Live Embed
-- Zoho SMTP (for email sending)
-- CDNs: Bootstrap, FontAwesome, AOS
+- Secure admin panel (JWT-protected) for livestream management
+- Dynamic event promos (Google Drive integration)
+- Contact/WhatsApp forms via Zoho SMTP
 
-### Hosting & Deployment
+### Technical Features
 
-- **Frontend**: Vercel
-- **Backend**: Render
-- **Database**: Aiven (MySQL)
-- **Version Control**: GitHub
-
-### Development Tools
-
-- Visual Studio Code
+- Dark mode toggle (with local storage)
+- Fully responsive design (mobile, tablet, desktop)
+- Embedded Google Maps with directions
+- Google Calendar integration
+- Click-to-copy WhatsApp number
 
 ---
 
-## 📁 Directory Structure
+## 🛠 Technology Stack
+
+- **Frontend:** HTML5, CSS3 (Bootstrap 5), JavaScript (ES6+)
+- **Backend:** Node.js, Express.js, MySQL
+- **Edge Computing:** Cloudflare Workers
+
+**Key Libraries:**
+
+- AOS (Animate On Scroll)
+- Google APIs (Calendar, Maps, reCAPTCHA v3)
+- JWT for authentication
+- Nodemailer for email services
+
+**Hosting:**
+
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** Aiven (MySQL)
+- **DNS/CDN:** Cloudflare
+
+---
+
+## 📂 Project Structure
 
 ```
-├── api/
-│   └── livestream.js              # Backend API route for livestream management
-├── kcmi-rcc-worker/
-│   ├── src/                       # Source code for the Cloudflare Worker
-│   ├── test/                      # Tests for the Cloudflare Worker
-│   └── ...                        # Other worker-related files (package.json, etc.)
-├── node_modules/                  # Node.js dependencies
-├── public/
-│   ├── admin/
-│   │   ├── index.html             # Admin dashboard UI
-│   │   └── js/
-│   │       └── admin.js           # Admin panel logic
-│   ├── assets/
-│   │   └── img/                   # Images and videos
-│   ├── css/
-│   │   ├── styles.css             # Main stylesheet
-│   │   ├── loading.css            # Homepage loading content stylesheet
-│   │   └── church-calendar.css    # Church events calendar styles
-│   ├── js/
-│   │   ├── scripts.js             # Main frontend JavaScript
-│   │   ├── loading.js             # Homepage loading content logic
-│   │   ├── church-calendar.js     # Main calendar logic
-│   │   ├── gapi-loader.js         # Google API initialization logic
-│   │   └── promos.js              # Church upcoming events logic (Google Drive integration)
-│   ├── about-apostle-aikins.html
-│   ├── contact-us.html
-│   ├── faqs.html
-│   ├── giving-kcmi.html
-│   ├── index.html                 # Homepage
-│   ├── livestream.html
-│   ├── location.html
-│   ├── mission-kcmi.html
-│   ├── sermons.html
-│   └── services.html
-├── server/
-│   ├── db.js                      # MySQL database connection
-│   ├── server.js                  # Main Node.js backend server
-│   └── certs/                     # Directory for SSL certificates
-└── .env.example                   # Sample env file (no secrets)
-└── README.md                      # Project documentation
+church_website/
+├── api/                # API endpoints
+│   └── livestream.js   # Livestream management API
+├── kcmi-rcc-worker/    # Cloudflare Worker
+│   ├── src/            # Worker source code
+│   └── test/           # Worker tests
+├── public/             # Frontend assets
+│   ├── admin/          # Admin panel
+│   ├── assets/         # Images and media
+│   ├── css/            # Stylesheets
+│   ├── js/             # JavaScript files
+│   └── *.html          # Website pages
+├── server/             # Backend server
+│   ├── db.js           # Database connection
+│   └── server.js       # Main server logic
+├── uploads/            # File upload directory
+└── .env.example        # Environment template
 ```
 
 ---
 
-## 🔍 Codebase Description
+## ⚙️ Setup Instructions
 
-### `api/livestream.js`
-
-Defines backend API routes for managing the livestream embed code. Handles fetching and updating the embed code, interacting with the MySQL database.
-
-### `public/admin/index.html`
-
-Provides the user interface for the admin panel, specifically for managing the livestream embed code.
-
-Key Features:
-
-- **Login Page**: Authentication for administrators.
-- **Livestream Management**: Form to manage embed code and live status.
-- **Authentication**: Validates tokens in localStorage.
-- **Styling**: Uses Bootstrap and custom CSS.
-
-### `public/admin/js/admin.js`
-
-Client-side functionality for the admin panel.
-
-Key Features:
-
-- **Livestream Embed Code Management**: Fetches and updates embed code.
-- **API Interaction**: Communicates with the backend API.
-- **Error Handling**: Displays user-friendly error messages.
-
-### `public/js/scripts.js`
-
-Main frontend logic for the website.
-
-Key Features:
-
-- **reCAPTCHA Initialization**
-- **Livestream Embed Code Management**
-- **Navbar Behavior**
-- **Smooth Scrolling**
-- **Dark Mode Toggle**
-
-### `server/server.js`
-
-Main entry point for the backend server.
-
-Key Features:
-
-- **API Server**
-- **Database Integration**
-- **Google API Integration**
-- **User Authentication**
-- **Email Handling**
-- **CORS Support**
-- **Error Handling**
-
----
-
-## ⚙️ Installation and Setup
-
-1. Clone the repository:
+1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/JosephTeteE/KCMI-Website.git
+   cd KCMI-Website
    ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 
    ```bash
    npm install
    ```
 
-3. Configure environment variables:
+3. **Configure environment:**
 
-   - Create a `.env` file using `.env.example` as a template.
-   - Add database credentials, JWT secret, email config, and reCAPTCHA keys.
+   - Copy `.env.example` to `.env`
+   - Fill in required credentials (database, email, reCAPTCHA)
 
-4. Configure Events Promos:
+4. **Database setup:**
 
-   - Create a JSON manifest file on Google Drive with event data.
-   - Update the `PROMO_SHEET_ID` constant in `public/js/promos.js`.
+   - Ensure MySQL database is configured with the provided schema
 
-5. Start the backend server:
+5. **Start development server:**
    ```bash
    node server/server.js
    ```
 
 ---
 
-## 📌 Security Notes
+## 🔒 Security & Maintenance
 
-- The `.env` file contains sensitive information (DB credentials, JWT secrets, etc.) — ensure it is **NOT** committed to version control.
-- Add `.env` to your `.gitignore` file.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to fork the repository and submit a pull request.
+- All sensitive credentials are stored in `.env` (excluded from version control)
+- API endpoints are protected with rate limiting
+- Admin panel requires JWT authentication
+- Regular backups of database and content are maintained
 
 ---
 
-## 📜 License
+## 📜 License & Usage
 
-This project is licensed under the MIT License.
-
----
-
-## 📈 Future Improvements
-
-- Add a blog section.
-- Implement search functionality.
-- Improve accessibility and ARIA support.
-- Optimize performance and loading speed.
-- Add a content management dashboard (CMS-style).
+This website and its codebase are property of Kingdom Covenant Ministries International. The code is provided for reference and maintenance purposes only. Unauthorized distribution or reuse is not permitted without explicit written consent from KCMI leadership.
 
 ---
 
 ## 🙏 Acknowledgements
 
-Thanks to all contributors, the KCMI media team, and the global developer community whose tools power this website.
+We gratefully acknowledge:
+
+- The KCMI media and leadership teams
+- Open source developers whose tools power this website
+- Volunteers who contributed to this project
+
+For questions about the website, please contact the KCMI administration.

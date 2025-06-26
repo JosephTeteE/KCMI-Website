@@ -23,3 +23,6 @@ kcmi-rcc-worker/.wrangler/
 
 # Multer uploads
 uploads/
+
+# Ignore the build directory
+internal-docs.md
