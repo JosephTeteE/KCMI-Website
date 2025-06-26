@@ -51,7 +51,11 @@ if (missingVars.length > 0) {
 // Allow requests from frontend domains. Crucial for security.
 // ==========================================================================
 const corsOptions = {
-  origin: ["https://www.kcmi-rcc.org", "https://kcmi-rcc.org"],
+  origin: [
+    "https://www.kcmi-rcc.org",
+    "https://kcmi-rcc.org",
+    "https://camp.kcmi-rcc.org",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
