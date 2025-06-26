@@ -1,21 +1,36 @@
 {
+  "redirects": [
+    {
+      "source": "/youth-camp.html",
+      "destination": "https://camp.kcmi-rcc.org",
+      "permanent": true
+    },
+    {
+      "source": "/camp/youth-camp.html",
+      "destination": "https://camp.kcmi-rcc.org",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "camp.kcmi-rcc.org"
         }
       ],
-      "destination": "/camp/$1"
-    }
-  ],
-  "redirects": [
+      "destination": "/camp/youth-camp.html"
+    },
     {
-      "source": "/youth-camp.html",
-      "destination": "https://camp.kcmi-rcc.org",
-      "permanent": true
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "camp.kcmi-rcc.org"
+        }
+      ],
+      "destination": "/camp/:path*"
     }
   ]
 }
