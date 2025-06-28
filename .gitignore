@@ -26,3 +26,8 @@ uploads/
 
 # Ignore the build directory
 internal-docs.md
+
+# Ignore build logs
+.vercel/
+.next/
+out/

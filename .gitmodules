@@ -1,0 +1,3 @@
+[submodule "camp-deploy"]
+	path = camp-deploy
+	url = https://github.com/JosephTeteE/kcmi-camp-temp.git
