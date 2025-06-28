@@ -223,73 +223,217 @@
         </div>
       </div>
     </nav>
-    <!-- Main Content -->
     <main>
-      <div class="container-lg pt-4 header-content">
-        <div class="row">
-          <!-- Giving Information Section -->
-          <div class="col-lg-6" data-aos="fade-right">
-            <h1 class="text-danger display-4 mt-2">Giving</h1>
-            <p>
-              Your giving is a reflection of your heart. It is an act of worship
-              and a way to honor God with your finances. Your generosity helps
-              us to reach more people with the message of hope and love.
+      <div class="container-lg py-4">
+        <div class="row mb-4">
+          <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold mb-3 giving-page-header">
+              Giving to KCMI
+            </h1>
+            <p class="lead">
+              Your giving is vital to the work we do at KCMI.
+              <br />
+              When you give, you are directly supporting us in sharing God's
+              message of love and hope.
+              <br />
+              Your financial partnership helps in many ways:
             </p>
-            <p>
-              We believe in the principle of sowing and reaping. When you give
-              generously, you will reap generously. Your giving is an investment
-              into the Kingdom of God and will yield a great harvest.
-            </p>
-            <p>
-              We encourage you to give cheerfully and with a heart of gratitude.
-              Your gift will make a difference in the lives of many people.
+            <ul class="lead">
+              <li>
+                General Ministry Work: This includes everything from our weekly
+                services and discipleship programs to community outreach and
+                administrative support that keeps the church running smoothly.
+              </li>
+              <li>
+                Care Groups' Charity Work: Through our "Care Groups," we are
+                able to extend a helping hand to those in need in our community,
+                providing assistance and showing God's love in tangible ways.
+              </li>
+            </ul>
+
+            <p class="lead">
+              Thank you for your generosity and partnership in advancing God's
+              Kingdom. May God bless you abundantly as you give!
+              <br />
+              Remember, your giving is an investment into the Kingdom of God and
+              will yield a great harvest.
             </p>
           </div>
-          <!-- Video Section -->
-          <div
-            class="col-lg-6 my-3 d-flex flex-column align-items-center"
-            data-aos="fade-left"
-          >
-            <div
-              id="video-container"
-              class="w-100 d-flex justify-content-center"
-            >
-              <!-- Video Element -->
-              <video
-                class="w-100"
-                id="my-video"
-                autoplay
-                loop
-                muted
-                playsinline
-                webkit-playsinline
-                preload="auto"
-                disablePictureInPicture
-                controlsList="nodownload nofullscreen noplaybackrate"
-                onloadeddata="this.play();"
-                poster="./assets/img/kcmi-giving-fallback-image.png"
-              >
-                <!-- Video Sources -->
-                <source src="./assets/img/giving-kcmi.webm" type="video/webm" />
-                <source src="./assets/img/giving-kcmi.MP4" type="video/mp4" />
-                <!-- Fallback Content for Unsupported Browsers -->
-                <div class="video-fallback">
-                  <p>Your browser does not support the video tag.</p>
-                  <img
-                    src="./assets/img/kcmi-giving-fallback-image.png"
-                    alt="Ecobank Account Details for KCMI Giving"
-                  />
-                  <br />
-                  <p>ACCOUNT NAME: KINGDOM COVENANT MINISTRIES INTERNATIONAL</p>
-                  <p>BANK NAME: ECOBANK</p>
+        </div>
+
+        <div class="row justify-content-center mb-4">
+          <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-3 giving-account-card">
+              <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center mb-4">
+                  <div class="giving-icon me-3">
+                    <i
+                      class="fas fa-hand-holding-heart fa-3x giving-text-primary"
+                    ></i>
+                  </div>
+                  <h2 class="mb-0 giving-card-header">General Giving</h2>
                 </div>
-              </video>
+                <p class="mb-4">
+                  For tithes, offerings, and seed gifts to support the general
+                  ministry work.
+                </p>
+
+                <div
+                  class="bg-light p-4 rounded-3 giving-bg-light giving-shadow-sm"
+                >
+                  <p class="mb-1 fw-bold">
+                    Account Name: KINGDOM COVENANT MINISTRIES INTERNATIONAL
+                  </p>
+                  <p class="mb-1 fw-bold">Bank Name: ECOBANK</p>
+                  <p class="mb-3 fw-bold">
+                    Account Number:
+                    <span
+                      id="generalAccountNumber"
+                      class="giving-account-number account-number-clickable"
+                      title="Click to copy"
+                    >
+                      1602002211 <i class="far fa-copy ms-2"></i>
+                    </span>
+                  </p>
+                  <div
+                    id="generalCopyConfirmation"
+                    class="text-success mt-2"
+                    style="display: none; font-size: 0.9em"
+                  >
+                    <i class="fas fa-check-circle me-1"></i> Copied
+                  </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                  <p class="mb-0">
+                    Please title your payment description accordingly.
+                  </p>
+                </div>
+              </div>
             </div>
-            <!-- Copy Account Number Link -->
-            <div class="text-center mt-3">
-              <a href="#" id="copy-link" data-account-number="1602002211"
-                >Click to Copy 1602002211</a
-              >
+          </div>
+        </div>
+
+        <div class="row justify-content-center mb-4">
+          <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-3 giving-account-card">
+              <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center mb-4">
+                  <div class="giving-icon me-3">
+                    <i
+                      class="fas fa-hands-helping fa-3x giving-text-primary"
+                    ></i>
+                  </div>
+                  <h2 class="mb-0 giving-card-header">Care Group Giving</h2>
+                </div>
+                <p class="mb-4">
+                  For welfare, prisoner, needy, and less-privileged support.
+                </p>
+
+                <div
+                  class="bg-light p-4 rounded-3 giving-bg-light giving-shadow-sm"
+                >
+                  <p class="mb-1 fw-bold">
+                    Account Name: KINGDOM COVENANT MINISTRIES INTERNATIONAL
+                  </p>
+                  <p class="mb-1 fw-bold">Bank Name: UNION BANK</p>
+                  <p class="mb-3 fw-bold">
+                    Account Number:
+                    <span
+                      id="careAccountNumber"
+                      class="giving-account-number account-number-clickable"
+                      title="Click to copy"
+                    >
+                      0055484937 <i class="far fa-copy ms-2"></i>
+                    </span>
+                  </p>
+                  <div
+                    id="careCopyConfirmation"
+                    class="text-success mt-2"
+                    style="display: none; font-size: 0.9em"
+                  >
+                    <i class="fas fa-check-circle me-1"></i> Copied
+                  </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                  <p class="mb-0">
+                    Please include "Care Group" in your payment description.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-center mb-4">
+          <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-3 giving-account-card">
+              <div class="card-body p-4 p-md-5">
+                <div class="d-flex align-items-center mb-4">
+                  <div class="giving-icon me-3">
+                    <i class="fas fa-globe fa-3x giving-text-primary"></i>
+                  </div>
+                  <h2 class="mb-0 giving-card-header">International Giving</h2>
+                </div>
+                <p class="mb-4">
+                  For donations in foreign currencies (USD, GBP, EUR) from
+                  outside Nigeria.
+                </p>
+
+                <div
+                  class="bg-light p-4 rounded-3 giving-bg-light giving-shadow-sm"
+                >
+                  <p class="mb-1 fw-bold">
+                    Account Name: KINGDOM COVENANT MINISTRIES INTERNATIONAL
+                  </p>
+                  <p class="mb-1 fw-bold">Bank Name: ZENITH BANK</p>
+                  <p class="mb-1 fw-bold">SWIFT CODE: ZEIBNGLA</p>
+                  <p class="mb-1 fw-bold">
+                    USD Account:
+                    <span
+                      id="usdAccountNumber"
+                      class="giving-account-number account-number-clickable"
+                      title="Click to copy"
+                    >
+                      5074346861 <i class="far fa-copy ms-2"></i>
+                    </span>
+                  </p>
+                  <p class="mb-1 fw-bold">
+                    GBP Account:
+                    <span
+                      id="gbpAccountNumber"
+                      class="giving-account-number account-number-clickable"
+                      title="Click to copy"
+                    >
+                      5061372275 <i class="far fa-copy ms-2"></i>
+                    </span>
+                  </p>
+                  <p class="mb-3 fw-bold">
+                    EUR Account:
+                    <span
+                      id="eurAccountNumber"
+                      class="giving-account-number account-number-clickable"
+                      title="Click to copy"
+                    >
+                      5081098025 <i class="far fa-copy ms-2"></i>
+                    </span>
+                  </p>
+                  <div
+                    id="internationalCopyConfirmation"
+                    class="text-success mt-2"
+                    style="display: none; font-size: 0.9em"
+                  >
+                    <i class="fas fa-check-circle me-1"></i> Copied
+                  </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                  <p class="mb-0">
+                    Please title your payment description accordingly.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -531,28 +675,96 @@
     <script src="./js/scripts.js" defer></script>
 
     <script>
-      // Handle video errors
-      const video = document.getElementById("my-video");
+      document.addEventListener("DOMContentLoaded", function () {
+        // Setup copy functionality for all account numbers
+        const setupCopyFunctionality = (spanElement, confirmationElement) => {
+          if (spanElement) {
+            spanElement.addEventListener("click", async function () {
+              const accountNumber = this.childNodes[0].textContent.trim();
 
-      video.addEventListener("error", (error) => {
-        console.error("Video error:", error);
-      });
+              try {
+                await navigator.clipboard.writeText(accountNumber);
+                console.log("Account number copied:", accountNumber);
 
-      // Copy account number to clipboard
-      document
-        .getElementById("copy-link")
-        .addEventListener("click", function (event) {
-          event.preventDefault();
-          const textToCopy = this.getAttribute("data-account-number");
-          navigator.clipboard.writeText(textToCopy).then(
-            () => {
-              alert("Account Number copied to clipboard!");
-            },
-            (err) => {
-              alert("Failed to copy text: " + err);
-            }
-          );
+                if (confirmationElement) {
+                  confirmationElement.style.display = "block";
+                  confirmationElement.style.animation =
+                    "fadeIn 0.3s ease-in-out";
+                }
+
+                const iconElement = spanElement.querySelector("i");
+                if (iconElement) {
+                  iconElement.classList.remove("fa-copy");
+                  iconElement.classList.add("fa-check-circle", "text-success");
+                }
+
+                setTimeout(() => {
+                  if (confirmationElement) {
+                    confirmationElement.style.display = "none";
+                  }
+                  if (iconElement) {
+                    iconElement.classList.remove(
+                      "fa-check-circle",
+                      "text-success"
+                    );
+                    iconElement.classList.add("fa-copy");
+                  }
+                }, 2000);
+              } catch (err) {
+                console.error("Failed to copy account number:", err);
+                const errorMsg = document.createElement("div");
+                errorMsg.className = "alert alert-danger mt-2";
+                errorMsg.style.fontSize = "0.9em";
+                errorMsg.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> Failed to copy. Please copy manually: ${accountNumber}`;
+                spanElement.parentNode.insertBefore(
+                  errorMsg,
+                  spanElement.nextSibling
+                );
+
+                setTimeout(() => {
+                  errorMsg.remove();
+                }, 5000);
+              }
+            });
+          }
+        };
+
+        // Set up all account number copy elements
+        const accountNumbers = [
+          {
+            element: document.getElementById("generalAccountNumber"),
+            confirmation: document.getElementById("generalCopyConfirmation"),
+          },
+          {
+            element: document.getElementById("usdAccountNumber"),
+            confirmation: document.getElementById(
+              "internationalCopyConfirmation"
+            ),
+          },
+          {
+            element: document.getElementById("gbpAccountNumber"),
+            confirmation: document.getElementById(
+              "internationalCopyConfirmation"
+            ),
+          },
+          {
+            element: document.getElementById("eurAccountNumber"),
+            confirmation: document.getElementById(
+              "internationalCopyConfirmation"
+            ),
+          },
+          {
+            element: document.getElementById("careAccountNumber"),
+            confirmation: document.getElementById("careCopyConfirmation"),
+          },
+        ];
+
+        accountNumbers.forEach(({ element, confirmation }) => {
+          if (element && confirmation) {
+            setupCopyFunctionality(element, confirmation);
+          }
         });
+      });
     </script>
   </body>
 </html>

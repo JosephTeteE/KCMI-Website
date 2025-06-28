@@ -1384,11 +1384,118 @@ body.navbar-open .homepage-header-video-container {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ## Styles for giving-kcmi Page  */
+/* Styles for giving-kcmi.html Page                                          */
 /* -------------------------------------------------------------------------- */
+
+/* General Page Styles */
 .giving-page main {
-  margin-top: 30px; /* Adjusted for the fixed navbar */
-  font-size: 1.4rem; /* Slightly reduced base font size */
+  margin-top: 20px;
+  font-size: 1.4rem;
+}
+
+.giving-page {
+  background-color: #f8f9fa;
+}
+
+.giving-page main {
+  padding-top: 25px;
+}
+
+.giving-page .lead {
+  text-align: left;
+  font-size: 1.4rem;
+}
+
+/* Header Styles */
+.giving-page-header {
+  color: #7c1963;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Styles */
+.giving-account-card {
+  border-top: 4px solid #7c1963;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.giving-account-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.giving-card-header {
+  color: #7c1963;
+  font-weight: 600;
+}
+
+/* Icon Styles */
+.giving-icon {
+  animation: pulse 2s infinite;
+}
+
+/* Account Number Styles */
+.giving-account-number {
+  color: #7c1963;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.giving-account-number:hover {
+  color: #9a3d81;
+  text-decoration: underline;
+}
+
+.giving-account-number::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #7c1963;
+  transition: width 0.3s ease;
+}
+
+.giving-account-number:hover::after {
+  width: 100%;
+}
+
+/* Utility Classes */
+.giving-text-primary {
+  color: #7c1963 !important;
+}
+
+.giving-bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.giving-shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .giving-page-header {
+    font-size: 2rem;
+  }
+
+  .giving-icon {
+    font-size: 2rem;
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1617,6 +1724,40 @@ body.navbar-open .homepage-header-video-container {
 [data-bs-theme="dark"] .modal-header,
 [data-bs-theme="dark"] .modal-footer {
   border-color: #444; /* Darker border for modal header/footer */
+}
+
+/* Dark Mode Styles for giving-kcmi.html Page */
+[data-bs-theme="dark"] .giving-page {
+  background-color: #121212;
+}
+
+[data-bs-theme="dark"] .giving-card-header,
+[data-bs-theme="dark"] .giving-text-primary {
+  color: #c298b7 !important;
+}
+
+[data-bs-theme="dark"] .giving-account-number {
+  color: #c298b7;
+}
+
+[data-bs-theme="dark"] .giving-account-number:hover {
+  color: #d8b3cc;
+}
+
+[data-bs-theme="dark"] .giving-account-number::after {
+  background-color: #c298b7;
+}
+
+[data-bs-theme="dark"] .giving-bg-light {
+  background-color: #1e1e1e !important;
+}
+
+[data-bs-theme="dark"] .giving-shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .giving-account-card {
+  border-top-color: #9a3d81;
 }
 
 [data-bs-theme="dark"] .accordion-button {

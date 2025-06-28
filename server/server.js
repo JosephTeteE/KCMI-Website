@@ -861,6 +861,17 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
+// Health Check Endpoint
+if (process.env.ENABLE_PING_ROUTE === "true") {
+  app.get("/ping", (req, res) => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Ping received at", new Date().toISOString());
+    }
+    res.send("pong");
+  });
+}
+
+// Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // ==========================================================================
