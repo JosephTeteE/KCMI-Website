@@ -10,27 +10,5 @@
       "destination": "https://camp.kcmi-rcc.org",
       "permanent": true
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "camp.kcmi-rcc.org"
-        }
-      ],
-      "destination": "/camp/youth-camp.html"
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "camp.kcmi-rcc.org"
-        }
-      ],
-      "destination": "/camp/:path*"
-    }
   ]
 }
