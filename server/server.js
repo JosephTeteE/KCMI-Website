@@ -477,6 +477,12 @@ app.get("/api/sheets-events", async (req, res) => {
       const row = rows[i];
       if (!row[0]) continue; // Skip empty rows
 
+      // --- DATE-BASED FILTERING ---
+      const today = new Date();
+      const eventEndDate = row[5] ? new Date(row[5]) : new Date(row[4]);
+      if (isNaN(eventEndDate.getTime())) continue; // skip invalid dates
+      if (eventEndDate < today.setHours(0, 0, 0, 0)) continue; // skip stale
+
       // Build times object from time columns
       const times = {};
       if (row[6] && row[6].toLowerCase() === "yes") {
@@ -861,7 +867,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-// Health Check Endpoint
+// Health Check Endpoint for server
 if (process.env.ENABLE_PING_ROUTE === "true") {
   app.get("/ping", (req, res) => {
     if (process.env.NODE_ENV !== "production") {
@@ -870,6 +876,19 @@ if (process.env.ENABLE_PING_ROUTE === "true") {
     res.send("pong");
   });
 }
+
+// DB Keep-Alive Ping (to prevent Aiven service sleep due to free-tier limitations)
+app.get("/api/db-keepalive", async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    await connection.query("SELECT 1"); // lightweight ping
+    connection.release();
+    res.json({ success: true, message: "DB keep-alive success" });
+  } catch (error) {
+    console.error("DB keep-alive failed:", error);
+    res.status(500).json({ success: false, message: "DB keep-alive error" });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
