@@ -68,22 +68,34 @@ function renderEvents(events) {
   const container = document.getElementById("promos-container");
   const gridContainer = container.querySelector(".promos-grid");
 
-  if (!events || events.length === 0) {
-    gridContainer.innerHTML = noEventsHTML(); // Show "no events" message if no events exist
+  // Filter out old events based on current date
+  const today = new Date();
+  const upcomingEvents = events.filter((event) => {
+    const endDate = event.endDate
+      ? new Date(event.endDate)
+      : new Date(event.date);
+    // Only include events that are today or in the future
+    return endDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0);
+  });
+
+  // Handle empty list (all filtered out or none in sheet)
+  if (!upcomingEvents || upcomingEvents.length === 0) {
+    gridContainer.innerHTML = noEventsHTML();
+    document.querySelector(".carousel-nav").style.display = "none";
     return;
   }
 
-  // Adjust layout for single or multiple events
-  container.classList.toggle("single-event", events.length === 1);
+  // Adjust layout for single/multiple
+  container.classList.toggle("single-event", upcomingEvents.length === 1);
   document.querySelector(".carousel-nav").style.display =
-    events.length > 1 ? "flex" : "none";
+    upcomingEvents.length > 1 ? "flex" : "none";
 
-  // Render event cards
-  gridContainer.innerHTML = events
+  // Render all valid cards
+  gridContainer.innerHTML = upcomingEvents
     .map((event) => createEventCard(event))
     .join("");
 
-  if (events.length > 1) initCarousel(); // Initialize carousel for multiple events
+  if (upcomingEvents.length > 1) initCarousel();
 }
 
 // HTML for "no events" message
