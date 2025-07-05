@@ -278,7 +278,7 @@ function createContactHTML(event) {
 // Utility functions for URLs, formatting, and escaping HTML
 function getFileUrl(event) {
   if (event.type === "youth-camp") {
-    return "youth-camp.html";
+    return "camp.kcmi-rcc.org";
   }
   if (event.type === "video") {
     return `https://drive.google.com/file/d/${event.fileId}/preview`;
