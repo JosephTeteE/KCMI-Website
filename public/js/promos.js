@@ -1,125 +1,198 @@
 // public/js/promos.js
-// This script handles the loading and rendering of promotional events from a Google Sheet.
-// It includes caching, error handling, responsive design features, and video modal functionality.
+// Handles loading, caching, and displaying promotional events from a Google Sheet
+// This script fetches event data from a Google Sheet, caches it, and displays it in a responsive grid.
+// It also handles video playback in a modal and provides a carousel for multiple events.
 
-// Constants
-const PROMO_SHEET_ID = "1RCk_BhG_uv791dIVUmLHxhW4Ok0hPfvXLNp3QFUiaQo"; // Google Sheet ID for fetching events
-const CACHE_KEY = "kcmi_events_cache"; // Local storage key for caching events
+// ======================
+// CONSTANTS & CONFIG
+// ======================
+const PROMO_SHEET_ID = "1RCk_BhG_uv791dIVUmLHxhW4Ok0hPfvXLNp3QFUiaQo"; // Google Sheet ID
+const CACHE_KEY = "kcmi_events_cache"; // LocalStorage key for cached data
 const CACHE_TTL = 30 * 60 * 1000; // Cache time-to-live (30 minutes)
 
-// Main loading function
+// ======================
+// CORE DATA FUNCTIONS
+// ======================
+
+/**
+ * Main function to load promotional events
+ * Checks cache first, then fetches fresh data if needed
+ */
 async function loadPromos() {
   try {
-    const cachedData = getCachedPromos(); // Check if cached data exists
-    if (cachedData) {
-      renderEvents(cachedData); // Render cached events
-      setTimeout(fetchAndCachePromos, 1000); // Refresh data in the background
-      return;
-    }
-    await fetchAndCachePromos(); // Fetch and cache promos if no cached data
-  } catch (error) {
-    console.error("Promos loading error:", error);
+    // Try to get cached data first for instant load
     const cachedData = getCachedPromos();
     if (cachedData) {
-      renderEvents(cachedData); // Fallback to cached data on error
-    } else {
-      showErrorUI(); // Show error UI if no cached data is available
+      renderEvents(transformData(cachedData));
+      // Fetch fresh data in background for next time
+      setTimeout(fetchAndCachePromos, 1000);
+      return;
     }
+    // No cache available, fetch fresh data
+    await fetchAndCachePromos();
+  } catch (error) {
+    console.error("Promos loading error:", error);
+    // Fallback to cache if available, even if stale
+    const cachedData = getCachedPromos();
+    if (cachedData) renderEvents(transformData(cachedData));
+    else showErrorUI(); // Show error if no data available
   }
 }
 
-// Fetch events from the backend and cache them
+/**
+ * Fetches event data from backend API and caches it
+ */
 async function fetchAndCachePromos() {
   const response = await fetch(
     `https://kcmi-backend.onrender.com/api/sheets-events?id=${PROMO_SHEET_ID}`
   );
-  if (!response.ok) throw new Error("Network error");
-  const events = await response.json();
-  cachePromos(events); // Cache the fetched events
-  renderEvents(events); // Render the fetched events
+  if (!response.ok) throw new Error("Network error while fetching promos.");
+  const rawData = await response.json();
+  // Store in cache with timestamp
+  localStorage.setItem(
+    CACHE_KEY,
+    JSON.stringify({ data: rawData, timestamp: Date.now() })
+  );
+  renderEvents(transformData(rawData));
 }
 
-// Retrieve cached events from local storage
+/**
+ * Retrieves cached event data if valid
+ * @returns {Array|null} Cached data or null if invalid/expired
+ */
 function getCachedPromos() {
   const cached = localStorage.getItem(CACHE_KEY);
   if (!cached) return null;
   try {
     const { data, timestamp } = JSON.parse(cached);
-    if (Date.now() - timestamp < CACHE_TTL) return data; // Check if cache is still valid
+    // Return data only if within TTL
+    if (Date.now() - timestamp < CACHE_TTL) return data;
   } catch (e) {
     console.warn("Cache parse error:", e);
   }
   return null;
 }
 
-// Cache events in local storage
-function cachePromos(data) {
-  localStorage.setItem(
-    CACHE_KEY,
-    JSON.stringify({
-      data,
-      timestamp: Date.now(),
-    })
-  );
+// ======================
+// DATA TRANSFORMATION
+// ======================
+
+/**
+ * Transforms raw sheet data into structured event objects
+ * @param {Array} rawData - Raw data from Google Sheet
+ * @returns {Array} Structured event objects
+ */
+function transformData(rawData) {
+  return rawData.map((row) => {
+    // Extract video ID and source type from media link
+    const { id, source } = extractMediaInfo(row["Media Link"] || "");
+
+    // Process time information
+    const times = {};
+    if (row["All Day"] === "TRUE" || row["All Day"] === true)
+      times.allday = true;
+    if (row["Morning Time"]) times.morning = row["Morning Time"];
+    if (row["Afternoon Time"]) times.afternoon = row["Afternoon Time"];
+    if (row["Evening Time"]) times.evening = row["Evening Time"];
+
+    // Process contact information
+    const contact = {};
+    if (row["Contact Details"]) contact.details = row["Contact Details"];
+    if (row["Contact Instructions"])
+      contact.instructions = row["Contact Instructions"];
+
+    return {
+      title: row["Event Title"],
+      type: row["Event Type"], // Video, Image, PDF
+      fileId: id,
+      videoSource: source, // 'youtube' or 'drive'
+      description: row["Description"],
+      date: row["Start Date"],
+      endDate: row["End Date"],
+      location: row["Location"],
+      notes: row["Notes"],
+      buttonText: row["Button Text"],
+      buttonLink: row["Button Link"],
+      times: Object.keys(times).length > 0 ? times : null,
+      contact: Object.keys(contact).length > 0 ? contact : null,
+    };
+  });
 }
 
-// Render events in the UI
+/**
+ * Extracts media ID and source from URL
+ * @param {string} url - Media URL
+ * @returns {Object} Contains id and source (youtube/drive)
+ */
+function extractMediaInfo(url) {
+  if (!url) return { id: null, source: null };
+
+  // YouTube URL patterns
+  const youtubeRegex =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  // Google Drive URL patterns
+  const driveRegex = /drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/;
+
+  const youtubeMatch = url.match(youtubeRegex);
+  if (youtubeMatch) return { id: youtubeMatch[1], source: "youtube" };
+
+  const driveMatch = url.match(driveRegex);
+  if (driveMatch) return { id: driveMatch[1], source: "drive" };
+
+  // Fallback for just pasting an ID
+  return { id: url, source: "drive" };
+}
+
+// ======================
+// UI RENDERING
+// ======================
+
+/**
+ * Renders events in the UI
+ * @param {Array} events - Array of event objects
+ */
 function renderEvents(events) {
   const container = document.getElementById("promos-container");
   const gridContainer = container.querySelector(".promos-grid");
-
-  // Filter out old events based on current date
   const today = new Date();
+
+  // Filter out past events
   const upcomingEvents = events.filter((event) => {
+    if (!event.date) return false;
     const endDate = event.endDate
       ? new Date(event.endDate)
       : new Date(event.date);
-    // Only include events that are today or in the future
     return endDate.setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0);
   });
 
-  // Handle empty list (all filtered out or none in sheet)
-  if (!upcomingEvents || upcomingEvents.length === 0) {
-    gridContainer.innerHTML = noEventsHTML();
+  // Handle no events case
+  if (upcomingEvents.length === 0) {
+    gridContainer.innerHTML = `<div class="col-12 text-center"><p class="text-muted">No upcoming events scheduled. Check back soon!</p></div>`;
     document.querySelector(".carousel-nav").style.display = "none";
     return;
   }
 
-  // Adjust layout for single/multiple
+  // Adjust UI based on number of events
   container.classList.toggle("single-event", upcomingEvents.length === 1);
   document.querySelector(".carousel-nav").style.display =
     upcomingEvents.length > 1 ? "flex" : "none";
 
-  // Render all valid cards
-  gridContainer.innerHTML = upcomingEvents
-    .map((event) => createEventCard(event))
-    .join("");
+  // Create and insert event cards
+  gridContainer.innerHTML = upcomingEvents.map(createEventCard).join("");
 
+  // Initialize carousel if multiple events
   if (upcomingEvents.length > 1) initCarousel();
 }
 
-// HTML for "no events" message
-function noEventsHTML() {
-  return `
-    <div class="col-12 text-center">
-      <p class="text-muted">No upcoming events scheduled.</p>
-      <p>Check back soon for updates!</p>
-    </div>`;
-}
-
-// Updated createEventCard function
+/**
+ * Creates HTML for an event card
+ * @param {Object} event - Event data
+ * @returns {string} HTML string for the card
+ */
 function createEventCard(event) {
-  const mediaHTML = createMediaHTML(event);
-  const dateHTML = createDateHTML(event);
-  const timeHTML = createTimeHTML(event);
-  const contactHTML = createContactHTML(event);
-
-  // Determine action buttons based on event type
-  const actionButtonsHTML = getActionButtons(event);
-
   return `
     <div class="promo-card">
-      ${mediaHTML}
+      ${createMediaHTML(event)}
       <div class="promo-content">
         <h3 class="event-title">${escapeHtml(event.title)}</h3>
         ${
@@ -130,173 +203,185 @@ function createEventCard(event) {
             : ""
         }
         <div class="event-details">
-          ${dateHTML}
-          ${timeHTML}
+          ${createDateHTML(event)}
+          ${createTimeHTML(event)}
           ${
             event.location
-              ? `<div class="event-location">
-                  <i class="fas fa-map-marker-alt"></i>
-                  <span>${escapeHtml(event.location)}</span>
-                </div>`
+              ? `<div class="event-location"><i class="fas fa-map-marker-alt"></i><span>${escapeHtml(
+                  event.location
+                )}</span></div>`
               : ""
           }
-          ${contactHTML}
+          ${createContactHTML(event)}
         </div>
-        <div class="text-center mt-2">
-          ${actionButtonsHTML}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// New getActionButtons function
-function getActionButtons(event) {
-  if (event.type === "youth-camp") {
-    return `
-      <a href="https://camp.kcmi-rcc.org" class="btn btn-primary" target="_blank">
-        Register Now!
-      </a>
-    `;
-  }
-
-  if (event.type === "youtube-video" || event.type === "drive-video") {
-    return `
-      <div class="d-flex gap-2 justify-content-center flex-wrap">
-        <button class="btn btn-primary watch-video-btn" 
-                data-video-id="${event.fileId}" 
-                data-video-type="${event.type}">
-          Watch Video
-        </button>
+        <div class="text-center mt-2">${getActionButtons(event)}</div>
         ${
-          event.type === "youtube-video"
-            ? `
-          <a href="https://www.youtube.com/watch?v=${event.fileId}" 
-             class="btn btn-outline-primary" 
-             target="_blank">
-            Open in YouTube
-          </a>
-        `
+          event.notes
+            ? `<p class="event-notes small text-muted mt-3">${escapeHtml(
+                event.notes
+              )}</p>`
             : ""
         }
       </div>
-    `;
-  }
-
-  // Default button for other types
-  return `
-    <a href="${getFileUrl(event)}" class="btn btn-primary" target="_blank">
-      ${getActionText(event.type)}
-    </a>
-  `;
+    </div>`;
 }
 
-// Updated createMediaHTML function
+/**
+ * Generates action buttons based on event type
+ * @param {Object} event - Event data
+ * @returns {string} HTML for buttons
+ */
+function getActionButtons(event) {
+  let buttonsHTML = "";
+
+  // Video events get a play button
+  if (event.type === "Video") {
+    buttonsHTML += `
+      <button class="btn btn-primary watch-video-btn" data-video-id="${event.fileId}" data-video-source="${event.videoSource}">
+        <i class="fas fa-play me-2"></i>Watch Promo
+      </button>`;
+  }
+
+  // Custom button if provided
+  if (event.buttonLink && event.buttonText) {
+    buttonsHTML += `
+      <a href="${
+        event.buttonLink
+      }" class="btn btn-outline-primary" target="_blank" rel="noopener">
+        ${escapeHtml(event.buttonText)}
+      </a>`;
+  }
+
+  // Default view button for non-video media
+  if (buttonsHTML === "" && event.fileId) {
+    buttonsHTML = `<a href="https://drive.google.com/file/d/${
+      event.fileId
+    }/view" class="btn btn-primary" target="_blank" rel="noopener">View ${escapeHtml(
+      event.type
+    )}</a>`;
+  }
+
+  return `<div class="d-flex gap-2 justify-content-center flex-wrap">${buttonsHTML}</div>`;
+}
+
+/**
+ * Creates HTML for event media (video/image)
+ * @param {Object} event - Event data
+ * @returns {string} HTML for media element
+ */
 function createMediaHTML(event) {
-  // Handle YouTube videos
-  if (event.type === "youtube-video") {
-    const thumbnail = `https://img.youtube.com/vi/${event.fileId}/hqdefault.jpg`;
-    return `
-      <div class="video-thumbnail-container">
-        <img src="${thumbnail}" 
-             alt="${escapeHtml(event.title)}" 
-             loading="lazy"
-             class="video-thumbnail">
-        <div class="play-button-overlay" 
-             data-video-id="${event.fileId}"
-             data-video-type="youtube-video">
-          <i class="fas fa-play"></i>
-        </div>
-      </div>
-    `;
+  // Handle video thumbnails
+  if (event.type === "Video" && event.fileId) {
+    const thumbnail =
+      event.videoSource === "youtube"
+        ? `https://img.youtube.com/vi/${event.fileId}/hqdefault.jpg`
+        : `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w500`;
+    return `<div class="video-thumbnail-container play-button-overlay" data-video-id="${
+      event.fileId
+    }" data-video-source="${
+      event.videoSource
+    }"><img src="${thumbnail}" alt="${escapeHtml(
+      event.title
+    )}" loading="lazy" class="video-thumbnail"><i class="fas fa-play"></i></div>`;
   }
 
-  // Handle Google Drive videos
-  if (event.type === "drive-video") {
-    const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w500`;
-    return `
-      <div class="video-thumbnail-container">
-        <img src="${thumbnail}" 
-             alt="${escapeHtml(event.title)}" 
-             loading="lazy"
-             class="video-thumbnail">
-        <div class="play-button-overlay" 
-             data-video-id="${event.fileId}"
-             data-video-type="drive-video">
-          <i class="fas fa-play"></i>
-        </div>
-      </div>
-    `;
+  // Handle images and PDFs
+  if (event.type === "Image" || event.type === "PDF") {
+    const link = `https://drive.google.com/file/d/${event.fileId}/view`;
+    const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
+    return `<a href="${link}" target="_blank" rel="noopener"><img src="${thumbnail}" alt="${escapeHtml(
+      event.title
+    )}" loading="lazy"></a>`;
   }
 
-  // Handle images and other types
-  const url = getFileUrl(event);
-  const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w500`;
-
-  if (event.type === "video") {
-    return `
-      <div class="video-container">
-        <iframe src="${url}" frameborder="0" allowfullscreen></iframe>
-      </div>
-    `;
-  }
-
-  return `
-    <a href="${url}" target="_blank" rel="noopener noreferrer">
-      <img src="${thumbnail}" alt="${escapeHtml(event.title)}" loading="lazy">
-    </a>
-  `;
+  return "";
 }
 
-// Create date section
+// ======================
+// DETAILS COMPONENTS
+// ======================
+
+/**
+ * Creates HTML for contact information
+ * @param {Object} event - Event data
+ * @returns {string} HTML for contact section
+ */
+function createContactHTML(event) {
+  if (!event.contact?.details) return "";
+
+  let contactContent;
+  const details = event.contact.details;
+
+  // Detect email
+  if (details.includes("@")) {
+    contactContent = `<a href="mailto:${details}">${escapeHtml(details)}</a>`;
+  }
+  // Detect phone number
+  else if (/\d/.test(details)) {
+    contactContent = `<a href="tel:${details.replace(/\s/g, "")}">${escapeHtml(
+      details
+    )}</a>`;
+  }
+  // Plain text fallback
+  else {
+    contactContent = `<span>${escapeHtml(details)}</span>`;
+  }
+
+  return `<div class="event-contact"><i class="fas fa-info-circle"></i>${contactContent}${
+    event.contact.instructions
+      ? `<span class="contact-instructions">(${escapeHtml(
+          event.contact.instructions
+        )})</span>`
+      : ""
+  }</div>`;
+}
+
+/**
+ * Creates HTML for date display
+ * @param {Object} event - Event data
+ * @returns {string} HTML for date section
+ */
 function createDateHTML(event) {
   if (!event.date) return "";
   const start = new Date(event.date);
   const end = event.endDate ? new Date(event.endDate) : start;
-  const isSameDay = start.toDateString() === end.toDateString();
+  if (isNaN(start)) return "";
 
-  if (!event.endDate || isSameDay) {
-    return `
-      <div class="promo-date">
-        <i class="fas fa-calendar-alt"></i>
-        ${start.toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </div>
-    `;
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  };
+
+  // Single day event
+  if (start.toDateString() === end.toDateString()) {
+    return `<div class="promo-date"><i class="fas fa-calendar-alt"></i> ${start.toLocaleDateString(
+      undefined,
+      options
+    )}</div>`;
   }
 
-  return `
-    <div class="promo-date">
-      <i class="fas fa-calendar-alt"></i>
-      ${start.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-      })} - 
-      ${end.toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })}
-    </div>
-  `;
+  // Multi-day event
+  return `<div class="promo-date"><i class="fas fa-calendar-alt"></i> ${start.toLocaleDateString(
+    undefined,
+    { ...options, month: "short" }
+  )} - ${end.toLocaleDateString(undefined, options)}</div>`;
 }
 
-// Create time section
+/**
+ * Creates HTML for time display
+ * @param {Object} event - Event data
+ * @returns {string} HTML for time section
+ */
 function createTimeHTML(event) {
   if (!event.times) return "";
 
-  if (event.times.allday) {
-    return `
-      <div class="event-time">
-        <i class="fas fa-clock"></i>
-        <span>All Day Event</span>
-      </div>
-    `;
-  }
+  // All day event
+  if (event.times.allday)
+    return `<div class="event-time"><i class="fas fa-clock"></i><span>All Day Event</span></div>`;
 
+  // Multiple time slots
   const timeSlots = [];
   if (event.times.morning) timeSlots.push(`Morning: ${event.times.morning}`);
   if (event.times.afternoon)
@@ -305,226 +390,147 @@ function createTimeHTML(event) {
 
   if (timeSlots.length === 0) return "";
 
-  if (timeSlots.length === 1) {
-    return `
-      <div class="event-time">
-        <i class="fas fa-clock"></i>
-        <span>${timeSlots[0].split(": ")[1]}</span>
-      </div>
-    `;
-  }
+  // Single time slot
+  if (timeSlots.length === 1)
+    return `<div class="event-time"><i class="fas fa-clock"></i><span>${
+      timeSlots[0].split(": ")[1]
+    }</span></div>`;
 
-  return `
-    <div class="event-times">
-      <i class="fas fa-clock"></i>
-      <div class="time-slots">
-        ${timeSlots
-          .map(
-            (slot) => `
-          <div class="time-slot">
-            <span class="session-name">${slot.split(":")[0]}:</span>
-            <span class="session-time">${slot.split(": ")[1]}</span>
-          </div>
-        `
-          )
-          .join("")}
-      </div>
-    </div>
-  `;
+  // Multiple time slots
+  return `<div class="event-times"><i class="fas fa-clock"></i><div class="time-slots">${timeSlots
+    .map(
+      (slot) =>
+        `<div class="time-slot"><span class="session-name">${
+          slot.split(":")[0]
+        }:</span><span class="session-time">${slot.split(": ")[1]}</span></div>`
+    )
+    .join("")}</div></div>`;
 }
 
-// Create contact section
-function createContactHTML(event) {
-  if (!event.contact?.number) return "";
-
-  return `
-    <div class="event-contact">
-      <i class="fas fa-phone"></i>
-      <a href="tel:${event.contact.number.replace(/\D/g, "")}">
-        ${formatPhoneNumber(event.contact.number)}
-      </a>
-      ${
-        event.contact.instructions
-          ? `<span class="contact-instructions">
-              (${escapeHtml(event.contact.instructions)})
-            </span>`
-          : ""
-      }
-    </div>
-  `;
-}
-
-// Utility functions for URLs, formatting, and escaping HTML
-function getFileUrl(event) {
-  if (event.type === "youth-camp") {
-    return "https://camp.kcmi-rcc.org";
-  }
-  if (event.type === "youtube-video") {
-    return `https://www.youtube.com/watch?v=${event.fileId}`;
-  }
-  if (event.type === "drive-video") {
-    return `https://drive.google.com/file/d/${event.fileId}/view`;
-  }
-  if (event.type === "video") {
-    return `https://drive.google.com/file/d/${event.fileId}/preview`;
-  }
-  return `https://drive.google.com/file/d/${event.fileId}/view`;
-}
-
-function getActionText(type) {
-  switch (type) {
-    case "video":
-    case "youtube-video":
-    case "drive-video":
-      return "Watch Video";
-    case "image":
-      return "View Image";
-    case "youth-camp":
-      return "Register Now!";
-    default:
-      return "View Details";
-  }
-}
-
-function formatPhoneNumber(number) {
-  if (!number) return "";
-  const cleaned = number.replace(/\D/g, "");
-  if (cleaned.length === 11 && cleaned.startsWith("0")) {
-    return cleaned.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3");
-  }
-  return number;
-}
-
+/**
+ * Escapes HTML special characters to prevent XSS
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
 function escapeHtml(text) {
-  if (typeof text !== "string") return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return text ? text.replace(/[&<>"']/g, (m) => map[m]) : "";
 }
 
-// Show error UI when events fail to load
+/**
+ * Shows error message when data fails to load
+ */
 function showErrorUI() {
   const container = document.getElementById("promos-container");
-  container.innerHTML = `
-    <div class="col-12 text-center">
-      <p class="text-danger">We're having trouble loading events.</p>
-      <p>Please try again later.</p>
-    </div>`;
+  if (container)
+    container.innerHTML = `<div class="col-12 text-center text-danger"><p>We're having trouble loading events. Please try again later.</p></div>`;
 }
 
-// Initialize carousel navigation for multiple events
-function initCarousel() {
-  const promosGrid = document.querySelector(".promos-grid");
-  const prevBtn = document.getElementById("prevPromo");
-  const nextBtn = document.getElementById("nextPromo");
+// ======================
+// MODAL & CAROUSEL
+// ======================
 
-  if (!promosGrid || !prevBtn || !nextBtn) return;
-
-  let currentIndex = 0;
-  const promoCards = document.querySelectorAll(".promo-card");
-  if (promoCards.length <= 1) return;
-
-  // Calculate how many cards are visible based on screen size
-  function getVisibleCards() {
-    if (window.innerWidth < 576) return 1;
-    if (window.innerWidth < 768) return 2;
-    return 3;
-  }
-
-  // Update the carousel position and button states
-  function updateCarousel() {
-    const visibleCards = getVisibleCards();
-    const cardWidth = promoCards[0].offsetWidth + 16; // card width + gap
-    promosGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-
-    prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex >= promoCards.length - visibleCards;
-  }
-
-  prevBtn.addEventListener("click", () => {
-    if (currentIndex > 0) {
-      currentIndex--;
-      updateCarousel();
-    }
-  });
-
-  nextBtn.addEventListener("click", () => {
-    const visibleCards = getVisibleCards();
-    if (currentIndex < promoCards.length - visibleCards) {
-      currentIndex++;
-      updateCarousel();
-    }
-  });
-
-  // Recalculate on resize
-  let resizeTimeout;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(updateCarousel, 200);
-  });
-
-  updateCarousel(); // Initial setup
-}
-
-// Setup video modal functionality
+/**
+ * Sets up video modal for playing videos
+ */
 function setupVideoModal() {
   const videoModalEl = document.getElementById("videoModal");
   if (!videoModalEl) return;
 
   const videoModal = new bootstrap.Modal(videoModalEl);
-  const videoModalFrame = document.getElementById("videoModalFrame");
-  const videoModalTitle = document.getElementById("videoModalTitle");
+  const frame = document.getElementById("videoModalFrame");
+  const title = document.getElementById("videoModalTitle");
 
-  document.addEventListener("click", function (e) {
-    const target = e.target;
-    // Handle watch video button clicks
-    const watchBtn = target.closest(".watch-video-btn");
-    if (watchBtn) {
+  // Handle play button clicks
+  document.addEventListener("click", (e) => {
+    const playBtn = e.target.closest(".play-button-overlay, .watch-video-btn");
+    if (playBtn) {
       e.preventDefault();
-      const videoId = watchBtn.dataset.videoId;
-      const videoType = watchBtn.dataset.videoType;
-      const title = watchBtn
-        .closest(".promo-card")
-        .querySelector(".event-title").textContent;
-      playVideo(videoId, videoType, title);
-    }
+      const { videoId, videoSource } = playBtn.dataset;
+      if (frame && title) {
+        // Set modal title from event card
+        title.textContent =
+          playBtn.closest(".promo-card")?.querySelector(".event-title")
+            ?.textContent || "Video Promo";
 
-    // Handle play button overlay clicks
-    const playOverlay = target.closest(".play-button-overlay");
-    if (playOverlay) {
-      e.preventDefault();
-      const videoId = playOverlay.dataset.videoId;
-      const videoType = playOverlay.dataset.videoType;
-      const title = playOverlay
-        .closest(".promo-card")
-        .querySelector(".event-title").textContent;
-      playVideo(videoId, videoType, title);
+        // Set appropriate video source
+        frame.src =
+          videoSource === "youtube"
+            ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
+            : `https://drive.google.com/file/d/${videoId}/preview?autoplay=1`;
+        videoModal.show();
+      }
     }
   });
 
-  function playVideo(videoId, videoType, title) {
-    if (!videoModalFrame || !videoModalTitle) return;
-
-    videoModalTitle.textContent = title || "Video";
-
-    if (videoType === "youtube-video") {
-      videoModalFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-    } else if (videoType === "drive-video") {
-      videoModalFrame.src = `https://drive.google.com/file/d/${videoId}/preview`;
-    }
-
-    videoModal.show();
-  }
-
-  // Reset iframe when modal is closed to stop video playback
-  videoModalEl.addEventListener("hidden.bs.modal", function () {
-    if (videoModalFrame) {
-      videoModalFrame.src = "";
-    }
+  // Clear video when modal closes
+  videoModalEl.addEventListener("hidden.bs.modal", () => {
+    if (frame) frame.src = "";
   });
 }
 
-// Initialize the scripts when DOM is ready
+/**
+ * Initializes event carousel navigation
+ */
+function initCarousel() {
+  const grid = document.querySelector(".promos-grid"),
+    prev = document.getElementById("prevPromo"),
+    next = document.getElementById("nextPromo");
+  if (!grid || !prev || !next) return;
+
+  let index = 0;
+  const cards = grid.querySelectorAll(".promo-card");
+
+  // Hide nav if only one card
+  if (cards.length <= 1) {
+    prev.style.display = "none";
+    next.style.display = "none";
+    return;
+  }
+
+  // Update carousel position
+  const update = () => {
+    const visible =
+      window.innerWidth < 768 ? 1 : window.innerWidth < 992 ? 2 : 3;
+    const cardWidth = cards[0].offsetWidth + 16;
+    grid.style.transform = `translateX(-${index * cardWidth}px)`;
+    prev.disabled = index === 0;
+    next.disabled = index >= cards.length - visible;
+  };
+
+  // Navigation handlers
+  prev.addEventListener("click", () => {
+    if (index > 0) {
+      index--;
+      update();
+    }
+  });
+
+  next.addEventListener("click", () => {
+    const visible =
+      window.innerWidth < 768 ? 1 : window.innerWidth < 992 ? 2 : 3;
+    if (index < cards.length - visible) {
+      index++;
+      update();
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener("resize", update);
+  update();
+}
+
+// ======================
+// INITIALIZATION
+// ======================
+
+// Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("promos-container")) {
     loadPromos();
