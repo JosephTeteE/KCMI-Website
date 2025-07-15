@@ -21,6 +21,17 @@ dotenv.config();
 
 const app = express();
 
+// Middleware to decode URL-encoded paths
+// Purpose: Prevents issues with encoded characters in URLs
+app.use((req, res, next) => {
+  try {
+    req.url = decodeURIComponent(req.url);
+  } catch (e) {
+    console.warn("URL decoding failed:", e.message);
+  }
+  next();
+});
+
 // Check for required environment variables
 const requiredEnvVars = [
   "SMTP_HOST",
