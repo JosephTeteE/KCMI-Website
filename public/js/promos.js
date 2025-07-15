@@ -238,7 +238,7 @@ function getActionButtons(event) {
   if (event.type === "Video") {
     buttonsHTML += `
       <button class="btn btn-primary watch-video-btn" data-video-id="${event.fileId}" data-video-source="${event.videoSource}">
-        <i class="fas fa-play me-2"></i>Watch Promo
+        <i class="fas fa-play me-2"></i>Watch Video
       </button>`;
   }
 
