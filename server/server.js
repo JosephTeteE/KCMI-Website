@@ -457,10 +457,16 @@ app.get("/api/drive-manifest", async (req, res) => {
 // Purpose: Retrieves and processes event data from Google Sheets
 // ==========================================================================
 app.get("/api/sheets-events", async (req, res) => {
-  try {
-    const { id } = req.query;
-    if (!id) return res.status(400).json({ error: "Sheet ID required" });
+  const id = req.query.id || req.params.id || req.body.id;
+  if (!id) {
+    return res.status(400).json({
+      error: "Sheet ID required",
+      details:
+        "Please provide a sheet ID as a query parameter (?id=YOUR_SHEET_ID)",
+    });
+  }
 
+  try {
     // Refresh token if needed
     if (oauth2Client.isTokenExpiring()) {
       const { credentials } = await oauth2Client.refreshAccessToken();
