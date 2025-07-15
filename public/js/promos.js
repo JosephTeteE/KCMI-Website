@@ -1,6 +1,6 @@
 // public/js/promos.js
 // This script handles the loading and rendering of promotional events from a Google Sheet.
-// It includes caching, error handling, and responsive design features.
+// It includes caching, error handling, responsive design features, and video modal functionality.
 
 // Constants
 const PROMO_SHEET_ID = "1RCk_BhG_uv791dIVUmLHxhW4Ok0hPfvXLNp3QFUiaQo"; // Google Sheet ID for fetching events
@@ -107,12 +107,15 @@ function noEventsHTML() {
     </div>`;
 }
 
-// Create an event card with event details
+// Updated createEventCard function
 function createEventCard(event) {
-  const mediaHTML = createMediaHTML(event); // Media (image/video) section
-  const dateHTML = createDateHTML(event); // Date section
-  const timeHTML = createTimeHTML(event); // Time section
-  const contactHTML = createContactHTML(event); // Contact section
+  const mediaHTML = createMediaHTML(event);
+  const dateHTML = createDateHTML(event);
+  const timeHTML = createTimeHTML(event);
+  const contactHTML = createContactHTML(event);
+
+  // Determine action buttons based on event type
+  const actionButtonsHTML = getActionButtons(event);
 
   return `
     <div class="promo-card">
@@ -140,21 +143,95 @@ function createEventCard(event) {
           ${contactHTML}
         </div>
         <div class="text-center mt-2">
-          <a href="${getFileUrl(
-            event
-          )}" class="btn btn-primary" target="_blank">
-            ${getActionText(event.type)}
-          </a>
+          ${actionButtonsHTML}
         </div>
       </div>
     </div>
   `;
 }
 
-// Create media section (image or video)
+// New getActionButtons function
+function getActionButtons(event) {
+  if (event.type === "youth-camp") {
+    return `
+      <a href="https://camp.kcmi-rcc.org" class="btn btn-primary" target="_blank">
+        Register Now!
+      </a>
+    `;
+  }
+
+  if (event.type === "youtube-video" || event.type === "drive-video") {
+    return `
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <button class="btn btn-primary watch-video-btn" 
+                data-video-id="${event.fileId}" 
+                data-video-type="${event.type}">
+          Watch Video
+        </button>
+        ${
+          event.type === "youtube-video"
+            ? `
+          <a href="https://www.youtube.com/watch?v=${event.fileId}" 
+             class="btn btn-outline-primary" 
+             target="_blank">
+            Open in YouTube
+          </a>
+        `
+            : ""
+        }
+      </div>
+    `;
+  }
+
+  // Default button for other types
+  return `
+    <a href="${getFileUrl(event)}" class="btn btn-primary" target="_blank">
+      ${getActionText(event.type)}
+    </a>
+  `;
+}
+
+// Updated createMediaHTML function
 function createMediaHTML(event) {
+  // Handle YouTube videos
+  if (event.type === "youtube-video") {
+    const thumbnail = `https://img.youtube.com/vi/${event.fileId}/hqdefault.jpg`;
+    return `
+      <div class="video-thumbnail-container">
+        <img src="${thumbnail}" 
+             alt="${escapeHtml(event.title)}" 
+             loading="lazy"
+             class="video-thumbnail">
+        <div class="play-button-overlay" 
+             data-video-id="${event.fileId}"
+             data-video-type="youtube-video">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+    `;
+  }
+
+  // Handle Google Drive videos
+  if (event.type === "drive-video") {
+    const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w500`;
+    return `
+      <div class="video-thumbnail-container">
+        <img src="${thumbnail}" 
+             alt="${escapeHtml(event.title)}" 
+             loading="lazy"
+             class="video-thumbnail">
+        <div class="play-button-overlay" 
+             data-video-id="${event.fileId}"
+             data-video-type="drive-video">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+    `;
+  }
+
+  // Handle images and other types
   const url = getFileUrl(event);
-  const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w1000`;
+  const thumbnail = `https://drive.google.com/thumbnail?id=${event.fileId}&sz=w500`;
 
   if (event.type === "video") {
     return `
@@ -173,11 +250,12 @@ function createMediaHTML(event) {
 
 // Create date section
 function createDateHTML(event) {
+  if (!event.date) return "";
   const start = new Date(event.date);
-  const end = new Date(event.endDate);
+  const end = event.endDate ? new Date(event.endDate) : start;
   const isSameDay = start.toDateString() === end.toDateString();
 
-  if (isSameDay) {
+  if (!event.endDate || isSameDay) {
     return `
       <div class="promo-date">
         <i class="fas fa-calendar-alt"></i>
@@ -194,14 +272,13 @@ function createDateHTML(event) {
     <div class="promo-date">
       <i class="fas fa-calendar-alt"></i>
       ${start.toLocaleDateString(undefined, {
-        year: "numeric",
         month: "short",
         day: "numeric",
       })} - 
       ${end.toLocaleDateString(undefined, {
-        year: "numeric",
         month: "short",
         day: "numeric",
+        year: "numeric",
       })}
     </div>
   `;
@@ -225,6 +302,8 @@ function createTimeHTML(event) {
   if (event.times.afternoon)
     timeSlots.push(`Afternoon: ${event.times.afternoon}`);
   if (event.times.evening) timeSlots.push(`Evening: ${event.times.evening}`);
+
+  if (timeSlots.length === 0) return "";
 
   if (timeSlots.length === 1) {
     return `
@@ -280,6 +359,12 @@ function getFileUrl(event) {
   if (event.type === "youth-camp") {
     return "https://camp.kcmi-rcc.org";
   }
+  if (event.type === "youtube-video") {
+    return `https://www.youtube.com/watch?v=${event.fileId}`;
+  }
+  if (event.type === "drive-video") {
+    return `https://drive.google.com/file/d/${event.fileId}/view`;
+  }
   if (event.type === "video") {
     return `https://drive.google.com/file/d/${event.fileId}/preview`;
   }
@@ -287,14 +372,15 @@ function getFileUrl(event) {
 }
 
 function getActionText(type) {
-  if (type === "youth-camp") {
-    return "Register Now!";
-  }
   switch (type) {
     case "video":
+    case "youtube-video":
+    case "drive-video":
       return "Watch Video";
     case "image":
       return "View Image";
+    case "youth-camp":
+      return "Register Now!";
     default:
       return "View Details";
   }
@@ -310,7 +396,7 @@ function formatPhoneNumber(number) {
 }
 
 function escapeHtml(text) {
-  if (!text) return "";
+  if (typeof text !== "string") return "";
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
@@ -336,23 +422,23 @@ function initCarousel() {
 
   let currentIndex = 0;
   const promoCards = document.querySelectorAll(".promo-card");
-  if (!promoCards.length) return;
+  if (promoCards.length <= 1) return;
 
   // Calculate how many cards are visible based on screen size
   function getVisibleCards() {
-    if (window.innerWidth < 576) return 1; // Mobile - 1 card
-    if (window.innerWidth < 768) return 2; // Tablet - 2 cards
-    if (window.innerWidth < 1200) return 3; // Desktop - 3 cards
-    return 3; // Large desktop - max 3 cards (as requested)
+    if (window.innerWidth < 576) return 1;
+    if (window.innerWidth < 768) return 2;
+    return 3;
   }
 
   // Update the carousel position and button states
   function updateCarousel() {
-    const cardWidth = promoCards[0].offsetWidth + 24; // Include gap
+    const visibleCards = getVisibleCards();
+    const cardWidth = promoCards[0].offsetWidth + 16; // card width + gap
     promosGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
 
     prevBtn.disabled = currentIndex === 0;
-    nextBtn.disabled = currentIndex >= promoCards.length - getVisibleCards();
+    nextBtn.disabled = currentIndex >= promoCards.length - visibleCards;
   }
 
   prevBtn.addEventListener("click", () => {
@@ -370,13 +456,78 @@ function initCarousel() {
     }
   });
 
-  window.addEventListener("resize", updateCarousel);
+  // Recalculate on resize
+  let resizeTimeout;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(updateCarousel, 200);
+  });
+
   updateCarousel(); // Initial setup
 }
 
-// Initialize the promo loading when DOM is ready
+// Setup video modal functionality
+function setupVideoModal() {
+  const videoModalEl = document.getElementById("videoModal");
+  if (!videoModalEl) return;
+
+  const videoModal = new bootstrap.Modal(videoModalEl);
+  const videoModalFrame = document.getElementById("videoModalFrame");
+  const videoModalTitle = document.getElementById("videoModalTitle");
+
+  document.addEventListener("click", function (e) {
+    const target = e.target;
+    // Handle watch video button clicks
+    const watchBtn = target.closest(".watch-video-btn");
+    if (watchBtn) {
+      e.preventDefault();
+      const videoId = watchBtn.dataset.videoId;
+      const videoType = watchBtn.dataset.videoType;
+      const title = watchBtn
+        .closest(".promo-card")
+        .querySelector(".event-title").textContent;
+      playVideo(videoId, videoType, title);
+    }
+
+    // Handle play button overlay clicks
+    const playOverlay = target.closest(".play-button-overlay");
+    if (playOverlay) {
+      e.preventDefault();
+      const videoId = playOverlay.dataset.videoId;
+      const videoType = playOverlay.dataset.videoType;
+      const title = playOverlay
+        .closest(".promo-card")
+        .querySelector(".event-title").textContent;
+      playVideo(videoId, videoType, title);
+    }
+  });
+
+  function playVideo(videoId, videoType, title) {
+    if (!videoModalFrame || !videoModalTitle) return;
+
+    videoModalTitle.textContent = title || "Video";
+
+    if (videoType === "youtube-video") {
+      videoModalFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+    } else if (videoType === "drive-video") {
+      videoModalFrame.src = `https://drive.google.com/file/d/${videoId}/preview`;
+    }
+
+    videoModal.show();
+  }
+
+  // Reset iframe when modal is closed to stop video playback
+  videoModalEl.addEventListener("hidden.bs.modal", function () {
+    if (videoModalFrame) {
+      videoModalFrame.src = "";
+    }
+  });
+}
+
+// Initialize the scripts when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("promos-container")) {
-    loadPromos(); // Load promos when the page is ready
+    loadPromos();
+    setupVideoModal();
   }
 });

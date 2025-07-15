@@ -838,11 +838,11 @@ app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
     "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com https://www.google.com https://www.gstatic.com; " + // Added Google reCAPTCHA domains
+      "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com https://www.google.com https://www.gstatic.com https://drive.google.com; " +
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "img-src 'self' data: https://*.googleapis.com https://*.gstatic.com; " +
-      "connect-src 'self' https://*.googleapis.com https://kcmi-backend.onrender.com https://www.google.com; " + // Added Google reCAPTCHA domain for API call
-      "frame-src 'self' https://www.google.com; " +
+      "img-src 'self' data: https://*.googleapis.com https://*.gstatic.com https://drive.google.com; " +
+      "connect-src 'self' https://*.googleapis.com https://kcmi-backend.onrender.com https://www.google.com; " +
+      "frame-src 'self' https://www.google.com https://drive.google.com https://accounts.google.com; " +
       "font-src 'self' https://fonts.gstatic.com"
   );
   next();
