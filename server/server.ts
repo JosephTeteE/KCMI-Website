@@ -301,7 +301,7 @@ app.get("/api/db-keepalive", async (req: Request, res: Response) => {
 
 
 
-const livestreamRoutes = require("../../api/livestream");
+import livestreamRoutes from '../api/livestream';
 app.use("/api/livestream", livestreamRoutes);
 
 app.post("/api/auth", async (req: Request, res: Response) => {
@@ -558,21 +558,6 @@ app.post("/api/camp-registration", upload.single("paymentReceipt"), async (req: 
 // =========================================
 // Final Middleware & Server Start
 // =========================================
-app.use((_req: Request, res: Response, next: NextFunction) => {
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https:; frame-src 'self' https://www.google.com https://drive.google.com https://*.youtube.com; font-src 'self' https://fonts.gstatic.com");
-    next();
-});
-
-app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-    console.error("Unhandled error:", err);
-    if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlink(req.file.path, (unlinkErr) => {
-            if (unlinkErr) console.error("Error deleting temp file on unhandled error:", unlinkErr);
-        });
-    }
-    res.status(500).json({ error: "Internal server error", message: err.message });
-});
-
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader(
     "Content-Security-Policy",
@@ -585,6 +570,16 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       "font-src 'self' https://fonts.gstatic.com"
   );
   next();
+});
+
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+    console.error("Unhandled error:", err);
+    if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlink(req.file.path, (unlinkErr) => {
+            if (unlinkErr) console.error("Error deleting temp file on unhandled error:", unlinkErr);
+        });
+    }
+    res.status(500).json({ error: "Internal server error", message: err.message });
 });
 
 const PORT = process.env.PORT || 5000;
