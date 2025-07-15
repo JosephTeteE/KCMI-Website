@@ -8,12 +8,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*"]
-    }
+    "resolveJsonModule": true
   },
-  "include": ["server/**/*.ts", "public/js/**/*.ts"],
-  "exclude": ["node_modules", "public", "api"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "uploads",
+    "camp-deploy",
+    "kcmi-rcc-worker"
+  ]
 }
