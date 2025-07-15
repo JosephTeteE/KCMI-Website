@@ -4,11 +4,11 @@
   "description": "Kingdom Covenant Ministries International Website",
   "main": "dist/server/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r public/ dist/",
     "start": "node dist/server/server.js",
     "dev": "ts-node-dev server/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
