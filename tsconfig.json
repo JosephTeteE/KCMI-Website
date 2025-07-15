@@ -15,5 +15,5 @@
     }
   },
   "include": ["server/**/*.ts", "public/js/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "public", "api"]
 }

@@ -2,7 +2,7 @@
 // Desc: API routes for updating and retrieving the livestream embed code
 
 const express = require("express");
-const pool = require("../server/db"); // Import the database connection pool
+const pool = require("../dist/server/db"); // Import the database connection pool
 const router = express.Router(); // Create a new router instance
 
 // ✅ Middleware to log all incoming requests
