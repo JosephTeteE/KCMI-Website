@@ -4,7 +4,7 @@
   "description": "Kingdom Covenant Ministries International Website",
   "main": "dist/server/server.js",
   "scripts": {
-  "build": "tsc && copyfiles -u 1 public/**/*.html public/**/*.css public/assets/**/* public/favicon/**/* public/*.webmanifest dist",
+  "build": "tsc && copyfiles -u 1 -e \"**/*.ts\" \"public/**/*\" dist/public",
   "start": "node dist/server/server.js",
   "dev": "ts-node-dev server/server.ts",
   "test": "echo \"Error: no test specified\" && exit 1"

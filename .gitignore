@@ -1,12 +1,17 @@
 #Ignore the.env file
 .env
 
+# Build output
+dist
+
 #Ignore the .htpasswd file
 .htpasswd
 
 .crt
 .pem
 .key
+
+uploads
 
 #Ignore node_modules
 node_modules
