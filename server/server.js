@@ -457,7 +457,17 @@ app.get("/api/drive-manifest", async (req, res) => {
 // Purpose: Retrieves and processes event data from Google Sheets
 // ==========================================================================
 app.get("/api/sheets-events", async (req, res) => {
-  const id = req.query.id || req.params.id || req.body.id;
+  let id = req.query.id;
+
+  if (!id && req.url.includes("id=")) {
+    try {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      id = url.searchParams.get("id");
+    } catch (e) {
+      console.error("Could not parse ID from malformed URL:", e);
+    }
+  }
+
   if (!id) {
     return res.status(400).json({
       error: "Sheet ID required",
