@@ -778,7 +778,6 @@ body.navbar-open .homepage-header-video-container {
 
 /* Video Modal Styles */
 #videoModal {
-  display: flex !important;
   align-items: center;
   justify-content: center;
 }
