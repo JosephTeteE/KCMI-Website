@@ -1,19 +1,17 @@
 // api/livestream.ts
 import { Router, Request, Response, NextFunction } from 'express';
-import { pool } from '../server/db'; // Correctly import the named export
+import { pool } from '../server/db';
 import { RowDataPacket, PoolConnection } from 'mysql2/promise';
 
 const router = Router();
-
-// Define a type for the data we expect from the database
-interface LivestreamSettings extends RowDataPacket {
+// Define the Livestream interface for type safety
+interface Livestream extends RowDataPacket {
   id: number;
-  is_live: boolean;
+  isLive: boolean;
   embed_code: string;
-  last_updated: string;
 }
 
-// Middleware to log all incoming requests to this router
+// Middleware to log requests
 router.use((req: Request, _res: Response, next: NextFunction) => {
   console.log(`📡 [${req.method}] Request to /api/livestream${req.url}`);
   if (req.body && Object.keys(req.body).length > 0) {
@@ -27,21 +25,17 @@ router.post("/", async (req: Request, res: Response) => {
   const { embedCode, isLive } = req.body as { embedCode: string; isLive: boolean };
 
   if (typeof embedCode === 'undefined') {
-    console.warn("⚠️ Missing embedCode in request");
     return res.status(400).json({ message: "Embed code is required" });
   }
 
   let connection: PoolConnection | undefined;
   try {
     connection = await pool.getConnection();
-    console.log("✅ [Livestream] Connected to database for update");
-
+  
     await connection.execute(
-      "REPLACE INTO livestream_settings (id, embed_code, isLive) VALUES (1, ?, ?)",
+      "REPLACE INTO livestream (id, embed_code, isLive) VALUES (1, ?, ?)",
       [embedCode, isLive]
     );
-
-    console.log("🎥 Livestream embed code updated successfully!");
     res.json({ message: "Livestream embed updated successfully" });
   } catch (error: any) {
     console.error("❌ [Livestream] Database Error on POST:", error);
@@ -56,25 +50,23 @@ router.get("/", async (_req: Request, res: Response) => {
   let connection: PoolConnection | undefined;
   try {
     connection = await pool.getConnection();
-    console.log("✅ [Livestream] Connected to database for retrieval");
-
-    const [rows] = await connection.execute<LivestreamSettings[]>(
-      "SELECT embed_code, isLive FROM livestream_settings WHERE id = 1"
+  
+    const [rows] = await connection.execute<Livestream[]>(
+      "SELECT embed_code, isLive FROM livestream WHERE id = 1"
     );
 
     if (rows.length > 0) {
-        const settings = rows[0];
-        res.json({
-            embedCode: settings.embed_code,
-            isLive: !!settings.is_live, // Coerce to boolean
-        });
+      const settings = rows[0];
+      res.json({
+        embedCode: settings.embed_code,
+        isLive: !!settings.isLive, // Coerce to boolean for safety
+      });
     } else {
-        console.warn("⚠️ No livestream settings found in database.");
-        res.status(404).json({
-            embedCode: "",
-            isLive: false,
-            message: "No livestream settings found",
-        });
+      res.status(404).json({
+        embedCode: "",
+        isLive: false,
+        message: "No livestream settings found",
+      });
     }
   } catch (error: any) {
     console.error("❌ [Livestream] Database Error on GET:", error);
@@ -84,5 +76,4 @@ router.get("/", async (_req: Request, res: Response) => {
   }
 });
 
-// Use `export =` for perfect CommonJS compatibility with server.ts
 export = router;

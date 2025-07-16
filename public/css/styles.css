@@ -409,11 +409,11 @@ body.navbar-open .homepage-header-video-container {
 }
 
 .index-page .homepage-pastor-slide:nth-child(2) {
-  background-image: url("../assets/img/apostle2.jpg");
+  background-image: url("../assets/img/apostle2.JPG");
 }
 
 .index-page .homepage-pastor-slide:nth-child(3) {
-  background-image: url("../assets/img/apostle3.jpg");
+  background-image: url("../assets/img/apostle3.JPG");
 }
 
 .index-page .homepage-pastor-slide:nth-child(4) {
@@ -508,6 +508,8 @@ body.navbar-open .homepage-header-video-container {
   flex-direction: column;
   min-height: auto;
   scroll-snap-align: start;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform, box-shadow;
 }
 
 #kcmi-promos-section .promo-card:hover {
@@ -734,8 +736,10 @@ body.navbar-open .homepage-header-video-container {
 #kcmi-promos-section .video-thumbnail {
   width: 100%;
   height: auto;
-  aspect-ratio: 16/9;
-  object-fit: cover;
+  max-height: 45vh;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
   transition: transform 0.3s ease;
 }
 
