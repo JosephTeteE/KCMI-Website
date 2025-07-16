@@ -169,7 +169,9 @@ function renderEvents(events: PromoEvent[]): void {
 function createEventCard(event: PromoEvent): string {
   return `
     <div class="promo-card">
-      ${createMediaHTML(event)}
+      <div class="promo-media-container">
+        ${createMediaHTML(event)}
+      </div>
       <div class="promo-content">
         <h3 class="event-title">${escapeHtml(event.title)}</h3>
         ${event.description ? `<p class="event-description">${escapeHtml(event.description)}</p>` : ""}
