@@ -3,259 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Privacy Policy | KCMI</title>
+    <title>Terms of Service | KCMI</title>
     <meta
       name="description"
-      content="Privacy Policy for Kingdom Covenant Ministries International (KCMI) website and services."
+      content="Terms of Service for the Kingdom Covenant Ministries International (KCMI) website."
     />
-
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="../favicon/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="../favicon/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="../favicon/favicon-16x16.png"
-    />
-    <link rel="manifest" href="../site.webmanifest" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="./favicon/favicon-32x32.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap"
       rel="stylesheet"
     />
-
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
-      crossorigin="anonymous"
     />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
-
-    <style>
-      :root {
-        --kcmi-primary: #7c1963;
-        --kcmi-primary-dark: #5a1349;
-        --kcmi-secondary: #9a3d81;
-        --kcmi-light: #f8f9fa;
-        --kcmi-dark: #121212;
-      }
-
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: var(--kcmi-light);
-        color: #333;
-        padding-top: 60px;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-
-      [data-bs-theme="dark"] body {
-        background-color: var(--kcmi-dark);
-        color: #e0e0e0;
-      }
-
-      body.navbar-open main {
-        margin-top: 280px; /* Adjust this value as needed when navbar is open on small screens */
-        transition: margin-top 0.3s ease; /* Smooth transition for content push */
-      }
-
-      /* Smooth transition for main content (general) */
-      body main {
-        transition: margin-top 0.3s ease;
-      }
-
-      /* Fixed Navbar */
-      .navbar.fixed-top {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 1000; /* Ensure navbar stays on top */
-        background-color: #eeabeddb; /* Light purple background */
-      }
-
-      .privacy-header {
-        background: linear-gradient(
-          135deg,
-          var(--kcmi-primary),
-          var(--kcmi-secondary)
-        );
-        color: white;
-        padding: 3rem 0;
-        margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .privacy-header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(
-            circle at 20% 80%,
-            rgba(255, 255, 255, 0.1) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 20%,
-            rgba(182, 11, 19, 0.05) 0%,
-            transparent 60%
-          );
-        opacity: 0.8;
-      }
-
-      .privacy-header .fw-bold {
-        color: white;
-      }
-
-      .privacy-container {
-        max-width: 800px;
-        margin: 0 auto 3rem;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        padding: 2.5rem;
-      }
-
-      [data-bs-theme="dark"] .privacy-container {
-        background-color: #1e1e1e;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        border: 1px solid #444;
-      }
-
-      h1,
-      h2,
-      h3 {
-        font-family: "Playfair Display", serif;
-        color: var(--kcmi-primary);
-      }
-
-      [data-bs-theme="dark"] h1,
-      [data-bs-theme="dark"] h2,
-      [data-bs-theme="dark"] h3 {
-        color: #c298b7;
-      }
-
-      h1 {
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        position: relative;
-      }
-
-      h2 {
-        margin-top: 2.5rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid rgba(124, 25, 99, 0.2);
-      }
-
-      [data-bs-theme="dark"] h2 {
-        border-bottom-color: rgba(194, 152, 183, 0.2);
-      }
-
-      h3 {
-        margin-top: 2rem;
-        font-size: 1.3rem;
-      }
-
-      a {
-        color: var(--kcmi-primary);
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-
-      [data-bs-theme="dark"] a {
-        color: #c298b7;
-      }
-
-      a:hover {
-        color: var(--kcmi-secondary);
-        text-decoration: underline;
-      }
-
-      ul {
-        padding-left: 1.5rem;
-      }
-
-      li {
-        margin-bottom: 0.75rem;
-        position: relative;
-      }
-
-      li::before {
-        content: "•";
-        color: var(--kcmi-primary);
-        font-weight: bold;
-        display: inline-block;
-        width: 1em;
-        margin-left: -1em;
-        position: absolute;
-      }
-
-      [data-bs-theme="dark"] li::before {
-        color: #c298b7;
-      }
-
-      .effective-date {
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        color: #666;
-      }
-
-      [data-bs-theme="dark"] .effective-date {
-        color: #aaa;
-      }
-
-      .contact-info {
-        background-color: rgba(124, 25, 99, 0.05);
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin-top: 2rem;
-      }
-
-      [data-bs-theme="dark"] .contact-info {
-        background-color: rgba(154, 61, 129, 0.1);
-      }
-
-      .nav-back {
-        margin-bottom: 2rem;
-      }
-
-      .nav-back a {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      @media (max-width: 768px) {
-        .privacy-container {
-          padding: 1.5rem;
-        }
-
-        .privacy-header {
-          padding: 2rem 0;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
@@ -358,230 +124,121 @@
       </div>
     </nav>
 
-    <main class="flex-grow-1">
-      <header class="privacy-header text-center">
+    <main class="flex-grow-1" style="padding-top: 80px">
+      <header
+        class="privacy-header text-center"
+        style="
+          background: linear-gradient(135deg, #7c1963, #9a3d81);
+          color: white;
+          padding: 3rem 0;
+        "
+      >
         <div class="container">
-          <h1 class="display-4 fw-bold">Privacy Policy</h1>
-          <p class="lead">How we protect and use your information</p>
+          <h1 class="display-4 fw-bold">Terms of Service</h1>
+          <p class="lead">The rules for using our online services.</p>
         </div>
       </header>
-      <div class="container">
-        <div class="nav-back">
-          <a href="https://kcmi-rcc.org" class="text-decoration-none">
-            <i class="fas fa-arrow-left"></i> Back to Home
-          </a>
-        </div>
-
-        <div class="privacy-container">
+      <div class="container pt-3 nav-back">
+        <a href="https://kcmi-rcc.org" class="text-decoration-none">
+          <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+      </div>
+      <div class="container my-5">
+        <div
+          class="privacy-container"
+          style="
+            max-width: 800px;
+            margin: auto;
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+          "
+        >
           <p class="effective-date">
-            <strong>Effective Date:</strong> June 30, 2025
+            <strong>Last Updated:</strong> July 16, 2025
           </p>
 
+          <h2>1. Introduction</h2>
           <p>
-            At Kingdom Covenant Ministries International (KCMI), we are
-            committed to protecting your privacy. This Privacy Policy explains
-            how we collect, use, disclose, and safeguard your information when
-            you visit our website <strong>https://kcmi-rcc.org</strong> and any
-            of its subdomains, including our youth camp platform and other
-            services.
+            Welcome to Kingdom Covenant Ministries International ("KCMI", "we",
+            "our", "us"). These Terms of Service ("Terms") govern your use of
+            our website located at https://kcmi-rcc.org (the "Service"). By
+            accessing or using the Service, you agree to be bound by these
+            Terms. If you disagree with any part of the terms, then you may not
+            access the Service.
           </p>
 
-          <h2>1. Information We Collect</h2>
+          <h2>2. Use of Our Service</h2>
           <p>
-            We may collect personal information that you voluntarily provide to
-            us when you:
+            You agree to use our Service only for lawful purposes. You must not
+            use our Service in any way that is unlawful, fraudulent, or harmful,
+            or in connection with any unlawful, fraudulent, or harmful purpose
+            or activity. This includes refraining from submitting spam or
+            malicious content through our forms.
           </p>
-          <ul>
-            <li>Register for events or camps</li>
-            <li>Submit forms or contact us</li>
-            <li>Make donations or payments</li>
-            <li>Subscribe to our communications</li>
-          </ul>
 
-          <h3>Information for Camp and Event Registrations</h3>
+          <h2>3. Intellectual Property</h2>
           <p>
-            When you register for an event such as our Youth Camp, we collect
-            information necessary for the registration, including your name,
-            contact details, number of attendees, and payment receipt. This data
-            is processed as follows:
+            The Service and its original content (excluding content provided by
+            users), features, and functionality are and will remain the
+            exclusive property of KCMI and its licensors. Our content is
+            protected by copyright and other laws. Our trademarks may not be
+            used in connection with any product or service without the prior
+            written consent of KCMI.
           </p>
-          <ul>
-            <li>
-              Registration details (name, email, phone number) are automatically
-              recorded in a secure Google Sheet owned by the ministry for
-              administrative purposes.
-            </li>
-            <li>
-              Uploaded payment receipts are stored securely in a restricted
-              Google Drive folder accessible only to authorized ministry
-              administrators.
-            </li>
-            <li>
-              We retain this registration data for up to 12 months after the
-              event for record-keeping purposes.
-            </li>
-          </ul>
 
+          <h2>4. Links To Other Web Sites</h2>
           <p>
-            We also automatically collect certain technical information when you
-            visit our website:
+            Our Service may contain links to third-party web sites or services
+            that are not owned or controlled by KCMI, such as YouTube, TikTok,
+            and Google Forms. KCMI has no control over, and assumes no
+            responsibility for, the content, privacy policies, or practices of
+            any third-party web sites or services. You further acknowledge and
+            agree that KCMI shall not be responsible or liable, directly or
+            indirectly, for any damage or loss caused or alleged to be caused by
+            or in connection with use of or reliance on any such content, goods
+            or services available on or through any such web sites or services.
           </p>
-          <ul>
-            <li>Log data (IP address, browser type, pages visited)</li>
-            <li>Cookies and similar tracking technologies</li>
-            <li>Google reCAPTCHA responses (to prevent spam and abuse)</li>
-          </ul>
 
-          <h2>2. How We Use Your Information</h2>
+          <h2>5. Disclaimer</h2>
           <p>
-            We use the information we collect for various purposes, including:
+            Your use of the Service is at your sole risk. The Service is
+            provided on an "AS IS" and "AS AVAILABLE" basis. The Service is
+            provided without warranties of any kind, whether express or implied,
+            including, but not limited to, implied warranties of
+            merchantability, fitness for a particular purpose, non-infringement
+            or course of performance.
           </p>
-          <ul>
-            <li>To provide and maintain our services</li>
-            <li>To process event registrations and donations</li>
-            <li>
-              To communicate with you (confirmations, updates, newsletters)
-            </li>
-            <li>To improve our website and services</li>
-            <li>To prevent fraud and ensure security</li>
-            <li>To comply with legal obligations</li>
-          </ul>
 
-          <h2>3. Google API Services</h2>
+          <h2>6. Limitation Of Liability</h2>
           <p>
-            We use Google APIs with restricted service accounts for ministry
-            operations:
+            In no event shall KCMI, nor its directors, employees, partners,
+            agents, suppliers, or affiliates, be liable for any indirect,
+            incidental, special, consequential or punitive damages, including
+            without limitation, loss of profits, data, use, goodwill, or other
+            intangible losses, resulting from your access to or use of or
+            inability to access or use the Service.
           </p>
-          <ul>
-            <li>
-              <strong>Drive API:</strong> Securely store payment receipts (admin
-              access only)
-            </li>
-            <li>
-              <strong>Sheets API:</strong> Manage registration data in
-              spreadsheets
-            </li>
-            <li>
-              <strong>Calendar API:</strong> Display public event schedules
-              (read-only)
-            </li>
-            <li>
-              <strong>Gmail API:</strong> Send automated email confirmations
-            </li>
-          </ul>
 
-          <p>Access is controlled through:</p>
-          <ul>
-            <li>JWT authentication for admin console</li>
-            <li>Limited API scopes (no full account access)</li>
-            <li>Service accounts instead of user OAuth</li>
-          </ul>
-
-          <h2>4. Admin Controls</h2>
-          <p>Administrative access features:</p>
-          <ul>
-            <li>JWT-secured admin console</li>
-            <li>Livestream embed code management</li>
-            <li>Registration data viewing (no editing of financial records)</li>
-            <li>Automatic session expiration</li>
-          </ul>
-
-          <h2>5. Data Security</h2>
-          <p>We implement multiple security layers:</p>
-          <ul>
-            <li>JWT authentication with 1-minute expiry for admin access</li>
-            <li>reCAPTCHA v2/v3 on all forms</li>
-            <li>Payment receipts encrypted in Google Drive</li>
-            <li>HTTPS for all data transfers</li>
-            <li>Regular security audits</li>
-          </ul>
-
+          <h2>7. Governing Law</h2>
           <p>
-            Uploaded files are stored securely in our Google Drive, accessible
-            only to authorized administrators.
+            These Terms shall be governed and construed in accordance with the
+            laws of Nigeria, without regard to its conflict of law provisions.
           </p>
 
-          <h2>6. Data Retention</h2>
-          <p>We retain data based on operational needs:</p>
-          <ul>
-            <li>
-              <strong>Active use:</strong> Camp data kept for 1 year post-event
-            </li>
-            <li>
-              <strong>Financial records:</strong> Payment receipts retained for
-              2 years
-            </li>
-            <li><strong>Contact forms:</strong> Deleted after 6 months</li>
-          </ul>
-
+          <h2>8. Changes</h2>
           <p>
-            You may request deletion of your data at any time by contacting us.
+            We reserve the right, at our sole discretion, to modify or replace
+            these Terms at any time. We will provide notice of any changes by
+            posting the new Terms of Service on this page.
           </p>
 
-          <h2>7. Your Rights and Choices</h2>
-          <p>You have certain rights regarding your personal information:</p>
-          <ul>
-            <li><strong>Access:</strong> Request a copy of your data</li>
-            <li>
-              <strong>Correction:</strong> Update or correct inaccurate
-              information
-            </li>
-            <li><strong>Deletion:</strong> Request deletion of your data</li>
-            <li><strong>Opt-out:</strong> Unsubscribe from communications</li>
-            <li>
-              <strong>Restriction:</strong> Limit how we use your information
-            </li>
-          </ul>
-
+          <h2>9. Contact Us</h2>
           <p>
-            To exercise these rights, please contact us using the information
-            below.
+            If you have any questions about these Terms, please contact us at
+            <a href="mailto:contact@kcmi-rcc.org">contact@kcmi-rcc.org</a>.
           </p>
-
-          <h2>8. Children's Privacy</h2>
-          <p>
-            Our services are not directed to children under 13. We do not
-            knowingly collect personal information from children under 13
-            without parental consent. If we become aware that we have collected
-            personal information from a child without verification of parental
-            consent, we will take steps to remove that information.
-          </p>
-
-          <h2>9. Links to Other Websites</h2>
-          <p>
-            Our Service may contain links to other websites that are not
-            operated by us, such as YouTube, TikTok, and Google Forms for
-            various requests. If you click on a third-party link, you will be
-            directed to that third party's site. We strongly advise you to
-            review the Privacy Policy of every site you visit. We have no
-            control over and assume no responsibility for the content, privacy
-            policies, or practices of any third-party sites or services.
-          </p>
-
-          <h2>10. Changes to This Policy</h2>
-          <p>
-            We may update this Privacy Policy periodically. We will notify you
-            of any changes by posting the new policy on this page and updating
-            the effective date. We encourage you to review this policy
-            regularly.
-          </p>
-
-          <h2>11. Contact Us</h2>
-          <p>
-            If you have questions about this Privacy Policy or your personal
-            information, please contact us:
-          </p>
-
-          <div class="contact-info">
-            <p>
-              <strong>Kingdom Covenant Ministries International (KCMI)</strong
-              ><br />
-              Email:
-              <a href="mailto:contact@kcmi-rcc.org">contact@kcmi-rcc.org</a
-              ><br />
-              Website: <a href="https://kcmi-rcc.org">https://kcmi-rcc.org</a>
-            </p>
-          </div>
         </div>
       </div>
     </main>

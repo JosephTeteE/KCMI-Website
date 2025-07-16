@@ -507,6 +507,7 @@ body.navbar-open .homepage-header-video-container {
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
+  padding: 0.5rem;
 }
 
 #kcmi-promos-section .promo-card:hover {
@@ -569,7 +570,7 @@ body.navbar-open .homepage-header-video-container {
   color: #7c1963;
   font-size: clamp(1.1rem, 3vw, 1.3rem);
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
   text-align: center;
   order: 2;
 }
@@ -739,6 +740,7 @@ body.navbar-open .homepage-header-video-container {
   width: 100%;
   height: 160px;
   overflow: hidden;
+  border-radius: 8px;
 }
 
 #kcmi-promos-section .video-thumbnail {
@@ -816,7 +818,7 @@ body.navbar-open .homepage-header-video-container {
   }
 
   #videoModal .modal-dialog {
-    margin: 0.5rem;
+    margin: 1rem auto;
   }
 }
 
@@ -838,7 +840,7 @@ body.navbar-open .homepage-header-video-container {
 
   #kcmi-promos-section #promos-container.single-event .promo-card {
     flex: 0 0 80%;
-    max-width: 800px;
+    max-width: 950px;
   }
 }
 

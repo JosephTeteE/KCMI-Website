@@ -10,7 +10,10 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
+// =========================================
+// === REMOVED OAuth2Client import ===
+// import { OAuth2Client } from 'google-auth-library';
+// =========================================
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import fs from 'fs';
@@ -20,6 +23,69 @@ import crypto from 'crypto';
 import { pool } from './db';
 
 dotenv.config();
+
+// =========================================
+// === ADDED NEW GOOGLE AUTH SETUP ===
+// =========================================
+import { GoogleAuth } from 'google-auth-library';
+
+// Check if the Base64 credential is provided
+if (!process.env.GOOGLE_CREDENTIALS_BASE64) {
+  throw new Error("GOOGLE_CREDENTIALS_BASE64 environment variable not set.");
+}
+
+// Decode the Base64 credential
+const decodedCredentials = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
+const credentials = JSON.parse(decodedCredentials);
+
+// Create a new Google Auth client
+const auth = new GoogleAuth({
+  credentials,
+  scopes: [
+    'https://www.googleapis.com/auth/calendar.readonly',
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/spreadsheets',
+  ],
+});
+let authClient: any;
+async function initializeGoogleAuth() {
+  authClient = await auth.getClient();
+  google.options({ auth: authClient });
+}
+// =========================================
+
+// =========================================
+// === COMMENTED OUT OLD OAUTH2 CLIENT SETUP ===
+// =========================================
+/*
+const oauth2Client: OAuth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID!,
+  process.env.GOOGLE_CLIENT_SECRET!,
+  process.env.GOOGLE_REDIRECT_URI || "https://developers.google.com/oauthplayground"
+);
+oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN! });
+*/
+// =========================================
+
+// =========================================
+// === COMMENTED OUT OLD VERIFY FUNCTION ===
+// =========================================
+/*
+async function verifyGoogleAuth(): Promise<void> {
+  if (!oauth2Client.credentials.access_token || (oauth2Client.credentials.expiry_date && oauth2Client.credentials.expiry_date < Date.now() + 5000)) {
+    try {
+      console.log("Refreshing Google API access token...");
+      const { credentials } = await oauth2Client.refreshAccessToken();
+      oauth2Client.setCredentials(credentials);
+      console.log("✅ Google API token refreshed successfully.");
+    } catch (error) {
+      if (error instanceof Error) console.error("❌ Error refreshing Google API token:", error.message);
+      throw new Error("Authentication with Google API failed.");
+    }
+  }
+}
+*/
+// =========================================
 
 // =========================================
 // Type Definitions
@@ -62,9 +128,9 @@ app.set('trust proxy', 1);
 // =========================================
 const requiredEnvVars: string[] = [
   "SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "CALENDAR_ID", "JWT_SECRET",
-  "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REFRESH_TOKEN", "GOOGLE_API_KEY",
-  "RECAPTCHA_SECRET_KEY_YOUTH", "RECAPTCHA_SECRET_KEY_CONTACT", "GOOGLE_DRIVE_RECEIPTS_FOLDER_ID",
-  "GOOGLE_SHEET_REGISTRATIONS_ID", "KCMI_ADMIN_EMAIL", "AD_USER", "AD_PASS"
+  "GOOGLE_API_KEY", "RECAPTCHA_SECRET_KEY_YOUTH", "RECAPTCHA_SECRET_KEY_CONTACT", 
+  "GOOGLE_DRIVE_RECEIPTS_FOLDER_ID", "GOOGLE_SHEET_REGISTRATIONS_ID", 
+  "KCMI_ADMIN_EMAIL", "AD_USER", "AD_PASS", "GOOGLE_CREDENTIALS_BASE64"
 ];
 
 const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
@@ -125,14 +191,6 @@ transporter.verify((error) => {
   }
 });
 
-// Google OAuth2 Client
-const oauth2Client: OAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID!,
-  process.env.GOOGLE_CLIENT_SECRET!,
-  process.env.GOOGLE_REDIRECT_URI || "https://developers.google.com/oauthplayground"
-);
-oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN! });
-
 // Multer (File Uploads)
 const upload = multer({
   dest: "uploads/",
@@ -150,20 +208,6 @@ const upload = multer({
 // =========================================
 // Helper Functions
 // =========================================
-async function verifyGoogleAuth(): Promise<void> {
-  if (!oauth2Client.credentials.access_token || (oauth2Client.credentials.expiry_date && oauth2Client.credentials.expiry_date < Date.now() + 5000)) {
-    try {
-      console.log("Refreshing Google API access token...");
-      const { credentials } = await oauth2Client.refreshAccessToken();
-      oauth2Client.setCredentials(credentials);
-      console.log("✅ Google API token refreshed successfully.");
-    } catch (error) {
-      if (error instanceof Error) console.error("❌ Error refreshing Google API token:", error.message);
-      throw new Error("Authentication with Google API failed.");
-    }
-  }
-}
-
 async function verifyRecaptcha(token: string, secretKey: string): Promise<boolean> {
   try {
     const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
@@ -197,7 +241,6 @@ function extractMediaInfo(url: string): MediaInfo {
   if (driveMatch) return { id: driveMatch[1], source: "drive" };
   return { id: url, source: "drive" }; // Fallback
 }
-
 
 // =========================================
 // API Endpoints
@@ -298,9 +341,6 @@ app.get("/api/db-keepalive", async (req: Request, res: Response) => {
   }
 });
 
-
-
-
 import livestreamRoutes from '../api/livestream';
 app.use("/api/livestream", livestreamRoutes);
 
@@ -318,12 +358,12 @@ const calendarCache = new NodeCache({ stdTTL: 1800, checkperiod: 300 });
 const calendarLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.get("/api/calendar-events", calendarLimiter, async (_req: Request, res: Response) => {
   try {
-    await verifyGoogleAuth();
     const cachedEvents = calendarCache.get<any[]>("events");
     if (cachedEvents) {
       return res.set("X-Cache", "HIT").json(cachedEvents);
     }
-    const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+    const calendar = google.calendar({ version: "v3" }); // auth is now set globally
+
     const now = new Date();
     const oneMonthLater = new Date();
     oneMonthLater.setMonth(now.getMonth() + 1);
@@ -352,8 +392,7 @@ app.get("/api/drive-manifest", async (req: Request, res: Response) => {
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: "Manifest ID required" });
   try {
-    await verifyGoogleAuth();
-    const drive = google.drive({ version: "v3", auth: oauth2Client });
+    const drive = google.drive({ version: "v3" }); // auth is now set globally
     await drive.files.get({ fileId: id as string, fields: "id,name" });
     const response = await drive.files.get({ fileId: id as string, alt: "media" }, { responseType: "json" });
     res.json(response.data);
@@ -389,8 +428,7 @@ app.get("/api/sheets-events", async (req: Request, res: Response) => {
     }
 
     try {
-        await verifyGoogleAuth();
-        const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+        const sheets = google.sheets({ version: "v4" }); // auth is now set globally
         const response = await sheets.spreadsheets.values.get({ spreadsheetId: id, range: "A1:P100" });
         const rows = response.data.values as string[][];
 
@@ -472,7 +510,6 @@ app.get("/api/sheets-events", async (req: Request, res: Response) => {
     }
 });
 
-
 const mapCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const mapLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, message: "Too many map requests, please try again later" });
 app.get("/api/maps-proxy", mapLimiter, async (_req: Request, res: Response) => {
@@ -514,9 +551,8 @@ app.post("/api/camp-registration", upload.single("paymentReceipt"), async (req: 
     
     const submissionId = crypto.randomBytes(10).toString("hex");
     try {
-        await verifyGoogleAuth();
-        const drive = google.drive({ version: "v3", auth: oauth2Client });
-        const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+        const drive = google.drive({ version: "v3" }); // auth is now set globally
+        const sheets = google.sheets({ version: "v4" }); // auth is now set globally
         const sheetId = process.env.GOOGLE_SHEET_REGISTRATIONS_ID!;
 
         const existingDataResponse = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range: "Sheet1!B:C" });
@@ -566,7 +602,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "img-src 'self' data: https:; " +
       "connect-src 'self' https:; " +
-      "frame-src 'self' https://www.google.com https://drive.google.com https://*.youtube.com; " +
+      "frame-src 'self' https://www.google.com https://drive.google.com https://www.youtube.com; " +
       "font-src 'self' https://fonts.gstatic.com"
   );
   next();
@@ -574,24 +610,28 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     console.error("Unhandled error:", err);
-    if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlink(req.file.path, (unlinkErr) => {
+    // Clean up uploaded file if present
+    if ((req as any).file && fs.existsSync((req as any).file.path)) {
+        fs.unlink((req as any).file.path, (unlinkErr) => {
             if (unlinkErr) console.error("Error deleting temp file on unhandled error:", unlinkErr);
         });
     }
-    res.status(500).json({ error: "Internal server error", message: err.message });
+    res.status(500).json({ error: "Internal server error", details: err.message });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
-(async function testDB() {
-    try {
-        const connection = await pool.getConnection();
-        await connection.ping();
-        connection.release();
-        console.log("✅ Database connected successfully!");
-    } catch (error) {
-        if (error instanceof Error) console.error("❌ Database connection failed!", error);
-    }
+(async () => {
+  await initializeGoogleAuth();
+
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+  try {
+      const connection = await pool.getConnection();
+      await connection.ping();
+      connection.release();
+      console.log("✅ Database connected successfully!");
+  } catch (error) {
+      if (error instanceof Error) console.error("❌ Database connection failed!", error);
+  }
 })();
