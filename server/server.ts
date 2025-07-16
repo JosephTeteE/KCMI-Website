@@ -10,10 +10,6 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 import { google } from 'googleapis';
-// =========================================
-// === REMOVED OAuth2Client import ===
-// import { OAuth2Client } from 'google-auth-library';
-// =========================================
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import fs from 'fs';
@@ -25,7 +21,7 @@ import { pool } from './db';
 dotenv.config();
 
 // =========================================
-// === ADDED NEW GOOGLE AUTH SETUP ===
+// === GOOGLE AUTH SETUP ===
 // =========================================
 import { GoogleAuth } from 'google-auth-library';
 
@@ -38,7 +34,7 @@ if (!process.env.GOOGLE_CREDENTIALS_BASE64) {
 const decodedCredentials = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
 const credentials = JSON.parse(decodedCredentials);
 
-// Create a new Google Auth client
+// Initialize GoogleAuth with the decoded credentials
 const auth = new GoogleAuth({
   credentials,
   scopes: [
@@ -52,40 +48,6 @@ async function initializeGoogleAuth() {
   authClient = await auth.getClient();
   google.options({ auth: authClient });
 }
-// =========================================
-
-// =========================================
-// === COMMENTED OUT OLD OAUTH2 CLIENT SETUP ===
-// =========================================
-/*
-const oauth2Client: OAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID!,
-  process.env.GOOGLE_CLIENT_SECRET!,
-  process.env.GOOGLE_REDIRECT_URI || "https://developers.google.com/oauthplayground"
-);
-oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN! });
-*/
-// =========================================
-
-// =========================================
-// === COMMENTED OUT OLD VERIFY FUNCTION ===
-// =========================================
-/*
-async function verifyGoogleAuth(): Promise<void> {
-  if (!oauth2Client.credentials.access_token || (oauth2Client.credentials.expiry_date && oauth2Client.credentials.expiry_date < Date.now() + 5000)) {
-    try {
-      console.log("Refreshing Google API access token...");
-      const { credentials } = await oauth2Client.refreshAccessToken();
-      oauth2Client.setCredentials(credentials);
-      console.log("✅ Google API token refreshed successfully.");
-    } catch (error) {
-      if (error instanceof Error) console.error("❌ Error refreshing Google API token:", error.message);
-      throw new Error("Authentication with Google API failed.");
-    }
-  }
-}
-*/
-// =========================================
 
 // =========================================
 // Type Definitions
@@ -362,7 +324,7 @@ app.get("/api/calendar-events", calendarLimiter, async (_req: Request, res: Resp
     if (cachedEvents) {
       return res.set("X-Cache", "HIT").json(cachedEvents);
     }
-    const calendar = google.calendar({ version: "v3" }); // auth is now set globally
+    const calendar = google.calendar({ version: "v3" });
 
     const now = new Date();
     const oneMonthLater = new Date();
@@ -392,7 +354,7 @@ app.get("/api/drive-manifest", async (req: Request, res: Response) => {
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: "Manifest ID required" });
   try {
-    const drive = google.drive({ version: "v3" }); // auth is now set globally
+    const drive = google.drive({ version: "v3" });
     await drive.files.get({ fileId: id as string, fields: "id,name" });
     const response = await drive.files.get({ fileId: id as string, alt: "media" }, { responseType: "json" });
     res.json(response.data);
@@ -428,7 +390,7 @@ app.get("/api/sheets-events", async (req: Request, res: Response) => {
     }
 
     try {
-        const sheets = google.sheets({ version: "v4" }); // auth is now set globally
+        const sheets = google.sheets({ version: "v4" });
         const response = await sheets.spreadsheets.values.get({ spreadsheetId: id, range: "A1:P100" });
         const rows = response.data.values as string[][];
 
@@ -465,7 +427,7 @@ app.get("/api/sheets-events", async (req: Request, res: Response) => {
 
             const eventEndDate = new Date(eventEndDateStr);
             if (isNaN(eventEndDate.getTime())) return null;
-            eventEndDate.setHours(23, 59, 59, 999); // Ensure end date is inclusive
+            eventEndDate.setHours(23, 59, 59, 999);
             if (eventEndDate < today) return null;
 
             const { id: fileId, source: videoSource } = extractMediaInfo(row[col.mediaLink] || "");
@@ -551,8 +513,8 @@ app.post("/api/camp-registration", upload.single("paymentReceipt"), async (req: 
     
     const submissionId = crypto.randomBytes(10).toString("hex");
     try {
-        const drive = google.drive({ version: "v3" }); // auth is now set globally
-        const sheets = google.sheets({ version: "v4" }); // auth is now set globally
+        const drive = google.drive({ version: "v3" });
+        const sheets = google.sheets({ version: "v4" });
         const sheetId = process.env.GOOGLE_SHEET_REGISTRATIONS_ID!;
 
         const existingDataResponse = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range: "Sheet1!B:C" });
