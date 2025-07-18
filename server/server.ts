@@ -493,63 +493,76 @@ app.get("/api/maps-proxy", mapLimiter, async (_req: Request, res: Response) => {
   }
 });
 
-app.post("/api/camp-registration", upload.single("paymentReceipt"), async (req: Request, res: Response) => {
-    const { fullName, email, phoneNumber, numPeople, recaptchaToken } = req.body;
-    const file = req.file;
 
-    if (!fullName || !email || !phoneNumber || !numPeople || !file) {
-      if (file) fs.unlinkSync(file.path);
-      return res.status(400).json({ success: false, message: "All fields are required, including payment receipt." });
+// KCMI Youth/Teens Camp Registration Endpoint
+app.post("/api/camp-registration", multer().none(), async (req: Request, res: Response) => {
+    
+    // --- File Upload to Cloudinary ---
+    const { fullName, email, phoneNumber, numPeople, recaptchaToken, paymentReceiptUrl } = req.body;
+
+    // --- 1. Validation ---
+    if (!fullName || !email || !phoneNumber || !numPeople || !paymentReceiptUrl) {
+      return res.status(400).json({ success: false, message: "All form fields, including the receipt, are required." });
     }
-    const parsedNumPeople = parseInt(numPeople);
-    if (isNaN(parsedNumPeople) || parsedNumPeople < 1 || parsedNumPeople > 10) {
-      if (file) fs.unlinkSync(file.path);
-      return res.status(400).json({ success: false, message: "Number of people must be between 1 and 10." });
+    const parsedNumPeople = parseInt(numPeople as string);
+    if (isNaN(parsedNumPeople) || parsedNumPeople < 1) {
+        return res.status(400).json({ success: false, message: "Invalid number of people." });
     }
     if (!(await verifyRecaptcha(recaptchaToken, process.env.RECAPTCHA_SECRET_KEY_YOUTH!))) {
-      if (file) fs.unlinkSync(file.path);
       return res.status(400).json({ success: false, message: "reCAPTCHA verification failed. Please try again." });
     }
-    
-    const submissionId = crypto.randomBytes(10).toString("hex");
+
     try {
-        const drive = google.drive({ version: "v3" });
         const sheets = google.sheets({ version: "v4" });
         const sheetId = process.env.GOOGLE_SHEET_REGISTRATIONS_ID!;
+        const submissionId = crypto.randomBytes(10).toString("hex");
 
-        const existingDataResponse = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range: "Sheet1!B:C" });
-        const isDuplicate = (existingDataResponse.data.values || []).some(row => row[0] === email && row[1] === fullName);
-        if (isDuplicate) {
-            if (file) fs.unlinkSync(file.path);
-            return res.status(409).json({ success: false, message: "You have already registered for this camp with these details." });
-        }
-        
-        const fileMetadata = {
-            name: `${new Date().toISOString().slice(0, 10)}_${fullName.replace(/\s/g, "_")}_Receipt_${submissionId}.${file.originalname.split(".").pop()}`,
-            parents: [process.env.GOOGLE_DRIVE_RECEIPTS_FOLDER_ID!],
-        };
-        const media = { mimeType: file.mimetype, body: fs.createReadStream(file.path) };
-        const driveResponse = await drive.files.create({
-            requestBody: fileMetadata,
-            media: media,
-            fields: "id,webViewLink"
+        // --- 2. Prepare Data for Google Sheet ---
+        const rowData = [
+          new Date().toLocaleString("en-NG", { timeZone: "Africa/Lagos" }),
+          fullName,
+          email,
+          phoneNumber,
+          parsedNumPeople,
+          paymentReceiptUrl,
+          submissionId,
+        ];
+
+        // --- 3. Append to Google Sheet ---
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: "Sheet1!A1",
+          valueInputOption: "RAW",
+          requestBody: { values: [rowData] },
         });
-        const driveFileUrl = driveResponse.data.webViewLink;
 
-        const rowData = [ new Date().toLocaleString("en-NG", { timeZone: "Africa/Lagos" }), fullName, email, phoneNumber, parsedNumPeople, driveFileUrl, submissionId ];
-        await sheets.spreadsheets.values.append({ spreadsheetId: sheetId, range: "Sheet1!A1", valueInputOption: "RAW", requestBody: { values: [rowData] } });
+        // --- 4. Send Automated Confirmation Email ---
+        const emailHtml = `
+          <h1>Thank you for registering for KCMI Youth/Teens Camp 2025!</h1>
+          <p>Hello ${fullName},</p>
+          <p>Your registration has been confirmed. Please keep this email for your records.</p>
+          <p><strong>Submission ID:</strong> ${submissionId}</p>
+          <p>You can view your submitted payment receipt by clicking the link below:</p>
+          <a href="${paymentReceiptUrl}" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+            View My Receipt
+          </a>
+          <br><br>
+          <p>We look forward to seeing you there!</p>
+          <p>God bless you,<br>KCMI Team</p>
+        `;
 
-        await transporter.sendMail({ from: process.env.SMTP_USER, to: email, subject: "KCMI Youth/Teens Camp 2025 Registration Confirmation - LEVEL UP", html: `...` });
-        await transporter.sendMail({ from: process.env.SMTP_USER, to: process.env.KCMI_ADMIN_EMAIL, subject: `NEW Youth/Teens Camp Registration: ${fullName}`, html: `...` });
+        await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: email,
+          subject: "KCMI Youth/Teens Camp 2025 Registration Confirmation",
+          html: emailHtml,
+        });
 
         res.json({ success: true, message: "Registration successful!" });
+
     } catch (error) {
         console.error("Camp registration error:", error);
-        res.status(500).json({ success: false, message: "Failed to complete registration. Please try again later." });
-    } finally {
-        if (file && fs.existsSync(file.path)) {
-            fs.unlink(file.path, (err) => { if (err) console.error("Error deleting temp file:", err); });
-        }
+        res.status(500).json({ success: false, message: "A server error occurred. Please try again later." });
     }
 });
 
