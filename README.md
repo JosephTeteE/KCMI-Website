@@ -1,147 +1,134 @@
 # Kingdom Covenant Ministries International (KCMI) Website
 
-**Official Website for Kingdom Covenant Ministries International (KCMI) / Rehoboth Christian Center**
+Official Web Platform for Kingdom Covenant Ministries International (KCMI) / Rehoboth Christian Center
 
-A dynamic, responsive web platform showcasing the church's mission, leadership, sermons, events, and livestream content.
+A dynamic, responsive, and type-safe web application built to serve the KCMI community. It showcases the church's mission, leadership, sermons, and events, featuring a live-updating promotional system and livestream capabilities.
 
 ---
 
 ## 🌐 Live Sites
 
-- **Production:** [kcmi-rcc.org](https://www.kcmi-rcc.org/)
-- **Staging:** [kcmiwebsite-vercel.app](https://kcmiwebsite-vercel.app/)
+- **Production:** kcmi-rcc.org
+- **Backend Server:** kcmi-backend.onrender.com
 
 ---
 
 ## ✨ Features
 
-### Ministry Presentation
+### Ministry & Community Engagement
 
-- Homepage with video background and upcoming events
-- Dedicated pages for Apostle Aikins, services, sermons, and locations
-- Mission statement and FAQ sections
+- Homepage with a dynamic promotional events section powered by Google Sheets.
+- Dedicated pages for Apostle Aikins' biography, global church locations, and ministry information.
+- Interactive events calendar through Google Calendar integration.
+- Livestream page with a dynamic embed for live services.
+- Youth Camp registration page with secure file uploads to Google Drive.
+- Contact forms and WhatsApp subscriptions protected by Google reCAPTCHA v3.
 
-### Engagement Tools
+### Technical & Administrative
 
-- Events calendar (shows 3 upcoming date groups)
-- Youth Camp page with registration
-- Contact form and WhatsApp subscription (Google reCAPTCHA v3)
-- Livestream page with dynamic Facebook Live embed
-
-### Administrative Features
-
-- Secure admin panel (JWT-protected) for livestream management
-- Dynamic event promos (Google Drive integration)
-- Contact/WhatsApp forms via Zoho SMTP
-
-### Technical Features
-
-- Dark mode toggle (with local storage)
-- Fully responsive design (mobile, tablet, desktop)
-- Embedded Google Maps with directions
-- Google Calendar integration
-- Click-to-copy WhatsApp number
+- Hybrid TypeScript/JavaScript Core: Key modules are written in TypeScript for enhanced stability and type safety, integrated with existing JavaScript modules.
+- Secure Admin Panel: A JWT-protected panel for managing livestream settings.
+- Robust Authentication: Utilizes a Google Service Account for secure, server-to-server interaction with Google APIs (Sheets, Drive, Calendar).
+- Modern UI: Dark mode toggle with local storage persistence, fully responsive design, and animations via AOS.
+- Embedded Services: Integrated Google Maps with directions and a click-to-copy WhatsApp number feature.
 
 ---
 
 ## 🛠 Technology Stack
 
+- **Core Logic:** TypeScript & Node.js with Express.js
 - **Frontend:** HTML5, CSS3 (Bootstrap 5), JavaScript (ES6+)
-- **Backend:** Node.js, Express.js, MySQL
-- **Edge Computing:** Cloudflare Workers
+- **Database:** MySQL on Aiven
 
 **Key Libraries:**
 
-- AOS (Animate On Scroll)
-- Google APIs (Calendar, Maps, reCAPTCHA v3)
-- JWT for authentication
-- Nodemailer for email services
+- googleapis for Google Workspace APIs
+- google-auth-library for secure Service Account authentication
+- nodemailer for SMTP email services
+- multer for file uploads
 
-**Hosting:**
+**Hosting & Deployment:**
 
 - **Frontend:** Vercel
 - **Backend:** Render
-- **Database:** Aiven (MySQL)
-- **DNS/CDN:** Cloudflare
+- **DNS & CDN:** Cloudflare
 
 ---
 
 ## 📂 Project Structure
 
+This is a high-level overview of the current project structure, reflecting both TypeScript and JavaScript files.
+
 ```
 church_website/
-├── api/                # API endpoints
-│   └── livestream.js   # Livestream management API
-├── kcmi-rcc-worker/    # Cloudflare Worker
-│   ├── src/            # Worker source code
-│   └── test/           # Worker tests
-├── public/             # Frontend assets
-│   ├── admin/          # Admin panel
-│   ├── assets/         # Images and media
-│   ├── css/            # Stylesheets
-│   ├── js/             # JavaScript files
-│   └── *.html          # Website pages
-├── server/             # Backend server
-│   ├── db.js           # Database connection
-│   └── server.js       # Main server logic
-├── uploads/            # File upload directory
-└── .env.example        # Environment template
+├── api/
+│   └── livestream.ts      # (TypeScript) Livestream management API
+├── public/                # Frontend source assets (HTML, CSS, JS, TS)
+│   ├── admin/             # Admin panel assets
+│   │   └── js/admin.js
+│   ├── assets/            # Images, Videos, etc.
+│   ├── css/               # All Stylesheets
+│   ├── js/                # Scripts folder
+│   │   ├── promos.ts      # (TypeScript) Promo events logic
+│   │   ├── scripts.ts     # (TypeScript) Main site interactivity
+│   │   ├── church-calendar.js # (JavaScript) Calendar logic
+│   │   └── loading.js     # (JavaScript) Loading screen logic
+│   └── *.html             # All HTML pages
+├── server/                # Backend server source
+│   ├── db.ts              # (TypeScript) Database connection
+│   └── server.ts          # (TypeScript) Main Express server
+├── .env.example           # Environment variables template
+├── package.json
+└── tsconfig.json          # TypeScript compiler configuration
 ```
 
 ---
 
-## ⚙️ Setup Instructions
+## ⚙️ Local Development & Setup
 
-1. **Clone the repository:**
+### Clone Repository
 
-   ```bash
-   git clone https://github.com/JosephTeteE/KCMI-Website.git
-   cd KCMI-Website
-   ```
+```bash
+git clone https://github.com/JosephTeteE/KCMI-Website.git
+cd KCMI-Website
+```
 
-2. **Install dependencies:**
+### Install Dependencies
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-3. **Configure environment:**
+### Configure Environment Variables
 
-   - Copy `.env.example` to `.env`
-   - Fill in required credentials (database, email, reCAPTCHA)
+- Copy `.env.example` to a new file named `.env`.
+- Populate `.env` with all required credentials.
+- **Important:** The `GOOGLE_CREDENTIALS_BASE64` variable must contain the entire JSON key file for your Google Service Account, encoded in Base64 format.
 
-4. **Database setup:**
+### Run the Development Server
 
-   - Ensure MySQL database is configured with the provided schema
+This command uses `ts-node-dev` to run the server and automatically restart it when you make changes to any `.ts` file.
 
-5. **Start development server:**
-   ```bash
-   node server/server.js
-   ```
+```bash
+npm run dev
+```
 
----
-
-## 🔒 Security & Maintenance
-
-- All sensitive credentials are stored in `.env` (excluded from version control)
-- API endpoints are protected with rate limiting
-- Admin panel requires JWT authentication
-- Regular backups of database and content are maintained
+The server will be available at [http://localhost:5000](http://localhost:5000) (or the port specified in your `.env`).
 
 ---
 
-## 📜 License & Usage
+## 🚀 Deployment
 
-This website and its codebase are property of Kingdom Covenant Ministries International. The code is provided for reference and maintenance purposes only. Unauthorized distribution or reuse is not permitted without explicit written consent from KCMI leadership.
+The project is configured for a dual-deployment setup where the build process compiles TypeScript and prepares all static assets for serving.
 
----
+### Backend (Render)
 
-## 🙏 Acknowledgements
+- **Build Command:** `npm run build`
+- **Start Command:** `node dist/server/server.js`
 
-We gratefully acknowledge:
+### Frontend (Vercel)
 
-- The KCMI media and leadership teams
-- Open source developers whose tools power this website
-- Volunteers who contributed to this project
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist/public`
 
-For questions about the website, please contact the KCMI administration.
+The `npm run build` script (`tsc && copyfiles ...`) is the single source of truth for creating the production-ready `dist` directory.
