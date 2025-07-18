@@ -495,7 +495,7 @@ app.get("/api/maps-proxy", mapLimiter, async (_req: Request, res: Response) => {
 
 
 // KCMI Youth/Teens Camp Registration Endpoint
-app.post("/api/camp-registration", multer().none(), async (req: Request, res: Response) => {
+app.post("/api/camp-registration", async (req: Request, res: Response) => {
     
     // --- File Upload to Cloudinary ---
     const { fullName, email, phoneNumber, numPeople, recaptchaToken, paymentReceiptUrl } = req.body;
