@@ -494,138 +494,77 @@ app.get("/api/maps-proxy", mapLimiter, async (_req: Request, res: Response) => {
 });
 
 
-// -----------------------------------------------------------------------------
-// POST /api/camp-registration
-// Handles Youth/Teens Camp registration: validates data, verifies reCAPTCHA,
-// stores receipt in Google Drive, appends registration to Google Sheets,
-// and sends a confirmation email.
-// -----------------------------------------------------------------------------
-
+// KCMI Youth/Teens Camp Registration Endpoint
 app.post("/api/camp-registration", async (req: Request, res: Response) => {
-  // --- 1. Destructure form data from request body ---
-  const { fullName, email, phoneNumber, numPeople, recaptchaToken, paymentReceiptUrl } = req.body;
+    
+    // --- File Upload to Cloudinary ---
+    const { fullName, email, phoneNumber, numPeople, recaptchaToken, paymentReceiptUrl } = req.body;
 
-  // --- 2. Basic validation checks ---
-  // Ensure all required fields are present
-  if (!fullName || !email || !phoneNumber || !numPeople || !paymentReceiptUrl) {
-    return res.status(400).json({
-      success: false,
-      message: "All form fields, including the receipt, are required.",
-    });
-  }
+    // --- 1. Validation ---
+    if (!fullName || !email || !phoneNumber || !numPeople || !paymentReceiptUrl) {
+      return res.status(400).json({ success: false, message: "All form fields, including the receipt, are required." });
+    }
+    const parsedNumPeople = parseInt(numPeople as string);
+    if (isNaN(parsedNumPeople) || parsedNumPeople < 1) {
+        return res.status(400).json({ success: false, message: "Invalid number of people." });
+    }
+    if (!(await verifyRecaptcha(recaptchaToken, process.env.RECAPTCHA_SECRET_KEY_YOUTH!))) {
+      return res.status(400).json({ success: false, message: "reCAPTCHA verification failed. Please try again." });
+    }
 
-  // Parse and validate number of attendees
-  const parsedNumPeople = parseInt(numPeople as string);
-  if (isNaN(parsedNumPeople) || parsedNumPeople < 1) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid number of people.",
-    });
-  }
+    try {
+        const sheets = google.sheets({ version: "v4" });
+        const sheetId = process.env.GOOGLE_SHEET_REGISTRATIONS_ID!;
+        const submissionId = crypto.randomBytes(10).toString("hex");
 
-  // Verify reCAPTCHA token with secret key
-  const recaptchaSuccess = await verifyRecaptcha(
-    recaptchaToken,
-    process.env.RECAPTCHA_SECRET_KEY_YOUTH!
-  );
-  if (!recaptchaSuccess) {
-    return res.status(400).json({
-      success: false,
-      message: "reCAPTCHA verification failed. Please try again.",
-    });
-  }
+        // --- 2. Prepare Data for Google Sheet ---
+        const rowData = [
+          new Date().toLocaleString("en-NG", { timeZone: "Africa/Lagos" }),
+          fullName,
+          email,
+          phoneNumber,
+          parsedNumPeople,
+          paymentReceiptUrl,
+          submissionId,
+        ];
 
-  try {
-    // --- 3. Setup Google APIs ---
-    const drive = google.drive({ version: "v3" });
-    const folderId = process.env.GOOGLE_DRIVE_RECEIPTS_FOLDER_ID!;
+        // --- 3. Append to Google Sheet ---
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: "Sheet1!A1",
+          valueInputOption: "RAW",
+          requestBody: { values: [rowData] },
+        });
 
-    const sheets = google.sheets({ version: "v4" });
-    const sheetId = process.env.GOOGLE_SHEET_REGISTRATIONS_ID!;
+        // --- 4. Send Automated Confirmation Email ---
+        const emailHtml = `
+          <h1>Thank you for registering for KCMI Youth/Teens Camp 2025!</h1>
+          <p>Hello ${fullName},</p>
+          <p>Your registration has been confirmed. Please keep this email for your records.</p>
+          <p><strong>Submission ID:</strong> ${submissionId}</p>
+          <p>You can view your submitted payment receipt by clicking the link below:</p>
+          <a href="${paymentReceiptUrl}" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+            View My Receipt
+          </a>
+          <br><br>
+          <p>We look forward to seeing you there!</p>
+          <p>God bless you,<br>KCMI Team</p>
+        `;
 
-    // Generate unique submission ID for traceability
-    const submissionId = crypto.randomBytes(10).toString("hex");
+        await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: email,
+          subject: "KCMI Youth/Teens Camp 2025 Registration Confirmation",
+          html: emailHtml,
+        });
 
-    // Build shortcut filename with date and user name
-    const now = new Date();
-    const datePrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
-      now.getDate()
-    ).padStart(2, "0")}`;
-    const shortcutName = `${datePrefix}_${fullName}_Receipt.url`;
+        res.json({ success: true, message: "Registration successful!" });
 
-    // --- 4. Save receipt URL as a shortcut file to Google Drive ---
-    await drive.files.create({
-      requestBody: {
-        name: shortcutName,
-        mimeType: "text/plain", // treated as a basic .url-like format
-        parents: [folderId],
-      },
-      media: {
-        mimeType: "text/plain",
-        body: `Cloudinary Receipt URL:\n${paymentReceiptUrl}`,
-      },
-      fields: "id", // Only return the file ID to minimize payload
-    });
-
-    // --- 5. Prepare row data for Google Sheets ---
-    const rowData = [
-      new Date().toLocaleString("en-NG", { timeZone: "Africa/Lagos" }),
-      fullName,
-      email,
-      phoneNumber,
-      parsedNumPeople,
-      paymentReceiptUrl,
-      submissionId,
-    ];
-
-    // --- 6. Append registration data to the spreadsheet ---
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: sheetId,
-      range: "Sheet1!A1", // Append to the first sheet
-      valueInputOption: "RAW",
-      requestBody: {
-        values: [rowData],
-      },
-    });
-
-    // --- 7. Compose confirmation email HTML ---
-    const emailHtml = `
-      <h1>Thank you for registering for KCMI Youth/Teens Camp 2025!</h1>
-      <p>Hello ${fullName},</p>
-      <p>Your registration has been confirmed. Please keep this email for your records.</p>
-      <p><strong>Submission ID:</strong> ${submissionId}</p>
-      <p>You can view your submitted payment receipt by clicking the link below:</p>
-      <a href="${paymentReceiptUrl}" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-        View My Receipt
-      </a>
-      <br><br>
-      <p>We look forward to seeing you there!</p>
-      <p>God bless you,<br>KCMI Team</p>
-    `;
-
-    // --- 8. Send confirmation email to the registrant ---
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: email,
-      subject: "KCMI Youth/Teens Camp 2025 Registration Confirmation",
-      html: emailHtml,
-    });
-
-    // --- 9. Final success response to frontend ---
-    res.json({
-      success: true,
-      message: "Registration successful!",
-    });
-  } catch (error) {
-    // --- Handle unexpected server or API errors ---
-    console.error("Camp registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "A server error occurred. Please try again later.",
-    });
-  }
+    } catch (error) {
+        console.error("Camp registration error:", error);
+        res.status(500).json({ success: false, message: "A server error occurred. Please try again later." });
+    }
 });
-
 
 // =========================================
 // Final Middleware & Server Start
