@@ -66,16 +66,16 @@ function tinySvg() {
 loadEnvLocal();
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const publishable = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const secret = process.env.SUPABASE_SECRET_KEY;
 const site = process.env.NEXT_PUBLIC_SITE_URL || "http://127.0.0.1:3000";
 
-if (!url || !anon || !service) {
-  console.error("FAIL env — missing Supabase keys in .env.local");
+if (!url || !publishable || !secret) {
+  console.error("FAIL env — missing Supabase URL/publishable/secret in .env.local");
   process.exit(1);
 }
 
-const admin = createClient(url, service, {
+const admin = createClient(url, secret, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
@@ -116,7 +116,7 @@ async function createUser(email, roleName) {
 }
 
 async function clientAs(email) {
-  const c = createClient(url, anon, {
+  const c = createClient(url, publishable, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const { data, error } = await c.auth.signInWithPassword({ email, password });
@@ -243,7 +243,7 @@ async function main() {
 
   // 6 preview invisible publicly
   {
-    const anonClient = createClient(url, anon, {
+    const anonClient = createClient(url, publishable, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { data } = await anonClient
@@ -303,7 +303,7 @@ async function main() {
 
   // 9 public adapter / anon sees published
   {
-    const anonClient = createClient(url, anon, {
+    const anonClient = createClient(url, publishable, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { data } = await anonClient
@@ -323,7 +323,7 @@ async function main() {
         archived_at: new Date().toISOString(),
       })
       .eq("id", programId);
-    const anonClient = createClient(url, anon, {
+    const anonClient = createClient(url, publishable, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     const { data } = await anonClient

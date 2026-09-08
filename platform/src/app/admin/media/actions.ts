@@ -8,7 +8,7 @@ import {
 } from "@/lib/cms/ingest-marketing-image";
 import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/admin";
+import { createSecretKeyClient } from "@/lib/supabase/admin";
 
 const BUCKET = "marketing-public";
 
@@ -90,7 +90,7 @@ export async function uploadMarketingImage(formData: FormData) {
   const storagePath = `${crypto.randomUUID()}.webp`;
 
   const supabase = await createClient();
-  const storage = createServiceRoleClient();
+  const storage = createSecretKeyClient();
   const { error: uploadError } = await storage.storage
     .from(BUCKET)
     .upload(storagePath, ingested.image.buffer, {

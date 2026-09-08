@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
-import { hasSupabasePublicConfig } from "@/lib/env";
+import { hasSupabasePublicConfig, isHostedKcmiEnvironment } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
 
 export default async function AdminDashboardPage() {
   if (!hasSupabasePublicConfig()) {
+    if (isHostedKcmiEnvironment()) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      );
+    }
     return null;
   }
   const session = await getStaffSession();

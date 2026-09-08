@@ -48,3 +48,11 @@ export function contentSecurityPolicy(): string {
   ];
   return directives.join("; ");
 }
+
+/** Staging-only search exclusion. Not applied when KCMI_ENVIRONMENT is production. */
+export function stagingRobotsHeaders(): { key: string; value: string }[] {
+  if (process.env.KCMI_ENVIRONMENT !== "staging") {
+    return [];
+  }
+  return [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+}

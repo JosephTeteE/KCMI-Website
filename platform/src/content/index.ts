@@ -34,7 +34,7 @@ import {
   fetchPublishedBranches,
   fetchPublishedSermons,
 } from "@/content/adapters/supabase-public";
-import { hasSupabasePublicConfig } from "@/lib/env";
+import { resolvePublicSiteUrl, shouldUseSeedContent } from "@/lib/env";
 import type {
   Branch,
   BranchMediaItem,
@@ -47,18 +47,16 @@ import type {
 
 /**
  * Content source strategy:
- * - Use seed when CONTENT_SOURCE=seed (tests/CI) OR Supabase public config is absent.
+ * - Use seed when CONTENT_SOURCE=seed (tests/CI/local demo) and the app is not hosted.
+ * - Hosted staging/production never fall back to seed; missing Supabase config fails closed.
  * - When Supabase IS configured, call the DB and throw on failure.
- *   Production must not silently fall back to seed when the DB is configured but failing.
  */
-function shouldUseSeedContent(): boolean {
-  return (
-    process.env.CONTENT_SOURCE === "seed" || !hasSupabasePublicConfig()
-  );
-}
 
 export function getChurchIdentity() {
-  return churchIdentity;
+  return {
+    ...churchIdentity,
+    siteUrl: resolvePublicSiteUrl(churchIdentity.siteUrl),
+  };
 }
 
 export async function getServiceTimes(): Promise<ServiceTime[]> {

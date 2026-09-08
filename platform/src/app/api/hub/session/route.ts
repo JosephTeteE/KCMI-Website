@@ -90,8 +90,8 @@ export async function GET(request: NextRequest) {
 
   if (bearer?.startsWith("Bearer ")) {
     const token = bearer.slice("Bearer ".length).trim();
-    const { url, anonKey } = requireSupabasePublicConfig();
-    const supabase = createSupabaseJs<Database>(url, anonKey, {
+    const { url, publishableKey } = requireSupabasePublicConfig();
+    const supabase = createSupabaseJs<Database>(url, publishableKey, {
       global: { headers: { Authorization: `Bearer ${token}` } },
       auth: { persistSession: false, autoRefreshToken: false },
     });

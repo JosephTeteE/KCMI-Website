@@ -35,5 +35,5 @@ jobs:
       - name: Production build
         run: npm run build
         env:
-          # Build must succeed without real secrets; public placeholders allowed
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          CONTENT_SOURCE: seed

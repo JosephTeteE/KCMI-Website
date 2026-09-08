@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getChurchIdentity } from "@/content";
+import { isStagingEnvironment } from "@/lib/env";
 
 const publicPaths = [
   "/",
@@ -17,6 +18,9 @@ const publicPaths = [
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  if (isStagingEnvironment()) {
+    return [];
+  }
   const { siteUrl } = getChurchIdentity();
   const lastModified = new Date();
 

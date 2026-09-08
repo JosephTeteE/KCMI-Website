@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isHostedKcmiEnvironment } from "@/lib/env";
 
 /**
  * Refresh the Auth session for Server Components / browser cookies.
@@ -9,13 +10,20 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+  if (!url || !publishableKey) {
+    if (isHostedKcmiEnvironment()) {
+      throw new Error(
+        url
+          ? "Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+          : "Missing NEXT_PUBLIC_SUPABASE_URL",
+      );
+    }
     return supabaseResponse;
   }
 
-  const supabase = createServerClient(url, anonKey, {
+  const supabase = createServerClient(url, publishableKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

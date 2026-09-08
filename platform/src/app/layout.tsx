@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { getChurchIdentity } from "@/content";
+import { isStagingEnvironment } from "@/lib/env";
 import "./globals.css";
 
 const display = Playfair_Display({
@@ -50,10 +51,12 @@ export const metadata: Metadata = {
     title: identity.legalName,
     description: identity.visionTagline,
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: isStagingEnvironment()
+    ? { index: false, follow: false, nocache: true }
+    : {
+        index: true,
+        follow: true,
+      },
 };
 
 export default function RootLayout({

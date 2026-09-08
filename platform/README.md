@@ -15,7 +15,7 @@ See [`docs/ARCHITECTURE_V1.md`](../docs/ARCHITECTURE_V1.md).
 
 ```bash
 npm install
-cp .env.example .env.local   # fill from `npx supabase status -o env` for Hub
+cp .env.example .env.local   # fill from `npx supabase status -o env` (API_URL, PUBLISHABLE_KEY, SECRET_KEY)
 npm run lint && npm run typecheck && npm test && npm run build
 npm run test:e2e
 npm run test:visual
@@ -32,6 +32,18 @@ npm run db:start && npm run db:reset && npm run db:test
 ```
 
 Never commit `.env.local`. No production deploy without separate authorization.
+
+Canonical application environment variable **names** (never commit values):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY` (server-only; never `NEXT_PUBLIC_`)
+- `NEXT_PUBLIC_SITE_URL`
+- `KCMI_ENVIRONMENT` (`staging` or `production` on hosted apps; omit locally)
+
+Hosted staging/production must not silently fall back to seed CMS. Tests may set `CONTENT_SOURCE=seed`.
+
+Local CLI mapping from `npx supabase status -o env`: `API_URL` → `NEXT_PUBLIC_SUPABASE_URL`, `PUBLISHABLE_KEY` → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SECRET_KEY` → `SUPABASE_SECRET_KEY`.
 
 ## Notes
 

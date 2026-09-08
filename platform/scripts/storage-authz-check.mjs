@@ -1,5 +1,6 @@
 /**
- * Local Storage authorization checks (JWT vs server service-role path).
+ * Local Storage authorization checks (JWT vs server secret-key path).
+ * Canonical env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY.
  * Synthetic users only. Does not print secrets. Does not deploy.
  *
  * Usage (from platform/, local Supabase running):
@@ -42,14 +43,14 @@ function tinyPng() {
 
 loadEnvLocal();
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !anon || !service) {
+const publishable = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const secret = process.env.SUPABASE_SECRET_KEY;
+if (!url || !publishable || !secret) {
   console.error("FAIL env — missing local Supabase keys");
   process.exit(1);
 }
 
-const admin = createClient(url, service, {
+const admin = createClient(url, secret, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 const password = "Local-Test-Only-Passw0rd!";
@@ -86,7 +87,7 @@ async function createUser(email, roleName) {
 }
 
 async function clientAs(email) {
-  const c = createClient(url, anon, {
+  const c = createClient(url, publishable, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const { error } = await c.auth.signInWithPassword({ email, password });
@@ -127,7 +128,7 @@ async function main() {
     branch_id: ACCRA,
   });
 
-  const anonClient = createClient(url, anon, {
+  const anonClient = createClient(url, publishable, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const anonUp = await tryUpload(anonClient, "anon");
@@ -169,7 +170,7 @@ async function main() {
   const { error: serverErr } = await admin.storage
     .from("marketing-public")
     .upload(serverPath, tinyPng(), { contentType: "image/png", upsert: false });
-  if (!mark("media-admin-server-service-role-upload-allowed", !serverErr, serverErr?.message)) {
+  if (!mark("media-admin-server-secret-key-upload-allowed", !serverErr, serverErr?.message)) {
     failed += 1;
   } else {
     await admin.storage.from("marketing-public").remove([serverPath]);

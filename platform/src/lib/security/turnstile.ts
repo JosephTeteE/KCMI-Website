@@ -3,7 +3,7 @@
  * Does not call production until TURNSTILE_SECRET_KEY is provisioned.
  */
 
-import { getServerEnv } from "@/lib/env";
+import { getServerEnv } from "@/lib/env/server";
 
 export type TurnstileVerifyResult =
   | { ok: true }

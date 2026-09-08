@@ -12,9 +12,7 @@
 
 # testing
 /coverage
-/.qa-c21/
-/.qa-d12/
-/.qa-d13/
+/.qa-*/
 /.qa-d11-results.json
 /e2e/.auth/
 /test-results/

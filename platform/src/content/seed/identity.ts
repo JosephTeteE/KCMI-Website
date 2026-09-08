@@ -11,6 +11,7 @@ export const churchIdentity: ChurchIdentity = {
     "Using every creative biblical means, we disciple individuals, strengthen families, and transform communities—until a nation is won for Christ!",
   discoverBlurb:
     "We are committed to serving God faithfully, and we invite you to be part of this great mission. Discover ways to connect, grow, and serve with us.",
+  /** Production canonical origin. Overlaid by NEXT_PUBLIC_SITE_URL at runtime. */
   siteUrl: "https://www.kcmi-rcc.org",
   copyrightYear: 2025,
 };

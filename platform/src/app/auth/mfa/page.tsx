@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { hasSupabasePublicConfig } from "@/lib/env";
+import { hasSupabasePublicConfig } from "@/lib/env/public";
 
 export default function MfaPage() {
   const router = useRouter();
@@ -48,7 +48,7 @@ export default function MfaPage() {
   if (!hasSupabasePublicConfig()) {
     return (
       <p className="mx-auto max-w-lg p-8 text-sm text-[var(--color-text-muted)]">
-        Configure Supabase env vars to exercise MFA enrollment.
+        Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
       </p>
     );
   }

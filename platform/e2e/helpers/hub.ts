@@ -16,11 +16,11 @@ export const TOGO_BRANCH_ID = "a1000000-0000-4000-8000-000000000004";
 export function serviceClient(): SupabaseClient {
   loadLocalEnv();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !service) {
-    throw new Error("Missing local Supabase service configuration");
+  const secret = process.env.SUPABASE_SECRET_KEY;
+  if (!url || !secret) {
+    throw new Error("Missing local Supabase secret configuration");
   }
-  return createClient(url, service, {
+  return createClient(url, secret, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
@@ -42,9 +42,9 @@ export async function ensureRole(
 export async function enrollTotpSecret(email: string): Promise<string> {
   loadLocalEnv();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) throw new Error("Missing public Supabase configuration");
-  const client = createClient(url, anon, {
+  const publishable = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !publishable) throw new Error("Missing public Supabase configuration");
+  const client = createClient(url, publishable, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const { error: signErr } = await client.auth.signInWithPassword({

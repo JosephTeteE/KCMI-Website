@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import {
   contentSecurityPolicy,
   securityHeaders,
+  stagingRobotsHeaders,
 } from "./src/lib/security/headers";
 import { legacyHtmlRedirects } from "./src/lib/routing/legacy-redirects";
 
@@ -33,6 +34,11 @@ const nextConfig: NextConfig = {
         port: "54321",
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
     ],
   },
   async headers() {
@@ -41,6 +47,7 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [
           ...securityHeaders,
+          ...stagingRobotsHeaders(),
           {
             key: "Content-Security-Policy-Report-Only",
             value: contentSecurityPolicy(),

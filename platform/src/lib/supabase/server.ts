@@ -9,9 +9,9 @@ import type { Database } from "@/lib/supabase/database.types";
  */
 export async function createClient() {
   const cookieStore = await cookies();
-  const { url, anonKey } = requireSupabasePublicConfig();
+  const { url, publishableKey } = requireSupabasePublicConfig();
 
-  return createServerClient<Database>(url, anonKey, {
+  return createServerClient<Database>(url, publishableKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();

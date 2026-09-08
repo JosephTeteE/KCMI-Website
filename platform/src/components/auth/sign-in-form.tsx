@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { hasSupabasePublicConfig } from "@/lib/env";
+import { hasSupabasePublicConfig } from "@/lib/env/public";
 
 export function SignInForm() {
   const router = useRouter();
@@ -15,9 +15,9 @@ export function SignInForm() {
   if (!hasSupabasePublicConfig()) {
     return (
       <p className="rounded-md border border-[var(--color-warning)] bg-[var(--color-warning-bg)] p-4 text-sm text-[var(--color-text-body)]">
-        Supabase public environment variables are not configured. Copy{" "}
-        <code>.env.example</code> to <code>.env.local</code> after local
-        Supabase provisioning. Hub sign-in cannot complete without them.
+        Missing <code>NEXT_PUBLIC_SUPABASE_URL</code> or{" "}
+        <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>. Hub sign-in cannot
+        complete without them.
       </p>
     );
   }

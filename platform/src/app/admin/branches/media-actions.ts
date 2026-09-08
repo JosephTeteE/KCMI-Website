@@ -8,7 +8,7 @@ import {
 } from "@/lib/cms/ingest-marketing-image";
 import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/admin";
+import { createSecretKeyClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/database.types";
 
 type BranchMediaPlacement =
@@ -106,7 +106,7 @@ export async function uploadBranchPhoto(formData: FormData) {
   const placement = parsePlacement(formData.get("placement"));
   const storagePath = `${crypto.randomUUID()}.webp`;
   const supabase = await createClient();
-  const storage = createServiceRoleClient();
+  const storage = createSecretKeyClient();
 
   const { error: uploadError } = await storage.storage
     .from(BUCKET)

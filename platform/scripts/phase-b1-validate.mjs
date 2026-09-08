@@ -50,16 +50,15 @@ function result(id, pass, detail) {
 loadEnvLocal();
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const publishable = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const secret = process.env.SUPABASE_SECRET_KEY;
 const site = process.env.NEXT_PUBLIC_SITE_URL || "http://127.0.0.1:3000";
-
-if (!url || !anon || !service) {
-  console.error("FAIL env — missing local Supabase URL/anon/service in .env.local");
+if (!url || !publishable || !secret) {
+  console.error("FAIL env — missing local Supabase URL/publishable/secret in .env.local");
   process.exit(1);
 }
 
-const admin = createClient(url, service, {
+const admin = createClient(url, secret, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
@@ -116,7 +115,7 @@ async function ensureUser(email, roleName, { inactive = false } = {}) {
 }
 
 function clientForUser() {
-  return createClient(url, anon, {
+  return createClient(url, publishable, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getStaffSession, requiresMfaEnrollment } from "@/lib/auth/session";
 import { HubNav } from "@/components/layout/hub-nav";
-import { hasSupabasePublicConfig } from "@/lib/env";
+import { hasSupabasePublicConfig, isHostedKcmiEnvironment } from "@/lib/env";
 import { signOutAction } from "@/app/auth/actions";
 
 export const dynamic = "force-dynamic";
@@ -12,15 +12,22 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   if (!hasSupabasePublicConfig()) {
+    if (isHostedKcmiEnvironment()) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      );
+    }
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-sm text-[var(--color-text-muted)]">
         <h1 className="text-xl font-semibold text-[var(--color-text-body)]">
           Hub unavailable
         </h1>
         <p className="mt-2">
-          Server-side Hub protection is active, but Supabase public env vars are
-          not configured. Provision local Supabase and set{" "}
-          <code>.env.local</code> from <code>.env.example</code>.
+          Server-side Hub protection is active, but{" "}
+          <code>NEXT_PUBLIC_SUPABASE_URL</code> or{" "}
+          <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> is not configured.
+          Provision local Supabase and copy names from <code>.env.example</code>{" "}
+          into <code>.env.local</code>.
         </p>
       </div>
     );

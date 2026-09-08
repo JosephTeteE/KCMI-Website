@@ -1,5 +1,6 @@
 #Ignore the.env file
 .env
+.env.local
 
 # Build output
 dist

@@ -367,6 +367,20 @@ flowchart LR
 
 **EXTERNAL VERIFICATION REQUIRED:** Legacy Vercel/Cloudflare project binding details; production DNS cutover plan timing.
 
+### Application environment variable names (no values)
+
+Canonical V2 names:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY` (server-only; never `NEXT_PUBLIC_*`)
+- `NEXT_PUBLIC_SITE_URL`
+- `KCMI_ENVIRONMENT` (`staging` or `production` on hosted deployments)
+
+The application does not use legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `SUPABASE_SERVICE_ROLE_KEY`. Hosted staging/production fail closed if the URL or publishable key is missing and must not silently serve seed CMS. Seed mode requires `CONTENT_SOURCE=seed` and is forbidden when `KCMI_ENVIRONMENT` is `staging` or `production`.
+
+Staging (`KCMI_ENVIRONMENT=staging`) must emit robots noindex/nofollow. That must not apply to eventual production.
+
 ---
 
 ## 24. Migration sequence from legacy website
