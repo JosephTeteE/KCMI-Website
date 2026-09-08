@@ -1,0 +1,76 @@
+---
+description: KCMI project identity, evidence standards, change control, legacy reference policy, and production safety
+alwaysApply: true
+---
+
+# KCMI Project Rules
+
+These rules override ordinary implementation convenience for the KCMI Digital Platform rebuild.
+
+## Identity and scope
+
+- This repository currently contains the **legacy** production website plus rebuild governance docs.
+- The rebuild is a **ground-up** platform. Use legacy code as **evidence of content and behavior**, not as the architectural template.
+- Do not copy legacy anti-patterns merely because they already exist (for example: UI-only auth, unauthenticated privileged writes, permanent public receipt URLs, eagerly loaded multi‑megabyte hero video).
+- Do not initialize or implement the new application stack until architecture is **ACCEPTED** via approved ADRs—not merely because `ARCHITECTURE_V1_DRAFT.md` exists.
+- Documents marked **DRAFT** are **not** implementation authorization.
+
+## Accuracy and evidence
+
+- Never invent facts about this repository, infrastructure, APIs, database, configuration, content, or external services.
+- Inspect the relevant source before making claims about existing behavior.
+- If something cannot be verified, explicitly label it UNKNOWN, UNVERIFIED, or EXTERNAL VERIFICATION REQUIRED.
+- Never silently assume that an external system behaves a certain way.
+- When framework or library behavior may have changed, consult **current official documentation** rather than relying on memory.
+- Do not present inferred or proposed architecture as existing architecture.
+- Prefer [`PHASE_0_INVENTORY.md`](PHASE_0_INVENTORY.md) as the inventory authority for legacy behavior.
+
+## Change control
+
+- Before a multi-file or architectural change, produce a plan and identify files/services affected.
+- Do not implement architecture that is still marked DRAFT or PENDING DECISION.
+- Make changes incrementally.
+- Preserve working current-site behavior unless the approved task explicitly replaces it.
+- Do not delete legacy files or assets merely because they appear unused until references have been verified.
+- Do not perform unrelated refactoring while implementing a scoped task.
+
+## Production safety
+
+Without **explicit** user instruction, NEVER:
+
+- deploy to production,
+- modify DNS,
+- modify Cloudflare production settings,
+- rotate credentials,
+- modify billing,
+- destroy databases,
+- delete production data,
+- force-push Git branches,
+- overwrite or rewrite Git history,
+- push directly to production,
+- modify live environment variables,
+- disable security controls.
+
+Local and staging work must remain isolated from production.
+
+## Dependencies
+
+- Do not add a dependency when the platform/framework already provides a reasonable solution.
+- Explain why a new dependency is needed before adding major infrastructure dependencies.
+- Do not perform major framework or dependency upgrades as a side effect of unrelated work.
+- Prefer maintained, current APIs over deprecated APIs.
+- Do not introduce Prisma unless an approved architecture decision demonstrates a compelling requirement.
+- Do not implement custom password storage unless explicitly approved by architecture.
+
+## Communication workflow
+
+When asked to implement a substantial feature:
+
+1. Understand current behavior.
+2. State assumptions and unresolved decisions.
+3. Produce an implementation plan.
+4. Implement only the approved scope.
+5. Verify the implementation.
+6. Report files changed, tests run, unresolved risks, and follow-up work.
+
+When requirements conflict with security, privacy, data integrity, or an approved architecture decision, **STOP** implementation and explain the conflict instead of silently working around the rule.

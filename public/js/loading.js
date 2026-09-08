@@ -1,3 +1,4 @@
+// public/js/loading.js
 // Wait for everything to load
 window.addEventListener("load", function () {
   // Show loading screen for minimum 4 seconds (matches longest animation)

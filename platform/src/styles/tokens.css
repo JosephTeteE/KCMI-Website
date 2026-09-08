@@ -1,0 +1,448 @@
+@import "tailwindcss";
+
+/*
+  KCMI design tokens
+  Primitives are authoritative brand values (ARCHITECTURE_V1.md).
+  Semantic tokens map to accessible combinations — never scatter raw hex in components.
+*/
+
+:root {
+  /* Primitive brand tokens */
+  --kcmi-off-white: #eff5f5;
+  --kcmi-red: #b60b13;
+  --kcmi-green: #108c1d;
+  --kcmi-lavender: #c298b7;
+  --kcmi-violet: #7c1963;
+
+  /* Semantic neutrals (not brand invents — UI accessibility) */
+  --neutral-950: #141216;
+  --neutral-800: #2c2830;
+  --neutral-600: #4a4450;
+  --neutral-400: #8a8490;
+  --neutral-200: #d4dde0;
+  --neutral-0: #ffffff;
+
+  /* Fluid type scale — readable without relying on OS a11y zoom */
+  --text-body: clamp(1.0625rem, 0.98rem + 0.35vw, 1.125rem); /* ~17–18px */
+  --text-small: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem); /* ≥16px footer/meta */
+  --text-nav: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --text-lead: clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+  --leading-body: 1.65;
+  --leading-tight: 1.35;
+  --paragraph-gap: 1.1em;
+
+  /* Semantic tokens (WCAG-aware mappings) */
+  --color-surface-page: var(--kcmi-off-white);
+  --color-surface-elevated: var(--neutral-0);
+  --color-surface-tint: color-mix(in srgb, var(--kcmi-lavender) 18%, var(--kcmi-off-white));
+  --color-surface-brand: var(--kcmi-violet);
+  --color-action-primary: var(--kcmi-violet);
+  --color-action-primary-fg: #ffffff;
+  --color-action-secondary: var(--kcmi-red);
+  --color-action-secondary-fg: #ffffff;
+  --color-accent: var(--kcmi-lavender);
+  --color-accent-fg: #1a1a1a;
+  /* Darkened vs brand green so small text meets WCAG AA on white */
+  --color-support: #0b6b16;
+  --color-text-body: var(--neutral-950);
+  --color-text-muted: var(--neutral-600);
+  --color-text-on-brand: #ffffff;
+  --color-border: var(--neutral-200);
+  --color-focus: var(--kcmi-violet);
+  --color-success: #0b6b16;
+  --color-success-bg: #e8f5ea;
+  --color-warning: #9a6700;
+  --color-warning-bg: #fff8e6;
+  --color-destructive: var(--kcmi-red);
+  --color-destructive-fg: #ffffff;
+
+  --shadow-soft: 0 12px 40px color-mix(in srgb, var(--kcmi-violet) 8%, transparent);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --max-content: 72rem;
+}
+
+@theme inline {
+  --color-surface-page: var(--color-surface-page);
+  --color-surface-elevated: var(--color-surface-elevated);
+  --color-surface-tint: var(--color-surface-tint);
+  --color-surface-brand: var(--color-surface-brand);
+  --color-action-primary: var(--color-action-primary);
+  --color-action-primary-fg: var(--color-action-primary-fg);
+  --color-action-secondary: var(--color-action-secondary);
+  --color-action-secondary-fg: var(--color-action-secondary-fg);
+  --color-accent: var(--color-accent);
+  --color-accent-fg: var(--color-accent-fg);
+  --color-support: var(--color-support);
+  --color-text-body: var(--color-text-body);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-on-brand: var(--color-text-on-brand);
+  --color-border: var(--color-border);
+  --color-focus: var(--color-focus);
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-fg: var(--color-destructive-fg);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-surface-page);
+  color: var(--color-text-body);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+p + p {
+  margin-top: var(--paragraph-gap);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  line-height: var(--leading-tight);
+}
+
+.site-container {
+  margin-inline: auto;
+  width: min(100% - 2rem, var(--max-content));
+  max-width: 100%;
+}
+
+.section-space {
+  padding-block: clamp(3rem, 6vw, 5.5rem);
+}
+
+.text-readable {
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+.text-readable-sm {
+  font-size: var(--text-small);
+  line-height: var(--leading-body);
+}
+
+.text-nav {
+  font-size: var(--text-nav);
+  line-height: var(--leading-tight);
+}
+
+.text-lead {
+  font-size: var(--text-lead);
+  line-height: var(--leading-body);
+}
+
+.text-break-safe {
+  /* Wrap long emails/URLs without inserting soft hyphens (avoids "gmail.-com"). */
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: manual;
+}
+
+.min-w-0 {
+  min-width: 0;
+}
+
+.motion-fade-up {
+  animation: fade-up 0.7s ease both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-fade-up {
+    animation: none;
+  }
+}
+
+/* Public footer — two bands: identity + wayfinding, then invitation */
+.site-footer {
+  background: color-mix(in srgb, var(--kcmi-lavender) 10%, var(--kcmi-off-white));
+  color: var(--color-text-body);
+}
+
+.site-footer-accent {
+  height: 3px;
+  background: color-mix(in srgb, var(--kcmi-violet) 72%, var(--kcmi-lavender));
+}
+
+.site-footer-heading {
+  font-size: var(--text-small);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-body);
+}
+
+.site-footer-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  max-width: 100%;
+  align-items: center;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.18em;
+}
+
+.site-footer-link:hover,
+.site-footer-link:focus-visible {
+  color: var(--color-action-primary);
+  text-decoration-color: currentColor;
+}
+
+.site-footer-link-strong {
+  font-weight: 600;
+  color: var(--color-action-primary);
+}
+
+.site-footer-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem 1.75rem;
+  padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
+  align-items: start;
+}
+
+.site-footer-lockup {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.site-footer-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+.site-footer-lockup p + p {
+  margin-top: 0;
+}
+
+.site-footer-tagline {
+  margin-top: 0.35rem;
+}
+
+.site-footer-explore-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer-contact-list {
+  margin-top: 0.75rem;
+}
+
+.site-footer-connect {
+  border-top: 1px solid color-mix(in srgb, var(--kcmi-violet) 12%, var(--color-border));
+  background: color-mix(in srgb, var(--kcmi-lavender) 16%, var(--kcmi-off-white));
+}
+
+.site-footer-invite {
+  display: grid;
+  gap: 1.25rem 2rem;
+  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.site-footer-dfr-body {
+  margin-top: 0.5rem;
+}
+
+.site-footer-invite-actions {
+  display: grid;
+  align-content: start;
+}
+
+.site-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer-social li {
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-footer-social-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+.site-footer-social-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--text-small);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.18em;
+}
+
+.site-footer-social-link:hover,
+.site-footer-social-link:focus-visible {
+  color: var(--color-action-primary);
+  text-decoration-color: currentColor;
+}
+
+.site-footer-legal {
+  border-top: 1px solid color-mix(in srgb, var(--kcmi-violet) 12%, var(--color-border));
+  background: color-mix(in srgb, var(--kcmi-violet) 6%, var(--kcmi-off-white));
+}
+
+.site-footer-legal-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-block: 1.1rem;
+}
+
+.site-footer-legal-line {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.site-footer-legal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.site-footer-legal-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-footer-legal-sep {
+  margin-inline: 0.45rem;
+  color: color-mix(in srgb, var(--kcmi-violet) 45%, var(--color-text-muted));
+}
+
+.site-footer-legal-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.18em;
+}
+
+.site-footer-legal-link:hover,
+.site-footer-legal-link:focus-visible {
+  color: var(--color-action-primary);
+  text-decoration-color: currentColor;
+}
+
+@media (min-width: 48rem) {
+  .site-footer-main {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "brand brand"
+      "explore contact";
+  }
+
+  .site-footer-brand {
+    grid-area: brand;
+  }
+
+  .site-footer-explore {
+    grid-area: explore;
+  }
+
+  .site-footer-contact {
+    grid-area: contact;
+  }
+
+  .site-footer-explore-list {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 1.25rem;
+  }
+
+  .site-footer-invite {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas:
+      "copy actions"
+      "social social";
+    align-items: start;
+  }
+
+  .site-footer-dfr {
+    grid-area: copy;
+  }
+
+  .site-footer-invite-actions {
+    grid-area: actions;
+  }
+
+  .site-footer-social {
+    grid-area: social;
+  }
+}
+
+@media (min-width: 80rem) {
+  .site-footer-main {
+    grid-template-columns: minmax(16rem, 1fr) auto auto;
+    grid-template-areas: "brand explore contact";
+    column-gap: 4rem;
+    justify-content: space-between;
+  }
+}

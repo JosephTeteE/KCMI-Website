@@ -1,0 +1,78 @@
+---
+description: Application security — secrets, authZ, trust boundaries, headers, MFA, ASVS Level 2, AI trust boundary
+alwaysApply: true
+---
+
+# KCMI Security Rules
+
+Target verification framework: **OWASP ASVS 5.0 Level 2**, with higher-assurance controls adopted selectively where the KCMI threat model warrants them. Follow secure-development practices consistent with current **NIST SSDF** guidance.
+
+## Secrets and credentials
+
+- Never hardcode passwords, API secrets, private keys, service-role keys, SMTP credentials, database credentials, access tokens, signing secrets, or connection strings.
+- Never print, echo, summarize, log, paste into documentation, or expose secret values discovered in environment files or configuration.
+- Environment variable **names** may be documented; secret **values** may not.
+- Client-exposed environment variables must never contain privileged credentials.
+- Supabase secret/service-role credentials are **server-only**. Never use a service-role client in browser code.
+- Never commit `.env` files containing credentials.
+- `.env.example` may contain variable names and safe placeholders only.
+- If a credential appears hardcoded in tracked source, flag the location **without** reproducing the credential.
+- AI agents must not receive unrestricted production credentials.
+
+## Authentication and authorization
+
+- Authentication is not authorization.
+- Sensitive authorization must be enforced **server-side and/or at the database layer** (including RLS), not merely by hiding UI elements, obscure URLs, CORS, or AI instructions.
+- Never assume that `/admin` being difficult to discover makes it secure.
+- Privileged actions must follow least privilege.
+- Prefer stable organizational **roles** plus fine-grained **permissions**; avoid role explosion for every pastoral workflow.
+- Prefer RLS and server permission checks as the source of truth for rapidly revocable sensitive access; JWT/custom claims may support authorization design but must not be the sole control for sensitive pastoral permissions.
+- KCMI Hub authentication uses the approved identity provider (Supabase Auth preferred). Do not build custom password storage.
+- **MFA (AAL2)** via stable Supabase **TOTP** is required before high-sensitivity Hub actions for at least: super administrators, pastoral administrators, pastors accessing counselling/welfare or similarly sensitive cases, finance reviewers, and users changing giving/payment configuration. Evaluate MFA for every Hub staff account. Do not depend on experimental passkey support for V1 security.
+- Session expiration, logout/revocation, and disabled-account enforcement must be designed and tested.
+- Cover CSRF considerations appropriate to cookie/session patterns used by the stack.
+- Public and auth endpoints need rate limiting, bot protection, and brute-force protection as applicable.
+
+## Input and output security
+
+- Treat all browser input, URL parameters, uploaded files, webhook payloads, external API content, and **AI output** as untrusted until validated.
+- Validate server-side input with an approved schema validator. Client-side validation is UX only.
+- Do not construct SQL using concatenated user input. Parameterized queries and migrations are required.
+- Validate URLs and file types where applicable; prefer MIME allowlisting and file-signature checks where practical.
+- Avoid raw HTML rendering and `dangerouslySetInnerHTML` unless explicitly reviewed and sanitized.
+- Public write endpoints require validation, rate limiting, and anti-abuse controls.
+- Do not promise antivirus/malware scanning without a defined mechanism; if desired but unselected, mark DECISION REQUIRED.
+
+## Storage and payment evidence
+
+- Never expose payment receipts through permanent public URLs.
+- Sensitive files must use **private** storage with authorized or short-lived signed access.
+- Enforce size limits and type allowlisting server-side.
+
+## Security headers
+
+New application responses should establish a concrete baseline including:
+
+- Content-Security-Policy (avoid broad `unsafe-inline`; allowlist specific third parties such as YouTube embeds intentionally),
+- Strict-Transport-Security,
+- X-Content-Type-Options,
+- Referrer-Policy,
+- Permissions-Policy,
+- CSP `frame-ancestors` (or equivalent clickjacking control).
+
+## Database and RLS
+
+- Any table exposed through Supabase's Data API must have deliberate grants and RLS appropriate to the workflow.
+- Do not create broad public SELECT, UPDATE, or DELETE access.
+- Do not create broad anonymous INSERT policies for sensitive workflows without explicit architectural approval and anti-abuse analysis.
+- RLS changes must include both positive and negative authorization tests.
+- Database schema changes must be reproducible through migrations.
+- Never manually alter production schema as an undocumented shortcut.
+
+## AI trust boundary
+
+- AI-generated administrative content is a **draft** until a human explicitly publishes it.
+- AI never replaces server-side or database authorization.
+- AI does not automatically receive counselling, welfare, prayer narratives, or pastoral notes unless separately approved through a future security review.
+- High-impact AI-assisted actions require human confirmation and must be attributable in audit logs.
+- Architecture must allow future AI features without granting AI direct database superuser privileges.

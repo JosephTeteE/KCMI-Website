@@ -6,129 +6,184 @@ A dynamic, responsive, and type-safe web application built to serve the KCMI com
 
 ---
 
-## 🌐 Live Sites
+## 🌐 Live Sites & Subdomains
 
-- **Production:** kcmi-rcc.org
-- **Backend Server:** kcmi-backend.onrender.com
+- **Main Website:** [kcmi-rcc.org](https://kcmi-rcc.org)
+- **Camp Microsite:** [camp.kcmi-rcc.org](https://camp.kcmi-rcc.org)
+- **Backend Server:** [kcmi-backend.onrender.com](https://kcmi-backend.onrender.com)
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-### Ministry & Community Engagement
+### Core Website Functionality
 
-- Homepage with a dynamic promotional events section powered by Google Sheets.
-- Dedicated pages for Apostle Aikins' biography, global church locations, and ministry information.
-- Interactive events calendar through Google Calendar integration.
-- Livestream page with a dynamic embed for live services.
-- Youth Camp registration page with secure file uploads to Google Drive.
-- Contact forms and WhatsApp subscriptions protected by Google reCAPTCHA v3.
+- **Dynamic Promotional System**: Powered by Google Sheets API with service account authentication
+- **Event Management**: Google Calendar integration with caching for performance
+- **Livestream System**: Admin-controlled embed codes with live status indicators
+- **Contact Forms**: Protected by reCAPTCHA v3 with automated email responses
+- **WhatsApp Broadcast**: Subscription system protected by Google reCAPTCHA v3.
 
-### Technical & Administrative
+### Youth Camp Microsite
 
-- Hybrid TypeScript/JavaScript Core: Key modules are written in TypeScript for enhanced stability and type safety, integrated with existing JavaScript modules.
-- Secure Admin Panel: A JWT-protected panel for managing livestream settings.
-- Robust Authentication: Utilizes a Google Service Account for secure, server-to-server interaction with Google APIs (Sheets, Drive, Calendar).
-- Modern UI: Dark mode toggle with local storage persistence, fully responsive design, and animations via AOS.
-- Embedded Services: Integrated Google Maps with directions and a click-to-copy WhatsApp number feature.
+- **Registration System**: Secure form with Cloudinary file uploads
+- **Payment Records Processing**: Integrated with Google Drive for receipt storage
+- **Interactive UI**: Drag-and-drop receipt upload, clipboard functionality
+
+### Technical Infrastructure
+
+- **Authentication**: JWT for admin panel, Google Service Account for APIs
+- **Database**: MySQL on Aiven with connection pooling
+- **Caching**: NodeCache for calendar events and map configurations
+- **Security**: Rate limiting, CSP headers, and input validation
 
 ---
 
 ## 🛠 Technology Stack
 
-- **Core Logic:** TypeScript & Node.js with Express.js
-- **Frontend:** HTML5, CSS3 (Bootstrap 5), JavaScript (ES6+)
-- **Database:** MySQL on Aiven
+### Backend Services
 
-**Key Libraries:**
+- **Runtime**: Node.js 18+ with TypeScript
+- **Framework**: Express.js
+- **Database**: MySQL (Aiven Cloud)
+- **Email**: Nodemailer with SMTP
+- **File Storage**: Google Drive + Cloudinary
 
-- googleapis for Google Workspace APIs
-- google-auth-library for secure Service Account authentication
-- nodemailer for SMTP email services
-- multer for file uploads
+### Frontend
 
-**Hosting & Deployment:**
+- **Core**: Vanilla JavaScript + TypeScript
+- **Styling**: Bootstrap 5 + Custom CSS
+- **Animations**: AOS (Animate On Scroll)
+- **Maps**: Google Maps API
 
-- **Frontend:** Vercel
-- **Backend:** Render
-- **DNS & CDN:** Cloudflare
+### APIs & Integrations
+
+- **Google Workspace**: Sheets, Drive, Calendar
+- **reCAPTCHA**: v3 for forms, v2 for camp registration
+- **Cloudinary**: Image and PDF uploads for camp receipts
 
 ---
 
 ## 📂 Project Structure
 
-This is a high-level overview of the current project structure, reflecting both TypeScript and JavaScript files.
-
 ```
 church_website/
 ├── api/
-│   └── livestream.ts      # (TypeScript) Livestream management API
-├── public/                # Frontend source assets (HTML, CSS, JS, TS)
-│   ├── admin/             # Admin panel assets
-│   │   └── js/admin.js
+│   └── livestream.ts      # Livestream management endpoints
+├── camp-deploy/           # Camp microsite (Git submodule)
+│   ├── public/            # Camp-specific assets
+│   └── package.json       # Camp dependencies
+├── public/                # Main site assets
+│   ├── admin/             # JWT-protected admin panel
 │   ├── assets/            # Images, Videos, etc.
 │   ├── css/               # All Stylesheets
-│   ├── js/                # Scripts folder
-│   │   ├── promos.ts      # (TypeScript) Promo events logic
-│   │   ├── scripts.ts     # (TypeScript) Main site interactivity
-│   │   ├── church-calendar.js # (JavaScript) Calendar logic
-│   │   └── loading.js     # (JavaScript) Loading screen logic
+│   ├── js/                # TypeScript/JavaScript modules
 │   └── *.html             # All HTML pages
 ├── server/                # Backend server source
-│   ├── db.ts              # (TypeScript) Database connection
-│   └── server.ts          # (TypeScript) Main Express server
-├── .env.example           # Environment variables template
-├── package.json
-└── tsconfig.json          # TypeScript compiler configuration
+│   ├── db.ts              # Database connection pool
+│   └── server.ts          # Main Application Logic
+├── kcmi-rcc-worker/       # Cloudflare worker
+└── vercel.json            # Deployment configuration
 ```
 
 ---
 
-## ⚙️ Local Development & Setup
+## Development Setup
 
-### Clone Repository
+### Prerequisites
+
+- Node.js 18+
+- MySQL 8+
+- Google Service Account credentials
+- Cloudinary account
+
+---
+
+### 🧩 Installation
 
 ```bash
-git clone https://github.com/JosephTeteE/KCMI-Website.git
+# Clone main repository and submodule
+git clone --recurse-submodules https://github.com/JosephTeteE/KCMI-Website.git
 cd KCMI-Website
-```
 
-### Install Dependencies
-
-```bash
+# Install dependencies
 npm install
+
+# Initialize camp-deploy submodule
+cd camp-deploy && npm install && cd ..
+
+
 ```
 
-### Configure Environment Variables
+### 🛠️ Environment Configuration
 
 - Copy `.env.example` to a new file named `.env`.
-- Populate `.env` with all required credentials.
-- **Important:** The `GOOGLE_CREDENTIALS_BASE64` variable must contain the entire JSON key file for your Google Service Account, encoded in Base64 format.
+- Populate `.env` with all required credentials and configuration keys.
 
-### Run the Development Server
+Required variables include:
 
-This command uses `ts-node-dev` to run the server and automatically restart it when you make changes to any `.ts` file.
+- GOOGLE_CREDENTIALS_BASE64: Base64-encoded service account JSON
+- CLOUDINARY_URL: Your Cloudinary API URL
+- Database credentials (Aiven)
+- SMTP credentials for emails
+- reCAPTCHA secret keys
+
+**Important:** Do not commit your `.env` file. It should always be included in `.gitignore`.
+
+### ▶️ Running Locally
 
 ```bash
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
+
+
+## Deployment Strategy
+
+### Main Website (Vercel)
+
+- Automatic deployments from main branch
+- Static assets served via Vercel CDN
+- Edge functions for dynamic routes
+
+### Backend API (Render)
+
+- Node.js environment with persistent MySQL connection
+- Environment variables managed in Render dashboard
+- Automatic SSL via Let's Encrypt
+
+### Camp Microsite (Vercel)
+
+- Separate project linked to camp-deploy submodule
+- Custom domain: camp.kcmi-rcc.org
+
+
+
+## 🔒 Security Practices
+
+### Credential Management
+
+- Service accounts instead of OAuth2
+- Base64-encoded credentials in environment variables
+- Regular credential rotation
+
+### Input Validation
+
+- reCAPTCHA on all forms
+- Rate limiting on API endpoints
+- SQL parameterized queries
+
+### Content Security
+
+- Strict CSP headers
+- XSS protection middleware
+- File upload validation
+
+
+## 📜 License
+
+This project is proprietary software owned by Kingdom Covenant Ministries International.
+Unauthorized use or distribution is prohibited.
 ```
-
-The server will be available at [http://localhost:5000](http://localhost:5000) (or the port specified in your `.env`).
-
----
-
-## 🚀 Deployment
-
-The project is configured for a dual-deployment setup where the build process compiles TypeScript and prepares all static assets for serving.
-
-### Backend (Render)
-
-- **Build Command:** `npm run build`
-- **Start Command:** `node dist/server/server.js`
-
-### Frontend (Vercel)
-
-- **Build Command:** `npm run build`
-- **Output Directory:** `dist/public`
-
-The `npm run build` script (`tsc && copyfiles ...`) is the single source of truth for creating the production-ready `dist` directory.

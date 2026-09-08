@@ -1,0 +1,28 @@
+# Local Supabase for KCMI platform Phase B foundation
+# Production/cloud linking is NOT authorized here.
+
+project_id = "kcmi-platform-local"
+
+[api]
+enabled = true
+
+[db]
+major_version = 15
+
+[db.migrations]
+enabled = true
+
+[auth]
+enabled = true
+
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+# Studio local logs/analytics often fail on Docker Desktop (vector socket).
+# Core Auth/DB/API are sufficient for Phase B.1 validation.
+[analytics]
+enabled = false

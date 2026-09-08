@@ -1,0 +1,49 @@
+---
+description: Frontend quality — TypeScript, SSR preference, tokens, a11y, Core Web Vitals, media dimensions
+alwaysApply: true
+---
+
+# KCMI Frontend Quality Rules
+
+Accessibility target: **WCAG 2.2 AA**.
+
+## TypeScript and rendering
+
+- New TypeScript must use **strict** typing.
+- Prefer server-rendered / Server Components unless browser-side interactivity is genuinely required.
+- Keep client JavaScript minimal.
+
+## Design tokens and content
+
+- Do not hardcode repeated branding dimensions, colors, URLs, or business content inside components.
+- Use centralized design tokens (primitives + semantic tokens) and structured content.
+- Require responsive, mobile-first design.
+- Do not use brand color combinations that fail WCAG contrast requirements.
+
+## Images and layout (CLS)
+
+The goal is **not** to eliminate intrinsic image dimensions.
+
+**Avoid:**
+
+- arbitrary fixed layout widths/heights scattered through components as a substitute for responsive design.
+
+**Prefer:**
+
+- responsive containers,
+- CSS `aspect-ratio`,
+- Next/Image (or equivalent) with explicit intrinsic media dimensions / aspect ratios where they prevent cumulative layout shift,
+- responsive `sizes`,
+- optimized responsive sources.
+
+## Performance and media
+
+- Target excellent Core Web Vitals; respect measurable performance budgets (LCP, INP, CLS, JS/CSS/font/media transfer).
+- Large media must not eagerly load merely because it exists on a page.
+- Hero/background video must never be mandatory for meaningful first paint.
+- Do not eagerly load large video on mobile; provide optimized poster/fallback media.
+- Respect `prefers-reduced-motion` and save-data / constrained-network behavior where feasible.
+
+## AI-generated UI content
+
+- AI-generated administrative content is a draft unless a human explicitly publishes it.

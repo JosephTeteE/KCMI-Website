@@ -1,0 +1,45 @@
+---
+description: Sensitive pastoral and financial data handling, least privilege, retention, notifications
+alwaysApply: true
+---
+
+# KCMI Data Privacy Rules
+
+## Sensitive data classes
+
+Treat the following as **sensitive**:
+
+- counselling narratives and case notes,
+- welfare narratives and case notes,
+- prayer request narratives,
+- pastoral notes and assignments,
+- personal contact details in pastoral or engagement contexts,
+- payment evidence / receipt uploads,
+- similar pastoral or financial records.
+
+## Access control
+
+- Apply least privilege and explicit role-based access with fine-grained permissions.
+- Use Row-Level Security (or equivalent database enforcement) where applicable.
+- Media administrators must **not** automatically receive access to counselling, welfare, prayer narratives, or pastoral notes.
+- Pastors should see only records appropriate to their authorization and assignments.
+- Do not expose one member's information to another member.
+- Isolate sensitive pastoral data from normal engagement/content data at the schema/table boundary where practical.
+
+## Logging and communications
+
+- Never place sensitive narratives in URLs.
+- Never put sensitive narratives in WhatsApp messages, SMS messages, analytics events, console logs, email **subjects**, or application logs.
+- Notifications may contain only minimal non-sensitive information and a reference number.
+- Do not log complete form payloads containing personal or sensitive information.
+
+## Storage and retention
+
+- Sensitive uploads use private storage with authorized or time-limited access.
+- Never expose permanent public receipt URLs.
+- Data retention must be **explicitly defined** rather than assumed forever.
+- Collect only information required for the approved workflow.
+
+## AI and pastoral data
+
+- AI agents must not have direct access to counselling/welfare/pastoral narratives unless separately approved through a future security review.

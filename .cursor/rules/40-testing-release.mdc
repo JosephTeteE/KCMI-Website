@@ -1,0 +1,33 @@
+---
+description: Verification, testing, and release gates — never claim unrun tests
+alwaysApply: true
+---
+
+# KCMI Testing and Release Rules
+
+## Verification after meaningful implementation
+
+Where applicable, require:
+
+- formatting / lint,
+- type checking,
+- unit tests,
+- authorization / RLS tests (positive and negative),
+- accessibility testing,
+- production build,
+- end-to-end tests for critical workflows (publish, registration, pastoral inbox isolation, giving config changes).
+
+## Honesty about results
+
+- Report what was actually run and its result.
+- Never claim that a test passed unless it actually ran.
+- Never claim that something works merely because the code looks correct.
+
+## Release and production
+
+- Production deploy, DNS, credential rotation, billing changes, and production data deletion still require **explicit** human instruction (see project rules).
+- Prefer CI gates that block merge on failing lint, typecheck, tests, or build once those pipelines exist.
+
+## RLS and security tests
+
+- RLS and permission changes are incomplete without both allow and deny test cases for the affected roles/permissions.
