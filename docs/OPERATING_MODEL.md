@@ -53,4 +53,4 @@ Branch-specific staff accounts are **not required** for this initial rollout.
 
 ## Future public branch pages
 
-Schema and adapters already support a later route such as `/locations/[branch-slug]` (slug, country, address, service times, contact, published branch media). That page is **not** built in this pass.
+Public branch pages live at `/locations/[branch-slug]`. HQ Content Admin manages all branches centrally. `branch_staff_assignments` remains for future decentralized `branch_admin` logins.

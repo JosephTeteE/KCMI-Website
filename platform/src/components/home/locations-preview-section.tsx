@@ -11,7 +11,7 @@ export function LocationsPreviewSection({ branches }: Props) {
     <section
       id="locations"
       aria-labelledby="locations-heading"
-      className="section-space"
+      className="section-space-lg"
     >
       <div className="site-container">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -37,7 +37,10 @@ export function LocationsPreviewSection({ branches }: Props) {
         <div className="mt-10">
           <BranchCountryGroups branches={branches} headingLevel="h3">
             {(branch) => (
-              <div className="h-full rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5">
+              <Link
+                href={`/locations/${branch.slug}`}
+                className="block h-full rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 hover:border-[var(--color-action-primary)]"
+              >
                 <h4 className="font-display text-xl font-semibold text-[var(--color-text-body)]">
                   {branch.name}
                 </h4>
@@ -56,7 +59,7 @@ export function LocationsPreviewSection({ branches }: Props) {
                     Service times will be listed here when they are available.
                   </p>
                 )}
-              </div>
+              </Link>
             )}
           </BranchCountryGroups>
         </div>

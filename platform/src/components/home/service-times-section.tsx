@@ -10,7 +10,7 @@ export function ServiceTimesSection({ times, locationLabel }: Props) {
     <section
       id="worship"
       aria-labelledby="worship-heading"
-      className="section-space bg-[var(--color-surface-elevated)]"
+      className="section-space-lg bg-[var(--color-surface-elevated)]"
     >
       <div className="site-container grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
         <div>

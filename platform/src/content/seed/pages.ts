@@ -42,6 +42,7 @@ export const serviceOfferings: ServiceOffering[] = [
     id: "cell-fellowships",
     title: "Cell Fellowships",
     body: "Join a smaller group for fellowship, Bible study, and prayer. Connect with others in a supportive environment.",
+    kind: "ministry",
     cta: {
       label: "Join a Cell Fellowship",
       href: "https://forms.gle/ogHw37wRpx9HC2bs5",
@@ -52,6 +53,7 @@ export const serviceOfferings: ServiceOffering[] = [
     id: "service-teams",
     title: "Service Teams",
     body: "Use your gifts and talents to serve God and our community. Find a place to make a difference.",
+    kind: "ministry",
     cta: {
       label: "Join a Service Team",
       href: "https://forms.gle/Xo3rbm2rFaidrqCbA",
@@ -59,17 +61,23 @@ export const serviceOfferings: ServiceOffering[] = [
     },
   },
   {
-    id: "worship-times",
-    title: "Worship Times",
-    body: "Join us for worship at Headquarters in Port Harcourt. Sunday and Thursday times are listed below.",
-    times: ["Sunday: 08:30 AM", "Thursday: 5:30 PM"],
+    id: "media",
+    title: "Sermons and media",
+    body: "Watch and listen to messages from KCMI gatherings and Rehoboth Wells.",
+    kind: "media",
+    links: [{ label: "Sermons", href: "/sermons" }],
   },
   {
-    id: "resources",
-    title: "Access Resources",
-    body: "Explore our resources to deepen your spiritual journey.",
+    id: "care",
+    title: "Prayer and care requests",
+    body: "Prayer, counselling, welfare and celebration requests are available through the forms below.",
+    kind: "care",
     links: [
-      { label: "Sermons", href: "/sermons" },
+      {
+        label: "Prayer request form",
+        href: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
+        external: true,
+      },
       {
         label: "Counselling request form",
         href: "https://forms.gle/L6DyfegmTCGHuSBk6",
@@ -85,17 +93,12 @@ export const serviceOfferings: ServiceOffering[] = [
         href: "https://forms.gle/QxiASWogkGFamvEJ8",
         external: true,
       },
-      {
-        label: "Prayer request form",
-        href: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
-        external: true,
-      },
     ],
   },
 ];
 
 export const servicesPageIntro =
-  "Discover the various services offered at Kingdom Covenant Ministries International. We're here to support you in your spiritual journey and provide resources for your growth.";
+  "Worship, cell fellowships, and service teams at Kingdom Covenant Ministries International. Headquarters times are listed below; other locations are on the Locations page.";
 
 /**
  * VERIFIED sermons.html — no individual sermon catalog in legacy HTML.
@@ -106,7 +109,7 @@ export const sermonPlatforms: SermonPlatform[] = [
     id: "youtube",
     name: "YouTube",
     description:
-      "Watch full sermons and special teachings on our official YouTube channel. Subscribe and be blessed!",
+      "Watch full sermons and special teachings on our official YouTube channel.",
     href: "https://www.youtube.com/@rehoboth-tv",
     external: true,
   },
@@ -114,17 +117,16 @@ export const sermonPlatforms: SermonPlatform[] = [
     id: "silverbird",
     name: "Silverbird · Rehoboth Wells",
     description:
-      "Rehoboth Wells airs on Silverbird Television on Fridays at 8:00 pm.",
+      "Rehoboth Wells airs on Silverbird Television. Broadcast times will be listed here when they are confirmed.",
     href: "https://silverbirdtv.com",
     external: true,
-    scheduleLabel: "Fridays, 8:00 pm — Silverbird Television",
   },
   {
     id: "tiktok",
-    name: "TikTok",
+    name: "Apostle Frank on TikTok",
     description:
-      "Get sermon highlights, powerful excerpts, and short clips to inspire you daily.",
-    href: "https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1",
+      "Sermon highlights and short clips from Apostle Philemon Frank Aikins.",
+    href: "https://www.tiktok.com/@frank.aikins",
     external: true,
   },
   {
@@ -137,9 +139,11 @@ export const sermonPlatforms: SermonPlatform[] = [
 ];
 
 export const sermonsPageHeader = {
-  headline: "Experience the Word of God Anytime, Anywhere.",
-  sub: "Stay spiritually nourished with powerful sermons from our church, available on multiple platforms.",
-  sectionTitle: "Where to Watch & Listen",
+  headline: "KCMI sermons and Rehoboth Wells",
+  sub: "Watch messages from Apostle Philemon Frank Aikins and KCMI gatherings on YouTube, Silverbird, and TikTok. Join us in person at a church location.",
+  sectionTitle: "Where to watch and listen",
+  emptyState:
+    "Individual sermon recordings are published here when they are available. Until then, use the platforms below.",
 } as const;
 
 /**
@@ -225,12 +229,12 @@ export const faqs: FaqItem[] = [
   {
     id: "contact",
     question: "How can I contact KCMI?",
-    answerParagraphs: [
-      "You can reach us through the following methods:",
-      "• Email: kingdomcovenantministriesinter@gmail.com",
-      "• Phone: +234 9134 44 8322",
-      "• Visit our Contact Us page or Locations page.",
-    ],
+      answerParagraphs: [
+        "You can reach us through the following methods:",
+        "• Email: contact@kcmi-rcc.org",
+        "• Phone: +234 9134 44 8322",
+        "• Visit our Contact Us page or Locations page.",
+      ],
     links: [
       { label: "Contact", href: "/contact" },
       { label: "Locations", href: "/locations" },
@@ -239,9 +243,9 @@ export const faqs: FaqItem[] = [
   {
     id: "past-sermons",
     question: "Where can I find past sermons?",
-    answerParagraphs: [
-      "You can find past sermons on our YouTube channel, TikTok page, and on Silverbird TV (Fridays, 8:00 PM).",
-    ],
+      answerParagraphs: [
+        "You can find past sermons on our YouTube channel, on Apostle Frank’s TikTok, and on the Sermons page.",
+      ],
     links: [
       {
         label: "YouTube",

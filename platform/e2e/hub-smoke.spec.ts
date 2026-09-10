@@ -6,6 +6,7 @@ import {
   TOGO_BRANCH_ID,
   cleanupSyntheticRecords,
   createSyntheticUser,
+  dismissHubTourIfPresent,
   serviceClient,
   signInStaff,
 } from "./helpers/hub";
@@ -16,7 +17,7 @@ test.describe("Hub browser smoke", () => {
   test.describe.configure({ mode: "serial" });
 
   test("programs, media, branch, sermons, livestream", async ({ page, context }) => {
-    test.setTimeout(180_000);
+    test.setTimeout(300_000);
     test.skip(!hasHubEnv(), "Local Supabase env is not configured");
 
     const stamp = Date.now();
@@ -46,46 +47,54 @@ test.describe("Hub browser smoke", () => {
 
     try {
       await signInStaff(page, publisherEmail);
-      await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible({
+      await expect(
+        page.getByRole("heading", { name: "What would you like to update?" }),
+      ).toBeVisible({
         timeout: 20_000,
       });
+      await dismissHubTourIfPresent(page);
 
-      await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Programs" }).click();
-      await expect(page.getByRole("heading", { name: "Programs" })).toBeVisible();
+      await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Programs & Announcements" }).click();
+      await expect(page.getByRole("heading", { name: "Programs & Announcements" })).toBeVisible();
       await page.getByRole("link", { name: "New program" }).click();
       await page.locator("#title").fill(programTitle);
       await page.locator("#short_description").fill("Synthetic D1.2 program");
       await page.locator("#cta_label").fill("Learn more");
       await page.locator("#cta_url").fill("/events");
       await page.locator("#placement").selectOption("featured");
-      await page.getByRole("button", { name: "Create draft" }).click();
-      await expect(page.getByText("Draft program created.")).toBeVisible();
+      await page.getByRole("button", { name: "Save as a draft (not public yet)" }).click();
+      await expect(page.getByText("Your program draft is saved. It is not on the public website yet.")).toBeVisible();
       programId = page.url().match(/\/admin\/programs\/([^/?#]+)/)?.[1] ?? null;
       expect(programId).toBeTruthy();
 
-      await page.getByRole("link", { name: "Open Hub preview" }).click();
-      await expect(page.getByRole("heading", { name: programTitle })).toBeVisible();
-      await page.goBack();
-
+      await page.getByRole("link", { name: "Preview this program" }).click();
+      await expect(page.getByRole("heading", { name: programTitle }).first()).toBeVisible();
+      await page.goto(`/admin/programs/${programId}`);
       await page.getByRole("button", { name: "Mark ready for preview" }).click();
-      await expect(page.getByText("Marked ready for preview.")).toBeVisible();
-      await page.getByRole("button", { name: "Publish" }).click();
-      await expect(page.getByText("Program published.")).toBeVisible();
+      await expect(page.getByText("This program is ready to preview. It is not public yet.")).toBeVisible();
+      await page.getByRole("button", { name: "Make this live on the website" }).click();
+      await expect(page.getByText("This program is now live on the website.")).toBeVisible();
+      await expect(page.getByText("Currently on the website").first()).toBeVisible();
+      await expect(page.getByRole("button", { name: "Change these details" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save my draft" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Mark ready for preview" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Make this live on the website" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Remove from public website" })).toBeVisible();
 
       const publicPage = await context.newPage();
       await publicPage.goto("/", { waitUntil: "networkidle" });
       await expect(publicPage.getByRole("heading", { name: programTitle })).toBeVisible();
       await publicPage.close();
 
-      await page.getByRole("button", { name: "Archive" }).click();
-      await expect(page.getByText("Program archived.")).toBeVisible();
+      await page.getByRole("button", { name: "Remove from public website" }).click();
+      await expect(page.getByText("This program is no longer on the public website.")).toBeVisible();
 
-      await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Media" }).click();
-      await expect(page.getByRole("heading", { name: "Media library" })).toBeVisible();
-      await page.locator("#file").setInputFiles(pixel);
-      await page.locator("#alt_text").fill("D1.2 synthetic pixel");
-      await page.getByRole("button", { name: "Upload" }).click();
-      await expect(page.getByText("Image uploaded.")).toBeVisible({
+      await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Photos" }).click();
+      await expect(page.getByRole("heading", { name: "Photos" })).toBeVisible();
+      await page.locator('input[name="file"]').setInputFiles(pixel);
+      await page.locator('input[name="alt_text"]').fill("D1.2 synthetic pixel");
+      await page.getByRole("button", { name: "Add this photo to the library" }).click();
+      await expect(page.getByText("The photo is ready to use on the website.")).toBeVisible({
         timeout: 20_000,
       });
       await expect(page.getByText("D1.2 synthetic pixel")).toBeVisible();
@@ -103,30 +112,51 @@ test.describe("Hub browser smoke", () => {
       await page.locator("#title").fill(sermonTitle);
       await page.locator("#speaker").fill("D1.2 Validation");
       await page.locator("#youtube_url").fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-      await page.getByRole("button", { name: "Create draft" }).click();
-      await expect(page.getByText("Draft sermon created.")).toBeVisible();
+      await page.getByRole("button", { name: "Save as a draft (not public yet)" }).click();
+      await expect(page.getByText("Your sermon draft is saved. It is not on the public website yet.")).toBeVisible();
       sermonId = page.url().match(/\/admin\/sermons\/([^/?#]+)/)?.[1] ?? null;
-      await page.locator("#speaker").fill("D1.2 Validation edited");
-      await page.getByRole("button", { name: "Save" }).click();
-      await expect(page.getByText("Sermon saved.")).toBeVisible();
+      await page.getByRole("button", { name: "Change these details" }).click();
+      await page.locator("#proposed-speaker").fill("D1.2 Validation edited");
+      await page.getByRole("button", { name: "Preview my changes" }).click();
+      await page.getByRole("button", { name: "Save my sermon details" }).click();
+      await expect(page.getByText("Your sermon details are saved.")).toBeVisible();
+      await page.getByRole("button", { name: "Make this live on the website" }).click();
+      await expect(page.getByText("This sermon is now live on the website.")).toBeVisible();
+      await expect(page.getByText("Currently on the website").first()).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save my draft" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Mark ready for preview" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Make this live on the website" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Remove from public website" })).toBeVisible();
 
       await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Livestream" }).click();
       await expect(page.getByRole("heading", { name: "Livestream" })).toBeVisible();
-      await page.locator("#facebook_url").fill("https://www.facebook.com/kcmi.d12.validation");
-      await page.getByRole("button", { name: "Save" }).click();
-      await expect(page.getByText("Livestream settings saved.")).toBeVisible();
+      await page.getByRole("button", { name: "Start a Facebook livestream" }).click();
+      await page.locator("#facebook_embed").fill(
+        '<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fkcmi.d12.validation"></iframe>',
+      );
+      await page.getByRole("button", { name: "Check and Preview" }).click();
+      await expect(page.getByText("Facebook video recognized")).toBeVisible();
+      await page.getByRole("button", { name: "Start a Facebook livestream" }).click();
+      await expect(page.getByText("The website is now showing the livestream.")).toBeVisible();
+      await expect(page.getByText("A live video is on")).toBeVisible();
+      await expect(page.getByRole("button", { name: "Change live video" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Turn off the livestream" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Make Livestream Live" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Start a Facebook livestream" })).toHaveCount(0);
 
       await page.getByRole("button", { name: "Sign out" }).click();
       await page.waitForURL("**/auth/sign-in");
 
       await signInStaff(page, branchEmail);
+      await dismissHubTourIfPresent(page);
       await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Branches" }).click();
       await page.getByRole("link", { name: "Accra" }).first().click();
       await expect(page.getByRole("heading", { name: "Accra" })).toBeVisible();
-      await page.locator("#file").setInputFiles(pixel);
-      await page.locator("#alt_text").fill("D1.2 Accra attach");
-      await page.getByRole("button", { name: "Add Image" }).click();
-      await expect(page.getByText("Photo added to this branch.")).toBeVisible({
+      const gallery = page.locator("form").filter({ hasText: "More branch photos" });
+      await gallery.locator('input[name="file"]').setInputFiles(pixel);
+      await gallery.locator('input[name="alt_text"]').fill("D1.2 Accra attach");
+      await gallery.getByRole("button", { name: "Add this photo to the branch" }).click();
+      await expect(page.getByText("This photo was added to the branch page.")).toBeVisible({
         timeout: 20_000,
       });
       const { data: branchAsset } = await admin
@@ -147,10 +177,16 @@ test.describe("Hub browser smoke", () => {
       expect(branchMediaId).toBeTruthy();
 
       await page.goto(`/admin/branches/${TOGO_BRANCH_ID}`);
-      const city = page.locator("#city_label");
-      if (await city.count()) {
-        await city.fill("Hacked Lome");
-        await page.getByRole("button", { name: "Save branch" }).click();
+      const changeDetails = page.getByRole("button", {
+        name: "Change branch details",
+      });
+      if (await changeDetails.count()) {
+        await changeDetails.click();
+        await page.locator("#proposed-city").fill("Hacked Lome");
+        await page.getByRole("button", { name: "Preview my changes" }).click();
+        await page
+          .getByRole("button", { name: "Make these branch details live" })
+          .click();
         await expect(page.getByRole("alert")).toBeVisible();
       }
       const { data: togo } = await admin

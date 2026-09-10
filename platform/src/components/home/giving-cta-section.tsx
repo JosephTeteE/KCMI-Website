@@ -10,7 +10,7 @@ export function GivingCtaSection({ giving }: Props) {
     <section
       id="giving"
       aria-labelledby="giving-heading"
-      className="section-space bg-[var(--color-surface-brand)] text-[var(--color-text-on-brand)]"
+      className="section-space-lg bg-[var(--color-surface-brand)] text-[var(--color-text-on-brand)]"
     >
       <div className="site-container grid gap-8 lg:grid-cols-[1.2fr_auto] lg:items-center">
         <div>

@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { publicPlaceLabel } from "@/content/branch-groups";
 import type { Branch } from "@/content/types";
 import { mapsHrefForBranch } from "@/content";
 
@@ -7,14 +9,17 @@ type Props = {
 
 export function BranchCard({ branch }: Props) {
   const mapsHref = mapsHrefForBranch(branch);
+  const detailHref = `/locations/${branch.slug}`;
 
   return (
-    <article className="flex h-full min-w-0 flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 shadow-[var(--shadow-soft)]">
+    <article className="card-pad flex h-full min-w-0 flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]">
       <h2 className="font-display text-break-safe text-2xl font-semibold text-[var(--color-text-body)]">
-        {branch.name}
+        <Link href={detailHref} className="hover:text-[var(--color-action-primary)]">
+          {branch.name}
+        </Link>
       </h2>
       <p className="mt-1 text-readable-sm text-[var(--color-text-muted)]">
-        {branch.cityLabel}
+        {publicPlaceLabel(branch.cityLabel, branch.country)}
       </p>
 
       <address className="text-readable mt-5 not-italic text-[var(--color-text-muted)]">
@@ -27,11 +32,11 @@ export function BranchCard({ branch }: Props) {
 
       {branch.serviceTimes.length > 0 ? (
         <ul className="mt-5 space-y-2">
-          {branch.serviceTimes.map((t) => (
-            <li key={`${t.day}-${t.time}`} className="text-readable-sm">
-              <span className="text-[var(--color-text-muted)]">{t.day}: </span>
+          {branch.serviceTimes.map((time) => (
+            <li key={`${time.day}-${time.time}`} className="text-readable-sm">
+              <span className="text-[var(--color-text-muted)]">{time.day}: </span>
               <span className="font-semibold text-[var(--color-action-primary)]">
-                {t.time}
+                {time.time}
               </span>
             </li>
           ))}
@@ -44,13 +49,13 @@ export function BranchCard({ branch }: Props) {
       )}
 
       <ul className="mt-5 space-y-2">
-        {branch.phones.map((p) => (
-          <li key={p.tel} className="min-w-0">
+        {branch.phones.map((phone) => (
+          <li key={phone.tel} className="min-w-0">
             <a
-              href={`tel:${p.tel}`}
+              href={`tel:${phone.tel}`}
               className="text-break-safe text-readable-sm font-medium text-[var(--color-text-body)] hover:text-[var(--color-action-primary)]"
             >
-              {p.display}
+              {phone.display}
             </a>
           </li>
         ))}
@@ -66,14 +71,22 @@ export function BranchCard({ branch }: Props) {
         ))}
       </ul>
 
-      <a
-        href={mapsHref}
-        className="mt-auto inline-flex min-h-11 items-center pt-6 text-readable-sm font-semibold text-[var(--color-action-primary)]"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        Open in Maps
-      </a>
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 pt-6">
+        <Link
+          href={detailHref}
+          className="inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
+        >
+          Location page
+        </Link>
+        <a
+          href={mapsHref}
+          className="inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Open in Maps
+        </a>
+      </div>
     </article>
   );
 }

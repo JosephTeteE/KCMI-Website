@@ -28,8 +28,8 @@ export default async function AdminProgramsPage({
   return (
     <div>
       <HubPageHeader
-        title="Programs"
-        description="Create announcements and featured programs. Saving a draft does not publish to the website."
+        title="Programs & Announcements"
+        description="Add or update programs. A draft is not on the website. Preview first, then make it live."
         actions={
           canCreate ? (
             <Link
@@ -58,7 +58,11 @@ export default async function AdminProgramsPage({
                     {program.title}
                   </p>
                   <p className="text-sm text-[var(--color-text-muted)]">
-                    Placement: {program.placement}
+                    {program.placement === "featured"
+                      ? "Shows on the homepage when live"
+                      : program.placement === "none"
+                        ? "Not featured on the homepage"
+                        : `Homepage placement: ${program.placement}`}
                   </p>
                 </div>
                 <HubStatusBadge status={program.status} />

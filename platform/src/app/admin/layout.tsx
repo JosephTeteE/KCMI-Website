@@ -1,10 +1,17 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getStaffSession, requiresMfaEnrollment } from "@/lib/auth/session";
 import { HubNav } from "@/components/layout/hub-nav";
+import { HubTour } from "@/components/hub/hub-tour";
 import { hasSupabasePublicConfig, isHostedKcmiEnvironment } from "@/lib/env";
 import { signOutAction } from "@/app/auth/actions";
+import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AdminLayout({
   children,
@@ -23,11 +30,8 @@ export default async function AdminLayout({
           Hub unavailable
         </h1>
         <p className="mt-2">
-          Server-side Hub protection is active, but{" "}
-          <code>NEXT_PUBLIC_SUPABASE_URL</code> or{" "}
-          <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> is not configured.
-          Provision local Supabase and copy names from <code>.env.example</code>{" "}
-          into <code>.env.local</code>.
+          This Hub computer is not set up yet. Ask a Super Admin to finish
+          setup.
         </p>
       </div>
     );
@@ -53,12 +57,15 @@ export default async function AdminLayout({
       <div className="mx-auto max-w-lg px-4 py-16">
         <h1 className="text-xl font-semibold">Access denied</h1>
         <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-          Your account is authenticated but has no Hub role permissions. Contact
-          a platform administrator.
+          You are signed in, but this account cannot use the Hub. Ask a Super
+          Admin for help.
         </p>
         <form action={signOutAction} className="mt-6">
-          <button type="submit" className="text-sm text-[var(--color-destructive)]">
-            Sign out
+          <button
+            type="submit"
+            className="inline-flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 text-sm font-semibold text-[var(--color-destructive)] hover:bg-[color-mix(in_srgb,var(--color-destructive)_10%,transparent)] hover:underline"
+          >
+            {HUB_ACTION_LABELS.signOut}
           </button>
         </form>
       </div>
@@ -66,9 +73,10 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--color-surface-page)] md:flex-row">
+    <div className="flex min-h-screen flex-col bg-[var(--color-surface-page)] lg:flex-row">
       <HubNav profile={session.profile} />
-      <div className="flex-1 p-6 md:p-10">{children}</div>
+      <div className="min-w-0 flex-1 p-4 lg:p-10">{children}</div>
+      <HubTour />
     </div>
   );
 }

@@ -17,7 +17,7 @@ export function BranchCountryGroups({
   const Heading = headingLevel;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {groups.map((group) => (
         <section
           key={group.country ?? "unlabeled"}
@@ -29,7 +29,13 @@ export function BranchCountryGroups({
           >
             {group.heading}
           </Heading>
-          <ul className="mt-5 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <ul
+            className={
+              group.branches.length === 1
+                ? "mt-4 grid max-w-xl gap-6"
+                : "mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
+            }
+          >
             {group.branches.map((branch) => (
               <li key={branch.slug} className="min-w-0">
                 {children(branch)}

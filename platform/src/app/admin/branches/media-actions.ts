@@ -186,7 +186,7 @@ export async function uploadBranchPhoto(formData: FormData) {
 
   redirectWithMessage(
     `/admin/branches/${branchId}`,
-    "Photo added to this branch.",
+    "This photo was added to the branch page.",
   );
 }
 
@@ -223,6 +223,6 @@ export async function removeBranchPhoto(formData: FormData) {
 
   redirectWithMessage(
     `/admin/branches/${branchId}`,
-    "Photo removed from this branch. The shared library file was not deleted.",
+    "This photo was removed from the branch page. It is still in the photo library.",
   );
 }

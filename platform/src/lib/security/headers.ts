@@ -29,8 +29,8 @@ export const securityHeaders: { key: string; value: string }[] = [
 
 /**
  * Baseline CSP without broad unsafe-inline.
- * Facebook/YouTube frame allowlists deferred until those embeds are built.
- * Script policy uses 'self' only for Phase B shell — refine with nonces when needed (see CSP_SPIKE).
+ * Facebook plugin frames are allowlisted for the controlled livestream preview.
+ * Script policy uses 'self' only — refine with nonces when needed (see CSP_SPIKE).
  */
 export function contentSecurityPolicy(): string {
   const directives = [
@@ -42,6 +42,7 @@ export function contentSecurityPolicy(): string {
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'", // Tailwind/Next often inject styles; spike before removing
     "script-src 'self'",
+    "frame-src 'self' https://www.facebook.com https://web.facebook.com",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com",
     "form-action 'self'",
     "upgrade-insecure-requests",

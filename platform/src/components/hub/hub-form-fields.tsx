@@ -99,6 +99,7 @@ export function HubCheckboxField({
   label,
   hint,
   defaultChecked,
+  checked,
   ...inputProps
 }: FieldProps & Omit<InputHTMLAttributes<HTMLInputElement>, "type">) {
   return (
@@ -111,9 +112,11 @@ export function HubCheckboxField({
           id={id}
           name={id}
           type="checkbox"
-          defaultChecked={defaultChecked}
           className="size-5 rounded border-[var(--color-border)] text-[var(--color-action-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           {...inputProps}
+          {...(checked === undefined
+            ? { defaultChecked }
+            : { checked })}
         />
         {label}
       </label>
@@ -151,9 +154,11 @@ export function HubFileField({
 export function HubSubmitButton({
   children,
   variant = "primary",
+  disabled = false,
 }: {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "danger" | "quiet";
+  disabled?: boolean;
 }) {
   const styles =
     variant === "primary"
@@ -167,7 +172,8 @@ export function HubSubmitButton({
   return (
     <button
       type="submit"
-      className={`inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] px-5 text-sm font-semibold ${styles}`}
+      disabled={disabled}
+      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] px-5 text-sm font-semibold transition-[filter,opacity] disabled:cursor-not-allowed disabled:opacity-50 ${styles}`}
     >
       {children}
     </button>
@@ -185,9 +191,15 @@ export function HubStatusBadge({ status }: { status: string }) {
           : "bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] border border-[var(--color-border)]";
 
   const label =
-    status === "preview"
-      ? "Ready for preview"
-      : status.charAt(0).toUpperCase() + status.slice(1);
+    status === "published"
+      ? "Live on website"
+      : status === "archived"
+        ? "Removed from public website"
+        : status === "preview"
+          ? "Ready to preview"
+          : status === "draft"
+            ? "Draft — not on the website"
+            : status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
     <span

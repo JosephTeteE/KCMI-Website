@@ -9,7 +9,7 @@ export const termsOfService: LegalDocument = {
   metaLine: "Last Updated: July 16, 2025",
   staleNotes: [
     "PRE-PRODUCTION LEGAL REVIEW REQUIRED before KCMI V2 production. Public wording is the July 16, 2025 legacy Terms, formatted only.",
-    "Section 9 contact email is contact@kcmi-rcc.org, which differs from the public Contact page Gmail address.",
+    "Section 9 contact email is contact@kcmi-rcc.org, matching the current public Contact identity. Confirm before production cutover.",
     "Section 1 website URL is https://kcmi-rcc.org. Confirm whether V2 public canonical host (www vs apex) should be named after cutover.",
     "Section 4 third-party examples (YouTube, TikTok, Google Forms) still match current public outbound links; counsel should confirm this remains accurate at cutover.",
   ],

@@ -37,6 +37,7 @@ export const PERMISSIONS = [
   "users.manage",
   "livestream.manage",
   "media.manage",
+  "website.manage",
   "branches.manage",
   "audit.read",
   "hub.access",
@@ -66,6 +67,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "giving.change",
       "livestream.manage",
       "media.manage",
+      "website.manage",
       "branches.manage",
       "audit.read",
       // Intentionally NO pastoral read/assign — must be granted explicitly
@@ -88,6 +90,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "programs.publish",
       "sermons.manage",
       "media.manage",
+      "website.manage",
       "livestream.manage",
       "branches.manage",
       // Operating name: HQ Content Admin. No pastoral, users.manage, or giving.change.

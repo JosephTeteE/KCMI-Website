@@ -29,28 +29,53 @@ import {
   fetchBranchMediaBySlug,
   fetchFeaturedProgram,
   fetchHeadquartersServiceTimes,
+  fetchHomeFeaturedSermon,
   fetchLivestreamPublic,
+  fetchMediaAssetPublic,
   fetchPublishedBranchBySlug,
   fetchPublishedBranches,
   fetchPublishedSermons,
+  fetchWebsiteDocumentPayload,
 } from "@/content/adapters/supabase-public";
+import { defaultHomeDocument } from "@/content/website/defaults";
+import {
+  resolveAboutDocument,
+  resolveFaqsDocument,
+  resolveGlobalDocument,
+  resolveHomeDocument,
+  resolveSermonsPageDocument,
+  resolveServicesDocument,
+} from "@/content/website/resolve";
+import {
+  FALLBACK_PORTRAIT,
+  mapAboutChurch,
+  mapFaqs,
+  mapGlobalContact,
+  mapGlobalDfr,
+  mapGlobalSocial,
+  mapHomePublic,
+  mapLivestreamCopy,
+  mapSermonPlatforms,
+  mapServicesOfferings,
+} from "@/content/website/public-map";
 import { resolvePublicSiteUrl, shouldUseSeedContent } from "@/lib/env";
 import type {
+  AboutChurchContent,
   Branch,
   BranchMediaItem,
+  DailyFaithRecharge,
+  FaqItem,
   FeaturedProgram,
+  HomePublicContent,
   LivestreamPublic,
+  PublicContact,
   SermonHighlight,
+  SermonPlatform,
   SermonPublic,
+  ServiceOffering,
   ServiceTime,
+  SocialLink,
 } from "@/content/types";
-
-/**
- * Content source strategy:
- * - Use seed when CONTENT_SOURCE=seed (tests/CI/local demo) and the app is not hosted.
- * - Hosted staging/production never fall back to seed; missing Supabase config fails closed.
- * - When Supabase IS configured, call the DB and throw on failure.
- */
 
 export function getChurchIdentity() {
   return {
@@ -64,6 +89,12 @@ export async function getServiceTimes(): Promise<ServiceTime[]> {
     return headquartersServiceTimes;
   }
   return fetchHeadquartersServiceTimes();
+}
+
+export async function getHeadquartersLocationLabel(): Promise<string> {
+  const all = await getBranches();
+  const hq = all.find((branch) => branch.slug === "headquarters");
+  return hq?.cityLabel?.trim() || "Port Harcourt, Nigeria";
 }
 
 export async function getBranches(): Promise<Branch[]> {
@@ -82,10 +113,6 @@ export async function getBranchBySlug(slug: string): Promise<Branch | null> {
   return fetchPublishedBranchBySlug(normalized);
 }
 
-/**
- * Adapter for a future `/locations/[branch-slug]` page.
- * Does not invent a public route in this phase.
- */
 export async function getBranchPublicDetail(slug: string): Promise<{
   branch: Branch;
   media: BranchMediaItem[];
@@ -101,11 +128,29 @@ export async function getFeaturedBranches(limit = 4): Promise<Branch[]> {
   return all.slice(0, limit);
 }
 
+export async function getHomeContent(): Promise<HomePublicContent> {
+  if (shouldUseSeedContent()) {
+    return mapHomePublic(defaultHomeDocument, null, null);
+  }
+  const row = await fetchWebsiteDocumentPayload("home");
+  if (!row) {
+    return mapHomePublic(defaultHomeDocument, null, null);
+  }
+  const doc = resolveHomeDocument(row.payload);
+  const [heroImage, welcomeImage] = await Promise.all([
+    fetchMediaAssetPublic(doc.heroMediaId),
+    fetchMediaAssetPublic(doc.welcomeMediaId),
+  ]);
+  return mapHomePublic(doc, heroImage, welcomeImage);
+}
+
 export async function getFeaturedProgram(): Promise<FeaturedProgram | null> {
   if (shouldUseSeedContent()) {
     return null;
   }
-  return fetchFeaturedProgram();
+  const row = await fetchWebsiteDocumentPayload("home");
+  const doc = resolveHomeDocument(row?.payload ?? {});
+  return fetchFeaturedProgram(doc.featuredProgramId);
 }
 
 function highlightFromSermon(sermon: SermonPublic): SermonHighlight {
@@ -113,17 +158,11 @@ function highlightFromSermon(sermon: SermonPublic): SermonHighlight {
     title: sermon.title,
     description:
       sermon.summary?.trim() ||
-      [
-        sermon.speaker,
-        sermon.scriptureReference,
-      ]
-        .filter(Boolean)
-        .join(" · ") ||
+      [sermon.speaker, sermon.scriptureReference].filter(Boolean).join(" · ") ||
       "Watch the latest message from KCMI.",
     ctaLabel: "Watch now",
     ctaHref: sermon.youtubeUrl ?? "/sermons",
-    youtubeChannelUrl:
-      sermon.youtubeUrl ?? sermonHighlight.youtubeChannelUrl,
+    youtubeChannelUrl: sermon.youtubeUrl ?? sermonHighlight.youtubeChannelUrl,
     youtubeChannelLabel: sermon.speaker
       ? `${sermon.speaker}`
       : sermonHighlight.youtubeChannelLabel,
@@ -131,15 +170,17 @@ function highlightFromSermon(sermon: SermonPublic): SermonHighlight {
 }
 
 export async function getFeaturedSermons(): Promise<SermonHighlight> {
+  const home = await getHomeContent();
   if (shouldUseSeedContent()) {
-    return sermonHighlight;
+    return home.sermonFallback;
   }
+  const featured = await fetchHomeFeaturedSermon();
+  if (featured) return highlightFromSermon(featured);
   const published = await fetchPublishedSermons(1);
   if (published.length > 0) {
     return highlightFromSermon(published[0]!);
   }
-  // No published sermon rows yet — keep verified channel highlight copy.
-  return sermonHighlight;
+  return home.sermonFallback;
 }
 
 export async function getPublishedSermons(
@@ -151,17 +192,26 @@ export async function getPublishedSermons(
   return fetchPublishedSermons(limit);
 }
 
-export async function getLivestreamPublic(): Promise<LivestreamPublic> {
+async function getResolvedGlobal() {
   if (shouldUseSeedContent()) {
-    return livestreamPublic;
+    return resolveGlobalDocument({});
   }
-  return fetchLivestreamPublic();
+  const row = await fetchWebsiteDocumentPayload("global");
+  return resolveGlobalDocument(row?.payload ?? {});
 }
 
-/**
- * Branch-scoped published media for future branch detail pages.
- * Locations listing unchanged — adapter ready without inventing page UI.
- */
+export async function getLivestreamPublic(): Promise<LivestreamPublic> {
+  const global = await getResolvedGlobal();
+  if (shouldUseSeedContent()) {
+    return mapLivestreamCopy(global, {
+      facebookPageUrl: livestreamPublic.facebookPageUrl,
+      isLive: livestreamPublic.isLive,
+    });
+  }
+  const live = await fetchLivestreamPublic();
+  return mapLivestreamCopy(global, live);
+}
+
 export async function getBranchMedia(
   branchSlug: string,
 ): Promise<BranchMediaItem[]> {
@@ -171,8 +221,11 @@ export async function getBranchMedia(
   return fetchBranchMediaBySlug(branchSlug);
 }
 
-export function getPublicContactDetails() {
-  return publicContact;
+export async function getPublicContactDetails(): Promise<PublicContact> {
+  if (shouldUseSeedContent()) {
+    return publicContact;
+  }
+  return mapGlobalContact(await getResolvedGlobal());
 }
 
 export function getPrimaryNavigation() {
@@ -191,20 +244,28 @@ export function getFooterLegalNavigation() {
   return footerLegalNav;
 }
 
-export function getSocialLinks() {
-  return socialLinks;
+export async function getSocialLinks(): Promise<SocialLink[]> {
+  if (shouldUseSeedContent()) {
+    return socialLinks;
+  }
+  return mapGlobalSocial(await getResolvedGlobal());
 }
 
-export function getDailyFaithRecharge() {
-  return dailyFaithRecharge;
+export async function getDailyFaithRecharge(): Promise<DailyFaithRecharge> {
+  if (shouldUseSeedContent()) {
+    return dailyFaithRecharge;
+  }
+  return mapGlobalDfr(await getResolvedGlobal());
 }
 
-export function getPrayerCta() {
-  return prayerCta;
+export async function getPrayerCta() {
+  const home = await getHomeContent();
+  return home.prayer;
 }
 
-export function getGivingCta() {
-  return givingCta;
+export async function getGivingCta() {
+  const home = await getHomeContent();
+  return home.giving;
 }
 
 export function getGivingAccounts() {
@@ -215,32 +276,83 @@ export function getGivingPageIntro() {
   return givingPageIntro;
 }
 
-export function getMissionContent() {
-  return missionContent;
+export async function getAboutChurch(): Promise<AboutChurchContent> {
+  if (shouldUseSeedContent()) {
+    return mapAboutChurch(resolveAboutDocument({}), null);
+  }
+  const row = await fetchWebsiteDocumentPayload("about");
+  const doc = resolveAboutDocument(row?.payload ?? {});
+  const portrait = await fetchMediaAssetPublic(doc.portraitMediaId);
+  return mapAboutChurch(doc, portrait);
 }
 
-export function getAboutLeadPastor() {
-  return aboutLeadPastor;
+export async function getMissionContent() {
+  const about = await getAboutChurch();
+  return {
+    vision: about.vision,
+    missionParagraphs: about.missionParagraphs,
+  };
 }
 
-export function getServiceOfferings() {
-  return serviceOfferings;
+export async function getAboutLeadPastor() {
+  const about = await getAboutChurch();
+  return {
+    name: about.leadershipName,
+    role: about.leadershipRole,
+    orgLine: about.leadershipOrgLine,
+    headquarters: about.leadershipHeadquarters,
+    portraitSrc: about.portrait.src,
+    portraitAlt: about.portrait.alt,
+    portraitWidth: about.portrait.width,
+    portraitHeight: about.portrait.height,
+    bioParagraphs: about.bioParagraphs,
+  };
 }
 
-export function getServicesPageIntro() {
-  return servicesPageIntro;
+export async function getServiceOfferings(): Promise<ServiceOffering[]> {
+  if (shouldUseSeedContent()) {
+    return serviceOfferings;
+  }
+  const row = await fetchWebsiteDocumentPayload("services");
+  return mapServicesOfferings(resolveServicesDocument(row?.payload ?? {}));
 }
 
-export function getSermonPlatforms() {
-  return sermonPlatforms;
+export async function getServicesPageIntro(): Promise<string> {
+  if (shouldUseSeedContent()) {
+    return servicesPageIntro;
+  }
+  const row = await fetchWebsiteDocumentPayload("services");
+  return resolveServicesDocument(row?.payload ?? {}).intro;
 }
 
-export function getSermonsPageHeader() {
-  return sermonsPageHeader;
+export async function getSermonPlatforms(): Promise<SermonPlatform[]> {
+  if (shouldUseSeedContent()) {
+    return sermonPlatforms;
+  }
+  const row = await fetchWebsiteDocumentPayload("sermons_page");
+  return mapSermonPlatforms(resolveSermonsPageDocument(row?.payload ?? {}));
 }
 
-export function getFaqs() {
-  return faqs;
+export async function getSermonsPageHeader() {
+  if (shouldUseSeedContent()) {
+    return sermonsPageHeader;
+  }
+  const row = await fetchWebsiteDocumentPayload("sermons_page");
+  const doc = resolveSermonsPageDocument(row?.payload ?? {});
+  return {
+    headline: doc.headline,
+    sub: doc.sub,
+    sectionTitle: doc.sectionTitle,
+    emptyState: doc.emptyState,
+  };
+}
+
+export async function getFaqs(): Promise<FaqItem[]> {
+  if (shouldUseSeedContent()) {
+    return faqs;
+  }
+  const row = await fetchWebsiteDocumentPayload("faqs");
+  return mapFaqs(resolveFaqsDocument(row?.payload ?? {}));
 }
 
 export function getPrivacyPolicy() {
@@ -256,3 +368,5 @@ export function mapsHrefForBranch(branch: Branch): string {
   const q = branch.mapsQuery ?? branch.addressLines.join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 }
+
+export { FALLBACK_PORTRAIT, prayerCta, givingCta, missionContent, aboutLeadPastor };

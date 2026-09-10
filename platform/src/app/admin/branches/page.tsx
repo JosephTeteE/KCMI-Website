@@ -22,7 +22,7 @@ export default async function AdminBranchesPage({
     <div>
       <HubPageHeader
         title="Branches"
-        description="Update public location details and service times. Phone numbers are only shown when you enter them — gaps are left blank."
+        description="Change service times, addresses and branch photos."
       />
       <HubFlash message={params.message} error={params.error} />
 

@@ -13,7 +13,7 @@ export function validateCtaUrl(input: string | null | undefined): CtaUrlResult {
 
   if (trimmed.startsWith("/")) {
     if (trimmed.startsWith("//") || trimmed.includes("://")) {
-      return { ok: false, error: "Relative CTA paths must start with a single /." };
+    return { ok: false, error: "Use a website path starting with / or a full https link." };
     }
     return { ok: true, url: trimmed };
   }
@@ -24,12 +24,12 @@ export function validateCtaUrl(input: string | null | undefined): CtaUrlResult {
   } catch {
     return {
       ok: false,
-      error: "CTA URL must be http(s) or a path starting with /.",
+      error: "Use a website path starting with / or a full https link.",
     };
   }
 
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    return { ok: false, error: "CTA URL must use http or https." };
+    return { ok: false, error: "The button destination must be an https link or a path starting with /." };
   }
 
   return { ok: true, url: parsed.toString() };

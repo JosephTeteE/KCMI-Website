@@ -28,7 +28,7 @@ export default async function NewSermonPage({
     <div>
       <HubPageHeader
         title="New sermon"
-        description="Add title, speaker, and a YouTube watch URL. Video files are not uploaded to storage."
+        description="Add the title, speaker, and a YouTube watch link. This starts as a draft and is not on the website yet."
         backHref="/admin/sermons"
         backLabel="All sermons"
       />
@@ -43,7 +43,7 @@ export default async function NewSermonPage({
         <HubTextField
           id="youtube_url"
           label="YouTube link"
-          hint="Videos stay on YouTube. Paste a youtube.com or youtu.be watch link — not a file upload or embed HTML."
+          hint="Paste a youtube.com or youtu.be watch link. Do not paste embed code or upload a video file."
         />
         <HubSelectField id="thumbnail_media_id" label="Thumbnail (optional)">
           <option value="">No thumbnail</option>
@@ -53,7 +53,7 @@ export default async function NewSermonPage({
             </option>
           ))}
         </HubSelectField>
-        <HubSubmitButton>Create draft</HubSubmitButton>
+        <HubSubmitButton>Save as a draft (not public yet)</HubSubmitButton>
       </form>
     </div>
   );

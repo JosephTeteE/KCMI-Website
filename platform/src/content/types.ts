@@ -92,6 +92,45 @@ export type PublicContact = {
   primaryEmailLabel?: string;
   primaryPhoneDisplay: string;
   primaryPhoneTel: string;
+  intro?: string;
+};
+
+export type PublicMediaRef = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+export type HomePublicContent = {
+  heroKicker: string;
+  heroHeadline: string;
+  heroSupporting: string;
+  heroPrimaryCtaLabel: string;
+  heroPrimaryCtaHref: string;
+  heroSecondaryCtaLabel: string;
+  heroSecondaryCtaHref: string;
+  heroImage: PublicMediaRef;
+  welcomeEyebrow: string;
+  welcomeHeading: string;
+  welcomeBody: string;
+  welcomeImage: PublicMediaRef;
+  prayer: PrayerCta;
+  giving: GivingCta;
+  sermonFallback: SermonHighlight;
+};
+
+export type AboutChurchContent = {
+  whoWeAre: string[];
+  vision: string;
+  missionParagraphs: string[];
+  leadershipName: string;
+  leadershipRole: string;
+  leadershipOrgLine: string;
+  leadershipHeadquarters: string;
+  leadershipPreview: string;
+  portrait: PublicMediaRef;
+  bioParagraphs: string[];
 };
 
 export type NavItem = {
@@ -103,14 +142,14 @@ export type NavItem = {
 export type SocialLink = {
   label: string;
   href: string;
+  /** When true, this is a personal/ministry account rather than a KCMI-branded profile. */
+  personal?: boolean;
 };
 
 export type DailyFaithRecharge = {
   heading: string;
   body: string;
   spotify: { label: string; href: string };
-  whatsappHint: string;
-  whatsappPhoneDisplay: string;
 };
 
 export type PrayerCta = {
@@ -189,8 +228,8 @@ export type ServiceOffering = {
   title: string;
   body: string;
   cta?: { label: string; href: string; external?: boolean };
-  times?: string[];
   links?: { label: string; href: string; external?: boolean }[];
+  kind?: "ministry" | "media" | "care";
 };
 
 export type LegalDocument = {

@@ -9,12 +9,12 @@ import {
 } from "@/content";
 import { SocialPlatformIcon } from "@/components/layout/social-platform-icon";
 
-export function SiteFooter() {
+export async function SiteFooter() {
   const identity = getChurchIdentity();
   const nav = getFooterNavigation();
   const legalNav = getFooterLegalNavigation();
-  const social = getSocialLinks();
-  const faith = getDailyFaithRecharge();
+  const social = await getSocialLinks();
+  const faith = await getDailyFaithRecharge();
   const copyrightYear = new Date().getFullYear();
 
   return (
@@ -62,15 +62,6 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-
-        <div className="site-footer-contact min-w-0">
-          <h2 className="site-footer-heading">Contact</h2>
-          <p className="site-footer-contact-list">
-            <Link href="/contact" className="site-footer-link site-footer-link-strong">
-              Contact KCMI
-            </Link>
-          </p>
-        </div>
       </div>
 
       <div className="site-footer-connect">

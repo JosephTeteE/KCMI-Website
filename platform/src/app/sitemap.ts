@@ -5,7 +5,7 @@ import { isStagingEnvironment } from "@/lib/env";
 const publicPaths = [
   "/",
   "/about",
-  "/mission",
+  "/about/apostle-frank-aikins",
   "/locations",
   "/services",
   "/sermons",
@@ -15,6 +15,7 @@ const publicPaths = [
   "/faqs",
   "/privacy",
   "/terms",
+  "/events",
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -27,7 +27,7 @@ export default async function AdminSermonsPage({
     <div>
       <HubPageHeader
         title="Sermons"
-        description="Manage sermon listings for the public Sermons page. Use a YouTube link — not embed code."
+        description="Sermon listings for the public Sermons page. Use a YouTube link — not a video file."
         actions={
           canManage ? (
             <Link

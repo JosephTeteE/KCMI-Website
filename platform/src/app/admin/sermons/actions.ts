@@ -72,6 +72,7 @@ function parseSermonFields(formData: FormData) {
       summary: emptyToNull(formData.get("summary")),
       youtube_url: youtubeUrl,
       thumbnail_media_id: emptyToNull(formData.get("thumbnail_media_id")),
+      home_featured: formData.get("home_featured") === "on",
     },
   };
 }
@@ -108,7 +109,7 @@ export async function createSermon(formData: FormData) {
     );
   }
 
-  redirectWithMessage(`/admin/sermons/${data.id}`, "Draft sermon created.");
+  redirectWithMessage(`/admin/sermons/${data.id}`, "Your sermon draft is saved. It is not on the public website yet.");
 }
 
 export async function updateSermon(formData: FormData) {
@@ -130,6 +131,14 @@ export async function updateSermon(formData: FormData) {
   const actorId = gate.session.user.id;
   const supabase = await createClient();
 
+  if (parsed.fields.home_featured) {
+    await supabase
+      .from("sermons")
+      .update({ home_featured: false })
+      .neq("id", id)
+      .eq("home_featured", true);
+  }
+
   const { error } = await supabase
     .from("sermons")
     .update({
@@ -142,7 +151,10 @@ export async function updateSermon(formData: FormData) {
     redirectWithError(`/admin/sermons/${id}`, error.message);
   }
 
-  redirectWithMessage(`/admin/sermons/${id}`, "Sermon saved.");
+  redirectWithMessage(
+    `/admin/sermons/${id}`,
+    "Your sermon details are saved. Visitors see them only if this sermon is live.",
+  );
 }
 
 export async function setSermonStatus(formData: FormData) {
@@ -238,11 +250,11 @@ export async function setSermonStatus(formData: FormData) {
   redirectWithMessage(
     `/admin/sermons/${id}`,
     status === "published"
-      ? "Sermon published."
+      ? "This sermon is now live on the website."
       : status === "archived"
-        ? "Sermon archived."
+        ? "This sermon is no longer on the public website."
         : status === "preview"
-          ? "Marked ready for preview."
-          : "Saved as draft.",
+          ? "This sermon is ready to preview. It is not public yet."
+          : "Your sermon draft is saved. It is not on the public website yet.",
   );
 }

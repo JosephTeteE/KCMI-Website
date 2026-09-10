@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupBranchesByCountry } from "@/content/branch-groups";
+import { groupBranchesByCountry, publicPlaceLabel } from "@/content/branch-groups";
 import { getBranchBySlug, getBranches, getFooterLegalNavigation, getFooterNavigation } from "@/content";
 import type { Branch } from "@/content/types";
 
@@ -31,6 +31,17 @@ describe("groupBranchesByCountry", () => {
       "Additional locations",
     ]);
     expect(groups[3]?.country).toBeNull();
+  });
+});
+
+describe("publicPlaceLabel", () => {
+  it("does not repeat a country already present in the city label", () => {
+    expect(publicPlaceLabel("Port Harcourt, Nigeria", "Nigeria")).toBe(
+      "Port Harcourt, Nigeria",
+    );
+    expect(publicPlaceLabel("Accra, Ghana", "Ghana")).toBe("Accra, Ghana");
+    expect(publicPlaceLabel("Lomé, Togo", "Togo")).toBe("Lomé, Togo");
+    expect(publicPlaceLabel("Accra", "Ghana")).toBe("Accra · Ghana");
   });
 });
 

@@ -14,19 +14,22 @@ export const metadata = publicPageMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
-  const contact = getPublicContactDetails();
-  const social = getSocialLinks();
-  const faith = getDailyFaithRecharge();
+export default async function ContactPage() {
+  const contact = await getPublicContactDetails();
+  const social = await getSocialLinks();
+  const faith = await getDailyFaithRecharge();
 
   return (
     <PageShell
       eyebrow="Connect"
       title="Contact Us"
-      description="We at KCMI love to hear from you! Whether you have a prayer request, need counseling, or simply want to connect, we're here for you."
+      description={
+        contact.intro ??
+        "Write or call the church office. Prayer and care requests use the forms on the Services page."
+      }
     >
       <div className="grid gap-8 lg:grid-cols-2">
-        <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6">
+        <section className="card-pad rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
           <h2 className="font-display text-2xl font-semibold">Public contact</h2>
           <ul className="mt-5 space-y-4 text-readable">
             <li className="min-w-0">
@@ -42,7 +45,7 @@ export default function ContactPage() {
             </li>
             <li>
               <p className="text-readable-sm font-semibold text-[var(--color-text-body)]">
-                Phone / WhatsApp
+                Phone
               </p>
               <a
                 href={`tel:${contact.primaryPhoneTel}`}
@@ -50,9 +53,6 @@ export default function ContactPage() {
               >
                 {contact.primaryPhoneDisplay}
               </a>
-              <p className="text-break-safe mt-2 text-readable-sm text-[var(--color-text-muted)]">
-                {faith.whatsappHint}
-              </p>
             </li>
           </ul>
           <p className="mt-6 rounded-[var(--radius-md)] bg-[var(--color-surface-page)] px-4 py-3 text-readable-sm text-[var(--color-text-muted)]">
@@ -60,13 +60,24 @@ export default function ContactPage() {
             other requests can also be sent through the forms on the Services
             page.
           </p>
+          <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
+            {faith.heading}: {faith.body}{" "}
+            <a
+              href={faith.spotify.href}
+              className="font-semibold text-[var(--color-action-primary)]"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {faith.spotify.label}
+            </a>
+            .
+          </p>
         </section>
 
-        <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6">
+        <section className="card-pad rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
           <h2 className="font-display text-2xl font-semibold">Find us</h2>
           <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-            Outside of Port Harcourt, Nigeria? See our other locations for
-            addresses and service times.
+            See locations for addresses and service times.
           </p>
           <Link
             href="/locations"
@@ -78,15 +89,15 @@ export default function ContactPage() {
             Social
           </h3>
           <ul className="mt-3 flex flex-wrap gap-2">
-            {social.map((s) => (
-              <li key={s.href}>
+            {social.map((item) => (
+              <li key={item.href}>
                 <a
-                  href={s.href}
+                  href={item.href}
                   className="inline-flex min-h-11 items-center rounded-[var(--radius-sm)] border border-[var(--color-border)] px-3 text-readable-sm"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  {s.label}
+                  {item.label}
                 </a>
               </li>
             ))}

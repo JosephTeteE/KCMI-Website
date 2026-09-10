@@ -3,6 +3,8 @@ import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 import { hasSupabasePublicConfig, isHostedKcmiEnvironment } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
+import { HUB_DASHBOARD_CARDS } from "@/lib/hub/dashboard-cards";
+import { humanAuditAction } from "@/lib/hub/humanize";
 
 export default async function AdminDashboardPage() {
   if (!hasSupabasePublicConfig()) {
@@ -18,133 +20,116 @@ export default async function AdminDashboardPage() {
 
   const supabase = await createClient();
 
-  const [
-    draftPrograms,
-    publishedPrograms,
-    sermons,
-    branches,
-    livestream,
-    audit,
-  ] = await Promise.all([
+  const [publishedBranches, livestream, featured, recent] = await Promise.all([
     supabase
-      .from("programs")
+      .from("church_branches")
       .select("id", { count: "exact", head: true })
-      .eq("status", "draft"),
-    supabase
-      .from("programs")
-      .select("id", { count: "exact", head: true })
+      .eq("is_public", true)
       .eq("status", "published"),
-    supabase.from("sermons").select("id", { count: "exact", head: true }),
-    supabase.from("church_branches").select("id", { count: "exact", head: true }),
     supabase
       .from("livestream_settings")
       .select("is_live")
       .eq("singleton_key", "default")
       .maybeSingle(),
+    supabase
+      .from("programs")
+      .select("title")
+      .eq("status", "published")
+      .eq("placement", "featured")
+      .maybeSingle(),
     staffHasPermission(session.profile, "audit.read")
       ? supabase
           .from("audit_events")
-          .select("id, action, entity_type, entity_id, created_at")
+          .select("id, action, created_at")
           .order("created_at", { ascending: false })
-          .limit(8)
+          .limit(5)
       : Promise.resolve({ data: [] as const, error: null }),
   ]);
-
-  const cards = [
-    {
-      label: "Draft programs",
-      value: draftPrograms.count ?? 0,
-      href: "/admin/programs",
-    },
-    {
-      label: "Published programs",
-      value: publishedPrograms.count ?? 0,
-      href: "/admin/programs",
-    },
-    {
-      label: "Sermons",
-      value: sermons.count ?? 0,
-      href: "/admin/sermons",
-    },
-    {
-      label: "Branches",
-      value: branches.count ?? 0,
-      href: "/admin/branches",
-    },
-    {
-      label: "Livestream",
-      value: livestream.data?.is_live ? "Live now" : "Not live",
-      href: "/admin/livestream",
-    },
-  ];
 
   return (
     <div>
       <HubPageHeader
-        title="Dashboard"
-        description="Overview of Hub content. Pastoral tools are not shown here."
+        title="What would you like to update?"
+        description="Choose a card. Preview first. Nothing changes on the public website until you make it live."
       />
 
-      <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {cards.map((card) => (
-          <div
-            key={card.label}
-            className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5"
-          >
-            <dt className="text-sm text-[var(--color-text-muted)]">{card.label}</dt>
-            <dd className="mt-2 text-2xl font-semibold text-[var(--color-text-body)]">
-              {card.value}
-            </dd>
+      <ul className="grid gap-4 sm:grid-cols-2" aria-label="Things you can update">
+        {HUB_DASHBOARD_CARDS.map((card) => (
+          <li key={card.href}>
             <Link
               href={card.href}
-              className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-[var(--color-action-primary)] underline-offset-2 hover:underline"
+              className="flex min-h-36 flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 hover:border-[var(--color-action-primary)]"
             >
-              Open
+              <h2 className="text-xl font-semibold text-[var(--color-text-body)]">
+                {card.title}
+              </h2>
+              <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+                {card.outcome}
+              </p>
             </Link>
-          </div>
+          </li>
         ))}
-      </dl>
+      </ul>
 
-      <section className="mt-10">
+      <section className="mt-10 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5">
         <h2 className="text-lg font-semibold text-[var(--color-text-body)]">
-          Recent activity
+          Website status
         </h2>
-        {!staffHasPermission(session.profile, "audit.read") ? (
-          <p className="mt-3 text-sm text-[var(--color-text-muted)]">
-            Your account cannot view audit history.
-          </p>
-        ) : (audit.data?.length ?? 0) === 0 ? (
-          <p className="mt-3 text-sm text-[var(--color-text-muted)]">
-            No recent activity yet.
-          </p>
-        ) : (
-          <ul className="mt-4 divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
-            {(audit.data ?? []).map((event) => (
-              <li key={event.id} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-medium text-[var(--color-text-body)]">
-                    {event.action}
-                  </p>
-                  <p className="text-sm text-[var(--color-text-muted)]">
-                    {event.entity_type}
-                    {event.entity_id ? ` · ${event.entity_id.slice(0, 8)}…` : ""}
-                  </p>
-                </div>
-                <time
-                  className="text-sm text-[var(--color-text-muted)]"
-                  dateTime={event.created_at}
-                >
-                  {new Date(event.created_at).toLocaleString("en-GB")}
-                </time>
-              </li>
-            ))}
-          </ul>
-        )}
+        <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div>
+            <dt className="text-sm text-[var(--color-text-muted)]">Livestream</dt>
+            <dd className="mt-1 font-semibold">
+              {livestream.data?.is_live ? "Live now" : "Not live"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-[var(--color-text-muted)]">
+              Featured program
+            </dt>
+            <dd className="mt-1 font-semibold">
+              {featured.data?.title ?? "None showing"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-sm text-[var(--color-text-muted)]">
+              Published branches
+            </dt>
+            <dd className="mt-1 font-semibold">{publishedBranches.count ?? 0}</dd>
+          </div>
+        </dl>
       </section>
 
-      <p className="mt-8 text-sm text-[var(--color-text-muted)]">
-        Session assurance level: {session.aal ?? "unknown"}
-      </p>
+      {staffHasPermission(session.profile, "audit.read") ? (
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold text-[var(--color-text-body)]">
+            Recent website changes
+          </h2>
+          {(recent.data?.length ?? 0) === 0 ? (
+            <p className="mt-3 text-sm text-[var(--color-text-muted)]">
+              No recent changes yet.
+            </p>
+          ) : (
+            <ul className="mt-4 divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
+              {(recent.data ?? []).map((event) => (
+                <li
+                  key={event.id}
+                  className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <p className="font-medium text-[var(--color-text-body)]">
+                    {humanAuditAction(event.action)}
+                  </p>
+                  <time
+                    className="text-sm text-[var(--color-text-muted)]"
+                    dateTime={event.created_at}
+                  >
+                    {new Date(event.created_at).toLocaleString("en-GB")}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : null}
     </div>
   );
 }

@@ -20,14 +20,16 @@ describe("RBAC foundation", () => {
     expect(canAccessPastoralNarratives(perms)).toBe(false);
     expect(perms.has("media.manage")).toBe(true);
     expect(perms.has("programs.update")).toBe(true);
+    expect(perms.has("website.manage")).toBe(true);
     expect(perms.has("livestream.manage")).toBe(true);
     expect(perms.has("branches.manage")).toBe(true);
     expect(perms.has("users.manage")).toBe(false);
     expect(perms.has("giving.change")).toBe(false);
   });
 
-  it("grants media.manage and programs.update to super_admin", () => {
+  it("grants media.manage, website.manage, and programs.update to super_admin", () => {
     expect(roleHasPermission("super_admin", "media.manage")).toBe(true);
+    expect(roleHasPermission("super_admin", "website.manage")).toBe(true);
     expect(roleHasPermission("super_admin", "programs.update")).toBe(true);
   });
 
@@ -46,6 +48,8 @@ describe("RBAC foundation", () => {
     expect(roleHasPermission("program_drafter", "programs.create")).toBe(true);
     expect(roleHasPermission("program_drafter", "programs.publish")).toBe(false);
     expect(roleHasPermission("program_drafter", "media.manage")).toBe(false);
+    expect(roleHasPermission("program_drafter", "website.manage")).toBe(false);
+    expect(roleHasPermission("branch_admin", "website.manage")).toBe(false);
   });
 });
 

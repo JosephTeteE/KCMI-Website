@@ -4,6 +4,7 @@ import {
   type StaffProfile,
 } from "@/lib/auth/session";
 import type { Permission } from "@/lib/authorization/rbac";
+import { humanAal2Required, humanPermissionDenied } from "@/lib/hub/humanize";
 import type { User } from "@supabase/supabase-js";
 
 export type StaffActionSession = {
@@ -27,19 +28,19 @@ export async function requireStaffAction(
     if (aal.reason === "aal2_required") {
       return {
         ok: false,
-        message: "Multi-factor authentication (AAL2) is required for this action.",
+        message: humanAal2Required(),
       };
     }
     return {
       ok: false,
-      message: "You must be signed in with an active Hub account.",
+      message: "Please sign in to the Hub first, then try again.",
     };
   }
 
   if (!staffHasPermission(aal.session.profile, permission)) {
     return {
       ok: false,
-      message: `Missing required permission: ${permission}`,
+      message: humanPermissionDenied(permission),
     };
   }
 

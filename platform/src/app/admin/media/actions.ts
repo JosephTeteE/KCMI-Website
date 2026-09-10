@@ -81,7 +81,7 @@ export async function uploadMarketingImage(formData: FormData) {
   if (!altText) {
     redirectWithError(
       "/admin/media",
-      "Please add alt text so visitors understand the image.",
+      "Please describe what is important in this photo for someone who cannot see it.",
     );
   }
 
@@ -148,7 +148,7 @@ export async function uploadMarketingImage(formData: FormData) {
     },
   });
 
-  redirectWithMessage("/admin/media", "Image prepared and published.");
+  redirectWithMessage("/admin/media", "The photo is ready to use on the website.");
 }
 
 export async function archiveMedia(formData: FormData) {
@@ -234,5 +234,5 @@ export async function archiveMedia(formData: FormData) {
     actorId,
   });
 
-  redirectWithMessage("/admin/media", "Image archived.");
+  redirectWithMessage("/admin/media", "This photo was removed from the library.");
 }

@@ -20,7 +20,7 @@ import { brandPrimitives } from "@/lib/design/tokens";
 const publicRoutes = [
   "/",
   "/about",
-  "/mission",
+  "/about/apostle-frank-aikins",
   "/locations",
   "/services",
   "/sermons",
@@ -30,6 +30,7 @@ const publicRoutes = [
   "/faqs",
   "/privacy",
   "/terms",
+  "/events",
 ];
 
 describe("public content adapters", () => {
@@ -57,19 +58,21 @@ describe("public content adapters", () => {
     expect(kasoa?.serviceTimes).toEqual([]);
   });
 
-  it("keeps prayer CTA on the verified Google Form URL", () => {
-    expect(getPrayerCta().ctaHref).toBe("https://forms.gle/gKTwNc9gNiVCWWrJ6");
+  it("keeps prayer CTA on the verified Google Form URL", async () => {
+    expect((await getPrayerCta()).ctaHref).toBe(
+      "https://forms.gle/gKTwNc9gNiVCWWrJ6",
+    );
   });
 
   it("does not embed pastoral narrative keys or receipt URLs in public seed JSON", async () => {
     const blob = JSON.stringify({
       identity: getChurchIdentity(),
       branches: await getBranches(),
-      social: getSocialLinks(),
-      prayer: getPrayerCta(),
+      social: await getSocialLinks(),
+      prayer: await getPrayerCta(),
       giving: getGivingAccounts(),
-      faqs: getFaqs(),
-      about: getAboutLeadPastor(),
+      faqs: await getFaqs(),
+      about: await getAboutLeadPastor(),
       live: await getLivestreamPublic(),
     });
     expect(blob.toLowerCase()).not.toMatch(/pastoral_note/);
@@ -107,8 +110,8 @@ describe("public content adapters", () => {
     expect(live.facebookPageUrl).not.toMatch(/\/videos\//);
   });
 
-  it("faqs include seven verified questions", () => {
-    expect(getFaqs()).toHaveLength(7);
+  it("faqs include seven verified questions", async () => {
+    expect(await getFaqs()).toHaveLength(7);
   });
 });
 
@@ -119,7 +122,6 @@ describe("navigation and redirects", () => {
       ...getFooterNavigation().map((i) => i.href),
       ...getFooterLegalNavigation().map((i) => i.href),
       "/livestream",
-      "/mission",
     ];
     for (const href of hrefs) {
       expect(publicRoutes).toContain(href);
@@ -133,10 +135,12 @@ describe("navigation and redirects", () => {
     expect(map["/index.html"]).toBe("/");
     expect(map["/location.html"]).toBe("/locations");
     expect(map["/giving-kcmi.html"]).toBe("/giving");
-    expect(map["/mission-kcmi.html"]).toBe("/mission");
-    expect(map["/about-apostle-aikins.html"]).toBe("/about");
+    expect(map["/mission-kcmi.html"]).toBe("/about#mission");
+    expect(map["/about-apostle-aikins.html"]).toBe(
+      "/about/apostle-frank-aikins",
+    );
     for (const dest of Object.values(map)) {
-      expect(publicRoutes).toContain(dest);
+      expect(publicRoutes).toContain(dest.replace(/#.*$/, ""));
     }
   });
 });

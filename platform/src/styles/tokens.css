@@ -31,6 +31,21 @@
   --leading-tight: 1.35;
   --paragraph-gap: 1.1em;
 
+  /*
+    Vertical rhythm (D1.6E). Informational pages stay denser than the home
+    hero. Do not scale padding with viewport width into huge desktop gaps.
+  */
+  --space-heading: 0.5rem;
+  --space-related: 1rem;
+  --space-group: 1.75rem;
+  --space-section: 2.25rem;
+  --space-section-lg: 3rem;
+  --space-masthead-y: 1.5rem;
+  --space-body-y: 1.75rem;
+  --space-card: 1.25rem;
+  --space-footer-block: 1.15rem;
+  --space-footer-legal: 0.65rem;
+
   /* Semantic tokens (WCAG-aware mappings) */
   --color-surface-page: var(--kcmi-off-white);
   --color-surface-elevated: var(--neutral-0);
@@ -44,6 +59,8 @@
   --color-accent-fg: #1a1a1a;
   /* Darkened vs brand green so small text meets WCAG AA on white */
   --color-support: #0b6b16;
+  /* Accessible green for normal/small text on pale surfaces; primitive brand green unchanged */
+  --color-text-support: #08570f;
   --color-text-body: var(--neutral-950);
   --color-text-muted: var(--neutral-600);
   --color-text-on-brand: #ffffff;
@@ -75,6 +92,7 @@
   --color-accent: var(--color-accent);
   --color-accent-fg: var(--color-accent-fg);
   --color-support: var(--color-support);
+  --color-text-support: var(--color-text-support);
   --color-text-body: var(--color-text-body);
   --color-text-muted: var(--color-text-muted);
   --color-text-on-brand: var(--color-text-on-brand);
@@ -128,6 +146,55 @@ p + p {
   outline-offset: 3px;
 }
 
+/*
+  Central interaction affordance (D1.6A / D1.6D).
+  Apply cursor/hover only to genuine controls — never to ordinary text or
+  noninteractive containers.
+*/
+a[href],
+button:not(:disabled),
+input[type="button"]:not(:disabled),
+input[type="submit"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+input[type="file"]:not(:disabled),
+input[type="image"]:not(:disabled),
+select:not(:disabled),
+summary,
+label[for],
+label:has(input[type="checkbox"]):not(:has(input:disabled)),
+label:has(input[type="radio"]):not(:has(input:disabled)) {
+  cursor: pointer;
+}
+
+a.ui-cta:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+a[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+button:not(:disabled):hover,
+input[type="submit"]:not(:disabled):hover,
+input[type="button"]:not(:disabled):hover,
+a.ui-cta:hover {
+  filter: brightness(0.96);
+}
+
+button:disabled,
+input:disabled {
+  opacity: 0.6;
+}
+
+a[href]:hover {
+  text-decoration-thickness: from-font;
+}
+
 .font-display {
   font-family: var(--font-display), Georgia, "Times New Roman", serif;
   line-height: var(--leading-tight);
@@ -140,7 +207,44 @@ p + p {
 }
 
 .section-space {
-  padding-block: clamp(3rem, 6vw, 5.5rem);
+  padding-block: var(--space-body-y);
+}
+
+.section-space-lg {
+  padding-block: var(--space-section-lg);
+}
+
+.page-masthead {
+  padding-block: var(--space-masthead-y);
+}
+
+.stack-heading > * + * {
+  margin-top: var(--space-heading);
+}
+
+.stack-related > * + * {
+  margin-top: var(--space-related);
+}
+
+.stack-section > * + * {
+  margin-top: var(--space-section);
+}
+
+.card-pad {
+  padding: var(--space-card);
+}
+
+.ui-text-link {
+  color: var(--color-action-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-action-primary) 45%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+.ui-text-link:hover,
+.ui-text-link:focus-visible {
+  text-decoration-color: currentColor;
 }
 
 .text-readable {
@@ -240,8 +344,8 @@ p + p {
 .site-footer-main {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem 1.75rem;
-  padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
+  gap: 1.15rem 1.5rem;
+  padding-block: var(--space-footer-block);
   align-items: start;
 }
 
@@ -264,14 +368,16 @@ p + p {
 
 .site-footer-tagline {
   margin-top: 0.35rem;
+  overflow-wrap: anywhere;
 }
 
 .site-footer-explore-list {
   display: grid;
-  grid-template-columns: 1fr;
-  margin-top: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 0.4rem;
   padding: 0;
   list-style: none;
+  column-gap: 0.75rem;
 }
 
 .site-footer-contact-list {
@@ -285,8 +391,8 @@ p + p {
 
 .site-footer-invite {
   display: grid;
-  gap: 1.25rem 2rem;
-  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  gap: 0.75rem 1.5rem;
+  padding-block: var(--space-footer-block);
 }
 
 .site-footer-dfr-body {
@@ -302,7 +408,7 @@ p + p {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem 1rem;
+  gap: 0.15rem 0.75rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -349,13 +455,17 @@ p + p {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem 1.5rem;
-  padding-block: 1.1rem;
+  min-width: 0;
+  padding-block: var(--space-footer-legal);
 }
 
 .site-footer-legal-line {
   margin: 0;
+  min-width: 0;
+  flex: 1 1 12rem;
   font-size: var(--text-small);
   color: var(--color-text-muted);
+  overflow-wrap: anywhere;
 }
 
 .site-footer-legal-nav {
@@ -394,10 +504,9 @@ p + p {
 
 @media (min-width: 48rem) {
   .site-footer-main {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
     grid-template-areas:
-      "brand brand"
-      "explore contact";
+      "brand explore";
   }
 
   .site-footer-brand {
@@ -408,13 +517,9 @@ p + p {
     grid-area: explore;
   }
 
-  .site-footer-contact {
-    grid-area: contact;
-  }
-
   .site-footer-explore-list {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 1.25rem;
+    column-gap: 1rem;
   }
 
   .site-footer-invite {
@@ -440,9 +545,24 @@ p + p {
 
 @media (min-width: 80rem) {
   .site-footer-main {
-    grid-template-columns: minmax(16rem, 1fr) auto auto;
-    grid-template-areas: "brand explore contact";
+    grid-template-columns: minmax(16rem, 1.1fr) minmax(0, 1fr);
+    grid-template-areas: "brand explore";
     column-gap: 4rem;
     justify-content: space-between;
   }
+}
+
+.hub-nav-dialog {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.hub-nav-dialog::backdrop {
+  background: color-mix(in srgb, var(--neutral-950) 45%, transparent);
 }

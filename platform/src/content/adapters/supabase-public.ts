@@ -134,8 +134,39 @@ export async function fetchPublishedBranches(): Promise<Branch[]> {
   });
 }
 
-export async function fetchFeaturedProgram(): Promise<FeaturedProgram | null> {
+export async function fetchFeaturedProgram(
+  preferredId?: string | null,
+): Promise<FeaturedProgram | null> {
   const supabase = await createClient();
+
+  if (preferredId) {
+    const { data: preferred, error: preferredError } = await supabase
+      .from("programs")
+      .select(
+        `
+        id,
+        title,
+        short_description,
+        starts_at,
+        ends_at,
+        cta_label,
+        cta_url,
+        placement,
+        status,
+        featured_media:media_assets!programs_featured_media_id_fkey (
+          public_url,
+          alt_text
+        )
+      `,
+      )
+      .eq("id", preferredId)
+      .eq("status", "published")
+      .maybeSingle();
+
+    if (preferredError) fail("fetchFeaturedProgram.preferred", preferredError);
+    if (preferred) return mapProgramRow(preferred);
+  }
+
   const { data: row, error } = await supabase
     .from("programs")
     .select(
@@ -163,7 +194,26 @@ export async function fetchFeaturedProgram(): Promise<FeaturedProgram | null> {
 
   if (error) fail("fetchFeaturedProgram", error);
   if (!row) return null;
+  return mapProgramRow(row);
+}
 
+type ProgramRow = {
+  id: string;
+  title: string;
+  short_description: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  cta_label: string | null;
+  cta_url: string | null;
+  placement: FeaturedProgram["placement"];
+  status: FeaturedProgram["status"];
+  featured_media:
+    | { public_url: string; alt_text: string }
+    | { public_url: string; alt_text: string }[]
+    | null;
+};
+
+function mapProgramRow(row: ProgramRow): FeaturedProgram {
   const media = Array.isArray(row.featured_media)
     ? row.featured_media[0]
     : row.featured_media;
@@ -316,7 +366,7 @@ export async function fetchHeadquartersServiceTimes(): Promise<ServiceTime[]> {
   return hq.serviceTimes;
 }
 
-/** Future `/locations/[branch-slug]` — published branch row or null. */
+/** Published branch row or null. */
 export async function fetchPublishedBranchBySlug(
   slug: string,
 ): Promise<Branch | null> {
@@ -324,4 +374,83 @@ export async function fetchPublishedBranchBySlug(
   if (!normalized) return null;
   const all = await fetchPublishedBranches();
   return all.find((branch) => branch.slug === normalized) ?? null;
+}
+
+export async function fetchWebsiteDocumentPayload(
+  key: string,
+): Promise<{ id: string; payload: Json; status: string } | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("website_documents")
+    .select("id, payload, status")
+    .eq("document_key", key)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error) fail(`fetchWebsiteDocumentPayload.${key}`, error);
+  return data;
+}
+
+export async function fetchMediaAssetPublic(id: string | null): Promise<{
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+} | null> {
+  if (!id) return null;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("media_assets")
+    .select("public_url, alt_text, width_px, height_px, archived_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) fail("fetchMediaAssetPublic", error);
+  if (!data || data.archived_at) return null;
+  return {
+    src: data.public_url,
+    alt: data.alt_text,
+    width: data.width_px ?? 1600,
+    height: data.height_px ?? 900,
+  };
+}
+
+export async function fetchHomeFeaturedSermon(): Promise<SermonPublic | null> {
+  const supabase = await createClient();
+  const { data: row, error } = await supabase
+    .from("sermons")
+    .select(
+      `
+      id,
+      title,
+      speaker,
+      sermon_date,
+      scripture_reference,
+      summary,
+      youtube_url,
+      thumbnail:media_assets!sermons_thumbnail_media_id_fkey (
+        public_url,
+        alt_text
+      )
+    `,
+    )
+    .eq("status", "published")
+    .eq("home_featured", true)
+    .maybeSingle();
+
+  if (error) fail("fetchHomeFeaturedSermon", error);
+  if (!row) return null;
+
+  const thumb = Array.isArray(row.thumbnail) ? row.thumbnail[0] : row.thumbnail;
+  return {
+    id: row.id,
+    title: row.title,
+    speaker: row.speaker,
+    sermonDate: row.sermon_date,
+    scriptureReference: row.scripture_reference,
+    summary: row.summary,
+    youtubeUrl: row.youtube_url,
+    thumbnailSrc: thumb?.public_url ?? null,
+    thumbnailAlt: thumb?.alt_text ?? "",
+  };
 }

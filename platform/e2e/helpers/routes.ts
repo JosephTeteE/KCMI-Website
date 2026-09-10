@@ -1,16 +1,20 @@
 export const PUBLIC_ROUTES = [
   "/",
   "/about",
+  "/about/apostle-frank-aikins",
   "/locations",
   "/services",
   "/sermons",
   "/contact",
   "/giving",
   "/livestream",
-  "/mission",
+  "/events",
   "/faqs",
   "/privacy",
   "/terms",
+  "/locations/headquarters",
+  "/locations/accra",
+  "/locations/togo",
 ] as const;
 
 export const LAYOUT_VIEWPORTS = [

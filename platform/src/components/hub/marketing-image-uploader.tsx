@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition, type MouseEvent, type ReactNode } from "react";
+import { useId, useMemo, useState, useTransition, type MouseEvent, type ReactNode } from "react";
 import {
   CROP_ASPECTS,
   clampFocal,
@@ -60,12 +60,16 @@ export function MarketingImageUploader({
   submitLabel,
   defaultCropAspect = "original",
   showCaption = false,
+  lockCropAspect = false,
+  placementTitle,
 }: {
   action: (formData: FormData) => Promise<void>;
   extraFields?: ReactNode;
   submitLabel: string;
   defaultCropAspect?: CropAspectId;
   showCaption?: boolean;
+  lockCropAspect?: boolean;
+  placementTitle?: string;
 }) {
   const [cropAspect, setCropAspect] = useState<CropAspectId>(defaultCropAspect);
   const [focal, setFocal] = useState({ x: 0.5, y: 0.5 });
@@ -74,6 +78,10 @@ export function MarketingImageUploader({
   const [prepared, setPrepared] = useState<PreparedPreview | null>(null);
   const [prepareError, setPrepareError] = useState<string | null>(null);
   const [isPreparing, startPrepare] = useTransition();
+  const fieldId = useId();
+  const fileFieldId = `${fieldId}-file`;
+  const altFieldId = `${fieldId}-alt`;
+  const captionFieldId = `${fieldId}-caption`;
 
   const selectedCrop = useMemo(
     () => CROP_ASPECTS.find((item) => item.id === cropAspect) ?? CROP_ASPECTS[3],
@@ -142,12 +150,12 @@ export function MarketingImageUploader({
       <input type="hidden" name="focal_y" value={String(focal.y)} />
 
       <div>
-        <label htmlFor="file" className="block text-sm font-medium">
+        <label htmlFor={fileFieldId} className="block text-sm font-medium">
           Image file
           <span className="text-[var(--color-destructive)]"> *</span>
         </label>
         <input
-          id="file"
+          id={fileFieldId}
           name="file"
           type="file"
           required
@@ -177,29 +185,38 @@ export function MarketingImageUploader({
         </div>
       ) : null}
 
-      <fieldset>
-        <legend className="text-sm font-medium">Website crop</legend>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          {CROP_ASPECTS.map((option) => (
-            <label
-              key={option.id}
-              className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 text-sm"
-            >
-              <input
-                type="radio"
-                name="crop_aspect_ui"
-                value={option.id}
-                checked={cropAspect === option.id}
-                onChange={() => {
-                  setCropAspect(parseCropAspect(option.id));
-                  setPrepared(null);
-                }}
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {lockCropAspect ? (
+        <p className="text-sm text-[var(--color-text-muted)]">
+          {placementTitle
+            ? `The website will fit this photo to “${placementTitle}” automatically.`
+            : "The website will crop this photo to fit this spot automatically."}{" "}
+          Click the photo below to choose what stays in view.
+        </p>
+      ) : (
+        <fieldset>
+          <legend className="text-sm font-medium">How should this photo be fitted?</legend>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {CROP_ASPECTS.map((option) => (
+              <label
+                key={option.id}
+                className="flex min-h-11 cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 text-sm"
+              >
+                <input
+                  type="radio"
+                  name="crop_aspect_ui"
+                  value={option.id}
+                  checked={cropAspect === option.id}
+                  onChange={() => {
+                    setCropAspect(parseCropAspect(option.id));
+                    setPrepared(null);
+                  }}
+                />
+                {option.label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       {source && selectedCrop.ratio ? (
         <div>
@@ -246,13 +263,14 @@ export function MarketingImageUploader({
       ) : null}
 
       <HubTextField
-        id="alt_text"
-        label="Alt text"
+        id={altFieldId}
+        name="alt_text"
+        label="Photo description"
         required
-        hint="Required. Describe the photo for visitors using a screen reader."
+        hint="Describe what is important in this photo for someone who cannot see it."
       />
       {showCaption ? (
-        <HubTextAreaField id="caption" label="Caption (optional)" rows={2} />
+        <HubTextAreaField id={captionFieldId} name="caption" label="Caption (optional)" rows={2} />
       ) : null}
 
       <div className="flex flex-wrap gap-3">
@@ -265,7 +283,7 @@ export function MarketingImageUploader({
           }}
           className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold text-[var(--color-text-body)] disabled:opacity-60"
         >
-          {isPreparing ? "Preparing…" : "Prepare website version"}
+          {isPreparing ? "Checking…" : "Check how the photo will look"}
         </button>
         <HubSubmitButton>{submitLabel}</HubSubmitButton>
       </div>

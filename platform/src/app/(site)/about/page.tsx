@@ -1,57 +1,98 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
-import { getAboutLeadPastor, getMissionContent } from "@/content";
+import { getAboutChurch } from "@/content";
 import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
 export const metadata = publicPageMetadata({
-  title: "About",
+  title: "About KCMI",
   description:
-    "Meet the Senior Pastor and Founder of Kingdom Covenant Ministries International (Rehoboth Christian Center).",
+    "Who we are, our vision and mission at Kingdom Covenant Ministries International (Rehoboth Christian Center).",
   path: "/about",
 });
 
-export default function AboutPage() {
-  const pastor = getAboutLeadPastor();
-  const mission = getMissionContent();
+export default async function AboutPage() {
+  const about = await getAboutChurch();
 
   return (
     <PageShell
       eyebrow="About KCMI"
-      title="Our Lead Pastor"
-      description={`${pastor.name} — ${pastor.role}`}
+      title="About KCMI"
+      description={`${about.leadershipOrgLine}, headquartered in ${about.leadershipHeadquarters}.`}
     >
-      <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <div className="relative mx-auto aspect-[2/3] w-full max-w-md overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-tint)]">
-          <Image
-            src={pastor.portraitSrc}
-            alt={pastor.portraitAlt}
-            width={pastor.portraitWidth}
-            height={pastor.portraitHeight}
-            className="h-full w-full object-cover"
-            sizes="(max-width: 1024px) 90vw, 40vw"
-            priority
-          />
-        </div>
-        <div className="min-w-0 space-y-5">
-          <p className="text-readable-sm font-semibold text-[var(--color-action-primary)]">
-            {pastor.role}
-          </p>
-          {pastor.bioParagraphs.map((p) => (
-            <p key={p.slice(0, 40)} className="text-readable text-[var(--color-text-muted)]">
-              {p}
+      <div className="mx-auto max-w-3xl space-y-8">
+        <section aria-labelledby="who-we-are-heading" className="space-y-4">
+          <h2 id="who-we-are-heading" className="font-display text-2xl font-semibold">
+            Who We Are
+          </h2>
+          {about.whoWeAre.map((paragraph) => (
+            <p
+              key={paragraph.slice(0, 48)}
+              className="text-readable text-[var(--color-text-muted)]"
+            >
+              {paragraph}
             </p>
           ))}
-          <p className="text-readable font-medium text-[var(--color-text-body)]">
-            Vision: {mission.vision}
+        </section>
+
+        <section id="vision" aria-labelledby="vision-heading" className="space-y-4">
+          <h2 id="vision-heading" className="font-display text-2xl font-semibold">
+            Our Vision
+          </h2>
+          <p className="font-display text-2xl font-semibold text-[var(--color-action-primary)]">
+            {about.vision}
           </p>
-          <Link
-            href="/mission"
-            className="inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
-          >
-            Read our mission
-          </Link>
-        </div>
+        </section>
+
+        <section id="mission" aria-labelledby="mission-heading" className="space-y-4">
+          <h2 id="mission-heading" className="font-display text-2xl font-semibold">
+            Our Mission
+          </h2>
+          <ol className="list-decimal space-y-4 pl-5 text-readable text-[var(--color-text-muted)]">
+            {about.missionParagraphs.map((paragraph) => (
+              <li key={paragraph.slice(0, 40)}>{paragraph}</li>
+            ))}
+          </ol>
+        </section>
+
+        <section
+          aria-labelledby="leadership-preview-heading"
+          className="card-pad grid items-start gap-6 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] lg:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)]"
+        >
+          <div className="relative mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-tint)]">
+            <Image
+              src={about.portrait.src}
+              alt={about.portrait.alt}
+              width={about.portrait.width}
+              height={about.portrait.height}
+              className="h-full w-full object-cover"
+              sizes="(max-width: 1024px) 70vw, 20vw"
+            />
+          </div>
+          <div>
+            <p className="text-readable-sm font-semibold tracking-wide text-[var(--color-action-primary)] uppercase">
+              Leadership
+            </p>
+            <h2
+              id="leadership-preview-heading"
+              className="font-display mt-2 text-2xl font-semibold"
+            >
+              {about.leadershipName}
+            </h2>
+            <p className="mt-1 text-readable-sm font-semibold text-[var(--color-text-body)]">
+              {about.leadershipRole}
+            </p>
+            <p className="text-readable mt-4 text-[var(--color-text-muted)]">
+              {about.leadershipPreview}
+            </p>
+            <Link
+              href="/about/apostle-frank-aikins"
+              className="mt-5 inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
+            >
+              Meet Our Lead Pastor
+            </Link>
+          </div>
+        </section>
       </div>
     </PageShell>
   );

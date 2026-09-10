@@ -1,180 +1,83 @@
 import type { LegalDocument } from "@/content/types";
 
 /**
- * Faithful migration from public/privacy-policy.html (Effective Date: June 30, 2025).
- * Formatting cleaned; legal meaning not rewritten.
- * staleNotes are for pre-production counsel review only — not rendered on the public page.
+ * Factual public notice for the KCMI V2 platform.
+ * PRE-PRODUCTION HUMAN/LEGAL REVIEW REQUIRED — staleNotes are not rendered.
+ * Do not reintroduce legacy JWT / Drive / Sheets / reCAPTCHA claims.
  */
 export const privacyPolicy: LegalDocument = {
   title: "Privacy Policy",
-  metaLine: "Effective Date: June 30, 2025",
+  metaLine:
+    "This notice describes how the current Kingdom Covenant Ministries International digital platform handles information.",
   staleNotes: [
-    "PRE-PRODUCTION LEGAL REVIEW REQUIRED before KCMI V2 production. Do not treat this seed as an accurate description of the V2 stack.",
-    "Contact email in this policy is contact@kcmi-rcc.org, which differs from the public contact Gmail on the Contact page.",
-    "Section 'Information for Camp and Event Registrations' describes Google Sheet capture and Google Drive receipt storage (legacy). V2 target is Hub + private storage (ADR-0004); runtime camp receipts also historically used Cloudinary (Phase 0 inventory).",
-    "Section 3 (Google API Services) describes Drive, Sheets, Calendar, and Gmail APIs used by the legacy site.",
-    "Sections 3–5 describe JWT admin console access, 1-minute JWT expiry, and livestream embed-code management from the legacy admin. V2 Hub uses Supabase Auth with MFA (AAL2) (ADR-0003).",
-    "Section 5 names reCAPTCHA v2/v3 on forms. V2 public-bot protection is Turnstile (ADR-0005) where forms exist.",
-    "Youth camp / events platform wording still refers to the legacy camp stack that V2 events hosting is intended to replace (ADR-0002) — not yet in production.",
+    "PRE-PRODUCTION HUMAN/LEGAL REVIEW REQUIRED. This is not a completed legal opinion.",
+    "Do not invent statutory interpretations, consent language, or retention commitments.",
+    "See docs/DATA_PROCESSING_INVENTORY.md and docs/PRIVACY_PREPRODUCTION_REVIEW.md.",
   ],
   sections: [
     {
       paragraphs: [
-        "At Kingdom Covenant Ministries International (KCMI), we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website https://kcmi-rcc.org and any of its subdomains, including our youth camp platform and other services.",
+        "This notice describes how the current Kingdom Covenant Ministries International (KCMI) digital platform handles information. It replaces earlier website text that described a different, legacy technical system.",
       ],
     },
     {
-      heading: "1. Information We Collect",
+      heading: "1. The services this notice covers",
       paragraphs: [
-        "We may collect personal information that you voluntarily provide to us when you:",
-      ],
-      bullets: [
-        "Register for events or camps",
-        "Submit forms or contact us",
-        "Make donations or payments",
-        "Subscribe to our communications",
+        "This notice covers the public KCMI website and the staff KCMI Hub operated as the V2 platform (a Next.js application hosted on Vercel, with Supabase used for authentication, database, and marketing-image storage).",
+        "It does not describe the separate camp registration site, and it does not describe pastoral-care case files.",
       ],
     },
     {
-      heading: "Information for Camp and Event Registrations",
+      heading: "2. Information the public website collects",
       paragraphs: [
-        "When you register for an event such as our Youth Camp, we collect information necessary for the registration, including your name, contact details, number of attendees, and payment receipt. This data is processed as follows:",
-      ],
-      bullets: [
-        "Registration details (name, email, phone number) are automatically recorded in a secure Google Sheet owned by the ministry for administrative purposes.",
-        "Uploaded payment receipts are stored securely in a restricted Google Drive folder accessible only to authorized ministry administrators.",
-        "We retain this registration data for up to 12 months after the event for record-keeping purposes.",
+        "Browsing public pages sends ordinary technical request data to the application host (for example, IP address and pages requested, as processed by the hosting provider).",
+        "This V2 website does not currently provide a first-party public contact form, newsletter signup, camp registration form, or payment-receipt upload. The Contact page uses email and telephone links. Giving pages display published bank details; they do not collect card payments on this site.",
       ],
     },
     {
+      heading: "3. Google Forms and other outbound links",
       paragraphs: [
-        "We also automatically collect certain technical information when you visit our website:",
-      ],
-      bullets: [
-        "Log data (IP address, browser type, pages visited)",
-        "Cookies and similar tracking technologies",
-        "Google reCAPTCHA responses (to prevent spam and abuse)",
+        "Some pages link to Google Forms that the ministry already uses for prayer, counselling, welfare, celebrations, cell fellowships, and service teams. If you submit those forms, Google and the ministry’s use of that form process the information — this website does not store those form responses.",
+        "The site also links to third-party platforms for media and directions, including YouTube, Facebook, Instagram, X (Twitter), TikTok, Spotify, Silverbird Television’s website, and Google Maps. Those services have their own policies.",
       ],
     },
     {
-      heading: "2. How We Use Your Information",
+      heading: "4. Staff Hub accounts",
       paragraphs: [
-        "We use the information we collect for various purposes, including:",
-      ],
-      bullets: [
-        "To provide and maintain our services",
-        "To process event registrations and donations",
-        "To communicate with you (confirmations, updates, newsletters)",
-        "To improve our website and services",
-        "To prevent fraud and ensure security",
-        "To comply with legal obligations",
+        "Church staff who use the KCMI Hub sign in with Supabase Auth. High-sensitivity Hub actions require multi-factor authentication. The Hub stores staff profile and role information needed to publish public content and to record audit events for privileged actions.",
+        "The Hub is not a public membership login.",
       ],
     },
     {
-      heading: "3. Google API Services",
+      heading: "5. Public content and images",
       paragraphs: [
-        "We use Google APIs with restricted service accounts for ministry operations:",
-      ],
-      bullets: [
-        "Drive API: Securely store payment receipts (admin access only)",
-        "Sheets API: Manage registration data in spreadsheets",
-        "Calendar API: Display public event schedules (read-only)",
-        "Gmail API: Send automated email confirmations",
+        "Published page copy, sermon titles and YouTube links, branch addresses and service times, livestream Facebook links, and public marketing photographs are stored in Supabase. Marketing images are converted for the web; embedded camera metadata is stripped on upload.",
+        "Unpublished drafts are not shown on the public website.",
       ],
     },
     {
-      paragraphs: ["Access is controlled through:"],
-      bullets: [
-        "JWT authentication for admin console",
-        "Limited API scopes (no full account access)",
-        "Service accounts instead of user OAuth",
-      ],
-    },
-    {
-      heading: "4. Admin Controls",
-      paragraphs: ["Administrative access features:"],
-      bullets: [
-        "JWT-secured admin console",
-        "Livestream embed code management",
-        "Registration data viewing (no editing of financial records)",
-        "Automatic session expiration",
-      ],
-    },
-    {
-      heading: "5. Data Security",
+      heading: "6. What this platform does not currently do",
       paragraphs: [
-        "We implement multiple security layers:",
-      ],
-      bullets: [
-        "JWT authentication with 1-minute expiry for admin access",
-        "reCAPTCHA v2/v3 on all forms",
-        "Payment receipts encrypted in Google Drive",
-        "HTTPS for all data transfers",
-        "Regular security audits",
+        "This platform stores published church content and staff Hub records in Supabase. It does not store camp or event payment receipts on this site, and it does not operate first-party public registration or bot-challenge widgets on these pages.",
+        "Event registration and pastoral-care case files are not part of this website. The camp registration site remains a distinct system.",
       ],
     },
     {
+      heading: "7. Retention",
       paragraphs: [
-        "Uploaded files are stored securely in our Google Drive, accessible only to authorized administrators.",
+        "This platform does not currently run automatic deletion jobs for published website content, marketing images, or Hub audit records. Specific retention periods are not stated in this notice.",
       ],
     },
     {
-      heading: "6. Data Retention",
-      paragraphs: ["We retain data based on operational needs:"],
-      bullets: [
-        "Active use: Camp data kept for 1 year post-event",
-        "Financial records: Payment receipts retained for 2 years",
-        "Contact forms: Deleted after 6 months",
-      ],
-    },
-    {
+      heading: "8. Search indexing on staging",
       paragraphs: [
-        "You may request deletion of your data at any time by contacting us.",
+        "Staging deployments of this platform are configured so search engines are asked not to index the site.",
       ],
     },
     {
-      heading: "7. Your Rights and Choices",
+      heading: "9. Contact",
       paragraphs: [
-        "You have certain rights regarding your personal information:",
-      ],
-      bullets: [
-        "Access: Request a copy of your data",
-        "Correction: Update or correct inaccurate information",
-        "Deletion: Request deletion of your data",
-        "Opt-out: Unsubscribe from communications",
-        "Restriction: Limit how we use your information",
-      ],
-    },
-    {
-      paragraphs: [
-        "To exercise these rights, please contact us using the information below.",
-      ],
-    },
-    {
-      heading: "8. Children's Privacy",
-      paragraphs: [
-        "Our services are not directed to children under 13. We do not knowingly collect personal information from children under 13 without parental consent. If we become aware that we have collected personal information from a child without verification of parental consent, we will take steps to remove that information.",
-      ],
-    },
-    {
-      heading: "9. Links to Other Websites",
-      paragraphs: [
-        "Our Service may contain links to other websites that are not operated by us, such as YouTube, TikTok, and Google Forms for various requests. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.",
-      ],
-    },
-    {
-      heading: "10. Changes to This Policy",
-      paragraphs: [
-        "We may update this Privacy Policy periodically. We will notify you of any changes by posting the new policy on this page and updating the effective date. We encourage you to review this policy regularly.",
-      ],
-    },
-    {
-      heading: "11. Contact Us",
-      paragraphs: [
-        "If you have questions about this Privacy Policy or your personal information, please contact us:",
-        "Kingdom Covenant Ministries International (KCMI)",
-        "Email: contact@kcmi-rcc.org",
-        "Website: https://kcmi-rcc.org",
+        "Questions about this notice or about personal information related to this website can be sent to Kingdom Covenant Ministries International at contact@kcmi-rcc.org.",
       ],
     },
   ],

@@ -3,7 +3,7 @@
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
 import { saveRevision } from "@/lib/cms/revisions";
-import { extractFacebookUrlFromEmbed } from "@/lib/cms/facebook-url";
+import { parseFacebookLivestreamInput } from "@/lib/cms/facebook-url";
 import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,25 +19,35 @@ export async function updateLivestreamSettings(formData: FormData) {
     redirectWithError("/admin/livestream", gate.message);
   }
 
-  const input =
+  const wantLive =
+    formData.get("is_live") === "on" || formData.get("is_live") === "true";
+  const pasted =
     emptyToNull(formData.get("facebook_input")) ??
-    emptyToNull(formData.get("facebook_url")) ??
-    "";
-  const isLive = formData.get("is_live") === "on" || formData.get("is_live") === "true";
+    emptyToNull(formData.get("facebook_embed")) ??
+    emptyToNull(formData.get("facebook_url"));
+  const existing = emptyToNull(formData.get("existing_facebook_url"));
 
-  let facebookUrl: string | null = null;
-  if (input) {
-    const extracted = extractFacebookUrlFromEmbed(input);
+  let facebookUrl: string | null = existing;
+
+  if (pasted) {
+    const extracted = parseFacebookLivestreamInput(pasted);
     if (!extracted.ok) {
       redirectWithError("/admin/livestream", extracted.error);
     }
     facebookUrl = extracted.url;
   }
 
+  if (wantLive && !facebookUrl) {
+    redirectWithError(
+      "/admin/livestream",
+      "Paste the Facebook embed code first, then click Check and Preview.",
+    );
+  }
+
   const actorId = gate.session.user.id;
   const supabase = await createClient();
 
-  const { data: existing } = await supabase
+  const { data: existingRow } = await supabase
     .from("livestream_settings")
     .select("id, facebook_url, is_live")
     .eq("singleton_key", "default")
@@ -46,22 +56,22 @@ export async function updateLivestreamSettings(formData: FormData) {
   let rowId: string;
   let saved: { id: string; facebook_url: string | null; is_live: boolean };
 
-  if (existing) {
+  if (existingRow) {
     const { data, error } = await supabase
       .from("livestream_settings")
       .update({
         facebook_url: facebookUrl,
-        is_live: isLive,
+        is_live: wantLive,
         updated_by: actorId,
       })
-      .eq("id", existing.id)
+      .eq("id", existingRow.id)
       .select("id, facebook_url, is_live")
       .single();
 
     if (error || !data) {
       redirectWithError(
         "/admin/livestream",
-        error?.message ?? "Could not update livestream settings.",
+        "We couldn't save the livestream. Please try again.",
       );
     }
     rowId = data.id;
@@ -72,7 +82,7 @@ export async function updateLivestreamSettings(formData: FormData) {
       .insert({
         singleton_key: "default",
         facebook_url: facebookUrl,
-        is_live: isLive,
+        is_live: wantLive,
         updated_by: actorId,
       })
       .select("id, facebook_url, is_live")
@@ -81,7 +91,7 @@ export async function updateLivestreamSettings(formData: FormData) {
     if (error || !data) {
       redirectWithError(
         "/admin/livestream",
-        error?.message ?? "Could not create livestream settings.",
+        "We couldn't save the livestream. Please try again.",
       );
     }
     rowId = data.id;
@@ -96,7 +106,7 @@ export async function updateLivestreamSettings(formData: FormData) {
     metadata: {
       is_live: saved.is_live,
       facebook_url: saved.facebook_url,
-      previous_is_live: existing?.is_live ?? null,
+      previous_is_live: existingRow?.is_live ?? null,
     },
   });
 
@@ -109,8 +119,13 @@ export async function updateLivestreamSettings(formData: FormData) {
       singleton_key: "default",
     },
     changedBy: actorId,
-    changeSummary: "Updated livestream settings",
+    changeSummary: wantLive ? "Livestream made live" : "Livestream turned off",
   });
 
-  redirectWithMessage("/admin/livestream", "Livestream settings saved.");
+  redirectWithMessage(
+    "/admin/livestream",
+    saved.is_live
+      ? "The website is now showing the livestream."
+      : "The livestream is off. Visitors will see the not-live message.",
+  );
 }

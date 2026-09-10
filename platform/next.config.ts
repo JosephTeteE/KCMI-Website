@@ -55,14 +55,23 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/admin",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
         source: "/admin/:path*",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
           {
             key: "Content-Security-Policy",
             value: "frame-ancestors 'none'",
           },
         ],
+      },
+      {
+        source: "/auth/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },

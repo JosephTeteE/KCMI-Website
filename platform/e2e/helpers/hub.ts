@@ -47,34 +47,44 @@ export async function enrollTotpSecret(email: string): Promise<string> {
   const client = createClient(url, publishable, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
-  const { error: signErr } = await client.auth.signInWithPassword({
-    email,
-    password: TEST_PASSWORD,
-  });
-  if (signErr) throw signErr;
-  const { data: enrolled, error: enrollErr } = await client.auth.mfa.enroll({
-    factorType: "totp",
-    friendlyName: `d12-${Date.now()}`,
-  });
-  if (enrollErr || !enrolled?.totp?.secret) {
-    throw enrollErr ?? new Error("TOTP enroll failed");
+  let lastErr: Error | null = null;
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    try {
+      const { error: signErr } = await client.auth.signInWithPassword({
+        email,
+        password: TEST_PASSWORD,
+      });
+      if (signErr) throw signErr;
+      const { data: enrolled, error: enrollErr } = await client.auth.mfa.enroll({
+        factorType: "totp",
+        friendlyName: `d12-${Date.now()}`,
+      });
+      if (enrollErr || !enrolled?.totp?.secret) {
+        throw enrollErr ?? new Error("TOTP enroll failed");
+      }
+      const secret = enrolled.totp.secret;
+      const totp = new TOTP({ secret, digits: 6, period: 30 });
+      const { data: challenge, error: challengeErr } = await client.auth.mfa.challenge({
+        factorId: enrolled.id,
+      });
+      if (challengeErr || !challenge) {
+        throw challengeErr ?? new Error("TOTP challenge failed");
+      }
+      const { error: verifyErr } = await client.auth.mfa.verify({
+        factorId: enrolled.id,
+        challengeId: challenge.id,
+        code: totp.generate(),
+      });
+      if (verifyErr) throw verifyErr;
+      await client.auth.signOut();
+      return secret;
+    } catch (err) {
+      lastErr = err instanceof Error ? err : new Error(String(err));
+      await client.auth.signOut().catch(() => undefined);
+      await new Promise((r) => setTimeout(r, 2000 * attempt));
+    }
   }
-  const secret = enrolled.totp.secret;
-  const totp = new TOTP({ secret, digits: 6, period: 30 });
-  const { data: challenge, error: challengeErr } = await client.auth.mfa.challenge({
-    factorId: enrolled.id,
-  });
-  if (challengeErr || !challenge) {
-    throw challengeErr ?? new Error("TOTP challenge failed");
-  }
-  const { error: verifyErr } = await client.auth.mfa.verify({
-    factorId: enrolled.id,
-    challengeId: challenge.id,
-    code: totp.generate(),
-  });
-  if (verifyErr) throw verifyErr;
-  await client.auth.signOut();
-  return secret;
+  throw lastErr ?? new Error("TOTP enroll failed");
 }
 
 export async function createSyntheticUser(
@@ -106,16 +116,19 @@ export async function createSyntheticUser(
 }
 
 export async function completeMfa(page: Page, knownSecret?: string) {
-  await expect(page.getByRole("heading", { name: /Hub MFA/i })).toBeVisible({
+  await expect(
+    page.getByRole("heading", { name: /Add extra protection|Hub MFA/i }),
+  ).toBeVisible({
     timeout: 20_000,
   });
   await expect(page.locator("#code")).toBeVisible({ timeout: 20_000 });
 
   let secret = knownSecret ?? "";
-  const secretEl = page.getByText(/Manual secret:/);
+  const secretEl = page.getByText(/Manual setup code:|Manual secret:/);
   try {
     await secretEl.waitFor({ timeout: 12_000 });
     secret = ((await secretEl.textContent()) ?? "")
+      .replace(/Manual setup code:\s*/i, "")
       .replace(/Manual secret:\s*/i, "")
       .trim();
   } catch {
@@ -125,9 +138,12 @@ export async function completeMfa(page: Page, knownSecret?: string) {
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const totp = new TOTP({ secret, digits: 6, period: 30 });
     await page.locator("#code").fill(totp.generate());
-    await page.getByRole("button", { name: /Verify and continue/i }).click();
+    await page
+      .getByRole("button", { name: /Continue to the Hub|Verify and continue/i })
+      .click();
     const reachedHub = await page
-      .getByText("KCMI Hub")
+      .getByRole("navigation", { name: "Hub" })
+      .or(page.getByRole("button", { name: "Open Hub menu" }))
       .waitFor({ timeout: 12_000 })
       .then(() => true)
       .catch(() => false);
@@ -136,18 +152,42 @@ export async function completeMfa(page: Page, knownSecret?: string) {
   throw new Error("MFA verify did not reach Hub");
 }
 
-export async function signInStaff(page: Page, email: string) {
+export async function dismissHubTourIfPresent(page: Page) {
+  const skip = page.getByRole("button", { name: "Skip tour" });
+  if (await skip.isVisible({ timeout: 12_000 }).catch(() => false)) {
+    await skip.click();
+    await expect(skip).toHaveCount(0);
+  }
+}
+
+export async function signInStaff(page: Page, email: string, knownSecret?: string) {
+  const secret = knownSecret ?? (await enrollTotpSecret(email));
   await page.goto("/auth/sign-in");
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(TEST_PASSWORD);
-  await page.getByRole("button", { name: /Sign in/i }).click();
-  const mfaHeading = page.getByRole("heading", { name: /Hub MFA/i });
-  const hubLabel = page.getByText("KCMI Hub");
-  await expect(mfaHeading.or(hubLabel)).toBeVisible({ timeout: 25_000 });
-  if (await mfaHeading.isVisible()) {
-    await completeMfa(page);
+  const mfaHeading = page.getByRole("heading", {
+    name: /Add extra protection|Hub MFA/i,
+  });
+  const hubLanded = page
+    .getByRole("navigation", { name: "Hub" })
+    .or(page.getByRole("button", { name: "Open Hub menu" }));
+  for (let attempt = 1; attempt <= 4; attempt += 1) {
+    await page.getByRole("button", { name: /^Sign in$/ }).click();
+    const reached = await mfaHeading
+      .or(hubLanded)
+      .waitFor({ timeout: 25_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (reached) break;
+    if (attempt === 4) {
+      throw new Error("Staff sign-in did not reach the Hub or extra-protection screen");
+    }
+    await new Promise((resolve) => setTimeout(resolve, 4000));
   }
-  await expect(hubLabel).toBeVisible({ timeout: 20_000 });
+  if (await mfaHeading.isVisible()) {
+    await completeMfa(page, secret);
+  }
+  await expect(hubLanded).toBeVisible({ timeout: 20_000 });
 }
 
 export async function cleanupSyntheticRecords(ids: {

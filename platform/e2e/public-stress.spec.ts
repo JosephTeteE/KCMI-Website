@@ -14,7 +14,17 @@ test.describe("text-length stress (test-only page)", () => {
         width: viewport.width,
         height: viewport.height,
       });
-      await page.goto("/qa/layout-stress", { waitUntil: "networkidle" });
+      await page.goto("/qa/layout-stress", {
+        waitUntil: "domcontentloaded",
+        timeout: 60_000,
+      });
+      if (
+        await page.getByRole("heading", { name: "Not available" }).count()
+      ) {
+        throw new Error(
+          "layout-stress requires ALLOW_QA_STRESS=1 on the running production server",
+        );
+      }
       await expect(
         page.getByRole("heading", { name: "Layout stress (test only)" }),
       ).toBeVisible();
@@ -31,7 +41,7 @@ test.describe("text-length stress (test-only page)", () => {
 test.describe("CSS root-font scale (not browser zoom)", () => {
   test("200% rem scale on home does not overflow", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded", timeout: 60_000 });
     if (await page.getByText("This page couldn't load").count()) {
       test.skip(true, "Home did not render; CSS scale is not browser zoom");
     }

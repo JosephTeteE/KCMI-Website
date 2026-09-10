@@ -84,6 +84,7 @@ export async function updateBranchPublicFields(formData: FormData) {
     .update({
       name,
       city_label: emptyToNull(formData.get("city_label")) ?? "",
+      country: emptyToNull(formData.get("country")),
       address_lines: parseAddressLines(
         emptyToNull(formData.get("address_lines")),
       ),
@@ -156,5 +157,5 @@ export async function updateBranchPublicFields(formData: FormData) {
     changeSummary: "Updated public branch fields and service times",
   });
 
-  redirectWithMessage(`/admin/branches/${id}`, "Branch details saved.");
+  redirectWithMessage(`/admin/branches/${id}`, "These branch details are now live on the website.");
 }

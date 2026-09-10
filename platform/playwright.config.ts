@@ -22,7 +22,7 @@ export default defineConfig({
       animations: "disabled",
     },
   },
-  updateSnapshots: process.env.UPDATE_SNAPSHOTS === "1" ? "all" : "missing",
+  updateSnapshots: process.env.UPDATE_SNAPSHOTS === "1" ? "all" : "none",
   use: {
     baseURL,
     channel: "chrome",
@@ -42,12 +42,22 @@ export default defineConfig({
     },
     {
       name: "hub-smoke",
-      testMatch: /hub-smoke/,
+      testMatch: /hub-(smoke|ux)/,
       use: { ...devices["Desktop Chrome"], channel: "chrome" },
     },
     {
       name: "hub-ui",
-      testMatch: /hub-(visual|a11y)/,
+      testMatch: /hub-a11y/,
+      dependencies: ["hub-setup"],
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome",
+        storageState: "e2e/.auth/staff.json",
+      },
+    },
+    {
+      name: "hub-visual",
+      testMatch: /hub-visual/,
       dependencies: ["hub-setup"],
       use: {
         ...devices["Desktop Chrome"],

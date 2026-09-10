@@ -10,11 +10,11 @@ export function SermonHighlightSection({ sermon }: Props) {
     <section
       id="sermons"
       aria-labelledby="sermons-heading"
-      className="section-space bg-[var(--color-surface-elevated)]"
+      className="section-space-lg bg-[var(--color-surface-elevated)]"
     >
       <div className="site-container grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <p className="text-sm font-semibold tracking-wide text-[var(--color-support)] uppercase">
+          <p className="text-sm font-semibold tracking-wide text-[var(--color-text-support)] uppercase">
             Media
           </p>
           <h2

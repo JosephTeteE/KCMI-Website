@@ -9,7 +9,7 @@ export function PrayerCtaSection({ prayer }: Props) {
     <section
       id="prayer"
       aria-labelledby="prayer-heading"
-      className="section-space bg-[var(--color-surface-elevated)]"
+      className="section-space-lg bg-[var(--color-surface-elevated)]"
     >
       <div className="site-container grid gap-8 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-page)] px-6 py-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-center sm:px-10">
         <div>

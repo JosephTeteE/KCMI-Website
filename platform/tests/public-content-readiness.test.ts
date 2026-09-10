@@ -32,17 +32,23 @@ const OBVIOUS_DEV_PATTERNS: { name: string; pattern: RegExp }[] = [
   { name: "verified URL later", pattern: /verified (live )?url will/i },
   { name: "phase implementation copy", pattern: /not implemented in phase/i },
   { name: "this component will", pattern: /this component will/i },
+  { name: "pastoral hub product language", pattern: /pastoral hub/i },
+  { name: "future hub product language", pattern: /future hub/i },
+  { name: "pre-production review banner", pattern: /pre-production human\/legal review required/i },
+  { name: "generic church-template sermons headline", pattern: /experience the word of god anytime/i },
+  { name: "generic church-template sermons sub", pattern: /stay spiritually nourished/i },
 ];
 
 function visitorLegalText(): string {
   return [getPrivacyPolicy(), getTermsOfService()]
-    .flatMap((doc) =>
-      doc.sections.flatMap((section) => [
+    .flatMap((doc) => [
+      doc.metaLine,
+      ...doc.sections.flatMap((section) => [
         section.heading ?? "",
         ...section.paragraphs,
         ...(section.bullets ?? []),
       ]),
-    )
+    ])
     .join("\n");
 }
 
@@ -50,6 +56,13 @@ async function publicVisitorText(): Promise<string> {
   const identity = getChurchIdentity();
   const live = await getLivestreamPublic();
   const program = await getFeaturedProgram();
+  const contact = await getPublicContactDetails();
+  const prayer = await getPrayerCta();
+  const mission = await getMissionContent();
+  const pastor = await getAboutLeadPastor();
+  const faqItems = await getFaqs();
+  const offerings = await getServiceOfferings();
+  const platforms = await getSermonPlatforms();
   const parts = [
     identity.legalName,
     identity.heroHeadline,
@@ -71,15 +84,15 @@ async function publicVisitorText(): Promise<string> {
     dailyFaithRecharge.body,
     sermonHighlight.title,
     sermonHighlight.description,
-    getPublicContactDetails().primaryEmail,
-    getPrayerCta().heading,
-    ...getPrayerCta().body,
-    getMissionContent().vision,
-    ...getMissionContent().missionParagraphs,
-    ...getAboutLeadPastor().bioParagraphs,
-    ...getFaqs().flatMap((faq) => [faq.question, ...faq.answerParagraphs]),
-    ...getServiceOfferings().flatMap((item) => [item.title, item.body]),
-    ...getSermonPlatforms().map((item) => item.description),
+    contact.primaryEmail,
+    prayer.heading,
+    ...prayer.body,
+    mission.vision,
+    ...mission.missionParagraphs,
+    ...pastor.bioParagraphs,
+    ...faqItems.flatMap((faq) => [faq.question, ...faq.answerParagraphs]),
+    ...offerings.flatMap((item) => [item.title, item.body]),
+    ...platforms.map((item) => item.description),
     ...getGivingAccounts().flatMap((account) => [
       account.purpose,
       account.description,

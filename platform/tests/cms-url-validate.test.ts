@@ -54,6 +54,36 @@ describe("extractFacebookUrlFromEmbed", () => {
       expect(result.url).toBe("https://facebook.com/share/18bfxXA9Sj/");
     }
   });
+
+  it("rejects scripts and non-Facebook iframe sources", () => {
+    expect(
+      extractFacebookUrlFromEmbed(
+        '<iframe src="https://www.facebook.com/watch/"></iframe><script>alert(1)</script>',
+      ).ok,
+    ).toBe(false);
+    expect(
+      extractFacebookUrlFromEmbed(
+        '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>',
+      ).ok,
+    ).toBe(false);
+    expect(
+      extractFacebookUrlFromEmbed(
+        '<iframe src="javascript:alert(1)"></iframe>',
+      ).ok,
+    ).toBe(false);
+  });
+
+  it("stores a normalized URL, not operator HTML", () => {
+    const html =
+      '<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D123" width="500"></iframe>';
+    const result = extractFacebookUrlFromEmbed(html);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.url.startsWith("https://")).toBe(true);
+      expect(result.url.includes("<iframe")).toBe(false);
+      expect(result.url.includes("script")).toBe(false);
+    }
+  });
 });
 
 describe("normalizeYoutubeUrl", () => {

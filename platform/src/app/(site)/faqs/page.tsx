@@ -10,8 +10,8 @@ export const metadata = publicPageMetadata({
   path: "/faqs",
 });
 
-export default function FaqsPage() {
-  const faqs = getFaqs();
+export default async function FaqsPage() {
+  const faqs = await getFaqs();
 
   return (
     <PageShell

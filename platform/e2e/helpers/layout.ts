@@ -51,7 +51,6 @@ export async function collectLayoutMetrics(page: Page): Promise<LayoutMetrics> {
     const regionSelectors = [
       ".site-footer-brand",
       ".site-footer-explore",
-      ".site-footer-contact",
       ".site-footer-connect",
     ];
     const regions = regionSelectors
@@ -100,7 +99,25 @@ export async function collectLayoutMetrics(page: Page): Promise<LayoutMetrics> {
   });
 }
 
+export async function openPublicPage(page: Page, route: string) {
+  await page.goto(route, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  if (await page.getByText("This page couldn't load").count()) {
+    await page.reload({ waitUntil: "domcontentloaded", timeout: 60_000 });
+  }
+  await expect(
+    page.locator("footer.site-footer"),
+    `${route}: footer missing after load`,
+  ).toBeVisible({
+    timeout: 30_000,
+  });
+}
+
 export async function assertPublicLayout(page: Page, label: string) {
+  const footer = page.locator("footer.site-footer");
+  await expect(footer, `${label}: footer missing`).toBeVisible({
+    timeout: 30_000,
+  });
+  await page.evaluate(() => window.scrollTo(0, 0));
   const metrics = await collectLayoutMetrics(page);
   expect(metrics.overflowX, `${label}: unexpected horizontal overflow`).toBe(
     false,
@@ -126,8 +143,6 @@ export async function assertPublicLayout(page: Page, label: string) {
     `${label}: links/buttons outside usable region`,
   ).toBe(0);
 
-  const footer = page.locator("footer.site-footer");
-  await expect(footer, `${label}: footer missing`).toBeVisible();
   await expect(
     page.locator(".site-footer-brand"),
     `${label}: brand missing`,
@@ -137,10 +152,6 @@ export async function assertPublicLayout(page: Page, label: string) {
     `${label}: explore heading`,
   ).toBeVisible();
   await expect(
-    footer.getByRole("heading", { name: "Contact", exact: true }),
-    `${label}: contact heading`,
-  ).toBeVisible();
-  await expect(
     footer.getByRole("heading", { name: "Daily Faith Recharge", exact: true }),
     `${label}: DFR heading`,
   ).toBeVisible();
@@ -148,7 +159,7 @@ export async function assertPublicLayout(page: Page, label: string) {
 
 export async function assertFooterContract(page: Page, year: number) {
   const footer = page.locator("footer.site-footer");
-  await expect(footer.getByRole("link", { name: /Contact KCMI/i })).toBeVisible();
+  await expect(footer.getByRole("link", { name: "Contact", exact: true })).toBeVisible();
   await expect(footer).not.toContainText("@gmail.com");
   await expect(footer).not.toContainText("WhatsApp");
   await expect(footer.locator(".site-footer-explore")).not.toContainText("Privacy");

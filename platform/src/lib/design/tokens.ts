@@ -23,6 +23,7 @@ export const semanticTokenNames = [
   "accent",
   "accent-fg",
   "support",
+  "text-support",
   "text-body",
   "text-muted",
   "text-on-brand",
@@ -44,5 +45,5 @@ export const contrastNotes = {
   violet: "Use with light/white text on violet surfaces.",
   lavender: "Requires dark text for ordinary readable content.",
   green:
-    "Do not automatically pair brand green (#108c1d) with white for normal-size text; use darkened success semantic for text.",
+    "Do not automatically pair brand green (#108c1d) with white for normal-size text; use --color-text-support for text on pale surfaces.",
 } as const;

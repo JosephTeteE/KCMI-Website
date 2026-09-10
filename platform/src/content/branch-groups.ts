@@ -10,6 +10,30 @@ export type BranchCountryGroup = {
 };
 
 /**
+ * Public place line. If cityDisplay already includes the country, do not
+ * append the country again. Does not change stored branch data.
+ */
+export function publicPlaceLabel(
+  cityLabel: string | null | undefined,
+  country: string | null | undefined,
+): string {
+  const city = cityLabel?.trim() ?? "";
+  const nation = country?.trim() ?? "";
+  if (!city) return nation;
+  if (!nation) return city;
+  const cityLower = city.toLowerCase();
+  const nationLower = nation.toLowerCase();
+  if (cityLower === nationLower) return city;
+  if (
+    cityLower.endsWith(`, ${nationLower}`) ||
+    cityLower.endsWith(` ${nationLower}`)
+  ) {
+    return city;
+  }
+  return `${city} · ${nation}`;
+}
+
+/**
  * Group published branches by verified country.
  * Branches without a country are not reclassified — they appear last unlabeled as additional locations.
  */

@@ -31,17 +31,18 @@ export default async function AdminMediaPage({
   return (
     <div>
       <HubPageHeader
-        title="Media library"
-        description="Upload a photo; the Hub prepares an optimized WebP for the public site. JPEG, PNG, and WebP sources up to 15MB. No SVG or video files — sermons use YouTube URLs, livestream uses Facebook URLs."
+        title="Photos"
+        description="Upload photos you can use on website pages. Prefer replacing a photo from the page where it appears (Homepage, Branches, Programs). JPEG, PNG, or WebP up to 15MB. No video files."
       />
       <HubFlash message={params.message} error={params.error} />
 
       <section className="mb-12 max-w-xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6">
-        <h2 className="mb-6 text-lg font-semibold">Upload image</h2>
+        <h2 className="mb-6 text-lg font-semibold">Add a photo</h2>
         <MarketingImageUploader
           action={uploadMarketingImage}
-          submitLabel="Publish image"
+          submitLabel="Add this photo to the library"
           showCaption
+          placementTitle="Photo library"
         />
       </section>
 
@@ -83,7 +84,7 @@ export default async function AdminMediaPage({
                 </p>
                 <form action={archiveMedia}>
                   <input type="hidden" name="id" value={asset.id} />
-                  <HubSubmitButton variant="quiet">Archive</HubSubmitButton>
+                  <HubSubmitButton variant="danger">Remove from library</HubSubmitButton>
                 </form>
               </div>
             </li>

@@ -28,7 +28,7 @@ export default async function NewProgramPage({
     <div>
       <HubPageHeader
         title="New program"
-        description="Start as a draft. Publishing is a separate step."
+        description="Start as a draft. It will not appear on the website until you make it live."
         backHref="/admin/programs"
         backLabel="All programs"
       />
@@ -50,19 +50,19 @@ export default async function NewProgramPage({
           />
           <HubTextField id="ends_at" label="Ends" type="datetime-local" />
         </div>
-        <HubTextField id="cta_label" label="Button label" />
+        <HubTextField id="cta_label" label="Button visitors can click" />
         <HubTextField
           id="cta_url"
-          label="Button link"
+          label="Button destination"
           hint="Use https://… or a site path like /events"
         />
-        <HubSelectField id="placement" label="Home page placement" defaultValue="none">
-          <option value="none">None</option>
-          <option value="featured">Featured</option>
-          <option value="banner">Banner</option>
-          <option value="card">Card</option>
+        <HubSelectField id="placement" label="Show on the homepage?" defaultValue="none">
+          <option value="none">No — program list only</option>
+          <option value="featured">Yes — featured on the homepage</option>
+          <option value="banner">Yes — homepage banner</option>
+          <option value="card">Yes — homepage card</option>
         </HubSelectField>
-        <HubSelectField id="featured_media_id" label="Featured image (optional)">
+        <HubSelectField id="featured_media_id" label="Program poster / main photo (optional)">
           <option value="">No image</option>
           {(media ?? []).map((item) => (
             <option key={item.id} value={item.id}>
@@ -70,7 +70,7 @@ export default async function NewProgramPage({
             </option>
           ))}
         </HubSelectField>
-        <HubSubmitButton>Create draft</HubSubmitButton>
+        <HubSubmitButton>Save as a draft (not public yet)</HubSubmitButton>
       </form>
     </div>
   );

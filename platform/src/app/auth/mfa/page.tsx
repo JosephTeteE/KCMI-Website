@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { hasSupabasePublicConfig } from "@/lib/env/public";
+import { humanMfaError } from "@/lib/hub/humanize";
 
 export default function MfaPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function MfaPage() {
         friendlyName: "KCMI Hub",
       });
       if (error) {
-        setMessage(error.message);
+        setMessage(humanMfaError(error.message));
         return;
       }
       setFactorId(data.id);
@@ -48,7 +49,7 @@ export default function MfaPage() {
   if (!hasSupabasePublicConfig()) {
     return (
       <p className="mx-auto max-w-lg p-8 text-sm text-[var(--color-text-muted)]">
-        Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
+        This Hub computer is not set up yet. Ask a Super Admin to finish setup.
       </p>
     );
   }
@@ -60,7 +61,7 @@ export default function MfaPage() {
     const supabase = createClient();
     const challenge = await supabase.auth.mfa.challenge({ factorId });
     if (challenge.error) {
-      setMessage(challenge.error.message);
+      setMessage(humanMfaError(challenge.error.message));
       return;
     }
     const verified = await supabase.auth.mfa.verify({
@@ -69,7 +70,7 @@ export default function MfaPage() {
       code,
     });
     if (verified.error) {
-      setMessage(verified.error.message);
+      setMessage(humanMfaError(verified.error.message));
       return;
     }
     router.replace("/admin");
@@ -78,27 +79,33 @@ export default function MfaPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6 px-4 py-12">
-      <h1 className="text-2xl font-semibold">Hub MFA (TOTP)</h1>
+      <h1 className="text-2xl font-semibold">Add extra protection</h1>
       <p className="text-sm text-[var(--color-text-muted)]">
-        All Hub staff must complete TOTP MFA. Sensitive actions require an AAL2
-        session.
+        Your authenticator app gives you a new 6-digit code when you sign in.
+        Scan the picture, then type the code. You will need this code when you
+        change the website.
       </p>
       {mode === "enroll" && qr ? (
         <div className="space-y-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4">
           <p className="text-sm">Scan this QR code with your authenticator app:</p>
           {/* QR from Supabase is an SVG data URL */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={qr} alt="TOTP enrollment QR code" width={200} height={200} />
+          <img
+            src={qr}
+            alt="QR code to connect your authenticator app"
+            width={200}
+            height={200}
+          />
           {secret ? (
             <p className="break-all text-xs text-[var(--color-text-muted)]">
-              Manual secret: {secret}
+          Manual setup code: {secret}
             </p>
           ) : null}
         </div>
       ) : null}
       <form onSubmit={verify} className="space-y-3">
         <label htmlFor="code" className="block text-sm font-medium">
-          Authentication code
+          6-digit app code
         </label>
         <input
           id="code"
@@ -116,9 +123,10 @@ export default function MfaPage() {
         ) : null}
         <button
           type="submit"
-          className="rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-sm text-[var(--color-action-primary-fg)]"
+          disabled={!factorId}
+          className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-action-primary-fg)] disabled:cursor-not-allowed"
         >
-          Verify and continue
+          Continue to the Hub
         </button>
       </form>
     </div>

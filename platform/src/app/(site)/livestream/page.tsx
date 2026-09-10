@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/layout/page-shell";
+import { FacebookVideoEmbed } from "@/components/content/facebook-embed";
 import { getLivestreamPublic } from "@/content";
 import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
@@ -14,7 +15,7 @@ export default async function LivestreamPage() {
 
   return (
     <PageShell eyebrow="Watch" title={live.heading}>
-      <div className="mx-auto max-w-2xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-8 text-center">
+      <div className="card-pad mx-auto max-w-3xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-center">
         <p
           className={`inline-flex rounded-full px-3 py-1 text-readable-sm font-semibold ${
             live.isLive
@@ -27,6 +28,14 @@ export default async function LivestreamPage() {
         <p className="text-readable mt-6 text-[var(--color-text-muted)]">
           {live.isLive ? live.liveMessage : live.notLiveMessage}
         </p>
+        {live.isLive && live.facebookPageUrl ? (
+          <div className="mt-8 text-left">
+            <FacebookVideoEmbed
+              url={live.facebookPageUrl}
+              title="KCMI livestream"
+            />
+          </div>
+        ) : null}
         <a
           href={live.facebookPageUrl}
           className="mt-8 inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-6 text-readable-sm font-semibold text-[var(--color-action-primary-fg)]"

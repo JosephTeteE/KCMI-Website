@@ -11,10 +11,12 @@ import type {
 
 /** VERIFIED contact-us.html / HQ */
 export const publicContact: PublicContact = {
-  primaryEmail: "kingdomcovenantministriesinter@gmail.com",
+  primaryEmail: "contact@kcmi-rcc.org",
   primaryEmailLabel: "Email KCMI",
   primaryPhoneDisplay: "+234 9134 44 8322",
   primaryPhoneTel: "+2349134448322",
+  intro:
+    "Write or call the church office. Prayer, counselling, and other pastoral-care requests use the forms on the Services page.",
 };
 
 /** Planned clean routes (C1 shell links; page bodies arrive in later phases) */
@@ -33,10 +35,13 @@ export const headerCta: NavItem = {
 };
 
 export const footerNav: NavItem[] = [
-  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Locations", href: "/locations" },
   { label: "Services", href: "/services" },
+  { label: "Sermons", href: "/sermons" },
   { label: "Giving", href: "/giving" },
   { label: "FAQs", href: "/faqs" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const footerLegalNav: NavItem[] = [
@@ -51,8 +56,9 @@ export const socialLinks: SocialLink[] = [
   { label: "Instagram", href: "https://www.instagram.com/kcmiworldwide" },
   { label: "X (Twitter)", href: "https://twitter.com/kcmi_official" },
   {
-    label: "TikTok",
-    href: "https://www.tiktok.com/@frank.aikins?_t=ZM-8tk1OR21Gy5&_r=1",
+    label: "Apostle Frank on TikTok",
+    href: "https://www.tiktok.com/@frank.aikins",
+    personal: true,
   },
 ];
 
@@ -63,8 +69,6 @@ export const dailyFaithRecharge: DailyFaithRecharge = {
     label: "Listen on Spotify",
     href: "https://open.spotify.com/show/6xYjccKxPNSCbBHbnPiEQq",
   },
-  whatsappHint: 'Message +234 9134 44 8322 with the word "Subscribe"',
-  whatsappPhoneDisplay: "+234 9134 44 8322",
 };
 
 export const prayerCta: PrayerCta = {

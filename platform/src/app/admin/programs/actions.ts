@@ -76,7 +76,7 @@ function programSnapshot(row: {
 }
 
 async function requireAnyPermission(permissions: Permission[]) {
-  let lastMessage = "Missing required permission.";
+  let lastMessage = "Your account is not allowed to do this. Ask a Super Admin for help.";
   for (const permission of permissions) {
     const gate = await requireStaffAction(permission);
     if (gate.ok) return gate;
@@ -166,7 +166,7 @@ export async function createProgram(formData: FormData) {
     );
   }
 
-  redirectWithMessage(`/admin/programs/${data.id}`, "Draft program created.");
+  redirectWithMessage(`/admin/programs/${data.id}`, "Your program draft is saved. It is not on the public website yet.");
 }
 
 export async function updateProgram(formData: FormData) {
@@ -205,7 +205,7 @@ export async function updateProgram(formData: FormData) {
     redirectWithError(`/admin/programs/${id}`, error.message);
   }
 
-  redirectWithMessage(`/admin/programs/${id}`, "Program saved.");
+  redirectWithMessage(`/admin/programs/${id}`, "Your program details are saved.");
 }
 
 export async function setProgramStatus(formData: FormData) {
@@ -314,14 +314,117 @@ export async function setProgramStatus(formData: FormData) {
 
   const message =
     status === "published"
-      ? "Program published."
+      ? "This program is now live on the website."
       : status === "archived"
-        ? "Program archived."
+        ? "This program is no longer on the public website."
         : status === "preview"
-          ? "Marked ready for preview."
+          ? "This program is ready to preview. It is not public yet."
           : isRestore
-            ? "Program restored to draft."
-            : "Saved as draft.";
+            ? "This program is a draft again. It is not on the public website."
+            : "Your program draft is saved. It is not on the public website yet.";
 
   redirectWithMessage(`/admin/programs/${id}`, message);
+}
+
+export async function uploadProgramCover(formData: FormData) {
+  const id = emptyToNull(formData.get("program_id"));
+  if (!id) {
+    redirectWithError("/admin/programs", "Missing program.");
+  }
+
+  const gate = await requireAnyPermission([
+    "programs.update",
+    "programs.create",
+    "media.manage",
+  ]);
+  if (!gate.ok) {
+    redirectWithError(`/admin/programs/${id}`, gate.message);
+  }
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    redirectWithError(`/admin/programs/${id}`, "Please choose a cover image.");
+  }
+
+  const { ingestMarketingImageFile } = await import(
+    "@/lib/cms/ingest-marketing-image"
+  );
+  const { createSecretKeyClient } = await import("@/lib/supabase/admin");
+
+  const ingested = await ingestMarketingImageFile(file, formData);
+  if (!ingested.ok) {
+    redirectWithError(`/admin/programs/${id}`, ingested.error);
+  }
+
+  const altText = emptyToNull(formData.get("alt_text"));
+  if (!altText) {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      "Please describe what is important in this photo for someone who cannot see it.",
+    );
+  }
+
+  const storagePath = `${crypto.randomUUID()}.webp`;
+  const supabase = await createClient();
+  const storage = createSecretKeyClient();
+  const { error: uploadError } = await storage.storage
+    .from("marketing-public")
+    .upload(storagePath, ingested.image.buffer, {
+      contentType: ingested.image.contentType,
+      upsert: false,
+    });
+  if (uploadError) {
+    redirectWithError(`/admin/programs/${id}`, uploadError.message);
+  }
+
+  const { data: publicData } = storage.storage
+    .from("marketing-public")
+    .getPublicUrl(storagePath);
+
+  const { data: asset, error: assetError } = await supabase
+    .from("media_assets")
+    .insert({
+      storage_bucket: "marketing-public",
+      storage_path: storagePath,
+      public_url: publicData.publicUrl,
+      original_filename: ingested.originalName,
+      content_type: ingested.image.contentType,
+      byte_size: ingested.image.byteSize,
+      width_px: ingested.image.width,
+      height_px: ingested.image.height,
+      alt_text: altText,
+      uploaded_by: gate.session.user.id,
+    })
+    .select("id")
+    .single();
+
+  if (assetError || !asset) {
+    await storage.storage.from("marketing-public").remove([storagePath]);
+    redirectWithError(
+      `/admin/programs/${id}`,
+      assetError?.message ?? "Could not save the cover image.",
+    );
+  }
+
+  const { error: updateError } = await supabase
+    .from("programs")
+    .update({
+      featured_media_id: asset.id,
+      updated_by: gate.session.user.id,
+    })
+    .eq("id", id);
+
+  if (updateError) {
+    redirectWithError(`/admin/programs/${id}`, updateError.message);
+  }
+
+  await writeAuditEvent({
+    action: "program.cover_replace",
+    entityType: "program",
+    entityId: id,
+    actorId: gate.session.user.id,
+    metadata: { media_asset_id: asset.id },
+  });
+
+  redirectWithMessage(`/admin/programs/${id}`, "The program poster is now updated.");
 }

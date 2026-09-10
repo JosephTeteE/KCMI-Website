@@ -15,6 +15,7 @@ describe("security headers foundation", () => {
   it("does not use script-src unsafe-inline in baseline CSP string", () => {
     const csp = contentSecurityPolicy();
     expect(csp).toContain("frame-ancestors 'none'");
+    expect(csp).toContain("frame-src 'self' https://www.facebook.com https://web.facebook.com");
     expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
   });
 });

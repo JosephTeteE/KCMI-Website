@@ -10,10 +10,10 @@ export type CropAspectOption = {
 };
 
 export const CROP_ASPECTS: readonly CropAspectOption[] = [
-  { id: "hero", label: "Hero · 16:9", ratio: 16 / 9 },
-  { id: "card", label: "Card · 4:3", ratio: 4 / 3 },
-  { id: "square", label: "Square · 1:1", ratio: 1 },
-  { id: "original", label: "Gallery · original ratio", ratio: null },
+  { id: "hero", label: "Wide photo for the top of a page", ratio: 16 / 9 },
+  { id: "card", label: "Photo for a program card", ratio: 4 / 3 },
+  { id: "square", label: "Square portrait photo", ratio: 1 },
+  { id: "original", label: "Keep the photo as it is", ratio: null },
 ];
 
 export type FocalPoint = {

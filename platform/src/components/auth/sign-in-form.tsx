@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { hasSupabasePublicConfig } from "@/lib/env/public";
+import { humanSignInError } from "@/lib/hub/humanize";
 
 export function SignInForm() {
   const router = useRouter();
@@ -15,9 +16,8 @@ export function SignInForm() {
   if (!hasSupabasePublicConfig()) {
     return (
       <p className="rounded-md border border-[var(--color-warning)] bg-[var(--color-warning-bg)] p-4 text-sm text-[var(--color-text-body)]">
-        Missing <code>NEXT_PUBLIC_SUPABASE_URL</code> or{" "}
-        <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>. Hub sign-in cannot
-        complete without them.
+        Hub sign-in is not ready on this computer yet. Ask a Super Admin to
+        finish setup.
       </p>
     );
   }
@@ -33,7 +33,7 @@ export function SignInForm() {
         password,
       });
       if (signInError) {
-        setError(signInError.message);
+        setError(humanSignInError(signInError.message));
         return;
       }
       router.push("/admin");
@@ -85,7 +85,7 @@ export function SignInForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-sm font-medium text-[var(--color-action-primary-fg)] disabled:opacity-60"
+        className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-sm font-medium text-[var(--color-action-primary-fg)] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

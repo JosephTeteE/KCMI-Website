@@ -12,9 +12,8 @@ import {
   getBranches,
   getFeaturedProgram,
   getFeaturedSermons,
-  getGivingCta,
-  getHeaderCta,
-  getPrayerCta,
+  getHeadquartersLocationLabel,
+  getHomeContent,
   getServiceTimes,
   getSocialLinks,
 } from "@/content";
@@ -26,9 +25,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-function OrganizationJsonLd() {
+async function OrganizationJsonLd() {
   const identity = getChurchIdentity();
-  const social = getSocialLinks();
+  const social = await getSocialLinks();
   const data = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -42,7 +41,6 @@ function OrganizationJsonLd() {
   return (
     <script
       type="application/ld+json"
-      // Verified Organization fields only — no dangerouslySetInnerHTML of user content
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />
   );
@@ -50,28 +48,28 @@ function OrganizationJsonLd() {
 
 export default async function HomePage() {
   const identity = getChurchIdentity();
+  const home = await getHomeContent();
   const times = await getServiceTimes();
+  const locationLabel = await getHeadquartersLocationLabel();
   const program = await getFeaturedProgram();
   const sermon = await getFeaturedSermons();
   const branches = await getBranches();
-  const prayer = getPrayerCta();
-  const giving = getGivingCta();
-  const live = getHeaderCta();
 
   return (
     <main id="main-content">
       <OrganizationJsonLd />
-      <HomeHero identity={identity} liveHref={live.href} />
-      <ServiceTimesSection
-        times={times}
-        locationLabel="Port Harcourt, Nigeria"
-      />
+      <HomeHero home={home} />
+      <ServiceTimesSection times={times} locationLabel={locationLabel} />
       <FeaturedProgramSection program={program} />
-      <WelcomeSection identity={identity} />
+      <WelcomeSection
+        home={home}
+        legalName={identity.legalName}
+        alternateName={identity.alternateName}
+      />
       <SermonHighlightSection sermon={sermon} />
       <LocationsPreviewSection branches={branches} />
-      <PrayerCtaSection prayer={prayer} />
-      <GivingCtaSection giving={giving} />
+      <PrayerCtaSection prayer={home.prayer} />
+      <GivingCtaSection giving={home.giving} />
     </main>
   );
 }

@@ -369,6 +369,47 @@ export type Database = {
           },
         ]
       }
+      website_documents: {
+        Row: {
+          created_at: string
+          document_key: string
+          id: string
+          payload: Json
+          published_at: string | null
+          status: Database["public"]["Enums"]["publication_status"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_key: string
+          id?: string
+          payload?: Json
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["publication_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_key?: string
+          id?: string
+          payload?: Json
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["publication_status"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_documents_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       livestream_settings: {
         Row: {
           created_at: string
@@ -684,6 +725,7 @@ export type Database = {
           updated_at: string
           updated_by: string | null
           youtube_url: string | null
+          home_featured: boolean
         }
         Insert: {
           archived_at?: string | null
@@ -702,6 +744,7 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           youtube_url?: string | null
+          home_featured?: boolean
         }
         Update: {
           archived_at?: string | null
@@ -720,6 +763,7 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           youtube_url?: string | null
+          home_featured?: boolean
         }
         Relationships: [
           {

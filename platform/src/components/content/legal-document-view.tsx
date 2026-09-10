@@ -2,7 +2,7 @@ import type { LegalDocument } from "@/content/types";
 
 export function LegalDocumentView({ doc }: { doc: LegalDocument }) {
   return (
-    <article className="mx-auto max-w-3xl space-y-8">
+    <article className="mx-auto max-w-3xl space-y-6">
       <p className="text-readable-sm font-medium text-[var(--color-text-muted)]">
         {doc.metaLine}
       </p>
