@@ -1,7 +1,7 @@
 /** Volunteer-facing Hub action labels. Prefer these over technical verbs. */
 export const HUB_ACTION_LABELS = {
   previewChanges: "Preview my changes",
-  viewFullSizePreview: "View full-size preview",
+  viewFullSizePreview: "View full preview",
   makeLive: "Make this live on the website",
   cancelChanges: "Cancel changes",
   changeSection: "Change this section",
@@ -25,6 +25,10 @@ export const HUB_ACTION_LABELS = {
   restoreDraft: "Move back to draft",
   signOut: "Sign out",
   replacePhoto: "Replace Photo",
+  uploadNewPhoto: "Upload a new photo",
+  useSavedPhoto: "Use a photo already saved",
+  uploadPhotoForPreview: "Upload this photo",
+  makePhotoLive: "Make this photo live on the website",
   addPhotoToBranch: "Add this photo to the branch",
   preparePhoto: "Check how the photo will look",
   saveBranch: "Make these branch details live",
@@ -34,10 +38,11 @@ export const HUB_ACTION_LABELS = {
   replayTour: "Replay Hub Tour",
   helpTutorial: "Help & Tutorial",
   skipTour: "Skip tour",
-  nextTour: "Next",
-  backTour: "Back",
+  nextTour: "Next step",
+  backTour: "Previous step",
   finishTour: "Finish tour",
   startTour: "Show me around",
+  skipTourStep: "Skip this step",
 } as const;
 
 export const HUB_STATUS_LABELS: Record<string, string> = {

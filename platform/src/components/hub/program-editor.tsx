@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import { FeaturedProgramSection } from "@/components/home/featured-program-section";
+import { ContextualPhotoEditor } from "@/components/hub/contextual-photo-editor";
 import { HubCopyProposeForm } from "@/components/hub/hub-copy-propose-form";
 import { HubHelpDetails } from "@/components/hub/hub-help-details";
 import { HubPreviewFrame } from "@/components/hub/hub-preview-frame";
-import { HubSelectField, HubSubmitButton } from "@/components/hub/hub-form-fields";
-import { MarketingImageUploader } from "@/components/hub/marketing-image-uploader";
+import { HubSubmitButton } from "@/components/hub/hub-form-fields";
+import type { MediaChooserItem } from "@/components/hub/media-chooser";
 import {
+  assignProgramCover,
   setProgramStatus,
+  stageProgramCover,
   updateProgram,
-  uploadProgramCover,
 } from "@/app/admin/programs/actions";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 import { HUB_MEDIA_PLACEMENTS } from "@/lib/hub/placement-copy";
 import {
+  hubCurrentSectionCopy,
   hubLifecycleActions,
   hubPreviewVariant,
   hubPublicationStateFromStatus,
@@ -35,21 +38,22 @@ type ProgramRecord = {
   status: string;
 };
 
-type MediaOption = { id: string; label: string };
-
 export function ProgramEditor({
   program,
   media,
   canPublish,
   coverPreview,
+  stagedPoster = null,
 }: {
   program: ProgramRecord;
-  media: MediaOption[];
+  media: MediaChooserItem[];
   canPublish: boolean;
   coverPreview: FeaturedProgram | null;
+  stagedPoster?: MediaChooserItem | null;
 }) {
   const publicationState = hubPublicationStateFromStatus(program.status);
   const lifecycle = hubLifecycleActions(program.status);
+  const posterCurrentCopy = hubCurrentSectionCopy(publicationState);
   const liveLabel = lifecycle.makeLive
     ? "Save my program details"
     : HUB_ACTION_LABELS.makeChangesLive;
@@ -88,10 +92,30 @@ export function ProgramEditor({
           { id: "title", label: "Title", kind: "text", current: program.title },
           { id: "short_description", label: "Short description", kind: "textarea", current: program.short_description, rows: 3 },
           { id: "body_text", label: "Full details", kind: "textarea", current: program.body_text, rows: 6 },
-          { id: "starts_at", label: "Starts", kind: "text", current: program.starts_at },
-          { id: "ends_at", label: "Ends", kind: "text", current: program.ends_at },
-          { id: "cta_label", label: "Button visitors can click", kind: "text", current: program.cta_label },
-          { id: "cta_url", label: "Button destination", kind: "text", current: program.cta_url },
+          {
+            id: "starts_at",
+            label: "Starts (date and time)",
+            kind: "text",
+            current: program.starts_at,
+          },
+          {
+            id: "ends_at",
+            label: "Ends (optional date and time)",
+            kind: "text",
+            current: program.ends_at,
+          },
+          {
+            id: "cta_label",
+            label: "Button visitors can click",
+            kind: "text",
+            current: program.cta_label,
+          },
+          {
+            id: "cta_url",
+            label: "Button link",
+            kind: "text",
+            current: program.cta_url,
+          },
         ]}
         preview={(values, mode) => (
           <HubPreviewFrame
@@ -116,70 +140,34 @@ export function ProgramEditor({
         )}
       />
 
-      <section className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-5">
-        <h2 className="text-lg font-semibold">{HUB_MEDIA_PLACEMENTS.programPoster.title}</h2>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          {HUB_MEDIA_PLACEMENTS.programPoster.where}
-        </p>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          {HUB_MEDIA_PLACEMENTS.programPoster.recommended}
-        </p>
-        <div className="grid gap-6 xl:grid-cols-2">
-          <div data-hub-role="current">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-              Current photo
-            </p>
-            {coverPreview?.imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={coverPreview.imageSrc}
-                alt={coverPreview.imageAlt || "Current program poster"}
-                className="w-full rounded-[var(--radius-md)] object-cover"
-              />
-            ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">
-                No poster photo yet.
-              </p>
-            )}
-          </div>
-          <MarketingImageUploader
-            action={uploadProgramCover}
-            submitLabel="Replace Photo"
-            defaultCropAspect="card"
-            lockCropAspect
-            placementTitle={HUB_MEDIA_PLACEMENTS.programPoster.title}
-            extraFields={
-              <input type="hidden" name="program_id" value={program.id} />
-            }
-          />
-        </div>
-        {media.length > 0 ? (
-          <form action={updateProgram} className="space-y-3">
-            <input type="hidden" name="id" value={program.id} />
-            <input type="hidden" name="title" value={program.title} />
-            <input type="hidden" name="short_description" value={program.short_description} />
-            <input type="hidden" name="body_text" value={program.body_text} />
-            <input type="hidden" name="starts_at" value={program.starts_at} />
-            <input type="hidden" name="ends_at" value={program.ends_at} />
-            <input type="hidden" name="cta_label" value={program.cta_label} />
-            <input type="hidden" name="cta_url" value={program.cta_url} />
-            <input type="hidden" name="placement" value={program.placement} />
-            <HubSelectField
-              id="featured_media_id"
-              label="Or choose a photo already in the library"
-              defaultValue={program.featured_media_id}
-            >
-              <option value="">No photo</option>
-              {media.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
-              ))}
-            </HubSelectField>
-            <HubSubmitButton variant="quiet">Use this library photo</HubSubmitButton>
-          </form>
-        ) : null}
-      </section>
+      <ContextualPhotoEditor
+        title={HUB_MEDIA_PLACEMENTS.programPoster.title}
+        where={HUB_MEDIA_PLACEMENTS.programPoster.where}
+        recommended={HUB_MEDIA_PLACEMENTS.programPoster.recommended}
+        cropAspect="card"
+        current={
+          coverPreview?.imageSrc
+            ? {
+                src: coverPreview.imageSrc,
+                alt: coverPreview.imageAlt || "Current program poster",
+              }
+            : null
+        }
+        currentMediaId={program.featured_media_id || null}
+        library={media}
+        staged={stagedPoster}
+        uploadAction={stageProgramCover}
+        assignAction={assignProgramCover}
+        hiddenFields={{ program_id: program.id }}
+        currentHeading={posterCurrentCopy.heading}
+        currentNote={posterCurrentCopy.note ?? undefined}
+        emptyCurrentLabel="No poster photo yet."
+        makeLiveLabel={
+          lifecycle.makeLive
+            ? "Save this poster on the program"
+            : HUB_ACTION_LABELS.makePhotoLive
+        }
+      />
 
       <div className="max-w-2xl space-y-3 border-t border-[var(--color-border)] pt-8">
         <h2 className="text-lg font-semibold">

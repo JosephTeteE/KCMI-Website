@@ -125,7 +125,7 @@ export function HubCopyProposeForm({
           data-hub-role="current"
           className="space-y-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-page)] p-4"
         >
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+          <h3 className="text-base font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
             {currentCopy.heading}
           </h3>
           {currentCopy.note ? (
@@ -134,7 +134,7 @@ export function HubCopyProposeForm({
           <dl className="space-y-3">
             {fields.map((field) => (
               <div key={field.id}>
-                <dt className="text-sm font-medium text-[var(--color-text-muted)]">
+                <dt className="text-base font-medium text-[var(--color-text-muted)]">
                   {field.label}
                 </dt>
                 <dd
@@ -193,7 +193,7 @@ export function HubCopyProposeForm({
               data-hub-role="proposed"
               className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-action-primary)] p-4"
             >
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+              <h3 className="text-base font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
                 What would you like to show instead?
               </h3>
               <p className="hub-help text-[var(--color-text-muted)]">

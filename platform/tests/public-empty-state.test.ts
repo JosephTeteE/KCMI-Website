@@ -7,15 +7,20 @@ import {
   withinSpotlightWindow,
 } from "@/lib/home/spotlight-takeover";
 import {
+  HUB_HOME_CONTEXT_TOUR_STEPS,
+  HUB_LIVESTREAM_CONTEXT_TOUR_STEPS,
+  HUB_PROGRAMS_CONTEXT_TOUR_STEPS,
   HUB_TOUR_STEPS,
   hubTourTargetSelector,
   readHubTourStepIndex,
+  resolveHubTourKind,
+  resolveReplayTourKind,
   writeHubTourStepIndex,
 } from "@/lib/hub/tour";
 import { defaultHomeDocument } from "@/content/website/defaults";
 import { replacementForExactStoredValue } from "@/content/website/stale-seed-replacements";
 
-  const APOLOGY_PATTERNS = [
+const APOLOGY_PATTERNS = [
   /service times will be listed/i,
   /service times (are )?unavailable/i,
   /times not available/i,
@@ -103,50 +108,80 @@ describe("spotlight takeover frequency helpers", () => {
 });
 
 describe("Hub coach-mark tour steps", () => {
-  it("anchors steps to data-tour targets and persists step index", () => {
-    expect(HUB_TOUR_STEPS.length).toBeGreaterThanOrEqual(11);
+  it("keeps the first-run tour on the Dashboard only", () => {
+    expect(HUB_TOUR_STEPS.length).toBe(6);
     expect(HUB_TOUR_STEPS.map((step) => step.id)).toEqual([
       "dashboard-homepage",
       "dashboard-programs",
       "dashboard-branches",
+      "dashboard-sermons",
       "dashboard-livestream",
       "help-tutorial",
-      "home-visual-overview",
-      "home-visual-section-banner",
-      "edit-category-words",
-      "change-section",
-      "preview-changes",
-      "make-live",
     ]);
-    const publishPath = HUB_TOUR_STEPS.filter((step) =>
-      [
-        "home-visual-overview",
-        "home-visual-section-banner",
-        "edit-category-words",
-        "change-section",
-        "preview-changes",
-        "make-live",
-      ].includes(step.id),
-    );
-    expect(publishPath.map((step) => step.target)).toEqual([
-      '[data-tour="home-section-chooser"]',
-      '[data-tour="home-visual-section-banner"]',
-      '[data-tour="edit-category-words"]',
-      '[data-tour="change-section"]',
-      '[data-tour="preview-changes"]',
-      '[data-tour="make-live"]',
-    ]);
-    expect(
-      HUB_TOUR_STEPS.find((step) => step.id === "change-section")?.selectHomeCategory,
-    ).toBe("words");
-    expect(
-      HUB_TOUR_STEPS.find((step) => step.id === "preview-changes")?.selectHomeCategory,
-    ).toBe("words");
+    expect(HUB_TOUR_STEPS.every((step) => step.href === "/admin")).toBe(true);
     for (const step of HUB_TOUR_STEPS) {
       expect(hubTourTargetSelector(step)).toMatch(/data-tour=/);
-      expect(step.href.startsWith("/admin")).toBe(true);
       expect(step.body).not.toMatch(/localStorage|modal_frequency|program_id/i);
     }
+  });
+
+  it("keeps Homepage contextual tour route-local", () => {
+    expect(
+      HUB_HOME_CONTEXT_TOUR_STEPS.every(
+        (step) => step.href === "/admin/website/home",
+      ),
+    ).toBe(true);
+    expect(HUB_HOME_CONTEXT_TOUR_STEPS.map((s) => s.id)).toEqual([
+      "home-choose-section",
+      "home-edit-section",
+      "home-words-photo",
+      "home-preview",
+      "home-make-live",
+    ]);
+    expect(HUB_HOME_CONTEXT_TOUR_STEPS.every((s) => s.title !== "Homepage")).toBe(
+      true,
+    );
+  });
+
+  it("keeps Program contextual tour on New Program only", () => {
+    expect(
+      HUB_PROGRAMS_CONTEXT_TOUR_STEPS.every(
+        (step) => step.href === "/admin/programs/new",
+      ),
+    ).toBe(true);
+    expect(HUB_PROGRAMS_CONTEXT_TOUR_STEPS.map((s) => s.title)).toEqual([
+      "Program name",
+      "When",
+      "Where",
+      "Visitor link",
+      "Review / Save draft",
+    ]);
+    expect(
+      HUB_PROGRAMS_CONTEXT_TOUR_STEPS.some((s) => s.title === "Homepage"),
+    ).toBe(false);
+  });
+
+  it("keeps Livestream contextual tour route-local", () => {
+    expect(
+      HUB_LIVESTREAM_CONTEXT_TOUR_STEPS.every(
+        (step) => step.href === "/admin/livestream",
+      ),
+    ).toBe(true);
+    expect(HUB_LIVESTREAM_CONTEXT_TOUR_STEPS[0]?.title).toMatch(/live status/i);
+    expect(
+      HUB_LIVESTREAM_CONTEXT_TOUR_STEPS.some((s) => s.title === "Homepage"),
+    ).toBe(false);
+  });
+
+  it("resolves tour kind from pathname", () => {
+    expect(resolveHubTourKind("/admin")).toBe("dashboard");
+    expect(resolveHubTourKind("/admin/website/home")).toBe("home");
+    expect(resolveHubTourKind("/admin/programs/new")).toBe("programs");
+    expect(resolveHubTourKind("/admin/livestream")).toBe("livestream");
+    expect(resolveReplayTourKind("/admin/programs")).toBe("programs");
+  });
+
+  it("persists tour step index", () => {
     const memory = new Map<string, string>();
     const storage = {
       getItem: (key: string) => memory.get(key) ?? null,

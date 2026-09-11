@@ -1,12 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import {
+  ContextualPhotoEditor,
+  type ContextualPhotoSelection,
+} from "@/components/hub/contextual-photo-editor";
 import { HubCopyProposeForm } from "@/components/hub/hub-copy-propose-form";
 import { HubHelpDetails } from "@/components/hub/hub-help-details";
 import { HubPreviewFrame } from "@/components/hub/hub-preview-frame";
-import { MarketingImageUploader } from "@/components/hub/marketing-image-uploader";
+import type { MediaChooserItem } from "@/components/hub/media-chooser";
 import { saveAboutDocument } from "@/app/admin/website/actions";
-import { uploadWebsiteContextImage } from "@/app/admin/website/media-actions";
+import {
+  assignWebsiteContextImage,
+  stageWebsiteContextImage,
+} from "@/app/admin/website/media-actions";
 import type { PublicMediaRef } from "@/content/types";
 import type { AboutDocument } from "@/content/website/schemas";
 import { HUB_MEDIA_PLACEMENTS } from "@/lib/hub/placement-copy";
@@ -20,16 +27,32 @@ import {
 
 type EditorView = "overview" | "section" | "category";
 
+export type AboutStagedPhoto = {
+  field: string;
+  asset: ContextualPhotoSelection;
+};
+
 export function AboutWebsiteEditor({
   about,
   portrait,
+  photoLibrary,
+  stagedPhoto,
 }: {
   about: AboutDocument;
   portrait: PublicMediaRef;
+  photoLibrary: MediaChooserItem[];
+  stagedPhoto: AboutStagedPhoto | null;
 }) {
-  const [view, setView] = useState<EditorView>("overview");
-  const [sectionId, setSectionId] = useState<AboutVisualSectionId | null>(null);
-  const [categoryId, setCategoryId] = useState<VisualCategoryId | null>(null);
+  const openPortrait = stagedPhoto?.field === "portraitMediaId";
+  const [view, setView] = useState<EditorView>(
+    openPortrait ? "category" : "overview",
+  );
+  const [sectionId, setSectionId] = useState<AboutVisualSectionId | null>(
+    openPortrait ? "portrait" : null,
+  );
+  const [categoryId, setCategoryId] = useState<VisualCategoryId | null>(
+    openPortrait ? "photo" : null,
+  );
 
   const selectedSection = sectionId ? getAboutVisualSection(sectionId) : undefined;
   const selectedCategory = selectedSection?.categories.find(
@@ -158,6 +181,8 @@ export function AboutWebsiteEditor({
           categoryId={selectedCategory.id}
           about={about}
           portrait={portrait}
+          photoLibrary={photoLibrary}
+          stagedPhoto={stagedPhoto}
         />
       </div>
     );
@@ -245,11 +270,15 @@ function AboutCategoryEditor({
   categoryId,
   about,
   portrait,
+  photoLibrary,
+  stagedPhoto,
 }: {
   sectionId: AboutVisualSectionId;
   categoryId: VisualCategoryId;
   about: AboutDocument;
   portrait: PublicMediaRef;
+  photoLibrary: MediaChooserItem[];
+  stagedPhoto: AboutStagedPhoto | null;
 }) {
   const hiddenBase = {
     portraitMediaId: about.portraitMediaId ?? "",
@@ -272,44 +301,26 @@ function AboutCategoryEditor({
   }
 
   if (sectionId === "portrait" && categoryId === "photo") {
+    const copy = HUB_MEDIA_PLACEMENTS.aboutPortrait;
     return (
-      <section className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-5">
-        <h2 className="text-lg font-semibold">
-          {HUB_MEDIA_PLACEMENTS.aboutPortrait.title}
-        </h2>
-        <p className="hub-help text-[var(--color-text-muted)]">
-          {HUB_MEDIA_PLACEMENTS.aboutPortrait.where}
-        </p>
-        <p className="hub-help text-[var(--color-text-muted)]">
-          {HUB_MEDIA_PLACEMENTS.aboutPortrait.recommended}
-        </p>
-        <div className="grid gap-6 xl:grid-cols-2">
-          <div data-hub-role="current">
-            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-              Current photo
-            </p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={portrait.src}
-              alt={portrait.alt || "Current Lead Pastor photo"}
-              className="max-w-xs rounded-[var(--radius-md)] object-cover"
-            />
-          </div>
-          <MarketingImageUploader
-            action={uploadWebsiteContextImage}
-            submitLabel="Replace Photo"
-            defaultCropAspect="square"
-            lockCropAspect
-            placementTitle={HUB_MEDIA_PLACEMENTS.aboutPortrait.title}
-            extraFields={
-              <>
-                <input type="hidden" name="document_key" value="about" />
-                <input type="hidden" name="media_field" value="portraitMediaId" />
-              </>
-            }
-          />
-        </div>
-      </section>
+      <ContextualPhotoEditor
+        title={copy.title}
+        where={copy.where}
+        recommended={copy.recommended}
+        cropAspect="square"
+        current={{ src: portrait.src, alt: portrait.alt }}
+        currentMediaId={about.portraitMediaId}
+        library={photoLibrary}
+        staged={
+          stagedPhoto?.field === "portraitMediaId" ? stagedPhoto.asset : null
+        }
+        uploadAction={stageWebsiteContextImage}
+        assignAction={assignWebsiteContextImage}
+        hiddenFields={{
+          document_key: "about",
+          media_field: "portraitMediaId",
+        }}
+      />
     );
   }
 

@@ -73,9 +73,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--color-surface-page)] lg:flex-row">
+    <div className="hub-chrome flex min-h-screen flex-col bg-[var(--color-surface-page)] lg:flex-row">
       <HubNav profile={session.profile} />
-      <div className="min-w-0 flex-1 p-4 lg:p-10">{children}</div>
+      <div className="hub-body min-w-0 flex-1 p-4 lg:p-10">{children}</div>
       <HubTour />
     </div>
   );

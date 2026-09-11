@@ -3,16 +3,31 @@ import { createClient } from "@/lib/supabase/server";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
 import { HubFlash } from "@/components/hub/hub-flash";
 import { BranchDetailsEditor } from "@/components/hub/branch-details-editor";
-import { MarketingImageUploader } from "@/components/hub/marketing-image-uploader";
+import { ContextualPhotoEditor } from "@/components/hub/contextual-photo-editor";
 import { HubSubmitButton } from "@/components/hub/hub-form-fields";
 import {
+  assignBranchPhoto,
   removeBranchPhoto,
-  uploadBranchPhoto,
+  stageBranchPhoto,
 } from "@/app/admin/branches/media-actions";
+import {
+  loadHubPhotoAsset,
+  loadHubPhotoLibrary,
+} from "@/lib/hub/photo-library";
+import { HUB_MEDIA_PLACEMENTS } from "@/lib/hub/placement-copy";
+import {
+  BRANCH_GALLERY_STAGED_FIELD,
+  BRANCH_HERO_STAGED_FIELD,
+} from "@/lib/hub/staged-photo";
 
 export const maxDuration = 60;
 
-type SearchParams = Promise<{ message?: string; error?: string }>;
+type SearchParams = Promise<{
+  message?: string;
+  error?: string;
+  stagedField?: string;
+  stagedMediaId?: string;
+}>;
 type Params = Promise<{ id: string }>;
 
 export default async function EditBranchPage({
@@ -62,6 +77,32 @@ export default async function EditBranchPage({
     .eq("branch_id", id)
     .order("sort_order", { ascending: true });
 
+  const [photoLibrary, stagedAsset] = await Promise.all([
+    loadHubPhotoLibrary(),
+    loadHubPhotoAsset(flash.stagedMediaId),
+  ]);
+
+  const stagedHero =
+    flash.stagedField === BRANCH_HERO_STAGED_FIELD && stagedAsset
+      ? stagedAsset
+      : null;
+  const stagedGallery =
+    flash.stagedField === BRANCH_GALLERY_STAGED_FIELD && stagedAsset
+      ? stagedAsset
+      : null;
+
+  const hero = (branchMedia ?? []).find(
+    (item) => item.placement === "hero" && item.is_active,
+  );
+  const heroMedia = hero
+    ? Array.isArray(hero.media)
+      ? hero.media[0]
+      : hero.media
+    : null;
+
+  const topCopy = HUB_MEDIA_PLACEMENTS.branchTopPhoto;
+  const galleryCopy = HUB_MEDIA_PLACEMENTS.branchGallery;
+
   return (
     <div>
       <HubPageHeader
@@ -93,20 +134,19 @@ export default async function EditBranchPage({
         }))}
       />
 
-      <section className="mt-14 max-w-2xl space-y-6 border-t border-[var(--color-border)] pt-10">
+      <section className="mt-10 space-y-8">
         <div>
-          <h2 className="font-display text-2xl font-semibold">Branch Photos</h2>
-          <p className="mt-2 text-readable-sm text-[var(--color-text-muted)]">
-            Photos for this branch only. Adding a photo here does not change other
-            branches. Removing a photo from the branch keeps the file in the shared
-            library.
+          <h2 className="text-xl font-semibold">Photos for this branch</h2>
+          <p className="hub-help mt-2 text-[var(--color-text-muted)]">
+            Change photos here. Uploading saves to the photo library. The branch
+            page only changes after you preview and make a photo live.
           </p>
         </div>
 
         <ul className="space-y-4">
           {(branchMedia ?? []).length === 0 ? (
-            <li className="rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-6 text-readable-sm text-[var(--color-text-muted)]">
-              No photos attached to this branch yet.
+            <li className="hub-help text-[var(--color-text-muted)]">
+              No photos are attached to this branch yet.
             </li>
           ) : (
             (branchMedia ?? []).map((item) => {
@@ -116,31 +156,29 @@ export default async function EditBranchPage({
               return (
                 <li
                   key={item.id}
-                  className="flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 sm:flex-row sm:items-center"
+                  className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4"
                 >
-                  {media?.public_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={media.public_url}
-                      alt={
-                        item.alt_text_override ||
-                        media.alt_text ||
-                        "Branch photo"
-                      }
-                      className="h-28 w-40 rounded-[var(--radius-md)] object-cover"
-                    />
-                  ) : null}
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold capitalize">
-                      {placementLabel(item.placement)}
-                    </p>
-                    <p className="text-readable-sm text-[var(--color-text-muted)]">
-                      {item.alt_text_override || media?.alt_text || "No description"}
-                    </p>
-                    <p className="mt-1 text-sm uppercase tracking-wide text-[var(--color-text-muted)]">
-                      {item.status}
-                      {!item.is_active ? " · inactive" : ""}
-                    </p>
+                  <div className="flex min-w-0 items-center gap-4">
+                    {media?.public_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={media.public_url}
+                        alt=""
+                        className="size-16 rounded-[var(--radius-md)] object-cover"
+                      />
+                    ) : null}
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold">
+                        {placementLabel(item.placement)}
+                        {!item.is_active ? " (not shown)" : ""}
+                      </p>
+                      <p className="hub-help mt-1 text-[var(--color-text-muted)]">
+                        {item.alt_text_override ||
+                          media?.alt_text ||
+                          media?.caption ||
+                          "Photo without a description"}
+                      </p>
+                    </div>
                   </div>
                   <form action={removeBranchPhoto}>
                     <input type="hidden" name="branch_id" value={branch.id} />
@@ -155,73 +193,52 @@ export default async function EditBranchPage({
           )}
         </ul>
 
-        <div className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5">
-          <h3 className="text-lg font-semibold">Top Photo</h3>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            The large photo at the top of this branch’s page on the website. The
-            website crops it to fit automatically.
-          </p>
-          {(() => {
-            const hero = (branchMedia ?? []).find((item) => item.placement === "hero");
-            const media = hero
-              ? Array.isArray(hero.media)
-                ? hero.media[0]
-                : hero.media
-              : null;
-            return media?.public_url ? (
-              <div data-hub-role="current" className="space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-                  Current photo
-                </p>
-                <div className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-tint)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={media.public_url}
-                    alt={hero?.alt_text_override || media.alt_text || `${branch.name} top photo`}
-                    className="size-full object-cover"
-                  />
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">
-                No top photo yet.
-              </p>
-            );
-          })()}
-          <MarketingImageUploader
-            action={uploadBranchPhoto}
-            submitLabel="Replace Photo"
-            defaultCropAspect="hero"
-            lockCropAspect
-            placementTitle="Branch Top Photo"
-            extraFields={
-              <>
-                <input type="hidden" name="branch_id" value={branch.id} />
-                <input type="hidden" name="placement" value="hero" />
-              </>
-            }
-          />
-        </div>
+        <ContextualPhotoEditor
+          title={topCopy.title}
+          where={topCopy.where}
+          recommended={topCopy.recommended}
+          cropAspect="hero"
+          current={
+            heroMedia?.public_url
+              ? {
+                  src: heroMedia.public_url,
+                  alt:
+                    hero?.alt_text_override ||
+                    heroMedia.alt_text ||
+                    `${branch.name} top photo`,
+                }
+              : null
+          }
+          library={photoLibrary}
+          staged={stagedHero}
+          uploadAction={stageBranchPhoto}
+          assignAction={assignBranchPhoto}
+          hiddenFields={{
+            branch_id: branch.id,
+            placement: "hero",
+          }}
+          emptyCurrentLabel="No top photo yet."
+        />
 
-        <div className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5">
-          <h3 className="text-lg font-semibold">More branch photos</h3>
-          <p className="text-sm text-[var(--color-text-muted)]">
-            Extra photos under the top photo on this branch’s page.
-          </p>
-          <MarketingImageUploader
-            action={uploadBranchPhoto}
-            submitLabel="Add this photo to the branch"
-            defaultCropAspect="original"
-            lockCropAspect
-            placementTitle="More branch photos"
-            extraFields={
-              <>
-                <input type="hidden" name="branch_id" value={branch.id} />
-                <input type="hidden" name="placement" value="gallery" />
-              </>
-            }
-          />
-        </div>
+        <ContextualPhotoEditor
+          title={galleryCopy.title}
+          where={galleryCopy.where}
+          recommended={galleryCopy.recommended}
+          cropAspect="original"
+          current={null}
+          library={photoLibrary}
+          staged={stagedGallery}
+          uploadAction={stageBranchPhoto}
+          assignAction={assignBranchPhoto}
+          hiddenFields={{
+            branch_id: branch.id,
+            placement: "gallery",
+          }}
+          currentHeading="Adding another photo"
+          currentNote="Gallery photos appear under the top photo. Choose or upload one, preview, then make it live."
+          emptyCurrentLabel="Use Replace Photo to add another gallery photo."
+          changeLabel="Add a gallery photo"
+        />
       </section>
     </div>
   );

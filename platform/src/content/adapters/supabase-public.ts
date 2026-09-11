@@ -8,6 +8,10 @@ import type {
   SermonPublic,
   ServiceTime,
 } from "@/content/types";
+import {
+  formatProgramScheduleLabel,
+  type ProgramSessionInput,
+} from "@/lib/programs/schedule";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -50,22 +54,6 @@ function parsePhones(
     return [{ display: phoneDisplay, tel: phoneTel }];
   }
   return [];
-}
-
-function formatProgramDates(
-  startsAt: string | null,
-  endsAt: string | null,
-): string | null {
-  if (!startsAt && !endsAt) return null;
-  const fmt = (iso: string) =>
-    new Date(iso).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  if (startsAt && endsAt) return `${fmt(startsAt)} – ${fmt(endsAt)}`;
-  if (startsAt) return fmt(startsAt);
-  return endsAt ? fmt(endsAt) : null;
 }
 
 export async function fetchPublishedBranches(): Promise<Branch[]> {
@@ -156,6 +144,13 @@ export async function fetchFeaturedProgram(
         featured_media:media_assets!programs_featured_media_id_fkey (
           public_url,
           alt_text
+        ),
+        program_sessions (
+          session_date,
+          start_time,
+          end_time,
+          label,
+          sort_order
         )
       `,
       )
@@ -164,7 +159,7 @@ export async function fetchFeaturedProgram(
       .maybeSingle();
 
     if (preferredError) fail("fetchFeaturedProgram.preferred", preferredError);
-    if (preferred) return mapProgramRow(preferred);
+    if (preferred) return mapProgramRow(preferred as ProgramRow);
   }
 
   const { data: row, error } = await supabase
@@ -183,6 +178,13 @@ export async function fetchFeaturedProgram(
       featured_media:media_assets!programs_featured_media_id_fkey (
         public_url,
         alt_text
+      ),
+      program_sessions (
+        session_date,
+        start_time,
+        end_time,
+        label,
+        sort_order
       )
     `,
     )
@@ -194,8 +196,16 @@ export async function fetchFeaturedProgram(
 
   if (error) fail("fetchFeaturedProgram", error);
   if (!row) return null;
-  return mapProgramRow(row);
+  return mapProgramRow(row as ProgramRow);
 }
+
+type ProgramSessionRow = {
+  session_date: string;
+  start_time: string | null;
+  end_time: string | null;
+  label: string | null;
+  sort_order: number | null;
+};
 
 type ProgramRow = {
   id: string;
@@ -211,18 +221,35 @@ type ProgramRow = {
     | { public_url: string; alt_text: string }
     | { public_url: string; alt_text: string }[]
     | null;
+  program_sessions?: ProgramSessionRow[] | null;
 };
+
+function mapSessions(rows: ProgramSessionRow[] | null | undefined): ProgramSessionInput[] {
+  if (!rows?.length) return [];
+  return rows.map((s) => ({
+    sessionDate: s.session_date,
+    startTime: s.start_time,
+    endTime: s.end_time,
+    label: s.label,
+    sortOrder: s.sort_order ?? 0,
+  }));
+}
 
 function mapProgramRow(row: ProgramRow): FeaturedProgram {
   const media = Array.isArray(row.featured_media)
     ? row.featured_media[0]
     : row.featured_media;
 
+  const datesLabel = formatProgramScheduleLabel(mapSessions(row.program_sessions), {
+    startsAt: row.starts_at,
+    endsAt: row.ends_at,
+  });
+
   return {
     id: row.id,
     title: row.title,
     shortDescription: row.short_description,
-    datesLabel: formatProgramDates(row.starts_at, row.ends_at),
+    datesLabel,
     imageSrc: media?.public_url ?? null,
     imageAlt: media?.alt_text ?? "",
     ctaLabel: row.cta_label ?? "Learn more",

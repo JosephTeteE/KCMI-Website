@@ -10,6 +10,7 @@ const CARD_TOUR: Record<string, string> = {
   "/admin/website/home": "dashboard-homepage",
   "/admin/programs": "dashboard-programs",
   "/admin/branches": "dashboard-branches",
+  "/admin/sermons": "dashboard-sermons",
   "/admin/livestream": "dashboard-livestream",
 };
 

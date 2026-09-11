@@ -50,6 +50,9 @@ const BUTTONS: VisualSectionCategory = {
   description: "The clickable buttons and where they take visitors.",
 };
 
+/** Reserved for elevated/structural cases — not shown on banner under V2. */
+export const STRUCTURAL_BUTTONS_CATEGORY = BUTTONS;
+
 const PROGRAM: VisualSectionCategory = {
   id: "program",
   label: "Featured program",
@@ -62,7 +65,7 @@ export const HOME_VISUAL_SECTIONS: readonly VisualSectionConfig<HomeVisualSectio
       id: "banner",
       label: "Top of Homepage",
       description: "First message and photo visitors see",
-      categories: [WORDS, PHOTO, BUTTONS],
+      categories: [WORDS, PHOTO],
     },
     {
       id: "spotlight",

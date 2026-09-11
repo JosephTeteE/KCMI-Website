@@ -152,13 +152,19 @@ test.describe("Hub browser smoke", () => {
       await page.getByRole("navigation", { name: "Hub" }).getByRole("link", { name: "Branches" }).click();
       await page.getByRole("link", { name: "Accra" }).first().click();
       await expect(page.getByRole("heading", { name: "Accra" })).toBeVisible();
-      const gallery = page.locator("form").filter({ hasText: "More branch photos" });
+      const gallery = page
+        .locator("section")
+        .filter({ hasText: "More branch photos" })
+        .last();
+      await gallery.getByRole("button", { name: "Add a gallery photo" }).click();
+      await gallery.getByRole("button", { name: "Upload a new photo" }).click();
       await gallery.locator('input[name="file"]').setInputFiles(pixel);
       await gallery.locator('input[name="alt_text"]').fill("D1.2 Accra attach");
-      await gallery.getByRole("button", { name: "Add this photo to the branch" }).click();
-      await expect(page.getByText("This photo was added to the branch page.")).toBeVisible({
-        timeout: 20_000,
-      });
+      await gallery.getByRole("button", { name: "Upload this photo" }).click();
+      await expect(
+        page.getByText("This photo is ready. Preview it, then make it live"),
+      ).toBeVisible({ timeout: 20_000 });
+
       const { data: branchAsset } = await admin
         .from("media_assets")
         .select("id")
@@ -167,6 +173,28 @@ test.describe("Hub browser smoke", () => {
         .limit(1)
         .maybeSingle();
       if (branchAsset?.id) mediaIds.push(branchAsset.id);
+      expect(branchAsset?.id).toBeTruthy();
+
+      // Uploading stages the photo only: the branch page must not change yet.
+      const { data: stagedLink } = await admin
+        .from("branch_media")
+        .select("id")
+        .eq("branch_id", ACCRA_BRANCH_ID)
+        .eq("media_asset_id", branchAsset?.id ?? "")
+        .maybeSingle();
+      expect(stagedLink).toBeNull();
+
+      const stagedGallery = page
+        .locator("section")
+        .filter({ hasText: "More branch photos" })
+        .last();
+      await stagedGallery.getByRole("button", { name: "Preview my changes" }).click();
+      await stagedGallery
+        .getByRole("button", { name: "Make this photo live on the website" })
+        .click();
+      await expect(page.getByText("This photo was added to the branch page.")).toBeVisible({
+        timeout: 20_000,
+      });
       const { data: link } = await admin
         .from("branch_media")
         .select("id")

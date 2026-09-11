@@ -25,7 +25,7 @@ export default function SignInPage() {
       <h1 className="text-2xl font-semibold text-[var(--color-text-body)]">
         KCMI Hub sign in
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+      <p className="hub-help mt-2 text-[var(--color-text-muted)]">
         Staff only. After you sign in, you will set up a 6-digit app code for
         extra safety.
       </p>

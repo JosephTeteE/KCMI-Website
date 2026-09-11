@@ -3,11 +3,13 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 
-/** Desktop-width canvas used for Hub thumbnail previews of public sections. */
+/** Desktop-width canvas used for Hub section thumbnail previews. */
 export const HUB_PREVIEW_CANVAS_WIDTH = 960;
+/** Phone-width canvas for genuine phone composition in full preview. */
+export const HUB_PREVIEW_PHONE_WIDTH = 390;
 
 /**
- * Scale a fixed desktop canvas into the available Hub card width.
+ * Scale a fixed canvas into the available Hub card width.
  * Never clips or requires horizontal scrolling; narrow cards shrink as a thumbnail.
  */
 export function hubPreviewFitScale(
@@ -17,6 +19,8 @@ export function hubPreviewFitScale(
   const width = Math.max(1, frameWidth);
   return Math.min(1, width / canvasWidth);
 }
+
+type DeviceMode = "phone" | "desktop";
 
 export function HubPreviewFrame({
   title,
@@ -45,6 +49,7 @@ export function HubPreviewFrame({
   const [scale, setScale] = useState(1);
   const [innerHeight, setInnerHeight] = useState(320);
   const [largeOpen, setLargeOpen] = useState(false);
+  const [device, setDevice] = useState<DeviceMode>("phone");
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -78,6 +83,8 @@ export function HubPreviewFrame({
 
   const scaledWidth = HUB_PREVIEW_CANVAS_WIDTH * scale;
   const scaledHeight = Math.max(8, innerHeight * scale);
+  const fullCanvasWidth =
+    device === "phone" ? HUB_PREVIEW_PHONE_WIDTH : HUB_PREVIEW_CANVAS_WIDTH;
 
   return (
     <section
@@ -85,12 +92,18 @@ export function HubPreviewFrame({
       className="overflow-hidden rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-page)] px-4 py-3">
-        <p className="text-sm font-semibold text-[var(--color-text-body)]">
-          {title}
-          <span className="ml-2 text-sm font-medium text-[var(--color-text-muted)]">
-            {caption}
-          </span>
-        </p>
+        <div>
+          <p className="text-base font-semibold text-[var(--color-text-body)]">
+            {title}
+            <span className="ml-2 text-base font-medium text-[var(--color-text-muted)]">
+              {caption}
+            </span>
+          </p>
+          <p className="hub-help mt-1 text-[var(--color-text-muted)]">
+            Section preview (thumbnail) — for orientation, not for reading body
+            text
+          </p>
+        </div>
         <button
           ref={openButtonRef}
           type="button"
@@ -102,8 +115,10 @@ export function HubPreviewFrame({
       </div>
       <div
         ref={frameRef}
+        data-hub-preview-scaled="true"
         className="overflow-hidden bg-[var(--color-surface-page)]"
         style={{ height: scaledHeight }}
+        aria-hidden="true"
       >
         <div
           className="origin-top-left"
@@ -133,26 +148,107 @@ export function HubPreviewFrame({
         onClick={(event) => {
           if (event.target === event.currentTarget) closeLarge();
         }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.stopPropagation();
+            closeLarge();
+          }
+        }}
       >
-        <div className="mx-auto my-6 max-h-[90vh] w-[min(960px,calc(100%-2rem))] overflow-auto rounded-[var(--radius-lg)] bg-[var(--color-surface-elevated)] p-4 shadow-[var(--shadow-soft)]">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <p id={titleId} className="text-sm font-semibold">
-              {title} — full-size preview
-            </p>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold"
-              onClick={closeLarge}
-            >
-              Close
-            </button>
+        <div className="mx-auto my-6 max-h-[90vh] w-[min(1100px,calc(100%-2rem))] overflow-auto rounded-[var(--radius-lg)] bg-[var(--color-surface-elevated)] p-4 shadow-[var(--shadow-soft)]">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p id={titleId} className="text-base font-semibold">
+                {title} — full preview
+              </p>
+              <p className="hub-help mt-1 text-[var(--color-text-muted)]">
+                {device === "phone"
+                  ? "Phone layout (390px-wide composition)"
+                  : "Desktop layout"}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div
+                role="group"
+                aria-label="Preview device"
+                className="flex rounded-[var(--radius-md)] border border-[var(--color-border)] p-1"
+              >
+                <button
+                  type="button"
+                  aria-pressed={device === "phone"}
+                  onClick={() => setDevice("phone")}
+                  className={`inline-flex min-h-11 items-center rounded-[var(--radius-sm)] px-4 text-base font-semibold ${
+                    device === "phone"
+                      ? "bg-[var(--color-action-primary)] text-[var(--color-text-on-brand)]"
+                      : "text-[var(--color-text-body)]"
+                  }`}
+                >
+                  Phone
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={device === "desktop"}
+                  onClick={() => setDevice("desktop")}
+                  className={`inline-flex min-h-11 items-center rounded-[var(--radius-sm)] px-4 text-base font-semibold ${
+                    device === "desktop"
+                      ? "bg-[var(--color-action-primary)] text-[var(--color-text-on-brand)]"
+                      : "text-[var(--color-text-body)]"
+                  }`}
+                >
+                  Desktop
+                </button>
+              </div>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] px-3 text-base font-semibold"
+                onClick={closeLarge}
+              >
+                Close
+              </button>
+            </div>
           </div>
           {largeOpen ? (
-            <div className="pointer-events-none">{children}</div>
+            <div className="flex justify-center bg-[var(--color-surface-page)] p-4">
+              <div
+                className="pointer-events-none w-full bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]"
+                style={{ maxWidth: fullCanvasWidth }}
+              >
+                {/*
+                  Phone uses a 390px-wide public composition so the layout is
+                  responsive phone, not a squeezed desktop canvas.
+                */}
+                <div style={{ width: "100%", maxWidth: fullCanvasWidth }}>
+                  {children}
+                </div>
+              </div>
+            </div>
           ) : null}
         </div>
       </dialog>
+    </section>
+  );
+}
+
+/** Readable Hub copy block outside scaled thumbnails (Preview Mode B). */
+export function HubReadableCurrentCopy({
+  heading = "Words currently on the website",
+  children,
+}: {
+  heading?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      data-hub-role="readable-current"
+      className="space-y-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-page)] p-4"
+    >
+      <h3 className="text-base font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
+        {heading}
+      </h3>
+      <div className="space-y-3 text-base text-[var(--color-text-body)]">
+        {children}
+      </div>
     </section>
   );
 }

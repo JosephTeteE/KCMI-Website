@@ -7,13 +7,20 @@ import { FindFamilySection } from "@/components/home/find-family-section";
 import { HomeHero } from "@/components/home/home-hero";
 import { PrayerGivingSection } from "@/components/home/prayer-giving-section";
 import { WatchListenSection } from "@/components/home/watch-listen-section";
+import {
+  ContextualPhotoEditor,
+  type ContextualPhotoSelection,
+} from "@/components/hub/contextual-photo-editor";
 import { FeaturedProgramChooser } from "@/components/hub/featured-program-chooser";
 import { HubCopyProposeForm } from "@/components/hub/hub-copy-propose-form";
 import { HubHelpDetails } from "@/components/hub/hub-help-details";
 import { HubPreviewFrame } from "@/components/hub/hub-preview-frame";
-import { MarketingImageUploader } from "@/components/hub/marketing-image-uploader";
+import type { MediaChooserItem } from "@/components/hub/media-chooser";
 import { saveHomeDocument } from "@/app/admin/website/actions";
-import { uploadWebsiteContextImage } from "@/app/admin/website/media-actions";
+import {
+  assignWebsiteContextImage,
+  stageWebsiteContextImage,
+} from "@/app/admin/website/media-actions";
 import { isPublicFeaturedProgram } from "@/content/featured-program";
 import { livestreamPublic } from "@/content/seed/pages";
 import { mapHomePublic } from "@/content/website/public-map";
@@ -33,15 +40,28 @@ import {
   type VisualCategoryId,
 } from "@/lib/hub/visual-sections";
 
+export type HomeStagedPhoto = {
+  field: string;
+  asset: ContextualPhotoSelection;
+};
+
 type Props = {
   home: HomeDocument;
   heroImage: PublicMediaRef;
   welcomeImage: PublicMediaRef;
   programs: FeaturedProgram[];
   featuredProgram: FeaturedProgram | null;
+  photoLibrary: MediaChooserItem[];
+  stagedPhoto: HomeStagedPhoto | null;
 };
 
 type EditorView = "overview" | "section" | "category";
+
+/** Photo fields the Hub can assign, and the section that owns each one. */
+const HOME_PHOTO_SECTIONS: Record<string, HomeVisualSectionId> = {
+  heroMediaId: "banner",
+  welcomeMediaId: "discover",
+};
 
 function homeHidden(home: HomeDocument, skip: string[]): Record<string, string> {
   const all: Record<string, string> = {
@@ -140,10 +160,22 @@ export function HomeWebsiteEditor({
   welcomeImage,
   programs,
   featuredProgram,
+  photoLibrary,
+  stagedPhoto,
 }: Props) {
-  const [view, setView] = useState<EditorView>("overview");
-  const [sectionId, setSectionId] = useState<HomeVisualSectionId | null>(null);
-  const [categoryId, setCategoryId] = useState<VisualCategoryId | null>(null);
+  // A staged upload returns here from the server, so open the photo it belongs to.
+  const stagedSection = stagedPhoto
+    ? (HOME_PHOTO_SECTIONS[stagedPhoto.field] ?? null)
+    : null;
+  const [view, setView] = useState<EditorView>(
+    stagedSection ? "category" : "overview",
+  );
+  const [sectionId, setSectionId] = useState<HomeVisualSectionId | null>(
+    stagedSection,
+  );
+  const [categoryId, setCategoryId] = useState<VisualCategoryId | null>(
+    stagedSection ? "photo" : null,
+  );
 
   const selectedSection = sectionId ? getHomeVisualSection(sectionId) : undefined;
   const selectedCategory = selectedSection?.categories.find(
@@ -253,7 +285,7 @@ export function HomeWebsiteEditor({
             onClick={backToOverview}
             className="inline-flex min-h-11 items-center text-base font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
           >
-            All homepage sections
+            Choose a different Homepage section
           </button>
           <h2 className="mt-3 text-xl font-semibold">{selectedSection.label}</h2>
           <p className="hub-help mt-2 text-[var(--color-text-muted)]">
@@ -292,7 +324,7 @@ export function HomeWebsiteEditor({
             onClick={backToSection}
             className="inline-flex min-h-11 items-center text-base font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
           >
-            Back to {selectedSection.label} choices
+            Choose a different part of {selectedSection.label}
           </button>
           <h2 className="mt-3 text-xl font-semibold">
             {selectedSection.label} — {selectedCategory.label}
@@ -310,6 +342,8 @@ export function HomeWebsiteEditor({
           welcomeImage={welcomeImage}
           programs={programs}
           featuredProgram={featuredProgram}
+          photoLibrary={photoLibrary}
+          stagedPhoto={stagedPhoto}
         />
       </div>
     );
@@ -407,6 +441,8 @@ function CategoryEditor({
   welcomeImage,
   programs,
   featuredProgram,
+  photoLibrary,
+  stagedPhoto,
 }: {
   sectionId: HomeVisualSectionId;
   categoryId: VisualCategoryId;
@@ -415,6 +451,8 @@ function CategoryEditor({
   welcomeImage: PublicMediaRef;
   programs: FeaturedProgram[];
   featuredProgram: FeaturedProgram | null;
+  photoLibrary: MediaChooserItem[];
+  stagedPhoto: HomeStagedPhoto | null;
 }) {
   if (sectionId === "spotlight" && categoryId === "program") {
     return (
@@ -428,24 +466,48 @@ function CategoryEditor({
 
   if (categoryId === "photo") {
     if (sectionId === "banner") {
+      const copy = HUB_MEDIA_PLACEMENTS.homeTopBanner;
       return (
-        <ContextPhoto
-          copy={HUB_MEDIA_PLACEMENTS.homeTopBanner}
-          current={heroImage}
-          documentKey="home"
-          mediaField="heroMediaId"
-          crop="hero"
+        <ContextualPhotoEditor
+          title={copy.title}
+          where={copy.where}
+          recommended={copy.recommended}
+          cropAspect="hero"
+          current={{ src: heroImage.src, alt: heroImage.alt }}
+          currentMediaId={home.heroMediaId}
+          library={photoLibrary}
+          staged={
+            stagedPhoto?.field === "heroMediaId" ? stagedPhoto.asset : null
+          }
+          uploadAction={stageWebsiteContextImage}
+          assignAction={assignWebsiteContextImage}
+          hiddenFields={{
+            document_key: "home",
+            media_field: "heroMediaId",
+          }}
         />
       );
     }
     if (sectionId === "discover") {
+      const copy = HUB_MEDIA_PLACEMENTS.homeWelcome;
       return (
-        <ContextPhoto
-          copy={HUB_MEDIA_PLACEMENTS.homeWelcome}
-          current={welcomeImage}
-          documentKey="home"
-          mediaField="welcomeMediaId"
-          crop="card"
+        <ContextualPhotoEditor
+          title={copy.title}
+          where={copy.where}
+          recommended={copy.recommended}
+          cropAspect="card"
+          current={{ src: welcomeImage.src, alt: welcomeImage.alt }}
+          currentMediaId={home.welcomeMediaId}
+          library={photoLibrary}
+          staged={
+            stagedPhoto?.field === "welcomeMediaId" ? stagedPhoto.asset : null
+          }
+          uploadAction={stageWebsiteContextImage}
+          assignAction={assignWebsiteContextImage}
+          hiddenFields={{
+            document_key: "home",
+            media_field: "welcomeMediaId",
+          }}
         />
       );
     }
@@ -479,28 +541,13 @@ function CategoryEditor({
 
   if (sectionId === "banner" && categoryId === "buttons") {
     return (
-      <HubCopyProposeForm
-        action={saveHomeDocument}
-        what="Top of Homepage buttons"
-        where="The two buttons visitors can click at the top of the homepage."
-        hidden={homeHidden(home, [
-          "heroPrimaryCtaLabel",
-          "heroPrimaryCtaHref",
-          "heroSecondaryCtaLabel",
-          "heroSecondaryCtaHref",
-        ])}
-        fields={[
-          { id: "heroPrimaryCtaLabel", label: "First button visitors can click", kind: "text", current: home.heroPrimaryCtaLabel },
-          { id: "heroPrimaryCtaHref", label: "First button destination", kind: "text", current: home.heroPrimaryCtaHref },
-          { id: "heroSecondaryCtaLabel", label: "Second button visitors can click", kind: "text", current: home.heroSecondaryCtaLabel },
-          { id: "heroSecondaryCtaHref", label: "Second button destination", kind: "text", current: home.heroSecondaryCtaHref },
-        ]}
-        preview={(values, mode) => (
-          <HubPreviewFrame title="Top of Homepage" live={mode === "live"}>
-            <HomeHero home={previewHome(home, heroImage, welcomeImage, values)} />
-          </HubPreviewFrame>
-        )}
-      />
+      <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] p-5">
+        <h3 className="text-lg font-semibold">Homepage buttons</h3>
+        <p className="hub-body mt-2 text-[var(--color-text-muted)]">
+          Plan a Visit and Watch Live stay the same for every visitor. Staff do
+          not change those destinations here.
+        </p>
+      </div>
     );
   }
 
@@ -541,16 +588,12 @@ function CategoryEditor({
         hidden={homeHidden(home, [
           "sermonFallbackTitle",
           "sermonFallbackDescription",
-          "sermonFallbackCtaLabel",
-          "sermonFallbackCtaHref",
           "sermonFallbackYoutubeUrl",
           "sermonFallbackYoutubeLabel",
         ])}
         fields={[
           { id: "sermonFallbackTitle", label: "Title", kind: "text", current: home.sermonFallbackTitle },
           { id: "sermonFallbackDescription", label: "Description", kind: "textarea", current: home.sermonFallbackDescription },
-          { id: "sermonFallbackCtaLabel", label: "Button visitors can click", kind: "text", current: home.sermonFallbackCtaLabel },
-          { id: "sermonFallbackCtaHref", label: "Button destination", kind: "text", current: home.sermonFallbackCtaHref },
           { id: "sermonFallbackYoutubeUrl", label: "YouTube link", kind: "text", current: home.sermonFallbackYoutubeUrl },
           { id: "sermonFallbackYoutubeLabel", label: "YouTube button label", kind: "text", current: home.sermonFallbackYoutubeLabel },
         ]}
@@ -661,53 +704,5 @@ function CategoryEditor({
     <p className="hub-help text-[var(--color-text-muted)]">
       This part of the homepage cannot be edited here.
     </p>
-  );
-}
-
-function ContextPhoto({
-  copy,
-  current,
-  documentKey,
-  mediaField,
-  crop,
-}: {
-  copy: (typeof HUB_MEDIA_PLACEMENTS)[keyof typeof HUB_MEDIA_PLACEMENTS];
-  current: PublicMediaRef;
-  documentKey: "home" | "about";
-  mediaField: string;
-  crop: "hero" | "card" | "square";
-}) {
-  return (
-    <section className="space-y-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-5">
-      <h2 className="text-lg font-semibold">{copy.title}</h2>
-      <p className="hub-help text-[var(--color-text-muted)]">{copy.where}</p>
-      <p className="hub-help text-[var(--color-text-muted)]">{copy.recommended}</p>
-      <div className="grid gap-6 xl:grid-cols-2">
-        <div data-hub-role="current">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
-            Current photo
-          </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={current.src}
-            alt={current.alt || "Current website photo"}
-            className="w-full rounded-[var(--radius-md)] object-cover"
-          />
-        </div>
-        <MarketingImageUploader
-          action={uploadWebsiteContextImage}
-          submitLabel="Replace Photo"
-          defaultCropAspect={crop}
-          lockCropAspect
-          placementTitle={copy.title}
-          extraFields={
-            <>
-              <input type="hidden" name="document_key" value={documentKey} />
-              <input type="hidden" name="media_field" value={mediaField} />
-            </>
-          }
-        />
-      </div>
-    </section>
   );
 }

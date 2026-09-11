@@ -625,6 +625,21 @@ a[href]:hover {
   background: color-mix(in srgb, var(--neutral-950) 45%, transparent);
 }
 
+.hub-tour-layer {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.hub-tour-layer::backdrop {
+  background: transparent;
+}
+
 /* Hub volunteer typography floor */
 .hub-body {
   font-size: 1rem;
@@ -635,3 +650,23 @@ a[href]:hover {
   font-size: 0.9375rem;
   line-height: 1.55;
 }
+
+/* D1.8 Hub typography floor: chrome/instructions outside scaled public thumbnails */
+.hub-chrome :where(.text-sm, .text-xs):not(:where([data-hub-preview-scaled] *)),
+.hub-chrome
+  :where(button, a, label, input, select, textarea, summary, dt, dd, li, p, h3, legend):not(
+    :where([data-hub-preview-scaled] *)
+  ):not(.hub-help):not(.hub-meta) {
+  font-size: max(1rem, 1em);
+}
+
+.hub-chrome .hub-help {
+  font-size: 0.9375rem;
+}
+
+.hub-chrome .hub-meta,
+.hub-chrome :where(.hub-meta) {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+

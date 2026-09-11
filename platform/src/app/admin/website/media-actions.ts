@@ -3,13 +3,17 @@
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
 import { saveRevision } from "@/lib/cms/revisions";
+import { emptyToNull } from "@/lib/cms/ingest-marketing-image";
 import {
-  emptyToNull,
-  ingestMarketingImageFile,
-} from "@/lib/cms/ingest-marketing-image";
-import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
+  loadAssignableAsset,
+  stageMarketingAsset,
+} from "@/lib/cms/stage-marketing-asset";
+import {
+  redirectWithError,
+  redirectWithMessage,
+  redirectWithParams,
+} from "@/lib/cms/hub-flash";
 import { createClient } from "@/lib/supabase/server";
-import { createSecretKeyClient } from "@/lib/supabase/admin";
 import {
   WEBSITE_DOCUMENT_IDS,
   type WebsiteDocumentKey,
@@ -17,84 +21,110 @@ import {
 import { resolveAboutDocument, resolveHomeDocument } from "@/content/website/resolve";
 import type { Json } from "@/lib/supabase/database.types";
 
-const BUCKET = "marketing-public";
+const CONTEXT_MEDIA_FIELDS: Record<string, Extract<WebsiteDocumentKey, "home" | "about">> = {
+  heroMediaId: "home",
+  welcomeMediaId: "home",
+  portraitMediaId: "about",
+};
 
-const MEDIA_FIELDS = new Set(["heroMediaId", "welcomeMediaId", "portraitMediaId"]);
+type ContextTarget = {
+  key: Extract<WebsiteDocumentKey, "home" | "about">;
+  field: string;
+  hubPath: string;
+};
 
-export async function uploadWebsiteContextImage(formData: FormData) {
-  const key = emptyToNull(formData.get("document_key")) as WebsiteDocumentKey | null;
+function contextTarget(formData: FormData): ContextTarget | null {
+  const key = emptyToNull(formData.get("document_key"));
   const field = emptyToNull(formData.get("media_field"));
-  if (!key || !field || !MEDIA_FIELDS.has(field)) {
+  if (!key || !field) return null;
+  const expectedKey = CONTEXT_MEDIA_FIELDS[field];
+  if (!expectedKey || expectedKey !== key) return null;
+  return {
+    key: expectedKey,
+    field,
+    hubPath:
+      expectedKey === "home" ? "/admin/website/home" : "/admin/website/about",
+  };
+}
+
+/**
+ * Upload a website photo into the photo library only.
+ * The public page is untouched until the operator previews and makes the photo live.
+ */
+export async function stageWebsiteContextImage(formData: FormData) {
+  const target = contextTarget(formData);
+  if (!target) {
     redirectWithError("/admin/website", "Missing image context.");
   }
 
-  const hubPath =
-    key === "home" ? "/admin/website/home" : "/admin/website/about";
-
   const gate = await requireStaffAction("website.manage");
   if (!gate.ok) {
-    redirectWithError(hubPath, gate.message);
+    redirectWithError(target.hubPath, gate.message);
   }
   const mediaGate = await requireStaffAction("media.manage");
   if (!mediaGate.ok) {
-    redirectWithError(hubPath, mediaGate.message);
+    redirectWithError(target.hubPath, mediaGate.message);
   }
 
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    redirectWithError(hubPath, "Please choose an image to upload.");
-  }
-
-  const ingested = await ingestMarketingImageFile(file, formData);
-  if (!ingested.ok) {
-    redirectWithError(hubPath, ingested.error);
+    redirectWithError(target.hubPath, "Please choose an image to upload.");
   }
 
   const altText = emptyToNull(formData.get("alt_text"));
   if (!altText) {
     redirectWithError(
-      hubPath,
+      target.hubPath,
       "Please describe what is important in this photo for someone who cannot see it.",
     );
   }
 
-  const storagePath = `${crypto.randomUUID()}.webp`;
+  const staged = await stageMarketingAsset({
+    file,
+    formData,
+    altText,
+    actorId: gate.session.user.id,
+    auditMetadata: { document_key: target.key, media_field: target.field },
+  });
+  if (!staged.ok) {
+    redirectWithError(target.hubPath, staged.error);
+  }
+
+  redirectWithParams(target.hubPath, {
+    stagedField: target.field,
+    stagedMediaId: staged.id,
+    message:
+      "This photo is ready. Preview it, then make it live when it looks right.",
+  });
+}
+
+/**
+ * Publish a library photo into a website document field.
+ * Only reached from the explicit Make live step in the contextual photo editor.
+ */
+export async function assignWebsiteContextImage(formData: FormData) {
+  const target = contextTarget(formData);
+  if (!target) {
+    redirectWithError("/admin/website", "Missing image context.");
+  }
+
+  const gate = await requireStaffAction("website.manage");
+  if (!gate.ok) {
+    redirectWithError(target.hubPath, gate.message);
+  }
+
+  const mediaAssetId = emptyToNull(formData.get("media_asset_id"));
+  if (!mediaAssetId) {
+    redirectWithError(target.hubPath, "Please choose a photo first.");
+  }
+
+  const loaded = await loadAssignableAsset(mediaAssetId);
+  if (!loaded.ok) {
+    redirectWithError(target.hubPath, loaded.error);
+  }
+
   const supabase = await createClient();
-  const storage = createSecretKeyClient();
-  const { error: uploadError } = await storage.storage
-    .from(BUCKET)
-    .upload(storagePath, ingested.image.buffer, {
-      contentType: ingested.image.contentType,
-      upsert: false,
-    });
-  if (uploadError) {
-    redirectWithError(hubPath, uploadError.message);
-  }
-
-  const { data: publicData } = storage.storage.from(BUCKET).getPublicUrl(storagePath);
-  const { data: asset, error: assetError } = await supabase
-    .from("media_assets")
-    .insert({
-      storage_bucket: BUCKET,
-      storage_path: storagePath,
-      public_url: publicData.publicUrl,
-      original_filename: ingested.originalName,
-      content_type: ingested.image.contentType,
-      byte_size: ingested.image.byteSize,
-      width_px: ingested.image.width,
-      height_px: ingested.image.height,
-      alt_text: altText,
-      uploaded_by: gate.session.user.id,
-    })
-    .select("id")
-    .single();
-
-  if (assetError || !asset) {
-    await storage.storage.from(BUCKET).remove([storagePath]);
-    redirectWithError(hubPath, assetError?.message ?? "Could not save the image.");
-  }
-
-  const id = WEBSITE_DOCUMENT_IDS[key];
+  const id = WEBSITE_DOCUMENT_IDS[target.key];
   const { data: current } = await supabase
     .from("website_documents")
     .select("payload")
@@ -102,13 +132,19 @@ export async function uploadWebsiteContextImage(formData: FormData) {
     .maybeSingle();
 
   const payload =
-    key === "home"
-      ? { ...resolveHomeDocument(current?.payload ?? {}), [field]: asset.id }
-      : {
-          ...resolveAboutDocument(current?.payload ?? {}),
-          portraitMediaId: asset.id,
-          portraitAlt: altText,
-        };
+    target.key === "home"
+      ? {
+          ...resolveHomeDocument(current?.payload ?? {}),
+          [target.field]: loaded.asset.id,
+        }
+      : (() => {
+          const about = resolveAboutDocument(current?.payload ?? {});
+          return {
+            ...about,
+            portraitMediaId: loaded.asset.id,
+            portraitAlt: loaded.asset.altText ?? about.portraitAlt,
+          };
+        })();
 
   const { error: updateError } = await supabase
     .from("website_documents")
@@ -121,7 +157,7 @@ export async function uploadWebsiteContextImage(formData: FormData) {
     .eq("id", id);
 
   if (updateError) {
-    redirectWithError(hubPath, updateError.message);
+    redirectWithError(target.hubPath, updateError.message);
   }
 
   await writeAuditEvent({
@@ -129,7 +165,11 @@ export async function uploadWebsiteContextImage(formData: FormData) {
     entityType: "website_document",
     entityId: id,
     actorId: gate.session.user.id,
-    metadata: { document_key: key, media_field: field, media_asset_id: asset.id },
+    metadata: {
+      document_key: target.key,
+      media_field: target.field,
+      media_asset_id: loaded.asset.id,
+    },
   });
 
   await saveRevision({
@@ -137,8 +177,8 @@ export async function uploadWebsiteContextImage(formData: FormData) {
     entityId: id,
     snapshot: payload as Record<string, unknown>,
     changedBy: gate.session.user.id,
-    changeSummary: `Replaced ${field}`,
+    changeSummary: `Replaced ${target.field}`,
   });
 
-  redirectWithMessage(hubPath, "The new photo is now on the website.");
+  redirectWithMessage(target.hubPath, "The new photo is now on the website.");
 }

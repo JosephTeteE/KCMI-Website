@@ -21,7 +21,7 @@ export function HubPageHeader({
         {backHref ? (
           <Link
             href={backHref}
-            className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--color-action-primary)] underline-offset-2 hover:underline"
+            className="inline-flex min-h-11 items-center text-base font-medium text-[var(--color-action-primary)] underline-offset-2 hover:underline"
           >
             ← {backLabel}
           </Link>

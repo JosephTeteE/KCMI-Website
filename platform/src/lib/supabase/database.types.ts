@@ -558,8 +558,53 @@ export type Database = {
         }
         Relationships: []
       }
+      program_sessions: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          id: string
+          label: string | null
+          program_id: string
+          session_date: string
+          sort_order: number
+          start_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          label?: string | null
+          program_id: string
+          session_date: string
+          sort_order?: number
+          start_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          label?: string | null
+          program_id?: string
+          session_date?: string
+          sort_order?: number
+          start_time?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_sessions_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       programs: {
         Row: {
+          action_kind: Database["public"]["Enums"]["program_action_kind"]
           archived_at: string | null
           body_text: string
           created_at: string
@@ -569,6 +614,9 @@ export type Database = {
           ends_at: string | null
           featured_media_id: string | null
           id: string
+          location_branch_id: string | null
+          location_kind: Database["public"]["Enums"]["program_location_kind"] | null
+          location_label: string | null
           placement: Database["public"]["Enums"]["program_placement"]
           published_at: string | null
           published_by: string | null
@@ -576,11 +624,13 @@ export type Database = {
           slug: string
           starts_at: string | null
           status: Database["public"]["Enums"]["publication_status"]
+          timezone: string | null
           title: string
           updated_at: string
           updated_by: string | null
         }
         Insert: {
+          action_kind?: Database["public"]["Enums"]["program_action_kind"]
           archived_at?: string | null
           body_text?: string
           created_at?: string
@@ -590,6 +640,9 @@ export type Database = {
           ends_at?: string | null
           featured_media_id?: string | null
           id?: string
+          location_branch_id?: string | null
+          location_kind?: Database["public"]["Enums"]["program_location_kind"] | null
+          location_label?: string | null
           placement?: Database["public"]["Enums"]["program_placement"]
           published_at?: string | null
           published_by?: string | null
@@ -597,11 +650,13 @@ export type Database = {
           slug: string
           starts_at?: string | null
           status?: Database["public"]["Enums"]["publication_status"]
+          timezone?: string | null
           title: string
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
+          action_kind?: Database["public"]["Enums"]["program_action_kind"]
           archived_at?: string | null
           body_text?: string
           created_at?: string
@@ -611,6 +666,9 @@ export type Database = {
           ends_at?: string | null
           featured_media_id?: string | null
           id?: string
+          location_branch_id?: string | null
+          location_kind?: Database["public"]["Enums"]["program_location_kind"] | null
+          location_label?: string | null
           placement?: Database["public"]["Enums"]["program_placement"]
           published_at?: string | null
           published_by?: string | null
@@ -618,6 +676,7 @@ export type Database = {
           slug?: string
           starts_at?: string | null
           status?: Database["public"]["Enums"]["publication_status"]
+          timezone?: string | null
           title?: string
           updated_at?: string
           updated_by?: string | null
@@ -635,6 +694,13 @@ export type Database = {
             columns: ["featured_media_id"]
             isOneToOne: false
             referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "programs_location_branch_id_fkey"
+            columns: ["location_branch_id"]
+            isOneToOne: false
+            referencedRelation: "church_branches"
             referencedColumns: ["id"]
           },
           {
@@ -845,6 +911,13 @@ export type Database = {
         | "featured"
         | "announcement"
         | "general"
+      program_action_kind:
+        | "none"
+        | "registration"
+        | "youtube"
+        | "facebook"
+        | "other"
+      program_location_kind: "branch" | "venue" | "online" | "hybrid"
       program_placement: "none" | "featured" | "banner" | "card"
       publication_status: "draft" | "preview" | "published" | "archived"
     }
@@ -984,6 +1057,14 @@ export const Constants = {
         "announcement",
         "general",
       ],
+      program_action_kind: [
+        "none",
+        "registration",
+        "youtube",
+        "facebook",
+        "other",
+      ],
+      program_location_kind: ["branch", "venue", "online", "hybrid"],
       program_placement: ["none", "featured", "banner", "card"],
       publication_status: ["draft", "preview", "published", "archived"],
     },

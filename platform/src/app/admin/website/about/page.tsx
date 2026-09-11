@@ -6,10 +6,19 @@ import { WEBSITE_DOCUMENT_IDS } from "@/content/website/keys";
 import { resolveAboutDocument } from "@/content/website/resolve";
 import { FALLBACK_PORTRAIT } from "@/content/website/public-map";
 import type { PublicMediaRef } from "@/content/types";
+import {
+  loadHubPhotoAsset,
+  loadHubPhotoLibrary,
+} from "@/lib/hub/photo-library";
 
 export const maxDuration = 60;
 
-type SearchParams = Promise<{ message?: string; error?: string }>;
+type SearchParams = Promise<{
+  message?: string;
+  error?: string;
+  stagedField?: string;
+  stagedMediaId?: string;
+}>;
 
 export default async function HubAboutContentPage({
   searchParams,
@@ -42,6 +51,18 @@ export default async function HubAboutContentPage({
     }
   }
 
+  const [photoLibrary, stagedAsset] = await Promise.all([
+    loadHubPhotoLibrary(),
+    loadHubPhotoAsset(flash.stagedMediaId),
+  ]);
+
+  const stagedField =
+    flash.stagedField === "portraitMediaId" ? flash.stagedField : null;
+  const stagedPhoto =
+    stagedField && stagedAsset
+      ? { field: stagedField, asset: stagedAsset }
+      : null;
+
   return (
     <div>
       <HubPageHeader
@@ -51,7 +72,12 @@ export default async function HubAboutContentPage({
         backLabel="Website pages"
       />
       <HubFlash message={flash.message} error={flash.error} />
-      <AboutWebsiteEditor about={about} portrait={portrait} />
+      <AboutWebsiteEditor
+        about={about}
+        portrait={portrait}
+        photoLibrary={photoLibrary}
+        stagedPhoto={stagedPhoto}
+      />
     </div>
   );
 }

@@ -32,7 +32,7 @@ export default async function AdminMediaPage({
     <div>
       <HubPageHeader
         title="Photos"
-        description="Upload photos you can use on website pages. Prefer replacing a photo from the page where it appears (Homepage, Branches, Programs). JPEG, PNG, or WebP up to 15MB. No video files."
+        description="Saved photos you can reuse later. Adding a photo here does not put it on the website — go to the page where it should appear (Homepage, About, Programs, Branches), choose or upload it there, then make it live. JPEG, PNG, or WebP up to 15MB. No video files."
       />
       <HubFlash message={params.message} error={params.error} />
 

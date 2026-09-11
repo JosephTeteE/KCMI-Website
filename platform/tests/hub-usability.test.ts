@@ -16,6 +16,11 @@ import {
   mergeProposedCopy,
 } from "@/lib/hub/propose";
 import {
+  canMakePhotoAssignmentLive,
+  humanizeFilename,
+  mediaAssetPrimaryLabel,
+} from "@/lib/hub/media-label";
+import {
   HUB_TOUR_STORAGE_KEY,
   HUB_TOUR_STEPS,
   isHubTourComplete,
@@ -64,6 +69,77 @@ describe("Hub current vs proposed copy", () => {
     const merged = mergeProposedCopy(current, { headline: "New title" });
     expect(merged.headline).toBe("New title");
     expect(merged.body).toBe("Live body");
+  });
+});
+
+describe("Photo assignment Make live gate", () => {
+  it("does not allow Make live before preview or without a proposed photo", () => {
+    expect(
+      canMakePhotoAssignmentLive({
+        editing: true,
+        previewed: false,
+        proposedMediaId: "asset-2",
+        currentMediaId: "asset-1",
+      }),
+    ).toBe(false);
+    expect(
+      canMakePhotoAssignmentLive({
+        editing: true,
+        previewed: true,
+        proposedMediaId: null,
+        currentMediaId: "asset-1",
+      }),
+    ).toBe(false);
+    expect(
+      canMakePhotoAssignmentLive({
+        editing: false,
+        previewed: true,
+        proposedMediaId: "asset-2",
+        currentMediaId: "asset-1",
+      }),
+    ).toBe(false);
+  });
+
+  it("allows Make live only after a different photo is chosen and previewed", () => {
+    expect(
+      canMakePhotoAssignmentLive({
+        editing: true,
+        previewed: true,
+        proposedMediaId: "asset-2",
+        currentMediaId: "asset-1",
+      }),
+    ).toBe(true);
+  });
+
+  it("does not treat selecting the same live photo as a publishable change", () => {
+    expect(
+      canMakePhotoAssignmentLive({
+        editing: true,
+        previewed: true,
+        proposedMediaId: "asset-1",
+        currentMediaId: "asset-1",
+      }),
+    ).toBe(false);
+  });
+
+  it("labels library photos from alt text or humanized filename, not ids", () => {
+    expect(
+      mediaAssetPrimaryLabel({
+        altText: "Sunday gathering",
+        originalFilename: "IMG_001.jpg",
+        id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      }),
+    ).toBe("Sunday gathering");
+    expect(humanizeFilename("welcome_banner-final.webp")).toBe(
+      "Welcome Banner Final",
+    );
+    expect(
+      mediaAssetPrimaryLabel({
+        altText: null,
+        originalFilename: "lead_pastor_portrait.jpg",
+        id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      }),
+    ).toBe("Lead Pastor Portrait");
   });
 });
 
@@ -127,8 +203,9 @@ describe("Hub tour persistence", () => {
         memory.delete(key);
       },
     };
-    expect(HUB_TOUR_STORAGE_KEY).toBe("kcmi-hub-tour-v1-complete");
-    expect(HUB_TOUR_STEPS).toHaveLength(11);
+    expect(HUB_TOUR_STORAGE_KEY).toBe("kcmi-hub-tour-v2-complete");
+    expect(HUB_TOUR_STEPS).toHaveLength(6);
+    expect(HUB_TOUR_STEPS.every((step) => step.href === "/admin")).toBe(true);
     expect(HUB_TOUR_STEPS.every((step) => step.target.includes("data-tour"))).toBe(
       true,
     );
@@ -251,7 +328,7 @@ describe("Hub preview fit scale", () => {
     expect(hubPreviewFitScale(480)).toBe(0.5);
     expect(hubPreviewFitScale(336)).toBe(0.35);
     expect(hubPreviewFitScale(336)).toBeLessThan(0.72);
-    expect(HUB_ACTION_LABELS.viewFullSizePreview).toBe("View full-size preview");
+    expect(HUB_ACTION_LABELS.viewFullSizePreview).toBe("View full preview");
     const src = readFileSync(
       resolve(process.cwd(), "src/components/hub/hub-preview-frame.tsx"),
       "utf8",
@@ -392,11 +469,13 @@ describe("Homepage Hub visual section editor", () => {
       "utf8",
     );
     expect(src).toMatch(/What would you like to change\?/);
-    expect(src).toMatch(/All homepage sections/);
+    expect(src).toMatch(/See each part of the page/);
     expect(src).toMatch(/Edit this section/);
     expect(src).toMatch(/data-tour="home-section-chooser"/);
     expect(src).toMatch(/editCategoryTourTarget/);
     expect(src).toMatch(/HOME_VISUAL_SECTIONS/);
+    expect(src).toMatch(/ContextualPhotoEditor/);
+    expect(src).toMatch(/stageWebsiteContextImage/);
     expect(config).toMatch(/Top of Homepage/);
     expect(config).toMatch(/KCMI Spotlight/);
     expect(config).toMatch(/Discover KCMI/);
@@ -414,7 +493,7 @@ describe("Homepage Hub visual section editor", () => {
       "locations",
       "prayer-giving",
     ]);
-    expect(homeVisualCategoryIds("banner")).toEqual(["words", "photo", "buttons"]);
+    expect(homeVisualCategoryIds("banner")).toEqual(["words", "photo"]);
     expect(homeVisualCategoryIds("spotlight")).toEqual(["program"]);
     expect(homeVisualCategoryIds("discover")).toEqual(["words", "photo"]);
     expect(homeVisualCategoryIds("watch")).toEqual(["words"]);

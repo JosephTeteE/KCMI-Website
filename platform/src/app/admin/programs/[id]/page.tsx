@@ -6,10 +6,17 @@ import { HubFlash } from "@/components/hub/hub-flash";
 import { HubStatusBadge } from "@/components/hub/hub-form-fields";
 import { ProgramEditor } from "@/components/hub/program-editor";
 import type { FeaturedProgram } from "@/content/types";
+import { loadHubPhotoAsset, loadHubPhotoLibrary } from "@/lib/hub/photo-library";
+import { PROGRAM_POSTER_STAGED_FIELD } from "@/lib/hub/staged-photo";
 
 export const maxDuration = 60;
 
-type SearchParams = Promise<{ message?: string; error?: string }>;
+type SearchParams = Promise<{
+  message?: string;
+  error?: string;
+  stagedField?: string;
+  stagedMediaId?: string;
+}>;
 type Params = Promise<{ id: string }>;
 
 function toDatetimeLocal(iso: string | null): string {
@@ -42,14 +49,17 @@ export default async function EditProgramPage({
 
   if (!program) notFound();
 
-  const { data: media } = await supabase
-    .from("media_assets")
-    .select("id, alt_text, original_filename, public_url")
-    .is("archived_at", null)
-    .order("created_at", { ascending: false });
+  const [photoLibrary, stagedAsset] = await Promise.all([
+    loadHubPhotoLibrary(),
+    loadHubPhotoAsset(
+      flash.stagedField === PROGRAM_POSTER_STAGED_FIELD
+        ? flash.stagedMediaId
+        : null,
+    ),
+  ]);
 
   const cover = program.featured_media_id
-    ? media?.find((item) => item.id === program.featured_media_id)
+    ? photoLibrary.find((item) => item.id === program.featured_media_id)
     : null;
 
   const coverPreview: FeaturedProgram | null = {
@@ -59,8 +69,8 @@ export default async function EditProgramPage({
     datesLabel: program.starts_at
       ? new Date(program.starts_at).toLocaleDateString("en-GB")
       : null,
-    imageSrc: cover?.public_url ?? null,
-    imageAlt: cover?.alt_text ?? "",
+    imageSrc: cover?.previewUrl ?? null,
+    imageAlt: cover?.alt ?? "",
     ctaLabel: program.cta_label ?? "Learn more",
     ctaHref: program.cta_url ?? "#",
     placement: program.placement === "featured" ? "featured" : "none",
@@ -91,12 +101,10 @@ export default async function EditProgramPage({
           featured_media_id: program.featured_media_id ?? "",
           status: program.status,
         }}
-        media={(media ?? []).map((item) => ({
-          id: item.id,
-          label: item.alt_text || item.original_filename || item.id.slice(0, 8),
-        }))}
+        media={photoLibrary}
         canPublish={canPublish}
         coverPreview={coverPreview}
+        stagedPoster={stagedAsset}
       />
     </div>
   );

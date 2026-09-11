@@ -2,19 +2,23 @@
 
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
+import { emptyToNull } from "@/lib/cms/ingest-marketing-image";
 import {
-  emptyToNull,
-  ingestMarketingImageFile,
-} from "@/lib/cms/ingest-marketing-image";
-import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
+  redirectWithError,
+  redirectWithMessage,
+  redirectWithParams,
+} from "@/lib/cms/hub-flash";
+import {
+  loadAssignableAsset,
+  stageMarketingAsset,
+} from "@/lib/cms/stage-marketing-asset";
 import { createClient } from "@/lib/supabase/server";
-import { createSecretKeyClient } from "@/lib/supabase/admin";
+import { branchStagedFieldForPlacement } from "@/lib/hub/staged-photo";
 import type { Database } from "@/lib/supabase/database.types";
 
 type BranchMediaPlacement =
   Database["public"]["Enums"]["branch_media_placement"];
 
-const BUCKET = "marketing-public";
 const PLACEMENTS = new Set<BranchMediaPlacement>([
   "hero",
   "gallery",
@@ -71,7 +75,11 @@ async function assertCanManageBranch(branchId: string): Promise<
   return { ok: true, actorId: session.user.id };
 }
 
-export async function uploadBranchPhoto(formData: FormData) {
+/**
+ * Upload a branch photo into the photo library only.
+ * The branch page keeps its current photos until the operator makes this one live.
+ */
+export async function stageBranchPhoto(formData: FormData) {
   const branchId = emptyToNull(formData.get("branch_id"));
   if (!branchId) {
     redirectWithError("/admin/branches", "Missing branch.");
@@ -90,11 +98,6 @@ export async function uploadBranchPhoto(formData: FormData) {
     );
   }
 
-  const ingested = await ingestMarketingImageFile(file, formData);
-  if (!ingested.ok) {
-    redirectWithError(`/admin/branches/${branchId}`, ingested.error);
-  }
-
   const altText = emptyToNull(formData.get("alt_text"));
   if (!altText) {
     redirectWithError(
@@ -104,54 +107,64 @@ export async function uploadBranchPhoto(formData: FormData) {
   }
 
   const placement = parsePlacement(formData.get("placement"));
-  const storagePath = `${crypto.randomUUID()}.webp`;
-  const supabase = await createClient();
-  const storage = createSecretKeyClient();
-
-  const { error: uploadError } = await storage.storage
-    .from(BUCKET)
-    .upload(storagePath, ingested.image.buffer, {
-      contentType: ingested.image.contentType,
-      upsert: false,
-    });
-  if (uploadError) {
-    redirectWithError(`/admin/branches/${branchId}`, uploadError.message);
+  const staged = await stageMarketingAsset({
+    file,
+    formData,
+    altText,
+    actorId: gate.actorId,
+    auditMetadata: { branch_id: branchId, placement },
+  });
+  if (!staged.ok) {
+    redirectWithError(`/admin/branches/${branchId}`, staged.error);
   }
 
-  const { data: publicData } = storage.storage
-    .from(BUCKET)
-    .getPublicUrl(storagePath);
+  redirectWithParams(`/admin/branches/${branchId}`, {
+    stagedField: branchStagedFieldForPlacement(placement),
+    stagedMediaId: staged.id,
+    message:
+      "This photo is ready. Preview it, then make it live on the branch page.",
+  });
+}
 
-  const { data: asset, error: assetError } = await supabase
-    .from("media_assets")
-    .insert({
-      storage_bucket: BUCKET,
-      storage_path: storagePath,
-      public_url: publicData.publicUrl,
-      original_filename: ingested.originalName,
-      content_type: ingested.image.contentType,
-      byte_size: ingested.image.byteSize,
-      width_px: ingested.image.width,
-      height_px: ingested.image.height,
-      alt_text: altText,
-      uploaded_by: gate.actorId,
-    })
-    .select("id")
-    .single();
+/** Put a library photo on the branch page. Reached only from the explicit Make live step. */
+export async function assignBranchPhoto(formData: FormData) {
+  const branchId = emptyToNull(formData.get("branch_id"));
+  if (!branchId) {
+    redirectWithError("/admin/branches", "Missing branch.");
+  }
 
-  if (assetError || !asset) {
-    await storage.storage.from(BUCKET).remove([storagePath]);
-    redirectWithError(
-      `/admin/branches/${branchId}`,
-      assetError?.message ?? "Could not save the photo.",
-    );
+  const gate = await assertCanManageBranch(branchId);
+  if (!gate.ok) {
+    redirectWithError(`/admin/branches/${branchId}`, gate.message);
+  }
+
+  const mediaAssetId = emptyToNull(formData.get("media_asset_id"));
+  if (!mediaAssetId) {
+    redirectWithError(`/admin/branches/${branchId}`, "Please choose a photo first.");
+  }
+
+  const loaded = await loadAssignableAsset(mediaAssetId);
+  if (!loaded.ok) {
+    redirectWithError(`/admin/branches/${branchId}`, loaded.error);
+  }
+
+  const placement = parsePlacement(formData.get("placement"));
+  const supabase = await createClient();
+
+  if (placement === "hero") {
+    await supabase
+      .from("branch_media")
+      .update({ is_active: false, updated_by: gate.actorId })
+      .eq("branch_id", branchId)
+      .eq("placement", "hero")
+      .eq("is_active", true);
   }
 
   const { data: link, error: linkError } = await supabase
     .from("branch_media")
     .insert({
       branch_id: branchId,
-      media_asset_id: asset.id,
+      media_asset_id: loaded.asset.id,
       placement,
       status: "published",
       is_active: true,
@@ -165,7 +178,7 @@ export async function uploadBranchPhoto(formData: FormData) {
   if (linkError || !link) {
     redirectWithError(
       `/admin/branches/${branchId}`,
-      linkError?.message ?? "Photo uploaded but could not attach to this branch.",
+      linkError?.message ?? "Could not add this photo to the branch page.",
     );
   }
 
@@ -177,16 +190,15 @@ export async function uploadBranchPhoto(formData: FormData) {
     metadata: {
       branch_id: branchId,
       placement,
-      media_asset_id: asset.id,
-      crop_aspect: ingested.image.cropAspect,
-      width_px: ingested.image.width,
-      height_px: ingested.image.height,
+      media_asset_id: loaded.asset.id,
     },
   });
 
   redirectWithMessage(
     `/admin/branches/${branchId}`,
-    "This photo was added to the branch page.",
+    placement === "hero"
+      ? "This photo is now the top photo on the branch page."
+      : "This photo was added to the branch page.",
   );
 }
 

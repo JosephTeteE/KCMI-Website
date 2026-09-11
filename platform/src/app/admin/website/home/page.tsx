@@ -9,10 +9,20 @@ import {
   FALLBACK_WELCOME_IMAGE,
 } from "@/content/website/public-map";
 import type { FeaturedProgram, PublicMediaRef } from "@/content/types";
+import {
+  loadHubPhotoAsset,
+  loadHubPhotoLibrary,
+} from "@/lib/hub/photo-library";
+import { formatProgramScheduleLabel } from "@/lib/programs/schedule";
 
 export const maxDuration = 60;
 
-type SearchParams = Promise<{ message?: string; error?: string }>;
+type SearchParams = Promise<{
+  message?: string;
+  error?: string;
+  stagedField?: string;
+  stagedMediaId?: string;
+}>;
 
 async function mediaRef(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -50,14 +60,16 @@ export default async function HubHomeContentPage({
 
   const { data: programs } = await supabase
     .from("programs")
-    .select("id, title, status, placement, short_description, cta_label, cta_url, starts_at, ends_at, featured_media_id")
+    .select(
+      "id, title, status, placement, short_description, cta_label, cta_url, starts_at, ends_at, featured_media_id",
+    )
     .eq("status", "published")
     .order("title", { ascending: true });
 
   const programPreviews: FeaturedProgram[] = await Promise.all(
-    (programs ?? []).map(async (row) => {
-      const cover = row.featured_media_id
-        ? await mediaRef(supabase, row.featured_media_id, {
+    (programs ?? []).map(async (programRow) => {
+      const cover = programRow.featured_media_id
+        ? await mediaRef(supabase, programRow.featured_media_id, {
             src: "",
             alt: "",
             width: 800,
@@ -65,16 +77,17 @@ export default async function HubHomeContentPage({
           })
         : null;
       return {
-        id: row.id,
-        title: row.title,
-        shortDescription: row.short_description ?? "",
-        datesLabel: row.starts_at
-          ? new Date(row.starts_at).toLocaleDateString("en-GB")
-          : null,
+        id: programRow.id,
+        title: programRow.title,
+        shortDescription: programRow.short_description ?? "",
+        datesLabel: formatProgramScheduleLabel([], {
+          startsAt: programRow.starts_at,
+          endsAt: programRow.ends_at,
+        }),
         imageSrc: cover?.src || null,
         imageAlt: cover?.alt ?? "",
-        ctaLabel: row.cta_label ?? "Learn more",
-        ctaHref: row.cta_url ?? "/programs",
+        ctaLabel: programRow.cta_label ?? "Learn more",
+        ctaHref: programRow.cta_url ?? "/programs",
         placement: "featured",
         status: "published" as const,
       };
@@ -82,13 +95,26 @@ export default async function HubHomeContentPage({
   );
   const featuredProgram =
     programPreviews.find((item) =>
-      programs?.some((row) => row.id === item.id && row.placement === "featured"),
+      programs?.some(
+        (programRow) => programRow.id === item.id && programRow.placement === "featured",
+      ),
     ) ?? null;
 
-  const [heroImage, welcomeImage] = await Promise.all([
+  const [heroImage, welcomeImage, photoLibrary, stagedAsset] = await Promise.all([
     mediaRef(supabase, home.heroMediaId, FALLBACK_HERO_IMAGE),
     mediaRef(supabase, home.welcomeMediaId, FALLBACK_WELCOME_IMAGE),
+    loadHubPhotoLibrary(),
+    loadHubPhotoAsset(flash.stagedMediaId),
   ]);
+
+  const stagedField =
+    flash.stagedField === "heroMediaId" || flash.stagedField === "welcomeMediaId"
+      ? flash.stagedField
+      : null;
+  const stagedPhoto =
+    stagedField && stagedAsset
+      ? { field: stagedField, asset: stagedAsset }
+      : null;
 
   return (
     <div>
@@ -105,6 +131,8 @@ export default async function HubHomeContentPage({
         welcomeImage={welcomeImage}
         programs={programPreviews}
         featuredProgram={featuredProgram}
+        photoLibrary={photoLibrary}
+        stagedPhoto={stagedPhoto}
       />
     </div>
   );

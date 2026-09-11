@@ -3,42 +3,40 @@
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
 import { saveRevision } from "@/lib/cms/revisions";
-import { validateCtaUrl } from "@/lib/cms/cta-url";
 import { slugifyTitle } from "@/lib/cms/slugify";
-import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
+import {
+  redirectWithError,
+  redirectWithMessage,
+  redirectWithParams,
+} from "@/lib/cms/hub-flash";
+import { loadAssignableAsset } from "@/lib/cms/stage-marketing-asset";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import type { Permission } from "@/lib/authorization/rbac";
+import {
+  DEFAULT_PROGRAM_TIMEZONE,
+  legacyIntervalFromSessions,
+  parseProgramTimezone,
+  type ParsedProgramSession,
+} from "@/lib/programs/sessions";
+import { timezoneForCountry } from "@/lib/programs/schedule";
+import { PROGRAM_POSTER_STAGED_FIELD } from "@/lib/hub/staged-photo";
+import {
+  parseProgramFields,
+  type ParsedProgramFields,
+} from "@/lib/programs/parse-fields";
 
 type PublicationStatus = Database["public"]["Enums"]["publication_status"];
 type ProgramPlacement = Database["public"]["Enums"]["program_placement"];
 
-const PLACEMENTS = new Set<ProgramPlacement>([
-  "none",
-  "featured",
-  "banner",
-  "card",
-]);
+const NEW_PROGRAM_PATH = "/admin/programs/new";
+
+type ProgramSessionInsert = Database["public"]["Tables"]["program_sessions"]["Insert"];
 
 function emptyToNull(value: FormDataEntryValue | null): string | null {
   if (typeof value !== "string") return null;
   const t = value.trim();
   return t.length ? t : null;
-}
-
-function parseOptionalIso(value: FormDataEntryValue | null): string | null {
-  const raw = emptyToNull(value);
-  if (!raw) return null;
-  const d = new Date(raw);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
-}
-
-function parsePlacement(value: FormDataEntryValue | null): ProgramPlacement {
-  const raw = typeof value === "string" ? value : "none";
-  return PLACEMENTS.has(raw as ProgramPlacement)
-    ? (raw as ProgramPlacement)
-    : "none";
 }
 
 function programSnapshot(row: {
@@ -102,31 +100,118 @@ async function uniqueProgramSlug(
   return `${base}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
-function parseProgramFields(formData: FormData) {
-  const title = emptyToNull(formData.get("title"));
-  if (!title) {
-    return { ok: false as const, error: "Title is required." };
+async function resolveTimezoneForFields(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  fields: ParsedProgramFields,
+): Promise<string> {
+  if (fields.location_kind === "branch" && fields.location_branch_id) {
+    const { data: branch } = await supabase
+      .from("church_branches")
+      .select("country, name, status")
+      .eq("id", fields.location_branch_id)
+      .maybeSingle();
+    if (!branch || branch.status !== "published") {
+      return fields.timezone || DEFAULT_PROGRAM_TIMEZONE;
+    }
+    return timezoneForCountry(branch.country);
+  }
+  return fields.timezone || DEFAULT_PROGRAM_TIMEZONE;
+}
+
+async function ingestPosterFromForm(
+  formData: FormData,
+  actorId: string,
+): Promise<
+  | { ok: true; mediaId: string | null }
+  | { ok: false; error: string }
+> {
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: true, mediaId: null };
   }
 
-  const cta = validateCtaUrl(emptyToNull(formData.get("cta_url")));
-  if (!cta.ok) {
-    return { ok: false as const, error: cta.error };
+  const { ingestMarketingImageFile } = await import(
+    "@/lib/cms/ingest-marketing-image"
+  );
+  const { createSecretKeyClient } = await import("@/lib/supabase/admin");
+
+  const ingested = await ingestMarketingImageFile(file, formData);
+  if (!ingested.ok) {
+    return { ok: false, error: ingested.error };
   }
 
-  return {
-    ok: true as const,
-    fields: {
-      title,
-      short_description: emptyToNull(formData.get("short_description")) ?? "",
-      body_text: emptyToNull(formData.get("body_text")) ?? "",
-      starts_at: parseOptionalIso(formData.get("starts_at")),
-      ends_at: parseOptionalIso(formData.get("ends_at")),
-      featured_media_id: emptyToNull(formData.get("featured_media_id")),
-      cta_label: emptyToNull(formData.get("cta_label")),
-      cta_url: cta.url,
-      placement: parsePlacement(formData.get("placement")),
-    },
-  };
+  const altText = emptyToNull(formData.get("alt_text"));
+  if (!altText) {
+    return {
+      ok: false,
+      error:
+        "Please describe what is important in this photo for someone who cannot see it.",
+    };
+  }
+
+  const storagePath = `${crypto.randomUUID()}.webp`;
+  const supabase = await createClient();
+  const storage = createSecretKeyClient();
+  const { error: uploadError } = await storage.storage
+    .from("marketing-public")
+    .upload(storagePath, ingested.image.buffer, {
+      contentType: ingested.image.contentType,
+      upsert: false,
+    });
+  if (uploadError) {
+    return { ok: false, error: uploadError.message };
+  }
+
+  const { data: publicData } = storage.storage
+    .from("marketing-public")
+    .getPublicUrl(storagePath);
+
+  const { data: asset, error: assetError } = await supabase
+    .from("media_assets")
+    .insert({
+      storage_bucket: "marketing-public",
+      storage_path: storagePath,
+      public_url: publicData.publicUrl,
+      original_filename: ingested.originalName,
+      content_type: ingested.image.contentType,
+      byte_size: ingested.image.byteSize,
+      width_px: ingested.image.width,
+      height_px: ingested.image.height,
+      alt_text: altText,
+      uploaded_by: actorId,
+    })
+    .select("id")
+    .single();
+
+  if (assetError || !asset) {
+    await storage.storage.from("marketing-public").remove([storagePath]);
+    return {
+      ok: false,
+      error: assetError?.message ?? "Could not save the program photo.",
+    };
+  }
+
+  return { ok: true, mediaId: asset.id };
+}
+
+async function insertProgramSessions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  programId: string,
+  sessions: ParsedProgramSession[],
+): Promise<{ error: string | null }> {
+  if (sessions.length === 0) return { error: null };
+
+  const rows: ProgramSessionInsert[] = sessions.map((session, index) => ({
+    program_id: programId,
+    session_date: session.session_date,
+    start_time: session.start_time,
+    end_time: session.end_time,
+    label: session.label,
+    sort_order: session.sort_order ?? index,
+  }));
+
+  const { error } = await supabase.from("program_sessions").insert(rows);
+  return { error: error?.message ?? null };
 }
 
 export async function createProgram(formData: FormData) {
@@ -135,22 +220,78 @@ export async function createProgram(formData: FormData) {
     "programs.update",
   ]);
   if (!gate.ok) {
-    redirectWithError("/admin/programs/new", gate.message);
+    redirectWithError(NEW_PROGRAM_PATH, gate.message);
   }
 
-  const parsed = parseProgramFields(formData);
+  const parsed = parseProgramFields(formData, { forcePlacementNone: true });
   if (!parsed.ok) {
-    redirectWithError("/admin/programs/new", parsed.error);
+    redirectWithError(NEW_PROGRAM_PATH, parsed.error);
+  }
+
+  if (!parsed.fields.hasSessionPayload || parsed.fields.sessions.length === 0) {
+    redirectWithError(
+      NEW_PROGRAM_PATH,
+      "Add at least one date and start time for this program.",
+    );
+  }
+  if (!parsed.fields.hasLocationPayload || !parsed.fields.location_kind) {
+    redirectWithError(NEW_PROGRAM_PATH, "Choose where this program happens.");
+  }
+  if (!parsed.fields.hasActionKindPayload) {
+    redirectWithError(
+      NEW_PROGRAM_PATH,
+      "Say whether visitors need a link for this program.",
+    );
   }
 
   const actorId = gate.session.user.id;
   const supabase = await createClient();
+
+  if (
+    parsed.fields.location_kind === "branch" &&
+    parsed.fields.location_branch_id
+  ) {
+    const { data: branch } = await supabase
+      .from("church_branches")
+      .select("id, name, status")
+      .eq("id", parsed.fields.location_branch_id)
+      .maybeSingle();
+    if (!branch || branch.status !== "published") {
+      redirectWithError(
+        NEW_PROGRAM_PATH,
+        "That branch is not available. Choose a published branch.",
+      );
+    }
+  }
+
+  const timezone = await resolveTimezoneForFields(supabase, parsed.fields);
+  const legacy = legacyIntervalFromSessions(parsed.fields.sessions, timezone);
+
+  const poster = await ingestPosterFromForm(formData, actorId);
+  if (!poster.ok) {
+    redirectWithError(NEW_PROGRAM_PATH, poster.error);
+  }
+
+  const featuredMediaId = poster.mediaId ?? parsed.fields.featured_media_id;
   const slug = await uniqueProgramSlug(supabase, parsed.fields.title);
 
   const { data, error } = await supabase
     .from("programs")
     .insert({
-      ...parsed.fields,
+      title: parsed.fields.title,
+      short_description: parsed.fields.short_description,
+      body_text: parsed.fields.body_text,
+      starts_at: legacy.startsAt,
+      ends_at: legacy.endsAt,
+      featured_media_id: featuredMediaId,
+      cta_label: parsed.fields.cta_label,
+      cta_url: parsed.fields.cta_url,
+      placement: "none",
+      action_kind: parsed.fields.action_kind,
+      location_kind: parsed.fields.location_kind,
+      location_branch_id: parsed.fields.location_branch_id,
+      location_label: parsed.fields.location_label,
+      timezone,
       slug,
       status: "draft",
       created_by: actorId,
@@ -161,12 +302,27 @@ export async function createProgram(formData: FormData) {
 
   if (error || !data) {
     redirectWithError(
-      "/admin/programs/new",
+      NEW_PROGRAM_PATH,
       error?.message ?? "Could not create program.",
     );
   }
 
-  redirectWithMessage(`/admin/programs/${data.id}`, "Your program draft is saved. It is not on the public website yet.");
+  const sessionsResult = await insertProgramSessions(
+    supabase,
+    data.id,
+    parsed.fields.sessions,
+  );
+  if (sessionsResult.error) {
+    redirectWithError(
+      `/admin/programs/${data.id}`,
+      `Your draft was saved, but the schedule could not be saved: ${sessionsResult.error}`,
+    );
+  }
+
+  redirectWithMessage(
+    `/admin/programs/${data.id}`,
+    "Your program draft is saved. It is not on the public website yet.",
+  );
 }
 
 export async function updateProgram(formData: FormData) {
@@ -192,17 +348,60 @@ export async function updateProgram(formData: FormData) {
   const supabase = await createClient();
   const slug = await uniqueProgramSlug(supabase, parsed.fields.title, id);
 
-  const { error } = await supabase
-    .from("programs")
-    .update({
-      ...parsed.fields,
-      slug,
-      updated_by: actorId,
-    })
-    .eq("id", id);
+  const timezone = parsed.fields.hasLocationPayload
+    ? await resolveTimezoneForFields(supabase, parsed.fields)
+    : parseProgramTimezone(formData.get("timezone"));
+
+  let starts_at = parsed.fields.starts_at;
+  let ends_at = parsed.fields.ends_at;
+  if (parsed.fields.hasSessionPayload) {
+    const legacy = legacyIntervalFromSessions(parsed.fields.sessions, timezone);
+    starts_at = legacy.startsAt;
+    ends_at = legacy.endsAt;
+  }
+
+  const patch: Database["public"]["Tables"]["programs"]["Update"] = {
+    title: parsed.fields.title,
+    short_description: parsed.fields.short_description,
+    body_text: parsed.fields.body_text,
+    starts_at,
+    ends_at,
+    featured_media_id: parsed.fields.featured_media_id,
+    cta_label: parsed.fields.cta_label,
+    cta_url: parsed.fields.cta_url,
+    placement: parsed.fields.placement,
+    slug,
+    updated_by: actorId,
+  };
+
+  if (parsed.fields.hasActionKindPayload) {
+    patch.action_kind = parsed.fields.action_kind;
+  }
+  if (parsed.fields.hasLocationPayload) {
+    patch.location_kind = parsed.fields.location_kind;
+    patch.location_branch_id = parsed.fields.location_branch_id;
+    patch.location_label = parsed.fields.location_label;
+    patch.timezone = timezone;
+  } else if (parsed.fields.hasSessionPayload) {
+    patch.timezone = timezone;
+  }
+
+  const { error } = await supabase.from("programs").update(patch).eq("id", id);
 
   if (error) {
     redirectWithError(`/admin/programs/${id}`, error.message);
+  }
+
+  if (parsed.fields.hasSessionPayload) {
+    await supabase.from("program_sessions").delete().eq("program_id", id);
+    const sessionsResult = await insertProgramSessions(
+      supabase,
+      id,
+      parsed.fields.sessions,
+    );
+    if (sessionsResult.error) {
+      redirectWithError(`/admin/programs/${id}`, sessionsResult.error);
+    }
   }
 
   redirectWithMessage(`/admin/programs/${id}`, "Your program details are saved.");
@@ -326,7 +525,11 @@ export async function setProgramStatus(formData: FormData) {
   redirectWithMessage(`/admin/programs/${id}`, message);
 }
 
-export async function uploadProgramCover(formData: FormData) {
+/**
+ * Upload a poster into the photo library only.
+ * The program record keeps its current poster until the operator makes the new one live.
+ */
+export async function stageProgramCover(formData: FormData) {
   const id = emptyToNull(formData.get("program_id"));
   if (!id) {
     redirectWithError("/admin/programs", "Missing program.");
@@ -346,70 +549,52 @@ export async function uploadProgramCover(formData: FormData) {
     redirectWithError(`/admin/programs/${id}`, "Please choose a cover image.");
   }
 
-  const { ingestMarketingImageFile } = await import(
-    "@/lib/cms/ingest-marketing-image"
-  );
-  const { createSecretKeyClient } = await import("@/lib/supabase/admin");
-
-  const ingested = await ingestMarketingImageFile(file, formData);
-  if (!ingested.ok) {
-    redirectWithError(`/admin/programs/${id}`, ingested.error);
-  }
-
-  const altText = emptyToNull(formData.get("alt_text"));
-  if (!altText) {
+  const poster = await ingestPosterFromForm(formData, gate.session.user.id);
+  if (!poster.ok || !poster.mediaId) {
     redirectWithError(
       `/admin/programs/${id}`,
-      "Please describe what is important in this photo for someone who cannot see it.",
+      poster.ok ? "Please choose a cover image." : poster.error,
     );
   }
 
-  const storagePath = `${crypto.randomUUID()}.webp`;
+  redirectWithParams(`/admin/programs/${id}`, {
+    stagedField: PROGRAM_POSTER_STAGED_FIELD,
+    stagedMediaId: poster.mediaId,
+    message:
+      "This poster photo is ready. Preview it, then make it live when it looks right.",
+  });
+}
+
+/** Put a library photo on the program. Reached only from the explicit Make live step. */
+export async function assignProgramCover(formData: FormData) {
+  const id = emptyToNull(formData.get("program_id"));
+  if (!id) {
+    redirectWithError("/admin/programs", "Missing program.");
+  }
+
+  const gate = await requireAnyPermission([
+    "programs.update",
+    "programs.create",
+  ]);
+  if (!gate.ok) {
+    redirectWithError(`/admin/programs/${id}`, gate.message);
+  }
+
+  const mediaAssetId = emptyToNull(formData.get("media_asset_id"));
+  if (!mediaAssetId) {
+    redirectWithError(`/admin/programs/${id}`, "Please choose a photo first.");
+  }
+
+  const loaded = await loadAssignableAsset(mediaAssetId);
+  if (!loaded.ok) {
+    redirectWithError(`/admin/programs/${id}`, loaded.error);
+  }
+
   const supabase = await createClient();
-  const storage = createSecretKeyClient();
-  const { error: uploadError } = await storage.storage
-    .from("marketing-public")
-    .upload(storagePath, ingested.image.buffer, {
-      contentType: ingested.image.contentType,
-      upsert: false,
-    });
-  if (uploadError) {
-    redirectWithError(`/admin/programs/${id}`, uploadError.message);
-  }
-
-  const { data: publicData } = storage.storage
-    .from("marketing-public")
-    .getPublicUrl(storagePath);
-
-  const { data: asset, error: assetError } = await supabase
-    .from("media_assets")
-    .insert({
-      storage_bucket: "marketing-public",
-      storage_path: storagePath,
-      public_url: publicData.publicUrl,
-      original_filename: ingested.originalName,
-      content_type: ingested.image.contentType,
-      byte_size: ingested.image.byteSize,
-      width_px: ingested.image.width,
-      height_px: ingested.image.height,
-      alt_text: altText,
-      uploaded_by: gate.session.user.id,
-    })
-    .select("id")
-    .single();
-
-  if (assetError || !asset) {
-    await storage.storage.from("marketing-public").remove([storagePath]);
-    redirectWithError(
-      `/admin/programs/${id}`,
-      assetError?.message ?? "Could not save the cover image.",
-    );
-  }
-
   const { error: updateError } = await supabase
     .from("programs")
     .update({
-      featured_media_id: asset.id,
+      featured_media_id: loaded.asset.id,
       updated_by: gate.session.user.id,
     })
     .eq("id", id);
@@ -423,7 +608,7 @@ export async function uploadProgramCover(formData: FormData) {
     entityType: "program",
     entityId: id,
     actorId: gate.session.user.id,
-    metadata: { media_asset_id: asset.id },
+    metadata: { media_asset_id: loaded.asset.id },
   });
 
   redirectWithMessage(`/admin/programs/${id}`, "The program poster is now updated.");

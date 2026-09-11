@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FacebookVideoEmbed } from "@/components/content/facebook-embed";
 import { HubHelpDetails } from "@/components/hub/hub-help-details";
 import { HubPreviewFrame } from "@/components/hub/hub-preview-frame";
@@ -14,6 +14,7 @@ import {
   type LivestreamFlow,
 } from "@/lib/hub/livestream-state";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
+import { HUB_TOUR_LIVESTREAM_BEGIN_EVENT } from "@/lib/hub/tour";
 import { updateLivestreamSettings } from "@/app/admin/livestream/actions";
 
 type Props = {
@@ -41,6 +42,25 @@ export function LivestreamEditor({
   const editingVideo = flow === "start" || flow === "change";
   const showingLivePreview = isLive || flow === "start" || flow === "change";
 
+  function begin(next: LivestreamFlow) {
+    setFlow(next);
+    setCheckedUrl(null);
+    setCheckError(null);
+    setEmbedInput("");
+    setLinkInput("");
+  }
+
+  useEffect(() => {
+    function onTourBegin() {
+      if (flow === "idle") {
+        begin(isLive ? "change" : "start");
+      }
+    }
+    window.addEventListener(HUB_TOUR_LIVESTREAM_BEGIN_EVENT, onTourBegin);
+    return () =>
+      window.removeEventListener(HUB_TOUR_LIVESTREAM_BEGIN_EVENT, onTourBegin);
+  }, [flow, isLive]);
+
   function checkAndPreview() {
     setCheckError(null);
     const raw = embedInput.trim() || linkInput.trim();
@@ -62,14 +82,6 @@ export function LivestreamEditor({
       return;
     }
     setCheckedUrl(parsed.url);
-  }
-
-  function begin(next: LivestreamFlow) {
-    setFlow(next);
-    setCheckedUrl(null);
-    setCheckError(null);
-    setEmbedInput("");
-    setLinkInput("");
   }
 
   const previewUrl = checkedUrl ?? (showingLivePreview ? currentUrl : null);
@@ -105,6 +117,7 @@ export function LivestreamEditor({
       <div className="space-y-6">
         <section
           data-hub-role="current"
+          data-tour="livestream-status"
           className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-page)] p-4"
         >
           <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
@@ -131,15 +144,16 @@ export function LivestreamEditor({
         {!isLive && flow === "idle" ? (
           <button
             type="button"
+            data-tour="livestream-start"
             onClick={() => begin("start")}
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-action-secondary)] px-5 text-sm font-semibold text-[var(--color-action-secondary-fg)]"
+            className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-action-secondary)] px-5 text-base font-semibold text-[var(--color-action-secondary-fg)]"
           >
             {HUB_ACTION_LABELS.startLivestream}
           </button>
         ) : null}
 
         {isLive && flow === "idle" ? (
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3" data-tour="livestream-start">
             <button
               type="button"
               onClick={() => begin("change")}
@@ -159,7 +173,11 @@ export function LivestreamEditor({
         ) : null}
 
         {editingVideo ? (
-          <form action={updateLivestreamSettings} className="space-y-6">
+          <form
+            action={updateLivestreamSettings}
+            className="space-y-6"
+            data-tour="livestream-start"
+          >
             <input type="hidden" name="existing_facebook_url" value={currentUrl ?? ""} />
             <input type="hidden" name="is_live" value="true" />
             <input
@@ -168,19 +186,24 @@ export function LivestreamEditor({
               value={embedInput.trim() || linkInput.trim()}
             />
 
-            <div className="space-y-4" data-hub-role="proposed">
-              <HubTextAreaField
-                id="facebook_embed"
-                name="facebook_embed"
-                label="Paste Facebook embed code"
-                rows={6}
-                value={embedInput}
-                onChange={(event) => {
-                  setEmbedInput(event.target.value);
-                  setCheckedUrl(null);
-                }}
-                hint="Copy the Embed code from Facebook. We will not save the code itself — only the Facebook video link."
-              />
+            <div
+              className="space-y-4"
+              data-hub-role="proposed"
+            >
+              <div data-tour="livestream-embed">
+                <HubTextAreaField
+                  id="facebook_embed"
+                  name="facebook_embed"
+                  label="Paste Facebook embed code"
+                  rows={6}
+                  value={embedInput}
+                  onChange={(event) => {
+                    setEmbedInput(event.target.value);
+                    setCheckedUrl(null);
+                  }}
+                  hint="Copy the Embed code from Facebook. We will not save the code itself — only the Facebook video link."
+                />
+              </div>
               <ol className="list-decimal space-y-1 pl-5 text-sm text-[var(--color-text-muted)]">
                 <li>Open the KCMI livestream/video on Facebook.</li>
                 <li>Choose the Embed option.</li>
@@ -215,6 +238,7 @@ export function LivestreamEditor({
               ) : null}
               <button
                 type="button"
+                data-tour="livestream-check-preview"
                 onClick={checkAndPreview}
                 className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold"
               >
@@ -238,7 +262,7 @@ export function LivestreamEditor({
                 : "Visitors will see the Facebook video on the Livestream page after you start it."}
             </p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3" data-tour="livestream-make-live">
               {confirmLabel ? (
                 <HubSubmitButton variant="secondary">{confirmLabel}</HubSubmitButton>
               ) : null}
