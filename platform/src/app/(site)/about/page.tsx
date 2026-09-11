@@ -15,11 +15,7 @@ export default async function AboutPage() {
   const about = await getAboutChurch();
 
   return (
-    <PageShell
-      eyebrow="About KCMI"
-      title="About KCMI"
-      description={`${about.leadershipOrgLine}, headquartered in ${about.leadershipHeadquarters}.`}
-    >
+    <PageShell eyebrow="About KCMI" title="About KCMI">
       <div className="mx-auto max-w-3xl space-y-8">
         <section aria-labelledby="who-we-are-heading" className="space-y-4">
           <h2 id="who-we-are-heading" className="font-display text-2xl font-semibold">

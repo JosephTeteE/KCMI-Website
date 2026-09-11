@@ -30,8 +30,9 @@ describe("Home CMS overlay", () => {
 
   it("keeps verified fallbacks when Hub payload is empty", async () => {
     const home = await getHomeContent();
-    expect(home.heroHeadline).toContain("Kingdom Covenant Ministries International");
-    expect(home.welcomeHeading).toBe("Raising Kings To Build The Kingdom");
+    expect(home.heroHeadline).toBe("Raising Kings To Build The Kingdom");
+    expect(home.heroSupporting).toContain("creative biblical means");
+    expect(home.welcomeHeading).toContain("Kingdom Covenant Ministries International");
   });
 });
 

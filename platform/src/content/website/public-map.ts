@@ -83,6 +83,15 @@ export function mapHomePublic(
       youtubeChannelUrl: doc.sermonFallbackYoutubeUrl,
       youtubeChannelLabel: doc.sermonFallbackYoutubeLabel,
     },
+    locationsHeading: doc.locationsHeading,
+    locationsSupporting: doc.locationsSupporting,
+    spotlight: {
+      takeoverEnabled: doc.spotlightTakeoverEnabled,
+      takeoverMode: doc.spotlightTakeoverMode,
+      promoVideoUrl: doc.spotlightPromoVideoUrl,
+      windowStart: doc.spotlightWindowStart,
+      windowEnd: doc.spotlightWindowEnd,
+    },
   };
 }
 

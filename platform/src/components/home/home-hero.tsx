@@ -1,12 +1,24 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { HomePublicContent } from "@/content/types";
+import type { HomePublicContent, ServiceTime } from "@/content/types";
 
 type Props = {
   home: HomePublicContent;
+  times?: ServiceTime[];
+  locationLabel?: string;
+  isLive?: boolean;
 };
 
-export function HomeHero({ home }: Props) {
+export function HomeHero({
+  home,
+  times = [],
+  locationLabel,
+  isLive = false,
+}: Props) {
+  const visibleTimes = times.filter(
+    (item) => item.day.trim() && item.time.trim(),
+  );
+
   return (
     <section
       aria-labelledby="home-hero-heading"
@@ -50,11 +62,53 @@ export function HomeHero({ home }: Props) {
             </Link>
             <Link
               href={home.heroSecondaryCtaHref}
-              className="ui-cta inline-flex min-h-12 items-center rounded-[var(--radius-md)] border border-white/40 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm"
+              className="ui-cta inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-white/40 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm"
             >
+              {isLive ? (
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,var(--kcmi-red)_85%,black)] px-2 py-0.5 text-[0.65rem] font-bold tracking-wide uppercase"
+                  aria-label="Live now"
+                >
+                  <span
+                    className="size-1.5 rounded-full bg-white"
+                    aria-hidden
+                  />
+                  Live
+                </span>
+              ) : null}
               {home.heroSecondaryCtaLabel}
             </Link>
           </div>
+
+          {visibleTimes.length > 0 ? (
+            <div
+              id="worship"
+              className="mt-2 max-w-xl border-t border-white/20 pt-5"
+            >
+              <p className="text-sm font-semibold tracking-[0.14em] text-white/75 uppercase">
+                Headquarters
+                {locationLabel ? ` · ${locationLabel}` : ""}
+              </p>
+              <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                {visibleTimes.map((item) => (
+                  <li
+                    key={`${item.day}-${item.time}`}
+                    className="text-base text-white/90"
+                  >
+                    <span className="text-white/70">{item.day}</span>{" "}
+                    <span className="font-semibold">{item.time}</span>
+                    {item.note ? (
+                      <span className="text-white/65"> · {item.note}</span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div id="worship" className="sr-only">
+              Plan a visit
+            </div>
+          )}
         </div>
       </div>
     </section>

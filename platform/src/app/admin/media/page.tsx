@@ -76,7 +76,7 @@ export default async function AdminMediaPage({
                     {asset.caption}
                   </p>
                 ) : null}
-                <p className="text-xs text-[var(--color-text-muted)]">
+                <p className="text-sm text-[var(--color-text-muted)]">
                   {asset.width_px && asset.height_px
                     ? `${asset.width_px}×${asset.height_px} · `
                     : null}

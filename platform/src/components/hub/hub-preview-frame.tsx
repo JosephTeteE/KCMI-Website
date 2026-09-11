@@ -87,14 +87,14 @@ export function HubPreviewFrame({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-page)] px-4 py-3">
         <p className="text-sm font-semibold text-[var(--color-text-body)]">
           {title}
-          <span className="ml-2 text-xs font-medium text-[var(--color-text-muted)]">
+          <span className="ml-2 text-sm font-medium text-[var(--color-text-muted)]">
             {caption}
           </span>
         </p>
         <button
           ref={openButtonRef}
           type="button"
-          className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
+          className="inline-flex min-h-11 items-center text-base font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
           onClick={openLarge}
         >
           {HUB_ACTION_LABELS.viewFullSizePreview}

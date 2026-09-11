@@ -30,6 +30,9 @@
   --leading-body: 1.65;
   --leading-tight: 1.35;
   --paragraph-gap: 1.1em;
+  --max-content: 72rem;
+  --max-content-editorial: 72rem;
+  --max-prose: 42rem;
 
   /*
     Vertical rhythm (D1.6E). Informational pages stay denser than the home
@@ -77,7 +80,40 @@
   --radius-sm: 0.375rem;
   --radius-md: 0.625rem;
   --radius-lg: 1rem;
-  --max-content: 72rem;
+}
+
+/* D1.7 — modest wide-display readability (not gigantic) */
+@media (min-width: 90rem) {
+  :root {
+    --text-body: clamp(1.125rem, 1.05rem + 0.28vw, 1.1875rem);
+    --text-small: clamp(1.0625rem, 1rem + 0.2vw, 1.125rem);
+    --text-nav: clamp(1.0625rem, 1rem + 0.2vw, 1.125rem);
+    --text-lead: clamp(1.25rem, 1.15rem + 0.3vw, 1.375rem);
+    --max-content: 76rem;
+    --max-content-editorial: 84rem;
+  }
+}
+
+@media (min-width: 120rem) {
+  :root {
+    --text-body: 1.1875rem;
+    --text-small: 1.125rem;
+    --text-nav: 1.125rem;
+    --text-lead: 1.375rem;
+    --max-content: 80rem;
+    --max-content-editorial: 96rem;
+  }
+}
+
+@media (min-width: 160rem) {
+  :root {
+    --text-body: 1.25rem;
+    --text-small: 1.125rem;
+    --text-nav: 1.125rem;
+    --text-lead: 1.4375rem;
+    --max-content: 84rem;
+    --max-content-editorial: 108rem;
+  }
 }
 
 @theme inline {
@@ -204,6 +240,28 @@ a[href]:hover {
   margin-inline: auto;
   width: min(100% - 2rem, var(--max-content));
   max-width: 100%;
+}
+
+/* Homepage editorial bands — wider media/composition without stretching prose */
+.site-container-editorial {
+  margin-inline: auto;
+  width: min(100% - 2rem, var(--max-content-editorial));
+  max-width: 100%;
+}
+
+@media (min-width: 120rem) {
+  .discover-pathway-grid {
+    grid-template-columns: 1.15fr 1fr 0.95fr;
+    gap: 1.25rem;
+  }
+
+  .discover-pathway-card {
+    min-height: 26rem;
+  }
+
+  .find-family-panel {
+    gap: 4rem;
+  }
 }
 
 .section-space {
@@ -565,4 +623,15 @@ a[href]:hover {
 
 .hub-nav-dialog::backdrop {
   background: color-mix(in srgb, var(--neutral-950) 45%, transparent);
+}
+
+/* Hub volunteer typography floor */
+.hub-body {
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.hub-help {
+  font-size: 0.9375rem;
+  line-height: 1.55;
 }

@@ -8,7 +8,6 @@ import {
   FALLBACK_HERO_IMAGE,
   FALLBACK_WELCOME_IMAGE,
 } from "@/content/website/public-map";
-import { getChurchIdentity } from "@/content";
 import type { FeaturedProgram, PublicMediaRef } from "@/content/types";
 
 export const maxDuration = 60;
@@ -48,7 +47,6 @@ export default async function HubHomeContentPage({
     .eq("id", WEBSITE_DOCUMENT_IDS.home)
     .maybeSingle();
   const home = resolveHomeDocument(row?.payload ?? {});
-  const identity = getChurchIdentity();
 
   const { data: programs } = await supabase
     .from("programs")
@@ -107,8 +105,6 @@ export default async function HubHomeContentPage({
         welcomeImage={welcomeImage}
         programs={programPreviews}
         featuredProgram={featuredProgram}
-        legalName={identity.legalName}
-        alternateName={identity.alternateName}
       />
     </div>
   );

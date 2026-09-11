@@ -1,5 +1,6 @@
 import { churchIdentity } from "@/content/seed/identity";
 import { branches, headquartersServiceTimes } from "@/content/seed/branches";
+import { seedBranchMediaForSlug } from "@/content/seed/branch-media";
 import {
   dailyFaithRecharge,
   footerLegalNav,
@@ -183,6 +184,20 @@ export async function getFeaturedSermons(): Promise<SermonHighlight> {
   return home.sermonFallback;
 }
 
+/**
+ * Published sermon for home Watch & Listen. Null when none exist —
+ * callers should use sermon fallback highlight, not invent content.
+ */
+export async function getHomeFeaturedSermon(): Promise<SermonPublic | null> {
+  if (shouldUseSeedContent()) {
+    return null;
+  }
+  const featured = await fetchHomeFeaturedSermon();
+  if (featured) return featured;
+  const published = await fetchPublishedSermons(1);
+  return published[0] ?? null;
+}
+
 export async function getPublishedSermons(
   limit = 12,
 ): Promise<SermonPublic[]> {
@@ -216,7 +231,7 @@ export async function getBranchMedia(
   branchSlug: string,
 ): Promise<BranchMediaItem[]> {
   if (shouldUseSeedContent()) {
-    return [];
+    return seedBranchMediaForSlug(branchSlug);
   }
   return fetchBranchMediaBySlug(branchSlug);
 }

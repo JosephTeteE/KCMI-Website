@@ -189,7 +189,7 @@ export function LivestreamEditor({
                 <li>Click Check and Preview.</li>
               </ol>
               <HubHelpDetails summary="Show me an example">
-                <pre className="overflow-x-auto whitespace-pre-wrap break-all text-xs">
+                <pre className="overflow-x-auto whitespace-pre-wrap break-all text-sm">
                   {FACEBOOK_EMBED_EXAMPLE}
                 </pre>
               </HubHelpDetails>

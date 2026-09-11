@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { groupBranchesByCountry, publicPlaceLabel } from "@/content/branch-groups";
-import { getBranchBySlug, getBranches, getFooterLegalNavigation, getFooterNavigation } from "@/content";
+import {
+  groupBranchesByCountry,
+  publicPlaceLabel,
+  sortCountriesForPresentation,
+} from "@/content/branch-groups";
+import {
+  getBranchBySlug,
+  getBranches,
+  getFooterLegalNavigation,
+  getFooterNavigation,
+} from "@/content";
 import type { Branch } from "@/content/types";
 
 function branch(partial: Partial<Branch> & Pick<Branch, "slug" | "name">): Branch {
@@ -35,13 +44,37 @@ describe("groupBranchesByCountry", () => {
 });
 
 describe("publicPlaceLabel", () => {
-  it("does not repeat a country already present in the city label", () => {
+  it("formats listing and detail place lines without repeating country", () => {
     expect(publicPlaceLabel("Port Harcourt, Nigeria", "Nigeria")).toBe(
       "Port Harcourt, Nigeria",
     );
     expect(publicPlaceLabel("Accra, Ghana", "Ghana")).toBe("Accra, Ghana");
     expect(publicPlaceLabel("Lomé, Togo", "Togo")).toBe("Lomé, Togo");
     expect(publicPlaceLabel("Accra", "Ghana")).toBe("Accra · Ghana");
+    expect(publicPlaceLabel("Port Harcourt, Nigeria", "Nigeria")).not.toMatch(
+      /Nigeria\s*[·•]\s*Nigeria/i,
+    );
+  });
+});
+
+describe("sortCountriesForPresentation", () => {
+  it("orders Nigeria, Ghana, Togo regardless of input order", () => {
+    expect(sortCountriesForPresentation(["Togo", "Nigeria", "Ghana"])).toEqual([
+      "Nigeria",
+      "Ghana",
+      "Togo",
+    ]);
+    expect(sortCountriesForPresentation(["Ghana", "Togo", "Nigeria"])).toEqual([
+      "Nigeria",
+      "Ghana",
+      "Togo",
+    ]);
+  });
+
+  it("keeps unknown countries after verified known order", () => {
+    expect(
+      sortCountriesForPresentation(["Kenya", "Togo", "Nigeria", "Ghana"]),
+    ).toEqual(["Nigeria", "Ghana", "Togo", "Kenya"]);
   });
 });
 

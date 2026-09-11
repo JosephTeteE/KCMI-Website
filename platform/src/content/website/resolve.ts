@@ -3,6 +3,7 @@ import {
   aboutDocumentSchema,
   faqsDocumentSchema,
   globalDocumentSchema,
+  homeDocumentBaseSchema,
   homeDocumentSchema,
   sermonsPageDocumentSchema,
   servicesDocumentSchema,
@@ -30,7 +31,7 @@ function mergeParsed<T extends Record<string, unknown>>(
 }
 
 export function resolveHomeDocument(input: unknown): HomeDocument {
-  const parsed = homeDocumentSchema.partial().safeParse(input);
+  const parsed = homeDocumentBaseSchema.partial().safeParse(input);
   return mergeParsed(
     defaultHomeDocument,
     parsed.success ? parsed.data : undefined,

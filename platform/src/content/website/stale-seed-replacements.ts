@@ -1,10 +1,11 @@
 import {
+  defaultHomeDocument,
   defaultSermonsPageDocument,
   defaultServicesDocument,
 } from "@/content/website/defaults";
 
 /**
- * Known original source-controlled seed/default strings that D1.6E replaced.
+ * Known original source-controlled seed/default strings that later phases replaced.
  * A stored website_documents field may be auto-corrected only when it still
  * equals one of these exact strings. Any other value is treated as possibly
  * human-edited and must be preserved.
@@ -42,6 +43,30 @@ export const STALE_WEBSITE_DOCUMENT_REPLACEMENTS = [
     oldValue:
       "Prayer, counselling, welfare, and celebration requests currently use the ministry's existing Google Forms. Those forms are not the future Pastoral Hub.",
     newValue: defaultServicesDocument.careBody,
+  },
+  {
+    documentKey: "home",
+    path: ["heroHeadline"],
+    oldValue: "Kingdom Covenant Ministries International",
+    newValue: defaultHomeDocument.heroHeadline,
+  },
+  {
+    documentKey: "home",
+    path: ["heroPrimaryCtaLabel"],
+    oldValue: "Plan a visit",
+    newValue: defaultHomeDocument.heroPrimaryCtaLabel,
+  },
+  {
+    documentKey: "home",
+    path: ["welcomeEyebrow"],
+    oldValue: "Welcome",
+    newValue: defaultHomeDocument.welcomeEyebrow,
+  },
+  {
+    documentKey: "home",
+    path: ["welcomeHeading"],
+    oldValue: "Raising Kings To Build The Kingdom",
+    newValue: defaultHomeDocument.welcomeHeading,
   },
 ] as const;
 

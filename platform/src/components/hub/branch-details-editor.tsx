@@ -173,7 +173,7 @@ export function BranchDetailsEditor({ id, current, currentTimes }: Props) {
             Currently on the website
           </h3>
           <div>
-            <p className="text-xs font-medium text-[var(--color-text-muted)]">
+            <p className="text-sm font-medium text-[var(--color-text-muted)]">
               Address
             </p>
             <p
@@ -184,7 +184,7 @@ export function BranchDetailsEditor({ id, current, currentTimes }: Props) {
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-[var(--color-text-muted)]">
+            <p className="text-sm font-medium text-[var(--color-text-muted)]">
               Service times
             </p>
             <ul className="mt-1 space-y-1 rounded-[var(--radius-md)] bg-[var(--color-surface-elevated)] px-3 py-2 text-sm">
@@ -201,7 +201,7 @@ export function BranchDetailsEditor({ id, current, currentTimes }: Props) {
             </ul>
           </div>
           <div>
-            <p className="text-xs font-medium text-[var(--color-text-muted)]">
+            <p className="text-sm font-medium text-[var(--color-text-muted)]">
               Public contact
             </p>
             <p

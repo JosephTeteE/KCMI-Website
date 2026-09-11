@@ -11,16 +11,16 @@ import type {
 
 export const defaultHomeDocument: HomeDocument = {
   heroKicker: "KCMI · Rehoboth Christian Center",
-  heroHeadline: "Kingdom Covenant Ministries International",
+  heroHeadline: "Raising Kings To Build The Kingdom",
   heroSupporting:
     "Using every creative biblical means, we disciple individuals, strengthen families, and transform communities—until a nation is won for Christ!",
-  heroPrimaryCtaLabel: "Plan a visit",
+  heroPrimaryCtaLabel: "Plan a Visit",
   heroPrimaryCtaHref: "#worship",
   heroSecondaryCtaLabel: "Watch Live",
   heroSecondaryCtaHref: "/livestream",
   heroMediaId: null,
-  welcomeEyebrow: "Welcome",
-  welcomeHeading: "Raising Kings To Build The Kingdom",
+  welcomeEyebrow: "Discover KCMI",
+  welcomeHeading: "Welcome to Kingdom Covenant Ministries International",
   welcomeBody:
     "We are committed to serving God faithfully, and we invite you to be part of this great mission. Discover ways to connect, grow, and serve with us.",
   welcomeMediaId: null,
@@ -48,6 +48,14 @@ export const defaultHomeDocument: HomeDocument = {
   sermonFallbackYoutubeUrl: "https://www.youtube.com/@rehoboth-tv",
   sermonFallbackYoutubeLabel: "YouTube · @rehoboth-tv",
   featuredProgramId: null,
+  locationsHeading: "One church · Multiple locations",
+  locationsSupporting:
+    "Find a KCMI family near you — worship with us in person across our locations.",
+  spotlightTakeoverEnabled: false,
+  spotlightTakeoverMode: "once_per_browser",
+  spotlightPromoVideoUrl: null,
+  spotlightWindowStart: null,
+  spotlightWindowEnd: null,
 };
 
 export const defaultAboutDocument: AboutDocument = {

@@ -1,5 +1,4 @@
-import { BranchCard } from "@/components/content/branch-card";
-import { BranchCountryGroups } from "@/components/content/branch-country-groups";
+import { LocationsFinder } from "@/components/content/locations-finder";
 import { PageShell } from "@/components/layout/page-shell";
 import { getBranches } from "@/content";
 import { publicPageMetadata } from "@/lib/seo/public-metadata";
@@ -7,7 +6,7 @@ import { publicPageMetadata } from "@/lib/seo/public-metadata";
 export const metadata = publicPageMetadata({
   title: "Locations",
   description:
-    "Find Kingdom Covenant Ministries International branches, addresses, phones, and service times.",
+    "Find Kingdom Covenant Ministries International branches across Nigeria, Ghana, and Togo.",
   path: "/locations",
 });
 
@@ -18,11 +17,9 @@ export default async function LocationsPage() {
     <PageShell
       eyebrow="Visit us"
       title="Our Locations"
-      description="Find a KCMI branch near you, with addresses, phone numbers, and service times where they are available."
+      description="Find a KCMI branch near you."
     >
-      <BranchCountryGroups branches={branches}>
-        {(branch) => <BranchCard branch={branch} />}
-      </BranchCountryGroups>
+      <LocationsFinder branches={branches} />
     </PageShell>
   );
 }

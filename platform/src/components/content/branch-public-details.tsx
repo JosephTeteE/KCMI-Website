@@ -33,12 +33,7 @@ export function BranchPublicDetails({
               </li>
             ))}
           </ul>
-        ) : (
-          <p className="mt-6 text-readable text-[var(--color-text-muted)]">
-            Service times for this location will be published here when they are
-            available.
-          </p>
-        )}
+        ) : null}
       </div>
       <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6">
         <h2 className="font-display text-2xl font-semibold">Contact</h2>

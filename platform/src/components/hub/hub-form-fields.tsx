@@ -3,9 +3,9 @@ import type { InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes 
 const controlClass =
   "mt-2 w-full min-h-11 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-base text-[var(--color-text-body)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]";
 
-const labelClass = "block text-sm font-medium text-[var(--color-text-body)]";
+const labelClass = "block text-base font-medium text-[var(--color-text-body)]";
 
-const hintClass = "mt-1.5 text-sm text-[var(--color-text-muted)]";
+const hintClass = "hub-help mt-1.5 text-[var(--color-text-muted)]";
 
 type FieldProps = {
   id: string;
@@ -106,7 +106,7 @@ export function HubCheckboxField({
     <div>
       <label
         htmlFor={id}
-        className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-medium text-[var(--color-text-body)]"
+        className="flex min-h-11 cursor-pointer items-center gap-3 text-base font-medium text-[var(--color-text-body)]"
       >
         <input
           id={id}
@@ -144,7 +144,7 @@ export function HubFileField({
         type="file"
         required={required}
         accept={accept}
-        className={`${controlClass} file:mr-3 file:rounded-md file:border-0 file:bg-[var(--color-surface-tint)] file:px-3 file:py-1.5 file:text-sm file:font-medium`}
+        className={`${controlClass} file:mr-3 file:rounded-md file:border-0 file:bg-[var(--color-surface-tint)] file:px-3 file:py-1.5 file:text-base file:font-medium`}
       />
       {hint ? <p className={hintClass}>{hint}</p> : null}
     </div>
@@ -173,7 +173,7 @@ export function HubSubmitButton({
     <button
       type="submit"
       disabled={disabled}
-      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] px-5 text-sm font-semibold transition-[filter,opacity] disabled:cursor-not-allowed disabled:opacity-50 ${styles}`}
+      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] px-5 text-base font-semibold transition-[filter,opacity] disabled:cursor-not-allowed disabled:opacity-50 ${styles}`}
     >
       {children}
     </button>
@@ -203,7 +203,7 @@ export function HubStatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`inline-flex min-h-8 items-center rounded-full px-3 text-xs font-semibold tracking-wide ${tone}`}
+      className={`inline-flex min-h-8 items-center rounded-full px-3 text-sm font-semibold tracking-wide ${tone}`}
     >
       {label}
     </span>

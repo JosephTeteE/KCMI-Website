@@ -8,6 +8,7 @@ import { operatingRoleLabel } from "@/lib/authorization/rbac";
 import { signOutAction } from "@/app/auth/actions";
 import { HubHelpMenu } from "@/components/hub/hub-help-menu";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
+import { HUB_TOUR_MENU_EVENT } from "@/lib/hub/tour";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", exact: true },
@@ -36,7 +37,7 @@ function HubIdentity({ profile }: { profile: StaffProfile }) {
         {roleLabel}
       </p>
       {email ? (
-        <p className="mt-0.5 truncate text-xs text-[var(--color-text-muted)]" title={email}>
+        <p className="mt-0.5 truncate text-sm text-[var(--color-text-muted)]" title={email}>
           {email}
         </p>
       ) : null}
@@ -65,7 +66,7 @@ function HubLinks({
               href={item.href}
               aria-current={current ? "page" : undefined}
               onClick={onNavigate}
-              className={`inline-flex min-h-11 w-full items-center rounded-md px-3 py-2 text-sm ${
+              className={`inline-flex min-h-11 w-full items-center rounded-md px-3 py-2 text-base ${
                 current
                   ? "bg-[var(--kcmi-off-white)] font-semibold text-[var(--color-action-primary)]"
                   : "text-[var(--color-text-body)] hover:bg-[var(--kcmi-off-white)]"
@@ -91,7 +92,7 @@ function HubNavBody({
 }) {
   return (
     <>
-      <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
+      <p className="text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
         KCMI Hub
       </p>
       <div className="mt-3 min-w-0">
@@ -104,7 +105,7 @@ function HubNavBody({
       <form action={signOutAction} className="mt-8">
         <button
           type="submit"
-          className="inline-flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 text-sm font-semibold text-[var(--color-destructive)] underline-offset-2 hover:bg-[color-mix(in_srgb,var(--color-destructive)_10%,transparent)] hover:underline"
+          className="inline-flex min-h-11 items-center rounded-[var(--radius-sm)] px-3 text-base font-semibold text-[var(--color-destructive)] underline-offset-2 hover:bg-[color-mix(in_srgb,var(--color-destructive)_10%,transparent)] hover:underline"
         >
           {HUB_ACTION_LABELS.signOut}
         </button>
@@ -129,6 +130,15 @@ export function HubNav({ profile }: { profile: StaffProfile }) {
     }
   }, [open]);
 
+  useEffect(() => {
+    function onTourMenu(event: Event) {
+      const detail = (event as CustomEvent<{ open?: boolean }>).detail;
+      setOpen(detail?.open !== false);
+    }
+    window.addEventListener(HUB_TOUR_MENU_EVENT, onTourMenu);
+    return () => window.removeEventListener(HUB_TOUR_MENU_EVENT, onTourMenu);
+  }, []);
+
   function close() {
     setOpen(false);
   }
@@ -136,12 +146,13 @@ export function HubNav({ profile }: { profile: StaffProfile }) {
   return (
     <>
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-4 py-3 lg:hidden">
-        <p className="text-sm font-semibold tracking-wide text-[var(--color-text-body)] uppercase">
+        <p className="text-base font-semibold tracking-wide text-[var(--color-text-body)] uppercase">
           KCMI Hub
         </p>
         <button
           type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-sm font-semibold"
+          data-tour-menu-open
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-base font-semibold"
           aria-label="Open Hub menu"
           aria-expanded={open}
           aria-haspopup="dialog"
@@ -165,12 +176,12 @@ export function HubNav({ profile }: { profile: StaffProfile }) {
       >
         <div className="flex h-full max-w-xs flex-col overflow-y-auto bg-[var(--color-surface-elevated)] p-4 shadow-[var(--shadow-soft)]">
           <div className="mb-2 flex items-center justify-between gap-3">
-            <p id={titleId} className="text-sm font-semibold uppercase tracking-wide">
+            <p id={titleId} className="text-base font-semibold uppercase tracking-wide">
               KCMI Hub
             </p>
             <button
               type="button"
-              className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] px-3 text-sm font-semibold"
+              className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] px-3 text-base font-semibold"
               onClick={close}
             >
               Close

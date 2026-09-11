@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   HubCheckboxField,
   HubSelectField,
@@ -19,7 +19,7 @@ import {
   hubCurrentSectionCopy,
   type HubPublicationState,
 } from "@/lib/hub/publication-copy";
-
+import { HUB_TOUR_START_CHANGE_EVENT } from "@/lib/hub/tour";
 export type HubCopyField = {
   id: string;
   label: string;
@@ -74,6 +74,17 @@ export function HubCopyProposeForm({
     editing && hasProposedCopy(proposed) ? "proposed" : "live";
   const currentCopy = hubCurrentSectionCopy(publicationState);
 
+  useEffect(() => {
+    function onTourStartChange() {
+      setEditing(true);
+      setPreviewed(false);
+      setProposed(emptyProposedCopy(current));
+    }
+    window.addEventListener(HUB_TOUR_START_CHANGE_EVENT, onTourStartChange);
+    return () =>
+      window.removeEventListener(HUB_TOUR_START_CHANGE_EVENT, onTourStartChange);
+  }, [current]);
+
   function startChange() {
     setEditing(true);
     setPreviewed(false);
@@ -102,7 +113,7 @@ export function HubCopyProposeForm({
           <h2 className="text-lg font-semibold text-[var(--color-text-body)]">
             {what}
           </h2>
-          <p className="mt-2 text-sm text-[var(--color-text-muted)]">{where}</p>
+          <p className="mt-2 hub-help text-[var(--color-text-muted)]">{where}</p>
         </div>
 
         <HubHelpDetails summary="Where does this appear?">
@@ -118,16 +129,16 @@ export function HubCopyProposeForm({
             {currentCopy.heading}
           </h3>
           {currentCopy.note ? (
-            <p className="text-sm text-[var(--color-text-muted)]">{currentCopy.note}</p>
+            <p className="hub-help text-[var(--color-text-muted)]">{currentCopy.note}</p>
           ) : null}
           <dl className="space-y-3">
             {fields.map((field) => (
               <div key={field.id}>
-                <dt className="text-xs font-medium text-[var(--color-text-muted)]">
+                <dt className="text-sm font-medium text-[var(--color-text-muted)]">
                   {field.label}
                 </dt>
                 <dd
-                  className="mt-1 whitespace-pre-wrap rounded-[var(--radius-md)] border border-transparent bg-[var(--color-surface-elevated)] px-3 py-2 text-sm text-[var(--color-text-body)]"
+                  className="mt-1 whitespace-pre-wrap rounded-[var(--radius-md)] border border-transparent bg-[var(--color-surface-elevated)] px-3 py-2 text-base text-[var(--color-text-body)]"
                   data-readonly="true"
                 >
                   {field.kind === "checkbox"
@@ -144,8 +155,9 @@ export function HubCopyProposeForm({
         {!editing ? (
           <button
             type="button"
+            data-tour="change-section"
             onClick={startChange}
-            className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold"
+            className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-base font-semibold"
           >
             {changeLabel}
           </button>
@@ -184,7 +196,7 @@ export function HubCopyProposeForm({
               <h3 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-muted)]">
                 What would you like to show instead?
               </h3>
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <p className="hub-help text-[var(--color-text-muted)]">
                 Leave a box empty to keep the current website text.
               </p>
               {fields.map((field) => {
@@ -281,45 +293,48 @@ export function HubCopyProposeForm({
               <button
                 type="button"
                 onClick={copyCurrent}
-                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold"
+                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-base font-semibold"
               >
                 {copyCurrentLabel}
               </button>
               <button
                 type="button"
+                data-tour="preview-changes"
                 onClick={() => setPreviewed(true)}
-                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold"
+                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-base font-semibold"
               >
                 {HUB_ACTION_LABELS.previewChanges}
               </button>
               <button
                 type="button"
                 onClick={cancel}
-                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] px-5 text-sm font-semibold text-[var(--color-text-muted)] underline-offset-2 hover:underline"
+                className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] px-5 text-base font-semibold text-[var(--color-text-muted)] underline-offset-2 hover:underline"
               >
                 {HUB_ACTION_LABELS.cancelChanges}
               </button>
             </div>
 
             {previewed ? (
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <p className="hub-help text-[var(--color-text-muted)]">
                 Check the preview. If it looks right, make it live. The public
                 website does not change until you do.
               </p>
             ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <p className="hub-help text-[var(--color-text-muted)]">
                 Preview your changes before they appear on the website.
               </p>
             )}
 
-            <HubSubmitButton
-              variant={canPublish ? "secondary" : "quiet"}
-              disabled={!canPublish}
-            >
-              {liveLabel}
-            </HubSubmitButton>
+            <div data-tour="make-live">
+              <HubSubmitButton
+                variant={canPublish ? "secondary" : "quiet"}
+                disabled={!canPublish}
+              >
+                {liveLabel}
+              </HubSubmitButton>
+            </div>
             {!canPublish ? (
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <p className="hub-help text-[var(--color-text-muted)]">
                 Type a change, then click Preview my changes, then you can make
                 it live.
               </p>

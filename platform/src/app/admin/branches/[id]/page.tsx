@@ -137,7 +137,7 @@ export default async function EditBranchPage({
                     <p className="text-readable-sm text-[var(--color-text-muted)]">
                       {item.alt_text_override || media?.alt_text || "No description"}
                     </p>
-                    <p className="mt-1 text-xs uppercase tracking-wide text-[var(--color-text-muted)]">
+                    <p className="mt-1 text-sm uppercase tracking-wide text-[var(--color-text-muted)]">
                       {item.status}
                       {!item.is_active ? " · inactive" : ""}
                     </p>

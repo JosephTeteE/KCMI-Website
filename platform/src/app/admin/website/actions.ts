@@ -157,6 +157,18 @@ export async function saveHomeDocument(formData: FormData) {
         formData.get("sermonFallbackYoutubeLabel"),
       ),
       featuredProgramId: emptyToNull(formData.get("featuredProgramId")),
+      locationsHeading: emptyToNull(formData.get("locationsHeading")),
+      locationsSupporting: emptyToNull(formData.get("locationsSupporting")),
+      spotlightTakeoverEnabled:
+        formData.get("spotlightTakeoverEnabled") === "on" ||
+        formData.get("spotlightTakeoverEnabled") === "true",
+      spotlightTakeoverMode:
+        emptyToNull(formData.get("spotlightTakeoverMode")) === "once_per_session"
+          ? "once_per_session"
+          : "once_per_browser",
+      spotlightPromoVideoUrl: emptyToNull(formData.get("spotlightPromoVideoUrl")),
+      spotlightWindowStart: emptyToNull(formData.get("spotlightWindowStart")),
+      spotlightWindowEnd: emptyToNull(formData.get("spotlightWindowEnd")),
     },
     "Updated Home website content",
   );
@@ -334,13 +346,68 @@ export async function setFeaturedProgramFromHome(formData: FormData) {
     }
   }
 
+  const { data: homeRow } = await supabase
+    .from("website_documents")
+    .select("payload")
+    .eq("id", WEBSITE_DOCUMENT_IDS.home)
+    .maybeSingle();
+
+  const { resolveHomeDocument } = await import("@/content/website/resolve");
+  const current = resolveHomeDocument(homeRow?.payload ?? {});
+  const nextHome = {
+    ...current,
+    featuredProgramId: programId,
+    spotlightTakeoverEnabled:
+      formData.get("spotlightTakeoverEnabled") === "on" ||
+      formData.get("spotlightTakeoverEnabled") === "true",
+    spotlightTakeoverMode:
+      emptyToNull(formData.get("spotlightTakeoverMode")) === "once_per_session"
+        ? "once_per_session"
+        : "once_per_browser",
+    spotlightPromoVideoUrl: emptyToNull(formData.get("spotlightPromoVideoUrl")),
+    spotlightWindowStart: emptyToNull(formData.get("spotlightWindowStart")),
+    spotlightWindowEnd: emptyToNull(formData.get("spotlightWindowEnd")),
+  };
+
+  const parsed = parseWebsiteDocumentSave("home", nextHome);
+  if (!parsed.ok) {
+    redirectWithError("/admin/website/home", parsed.error);
+  }
+
+  const { error: homeError } = await supabase
+    .from("website_documents")
+    .update({
+      payload: parsed.payload as Json,
+      status: "published",
+      updated_by: gate.session.user.id,
+      published_at: new Date().toISOString(),
+    })
+    .eq("id", WEBSITE_DOCUMENT_IDS.home);
+  if (homeError) {
+    redirectWithError("/admin/website/home", homeError.message);
+  }
+
+  await saveRevision({
+    entityType: "website_document",
+    entityId: WEBSITE_DOCUMENT_IDS.home,
+    snapshot: parsed.payload,
+    changedBy: gate.session.user.id,
+    changeSummary: "Updated KCMI Spotlight on the homepage",
+  });
+
   await writeAuditEvent({
     action: "program.feature_home",
     entityType: "program",
     entityId: programId ?? WEBSITE_DOCUMENT_IDS.home,
     actorId: gate.session.user.id,
-    metadata: { program_id: programId },
+    metadata: {
+      program_id: programId,
+      spotlight_takeover_enabled: nextHome.spotlightTakeoverEnabled,
+    },
   });
 
-  redirectWithMessage("/admin/website/home", "The featured program on the homepage is now updated.");
+  redirectWithMessage(
+    "/admin/website/home",
+    "The KCMI Spotlight on the homepage is now updated.",
+  );
 }

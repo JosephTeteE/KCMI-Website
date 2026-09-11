@@ -23,6 +23,13 @@ import {
   resetHubTour,
 } from "@/lib/hub/tour";
 import {
+  aboutVisualSectionIds,
+  editCategoryTourTarget,
+  homeVisualCategoryIds,
+  homeVisualSectionIds,
+  homeVisualSectionTourTarget,
+} from "@/lib/hub/visual-sections";
+import {
   hubCurrentSectionCopy,
   hubLifecycleActions,
   hubPreviewVariant,
@@ -34,7 +41,10 @@ import {
   livestreamPrimaryAction,
 } from "@/lib/hub/livestream-state";
 import { replacementForExactStoredValue } from "@/content/website/stale-seed-replacements";
-import { defaultSermonsPageDocument } from "@/content/website/defaults";
+import {
+  defaultHomeDocument,
+  defaultSermonsPageDocument,
+} from "@/content/website/defaults";
 import {
   permissionsForRoles,
   roleHasPermission,
@@ -118,7 +128,10 @@ describe("Hub tour persistence", () => {
       },
     };
     expect(HUB_TOUR_STORAGE_KEY).toBe("kcmi-hub-tour-v1-complete");
-    expect(HUB_TOUR_STEPS).toHaveLength(6);
+    expect(HUB_TOUR_STEPS).toHaveLength(11);
+    expect(HUB_TOUR_STEPS.every((step) => step.target.includes("data-tour"))).toBe(
+      true,
+    );
     expect(isHubTourComplete(storage)).toBe(false);
     markHubTourComplete(storage);
     expect(isHubTourComplete(storage)).toBe(true);
@@ -192,9 +205,11 @@ describe("Hub MFA volunteer language", () => {
     expect(branch).toMatch(/changeBranchDetails/);
     expect(branch).toMatch(/useCurrentInformation/);
     expect(branch).toMatch(/Currently on the website/);
-    expect(featured).toMatch(/Currently featured/);
+    expect(featured).toMatch(/Currently on the website/);
     expect(featured).toMatch(/changeFeaturedProgram/);
     expect(featured).toMatch(/makeFeaturedLive/);
+    expect(featured).toMatch(/Feature this when visitors first open the website/);
+    expect(featured).toMatch(/Show once on this device/);
     expect(mfa).toMatch(/QR code to connect your authenticator app/);
     expect(mfa).toMatch(/Your authenticator app gives you a new 6-digit code/);
     expect(mfa).not.toMatch(/TOTP enrollment QR code/);
@@ -355,20 +370,74 @@ describe("stale website_documents seed repair", () => {
         ["heroHeadline"],
         "Kingdom Covenant Ministries International",
       ),
+    ).toBe(defaultHomeDocument.heroHeadline);
+    expect(
+      replacementForExactStoredValue(
+        "home",
+        ["heroHeadline"],
+        "Operator kept custom headline",
+      ),
     ).toBeNull();
   });
 });
 
-describe("Homepage Hub section chooser", () => {
-  it("indexes homepage work instead of one giant form", () => {
+describe("Homepage Hub visual section editor", () => {
+  it("indexes homepage work with live section previews and category choices", () => {
     const src = readFileSync(
       resolve(process.cwd(), "src/components/hub/home-website-editor.tsx"),
       "utf8",
     );
+    const config = readFileSync(
+      resolve(process.cwd(), "src/lib/hub/visual-sections.ts"),
+      "utf8",
+    );
     expect(src).toMatch(/What would you like to change\?/);
     expect(src).toMatch(/All homepage sections/);
-    expect(src).toMatch(/Top Banner/);
-    expect(src).toMatch(/Featured Program/);
+    expect(src).toMatch(/Edit this section/);
+    expect(src).toMatch(/data-tour="home-section-chooser"/);
+    expect(src).toMatch(/editCategoryTourTarget/);
+    expect(src).toMatch(/HOME_VISUAL_SECTIONS/);
+    expect(config).toMatch(/Top of Homepage/);
+    expect(config).toMatch(/KCMI Spotlight/);
+    expect(config).toMatch(/Discover KCMI/);
+    expect(config).toMatch(/Watch \& Listen/);
+    expect(config).toMatch(/Find a Location section/);
+    expect(config).toMatch(/Prayer \& Giving/);
+  });
+
+  it("exposes typed visual section config for homepage and about", () => {
+    expect(homeVisualSectionIds()).toEqual([
+      "banner",
+      "spotlight",
+      "discover",
+      "watch",
+      "locations",
+      "prayer-giving",
+    ]);
+    expect(homeVisualCategoryIds("banner")).toEqual(["words", "photo", "buttons"]);
+    expect(homeVisualCategoryIds("spotlight")).toEqual(["program"]);
+    expect(homeVisualCategoryIds("discover")).toEqual(["words", "photo"]);
+    expect(homeVisualCategoryIds("watch")).toEqual(["words"]);
+    expect(aboutVisualSectionIds()).toEqual([
+      "who-we-are",
+      "vision-mission",
+      "leadership",
+      "portrait",
+    ]);
+    expect(homeVisualSectionTourTarget("banner")).toBe("home-visual-section-banner");
+    expect(editCategoryTourTarget("words")).toBe("edit-category-words");
+  });
+});
+
+describe("Hub volunteer typography floor", () => {
+  it("keeps form labels and buttons at text-base", () => {
+    const fields = readFileSync(
+      resolve(process.cwd(), "src/components/hub/hub-form-fields.tsx"),
+      "utf8",
+    );
+    expect(fields).toMatch(/labelClass = "block text-base/);
+    expect(fields).toMatch(/text-base font-semibold/);
+    expect(fields).not.toMatch(/text-xs/);
   });
 });
 

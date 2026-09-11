@@ -15,6 +15,9 @@
 /.qa-*/
 /.qa-d11-results.json
 /e2e/.auth/
+/.auth/
+/screenshots/
+/kcmi-screenshots.zip
 /test-results/
 /playwright-report/
 /blob-report/
@@ -53,3 +56,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# docker backup
+.env.local.docker-backup

@@ -34,6 +34,25 @@ export function publicPlaceLabel(
 }
 
 /**
+ * Deterministic public country presentation order.
+ * Known countries follow BRANCH_COUNTRY_ORDER; any others sort after.
+ */
+export function sortCountriesForPresentation(
+  countries: readonly string[],
+): string[] {
+  const unique = [...new Set(countries.map((c) => c.trim()).filter(Boolean))];
+  const rank = new Map<string, number>(
+    BRANCH_COUNTRY_ORDER.map((name, index) => [name, index]),
+  );
+  return unique.sort((a, b) => {
+    const aRank = rank.get(a) ?? BRANCH_COUNTRY_ORDER.length;
+    const bRank = rank.get(b) ?? BRANCH_COUNTRY_ORDER.length;
+    if (aRank !== bRank) return aRank - bRank;
+    return a.localeCompare(b);
+  });
+}
+
+/**
  * Group published branches by verified country.
  * Branches without a country are not reclassified — they appear last unlabeled as additional locations.
  */

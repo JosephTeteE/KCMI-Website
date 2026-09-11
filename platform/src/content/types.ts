@@ -118,6 +118,15 @@ export type HomePublicContent = {
   prayer: PrayerCta;
   giving: GivingCta;
   sermonFallback: SermonHighlight;
+  locationsHeading: string;
+  locationsSupporting: string;
+  spotlight: {
+    takeoverEnabled: boolean;
+    takeoverMode: "once_per_browser" | "once_per_session";
+    promoVideoUrl: string | null;
+    windowStart: string | null;
+    windowEnd: string | null;
+  };
 };
 
 export type AboutChurchContent = {

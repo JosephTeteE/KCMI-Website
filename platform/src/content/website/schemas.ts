@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validateOptionalSocialUrl } from "@/lib/cms/social-url";
 
 const hrefSchema = z
   .string()
@@ -17,7 +18,14 @@ const linkSchema = z.object({
   external: z.boolean().optional(),
 });
 
-export const homeDocumentSchema = z.object({
+const optionalNullableString = z.preprocess((value) => {
+  if (value == null) return null;
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : null;
+}, z.string().nullable());
+
+export const homeDocumentBaseSchema = z.object({
   heroKicker: z.string().min(1).max(160),
   heroHeadline: z.string().min(1).max(200),
   heroSupporting: z.string().min(1).max(800),
@@ -48,7 +56,66 @@ export const homeDocumentSchema = z.object({
   sermonFallbackYoutubeUrl: z.string().min(1).max(400),
   sermonFallbackYoutubeLabel: z.string().min(1).max(120),
   featuredProgramId: z.string().uuid().nullable(),
+  locationsHeading: z.string().min(1).max(160),
+  locationsSupporting: z.string().min(1).max(400),
+  spotlightTakeoverEnabled: z.boolean().default(false),
+  spotlightTakeoverMode: z
+    .enum(["once_per_browser", "once_per_session"])
+    .default("once_per_browser"),
+  spotlightPromoVideoUrl: optionalNullableString,
+  spotlightWindowStart: optionalNullableString,
+  spotlightWindowEnd: optionalNullableString,
 });
+
+export const homeDocumentSchema = homeDocumentBaseSchema.superRefine(
+  (doc, ctx) => {
+    if (doc.spotlightPromoVideoUrl) {
+      const result = validateOptionalSocialUrl(doc.spotlightPromoVideoUrl);
+      if (!result.ok || !result.url) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["spotlightPromoVideoUrl"],
+          message: result.ok ? "Enter a full https:// URL." : result.error,
+        });
+        return;
+      }
+      try {
+        const host = new URL(result.url).hostname.toLowerCase();
+        const allowed =
+          host.includes("youtube.") ||
+          host === "youtu.be" ||
+          host.includes("facebook.") ||
+          host === "fb.watch" ||
+          host === "www.fb.watch";
+        if (!allowed) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["spotlightPromoVideoUrl"],
+            message: "Promo video must be a YouTube or Facebook link.",
+          });
+        } else {
+          doc.spotlightPromoVideoUrl = result.url;
+        }
+      } catch {
+        ctx.addIssue({
+          code: "custom",
+          path: ["spotlightPromoVideoUrl"],
+          message: "Enter a full https:// URL.",
+        });
+      }
+    }
+    for (const key of ["spotlightWindowStart", "spotlightWindowEnd"] as const) {
+      const value = doc[key];
+      if (value != null && Number.isNaN(Date.parse(value))) {
+        ctx.addIssue({
+          code: "custom",
+          path: [key],
+          message: "Must be a valid date",
+        });
+      }
+    }
+  },
+);
 
 export const aboutDocumentSchema = z.object({
   whoWeAre: z.array(z.string().min(1).max(800)).min(1).max(6),

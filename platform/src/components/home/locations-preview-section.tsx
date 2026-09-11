@@ -54,11 +54,7 @@ export function LocationsPreviewSection({ branches }: Props) {
                       {branch.serviceTimes[0].time}
                     </span>
                   </p>
-                ) : (
-                  <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
-                    Service times will be listed here when they are available.
-                  </p>
-                )}
+                ) : null}
               </Link>
             )}
           </BranchCountryGroups>

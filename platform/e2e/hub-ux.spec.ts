@@ -55,12 +55,15 @@ test.describe("Hub volunteer UX", () => {
       await page.setViewportSize({ width: 1280, height: 720 });
 
       await page.getByRole("link", { name: "Homepage" }).click();
-      await expect(page.getByText("What would you like to change?")).toBeVisible();
-      await page.getByRole("button", { name: "Top Banner" }).click();
-      await expect(page.getByText("Currently on the website").first()).toBeVisible();
+      await expect(
+        page.getByText("See each part of the page, then choose what to change."),
+      ).toBeVisible();
+      await expect(page.getByText("Top of Homepage").first()).toBeVisible();
+      const bannerCard = page.locator('[data-tour="home-visual-section-banner"]');
+      await expect(bannerCard.getByText("Currently on the website")).toBeVisible();
       await expect(page.getByText("Scroll sideways")).toHaveCount(0);
-      const bannerPreview = page.getByRole("region", {
-        name: "Homepage Top Banner",
+      const bannerPreview = bannerCard.getByRole("region", {
+        name: "Top of Homepage",
       });
       await expect(
         bannerPreview.getByRole("button", { name: "View full-size preview" }),
@@ -77,7 +80,7 @@ test.describe("Hub volunteer UX", () => {
       const fullPreview = page.getByRole("dialog");
       await expect(fullPreview).toBeVisible();
       await expect(
-        fullPreview.getByText("Homepage Top Banner — full-size preview"),
+        fullPreview.getByText("Top of Homepage — full-size preview"),
       ).toBeVisible();
       await expect(fullPreview.getByRole("button", { name: "Close" })).toBeFocused();
       await page.keyboard.press("Escape");
@@ -86,6 +89,10 @@ test.describe("Hub volunteer UX", () => {
         bannerPreview.getByRole("button", { name: "View full-size preview" }),
       ).toBeFocused();
       await page.setViewportSize({ width: 1280, height: 720 });
+      await bannerCard.getByRole("button", { name: "Edit this section" }).click();
+      await expect(page.getByText("What would you like to change?")).toBeVisible();
+      await page.getByRole("button", { name: /^Words/ }).click();
+      await expect(page.getByText("Currently on the website").first()).toBeVisible();
       const proposed = page.locator("[data-hub-role='proposed']");
       await expect(proposed).toHaveCount(0);
       await page.getByRole("button", { name: "Change this section" }).first().click();
@@ -98,9 +105,12 @@ test.describe("Hub volunteer UX", () => {
         page.getByRole("button", { name: "Make these changes live" }).first(),
       ).toBeVisible();
 
+      await page.getByRole("button", { name: "Back to Top of Homepage choices" }).click();
       await page.getByRole("button", { name: "All homepage sections" }).click();
-      await page.getByRole("button", { name: "Featured Program" }).click();
-      await expect(page.getByText("Currently featured")).toBeVisible();
+      const spotlightCard = page.locator('[data-tour="home-visual-section-spotlight"]');
+      await spotlightCard.getByRole("button", { name: "Edit this section" }).click();
+      await page.getByRole("button", { name: /^Featured program/ }).click();
+      await expect(page.getByText("Currently on the website")).toBeVisible();
       await expect(page.locator("#proposed-featuredProgramId")).toHaveCount(0);
       await page
         .getByRole("button", { name: "Choose a different featured program" })

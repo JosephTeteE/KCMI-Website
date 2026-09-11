@@ -15,7 +15,7 @@ export function SignInForm() {
 
   if (!hasSupabasePublicConfig()) {
     return (
-      <p className="rounded-md border border-[var(--color-warning)] bg-[var(--color-warning-bg)] p-4 text-sm text-[var(--color-text-body)]">
+      <p className="rounded-md border border-[var(--color-warning)] bg-[var(--color-warning-bg)] p-4 hub-body text-[var(--color-text-body)]">
         Hub sign-in is not ready on this computer yet. Ask a Super Admin to
         finish setup.
       </p>
@@ -48,7 +48,7 @@ export function SignInForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium">
+        <label htmlFor="email" className="block text-base font-medium">
           Email
         </label>
         <input
@@ -59,11 +59,11 @@ export function SignInForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-sm"
+          className="mt-1 w-full min-h-11 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-base"
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium">
+        <label htmlFor="password" className="block text-base font-medium">
           Password
         </label>
         <input
@@ -74,22 +74,22 @@ export function SignInForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-sm"
+          className="mt-1 w-full min-h-11 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-base"
         />
       </div>
       {error ? (
-        <p className="text-sm text-[var(--color-destructive)]" role="alert">
+        <p className="hub-body text-[var(--color-destructive)]" role="alert">
           {error}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-sm font-medium text-[var(--color-action-primary-fg)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-11 w-full cursor-pointer items-center justify-center rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-base font-medium text-[var(--color-action-primary-fg)] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>
-      <p className="text-xs text-[var(--color-text-muted)]">
+      <p className="hub-help text-[var(--color-text-muted)]">
         Staff accounts are invitation-only. There is no public Hub signup.
       </p>
     </form>

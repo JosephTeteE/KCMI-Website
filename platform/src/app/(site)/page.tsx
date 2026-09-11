@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import { DiscoverKcmiSection } from "@/components/home/discover-kcmi-section";
 import { FeaturedProgramSection } from "@/components/home/featured-program-section";
-import { GivingCtaSection } from "@/components/home/giving-cta-section";
+import { FindFamilySection } from "@/components/home/find-family-section";
 import { HomeHero } from "@/components/home/home-hero";
-import { LocationsPreviewSection } from "@/components/home/locations-preview-section";
-import { PrayerCtaSection } from "@/components/home/prayer-cta-section";
-import { SermonHighlightSection } from "@/components/home/sermon-highlight-section";
-import { ServiceTimesSection } from "@/components/home/service-times-section";
-import { WelcomeSection } from "@/components/home/welcome-section";
+import { PrayerGivingSection } from "@/components/home/prayer-giving-section";
+import { ProgramSpotlightTakeover } from "@/components/home/program-spotlight-takeover";
+import { WatchListenSection } from "@/components/home/watch-listen-section";
 import {
   getChurchIdentity,
   getBranches,
@@ -14,6 +13,9 @@ import {
   getFeaturedSermons,
   getHeadquartersLocationLabel,
   getHomeContent,
+  getHomeFeaturedSermon,
+  getLivestreamPublic,
+  getServiceOfferings,
   getServiceTimes,
   getSocialLinks,
 } from "@/content";
@@ -47,29 +49,46 @@ async function OrganizationJsonLd() {
 }
 
 export default async function HomePage() {
-  const identity = getChurchIdentity();
   const home = await getHomeContent();
   const times = await getServiceTimes();
   const locationLabel = await getHeadquartersLocationLabel();
   const program = await getFeaturedProgram();
-  const sermon = await getFeaturedSermons();
+  const sermonFallback = await getFeaturedSermons();
+  const sermon = await getHomeFeaturedSermon();
   const branches = await getBranches();
+  const livestream = await getLivestreamPublic();
+  const offerings = await getServiceOfferings();
 
   return (
     <main id="main-content">
       <OrganizationJsonLd />
-      <HomeHero home={home} />
-      <ServiceTimesSection times={times} locationLabel={locationLabel} />
-      <FeaturedProgramSection program={program} />
-      <WelcomeSection
-        home={home}
-        legalName={identity.legalName}
-        alternateName={identity.alternateName}
+      <ProgramSpotlightTakeover
+        program={program}
+        enabled={home.spotlight.takeoverEnabled}
+        frequency={home.spotlight.takeoverMode}
+        promoVideoUrl={home.spotlight.promoVideoUrl}
+        windowStart={home.spotlight.windowStart}
+        windowEnd={home.spotlight.windowEnd}
       />
-      <SermonHighlightSection sermon={sermon} />
-      <LocationsPreviewSection branches={branches} />
-      <PrayerCtaSection prayer={home.prayer} />
-      <GivingCtaSection giving={home.giving} />
+      <HomeHero
+        home={home}
+        times={times}
+        locationLabel={locationLabel}
+        isLive={livestream.isLive}
+      />
+      <FeaturedProgramSection program={program} />
+      <DiscoverKcmiSection home={home} offerings={offerings} aboutHref="/about" />
+      <WatchListenSection
+        livestream={livestream}
+        sermon={sermon}
+        fallback={sermonFallback}
+      />
+      <FindFamilySection
+        branches={branches}
+        heading={home.locationsHeading}
+        subheading={home.locationsSupporting}
+      />
+      <PrayerGivingSection prayer={home.prayer} giving={home.giving} />
     </main>
   );
 }

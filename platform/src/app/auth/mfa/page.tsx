@@ -48,7 +48,7 @@ export default function MfaPage() {
 
   if (!hasSupabasePublicConfig()) {
     return (
-      <p className="mx-auto max-w-lg p-8 text-sm text-[var(--color-text-muted)]">
+      <p className="mx-auto max-w-lg p-8 hub-body text-[var(--color-text-muted)]">
         This Hub computer is not set up yet. Ask a Super Admin to finish setup.
       </p>
     );
@@ -80,14 +80,14 @@ export default function MfaPage() {
   return (
     <div className="mx-auto max-w-lg space-y-6 px-4 py-12">
       <h1 className="text-2xl font-semibold">Add extra protection</h1>
-      <p className="text-sm text-[var(--color-text-muted)]">
+      <p className="hub-body text-[var(--color-text-muted)]">
         Your authenticator app gives you a new 6-digit code when you sign in.
         Scan the picture, then type the code. You will need this code when you
         change the website.
       </p>
       {mode === "enroll" && qr ? (
         <div className="space-y-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4">
-          <p className="text-sm">Scan this QR code with your authenticator app:</p>
+          <p className="hub-body">Scan this QR code with your authenticator app:</p>
           {/* QR from Supabase is an SVG data URL */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -97,14 +97,14 @@ export default function MfaPage() {
             height={200}
           />
           {secret ? (
-            <p className="break-all text-xs text-[var(--color-text-muted)]">
+            <p className="break-all text-sm text-[var(--color-text-muted)]">
           Manual setup code: {secret}
             </p>
           ) : null}
         </div>
       ) : null}
       <form onSubmit={verify} className="space-y-3">
-        <label htmlFor="code" className="block text-sm font-medium">
+        <label htmlFor="code" className="block text-base font-medium">
           6-digit app code
         </label>
         <input
@@ -114,17 +114,17 @@ export default function MfaPage() {
           required
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="w-full rounded-md border border-[var(--color-border)] px-3 py-2 text-sm"
+          className="w-full min-h-11 rounded-md border border-[var(--color-border)] px-3 py-2 text-base"
         />
         {message ? (
-          <p className="text-sm text-[var(--color-destructive)]" role="alert">
+          <p className="hub-body text-[var(--color-destructive)]" role="alert">
             {message}
           </p>
         ) : null}
         <button
           type="submit"
           disabled={!factorId}
-          className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-sm font-semibold text-[var(--color-action-primary-fg)] disabled:cursor-not-allowed"
+          className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-[var(--color-action-primary)] px-4 py-2 text-base font-semibold text-[var(--color-action-primary-fg)] disabled:cursor-not-allowed"
         >
           Continue to the Hub
         </button>
