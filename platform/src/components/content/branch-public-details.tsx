@@ -20,7 +20,11 @@ export function BranchPublicDetails({
           ))}
         </address>
         {branch.serviceTimes.length > 0 ? (
-          <ul className="mt-6 space-y-2">
+          <ul
+            className="mt-6 space-y-2"
+            data-qa-service-times="present"
+            data-qa-service-time-count={branch.serviceTimes.length}
+          >
             {branch.serviceTimes.map((time) => (
               <li key={`${time.day}-${time.time}`} className="text-readable">
                 <span className="text-[var(--color-text-muted)]">{time.day}: </span>
@@ -33,7 +37,13 @@ export function BranchPublicDetails({
               </li>
             ))}
           </ul>
-        ) : null}
+        ) : (
+          <div
+            className="mt-6"
+            data-qa-service-times="absent"
+            data-qa-service-time-count={0}
+          />
+        )}
       </div>
       <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6">
         <h2 className="font-display text-2xl font-semibold">Contact</h2>

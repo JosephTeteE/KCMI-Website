@@ -12,9 +12,12 @@ import {
   HUB_PROGRAMS_CONTEXT_TOUR_STEPS,
   HUB_TOUR_STEPS,
   hubTourTargetSelector,
+  isProgramsWizardPath,
   readHubTourStepIndex,
   resolveHubTourKind,
   resolveReplayTourKind,
+  resolveTourEntryHref,
+  tourStepMatchesRoute,
   writeHubTourStepIndex,
 } from "@/lib/hub/tour";
 import { defaultHomeDocument } from "@/content/website/defaults";
@@ -143,7 +146,7 @@ describe("Hub coach-mark tour steps", () => {
     );
   });
 
-  it("keeps Program contextual tour on New Program only", () => {
+  it("shares Program contextual tour between create and edit", () => {
     expect(
       HUB_PROGRAMS_CONTEXT_TOUR_STEPS.every(
         (step) => step.href === "/admin/programs/new",
@@ -159,6 +162,22 @@ describe("Hub coach-mark tour steps", () => {
     expect(
       HUB_PROGRAMS_CONTEXT_TOUR_STEPS.some((s) => s.title === "Homepage"),
     ).toBe(false);
+    expect(isProgramsWizardPath("/admin/programs/new")).toBe(true);
+    expect(
+      isProgramsWizardPath(
+        "/admin/programs/4798d76c-6112-4870-9f52-7d1ab38d06bd",
+      ),
+    ).toBe(true);
+    expect(isProgramsWizardPath("/admin/programs")).toBe(false);
+    expect(
+      isProgramsWizardPath("/admin/programs/fixture-published-safety"),
+    ).toBe(false);
+    expect(
+      tourStepMatchesRoute(
+        HUB_PROGRAMS_CONTEXT_TOUR_STEPS[0]!,
+        "/admin/programs/4798d76c-6112-4870-9f52-7d1ab38d06bd",
+      ),
+    ).toBe(true);
   });
 
   it("keeps Livestream contextual tour route-local", () => {
@@ -177,8 +196,19 @@ describe("Hub coach-mark tour steps", () => {
     expect(resolveHubTourKind("/admin")).toBe("dashboard");
     expect(resolveHubTourKind("/admin/website/home")).toBe("home");
     expect(resolveHubTourKind("/admin/programs/new")).toBe("programs");
+    expect(
+      resolveHubTourKind(
+        "/admin/programs/4798d76c-6112-4870-9f52-7d1ab38d06bd",
+      ),
+    ).toBe("programs");
     expect(resolveHubTourKind("/admin/livestream")).toBe("livestream");
     expect(resolveReplayTourKind("/admin/programs")).toBe("programs");
+    expect(
+      resolveTourEntryHref(
+        "programs",
+        "/admin/programs/4798d76c-6112-4870-9f52-7d1ab38d06bd",
+      ),
+    ).toBe("/admin/programs/4798d76c-6112-4870-9f52-7d1ab38d06bd");
   });
 
   it("persists tour step index", () => {

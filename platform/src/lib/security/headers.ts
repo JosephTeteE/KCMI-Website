@@ -31,8 +31,13 @@ export const securityHeaders: { key: string; value: string }[] = [
  * Baseline CSP without broad unsafe-inline.
  * Facebook plugin frames are allowlisted for the controlled livestream preview.
  * Script policy uses 'self' only — refine with nonces when needed (see CSP_SPIKE).
+ *
+ * `upgrade-insecure-requests` belongs only on an *enforced* CSP. Browsers ignore it
+ * in Content-Security-Policy-Report-Only and emit console noise; omit it from report-only.
  */
-export function contentSecurityPolicy(): string {
+export function contentSecurityPolicy(
+  options: { reportOnly?: boolean } = {},
+): string {
   const directives = [
     "default-src 'self'",
     "base-uri 'self'",
@@ -45,9 +50,16 @@ export function contentSecurityPolicy(): string {
     "frame-src 'self' https://www.facebook.com https://web.facebook.com",
     "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com",
     "form-action 'self'",
-    "upgrade-insecure-requests",
   ];
+  if (!options.reportOnly) {
+    directives.push("upgrade-insecure-requests");
+  }
   return directives.join("; ");
+}
+
+/** Report-only policy for staging observation — never includes upgrade-insecure-requests. */
+export function contentSecurityPolicyReportOnly(): string {
+  return contentSecurityPolicy({ reportOnly: true });
 }
 
 /** Staging-only search exclusion. Not applied when KCMI_ENVIRONMENT is production. */

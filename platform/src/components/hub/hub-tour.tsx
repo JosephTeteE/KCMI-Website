@@ -13,7 +13,6 @@ import {
 } from "react";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 import {
-  hubTourEntryPath,
   hubTourStepsForKind,
   HUB_TOUR_LIVESTREAM_BEGIN_EVENT,
   HUB_TOUR_MENU_EVENT,
@@ -29,7 +28,9 @@ import {
   readHubTourStepIndex,
   resetHubTour,
   resolveReplayTourKind,
+  resolveTourEntryHref,
   setHubTourActive,
+  tourStepMatchesRoute,
   writeHubTourKind,
   writeHubTourStepIndex,
   type HubTourKind,
@@ -287,10 +288,12 @@ export function HubTour() {
     setManualActive(true);
     setTargetMissing(false);
     setSearching(true);
-    const dest = entryHref ?? hubTourEntryPath(nextKind);
     const here = (pathname ?? "").replace(/\/$/, "") || "/";
-    const want = dest.replace(/\/$/, "") || "/";
-    if (here !== want) {
+    const dest = (entryHref ?? resolveTourEntryHref(nextKind, pathname)).replace(
+      /\/$/,
+      "",
+    ) || "/";
+    if (here !== dest) {
       router.push(dest);
     } else {
       const first = nextSteps[0];
@@ -324,10 +327,8 @@ export function HubTour() {
     const current = steps[step];
     if (!current) return;
 
-    // Never leave the tour's route mid-flow.
-    const here = (pathname ?? "").replace(/\/$/, "") || "/";
-    const want = current.href.replace(/\/$/, "") || "/";
-    if (here !== want) {
+    // Never leave the tour's route mid-flow (create+edit share program steps).
+    if (!tourStepMatchesRoute(current, pathname)) {
       queueMicrotask(() => {
         setTargetBox(null);
         setTargetMissing(true);

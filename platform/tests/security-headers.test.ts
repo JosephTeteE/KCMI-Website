@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { contentSecurityPolicy, securityHeaders, stagingRobotsHeaders } from "@/lib/security/headers";
+import {
+  contentSecurityPolicy,
+  contentSecurityPolicyReportOnly,
+  securityHeaders,
+  stagingRobotsHeaders,
+} from "@/lib/security/headers";
 
 describe("security headers foundation", () => {
   it("includes HSTS without preload", () => {
@@ -17,5 +22,12 @@ describe("security headers foundation", () => {
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("frame-src 'self' https://www.facebook.com https://web.facebook.com");
     expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
+  });
+
+  it("keeps upgrade-insecure-requests only on enforced CSP, not report-only", () => {
+    expect(contentSecurityPolicy()).toContain("upgrade-insecure-requests");
+    expect(contentSecurityPolicyReportOnly()).not.toContain(
+      "upgrade-insecure-requests",
+    );
   });
 });

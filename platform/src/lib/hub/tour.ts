@@ -145,7 +145,11 @@ export const HUB_HOME_CONTEXT_TOUR_STEPS: readonly HubTourStep[] = [
   },
 ] as const;
 
-/** New Program contextual — stays on /admin/programs/new. */
+/**
+ * Program contextual — shared by create (`/admin/programs/new`) and edit
+ * (`/admin/programs/[id]`). Step `href` documents the create path; route
+ * matching uses `isProgramsWizardPath` so edit stays on the same wizard.
+ */
 export const HUB_PROGRAMS_CONTEXT_TOUR_STEPS: readonly HubTourStep[] = [
   {
     id: "program-about",
@@ -189,6 +193,31 @@ export const HUB_PROGRAMS_CONTEXT_TOUR_STEPS: readonly HubTourStep[] = [
     programWizardStep: 5,
   },
 ] as const;
+
+/** Create or edit wizard (not list, preview, or QA-only fixtures). */
+export function isProgramsWizardPath(
+  pathname: string | null | undefined,
+): boolean {
+  const path = (pathname ?? "").replace(/\/$/, "") || "/";
+  if (path === "/admin/programs/new") return true;
+  if (path === "/admin/programs" || path === "/admin/programs/fixture-published-safety") {
+    return false;
+  }
+  if (path.endsWith("/preview")) return false;
+  return /^\/admin\/programs\/[^/]+$/.test(path);
+}
+
+/** Whether a tour step is valid on the current route (create+edit aware). */
+export function tourStepMatchesRoute(
+  step: HubTourStep,
+  pathname: string | null | undefined,
+): boolean {
+  const here = (pathname ?? "").replace(/\/$/, "") || "/";
+  const want = step.href.replace(/\/$/, "") || "/";
+  if (here === want) return true;
+  if (want === "/admin/programs/new" && isProgramsWizardPath(here)) return true;
+  return false;
+}
 
 /** Livestream contextual — stays on /admin/livestream. */
 export const HUB_LIVESTREAM_CONTEXT_TOUR_STEPS: readonly HubTourStep[] = [
@@ -238,7 +267,7 @@ export type HubTourStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">
 export function resolveHubTourKind(pathname: string | null | undefined): HubTourKind {
   const path = (pathname ?? "").replace(/\/$/, "") || "/";
   if (path === "/admin/website/home") return "home";
-  if (path === "/admin/programs/new") return "programs";
+  if (isProgramsWizardPath(path)) return "programs";
   if (path === "/admin/livestream") return "livestream";
   return "dashboard";
 }
@@ -273,9 +302,22 @@ export function hubTourEntryPath(kind: HubTourKind): string {
 export function resolveReplayTourKind(pathname: string | null | undefined): HubTourKind {
   const path = (pathname ?? "").replace(/\/$/, "") || "/";
   if (path === "/admin/website/home") return "home";
-  if (path.startsWith("/admin/programs")) return "programs";
+  if (isProgramsWizardPath(path) || path === "/admin/programs") return "programs";
   if (path === "/admin/livestream") return "livestream";
   return "dashboard";
+}
+
+/**
+ * Stay on the current create/edit program page when replaying Help there.
+ * Default entry for programs remains `/admin/programs/new`.
+ */
+export function resolveTourEntryHref(
+  kind: HubTourKind,
+  pathname: string | null | undefined,
+): string {
+  const here = (pathname ?? "").replace(/\/$/, "") || "/";
+  if (kind === "programs" && isProgramsWizardPath(here)) return here;
+  return hubTourEntryPath(kind);
 }
 
 export function isHubTourComplete(storage: HubTourStorage | null): boolean {

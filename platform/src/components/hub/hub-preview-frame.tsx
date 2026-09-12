@@ -81,18 +81,29 @@ export function HubPreviewFrame({
     openButtonRef.current?.focus();
   }
 
-  const scaledWidth = HUB_PREVIEW_CANVAS_WIDTH * scale;
   const scaledHeight = Math.max(8, innerHeight * scale);
   const fullCanvasWidth =
     device === "phone" ? HUB_PREVIEW_PHONE_WIDTH : HUB_PREVIEW_CANVAS_WIDTH;
 
+  useEffect(() => {
+    const root = frameRef.current;
+    if (!root) return;
+    // Belt-and-suspenders beside `inert`: remove focusability from thumbnail subtree.
+    const focusable = root.querySelectorAll<HTMLElement>(
+      "a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])",
+    );
+    for (const el of focusable) {
+      el.setAttribute("tabindex", "-1");
+    }
+  }, [children, scale, innerHeight]);
+
   return (
     <section
       aria-label={title}
-      className="overflow-hidden rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]"
+      className="min-w-0 max-w-full overflow-x-hidden rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-page)] px-4 py-3">
-        <div>
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-page)] px-4 py-3">
+        <div className="min-w-0 flex-1 basis-[12rem]">
           <p className="text-base font-semibold text-[var(--color-text-body)]">
             {title}
             <span className="ml-2 text-base font-medium text-[var(--color-text-muted)]">
@@ -107,33 +118,37 @@ export function HubPreviewFrame({
         <button
           ref={openButtonRef}
           type="button"
-          className="inline-flex min-h-11 items-center text-base font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
+          className="inline-flex min-h-11 shrink-0 items-center text-base font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
           onClick={openLarge}
         >
           {HUB_ACTION_LABELS.viewFullSizePreview}
         </button>
       </div>
+      {/*
+        Orientation thumbnail only: inert + aria-hidden so public controls inside
+        are not focusable/clickable. Full Phone/Desktop dialog below stays interactive.
+        Inner canvas is absolutely positioned so the fixed 960px width cannot force
+        horizontal document overflow (transform scale does not shrink layout size).
+      */}
       <div
         ref={frameRef}
         data-hub-preview-scaled="true"
-        className="overflow-hidden bg-[var(--color-surface-page)]"
-        style={{ height: scaledHeight }}
+        data-hub-preview="scaled"
+        className="relative min-w-0 max-w-full overflow-hidden bg-[var(--color-surface-page)]"
+        style={{ height: scaledHeight, width: "100%" }}
         aria-hidden="true"
+        inert
       >
         <div
-          className="origin-top-left"
-          style={{ width: scaledWidth, height: scaledHeight }}
+          ref={innerRef}
+          className="pointer-events-none absolute left-0 top-0 origin-top-left"
+          style={{
+            width: HUB_PREVIEW_CANVAS_WIDTH,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
         >
-          <div
-            ref={innerRef}
-            className="pointer-events-none origin-top-left"
-            style={{
-              width: HUB_PREVIEW_CANVAS_WIDTH,
-              transform: `scale(${scale})`,
-            }}
-          >
-            {children}
-          </div>
+          {children}
         </div>
       </div>
 
@@ -211,12 +226,14 @@ export function HubPreviewFrame({
           {largeOpen ? (
             <div className="flex justify-center bg-[var(--color-surface-page)] p-4">
               <div
-                className="pointer-events-none w-full bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]"
+                data-hub-preview="full"
+                className="w-full min-w-0 bg-[var(--color-surface-elevated)] shadow-[var(--shadow-soft)]"
                 style={{ maxWidth: fullCanvasWidth }}
               >
                 {/*
                   Phone uses a 390px-wide public composition so the layout is
                   responsive phone, not a squeezed desktop canvas.
+                  Full preview remains an interactive surface (unlike the thumbnail).
                 */}
                 <div style={{ width: "100%", maxWidth: fullCanvasWidth }}>
                   {children}

@@ -238,12 +238,12 @@ export function HomeWebsiteEditor({
             See each part of the page, then choose what to change.
           </p>
         </div>
-        <ul className="grid gap-6">
+        <ul className="grid min-w-0 gap-6">
           {HOME_VISUAL_SECTIONS.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="min-w-0">
               <article
                 data-tour={homeVisualSectionTourTarget(item.id)}
-                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 transition-[outline,border-color] hover:border-[var(--color-action-primary)] hover:outline hover:outline-2 hover:outline-offset-2 hover:outline-[var(--color-action-primary)] focus-within:border-[var(--color-action-primary)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--color-action-primary)]"
+                className="min-w-0 overflow-x-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 transition-[outline,border-color] hover:border-[var(--color-action-primary)] hover:outline hover:outline-2 hover:outline-offset-2 hover:outline-[var(--color-action-primary)] focus-within:border-[var(--color-action-primary)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--color-action-primary)]"
               >
                 <div className="mb-4">
                   <SectionLivePreview

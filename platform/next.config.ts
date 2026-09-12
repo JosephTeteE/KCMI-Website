@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 import {
-  contentSecurityPolicy,
+  contentSecurityPolicyReportOnly,
   securityHeaders,
   stagingRobotsHeaders,
 } from "./src/lib/security/headers";
@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           ...stagingRobotsHeaders(),
           {
             key: "Content-Security-Policy-Report-Only",
-            value: contentSecurityPolicy(),
+            value: contentSecurityPolicyReportOnly(),
           },
         ],
       },
