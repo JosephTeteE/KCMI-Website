@@ -1,27 +1,50 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { createProgram } from "@/app/admin/programs/actions";
+import {
+  createProgram,
+  saveProgramWizardEdit,
+} from "@/app/admin/programs/actions";
 import {
   HubSelectField,
   HubTextAreaField,
   HubTextField,
 } from "@/components/hub/hub-form-fields";
 import { MediaChooser, type MediaChooserItem } from "@/components/hub/media-chooser";
+import { ProgramReviewScheduleSummary } from "@/components/hub/program-review-schedule-summary";
+import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 import { HUB_TOUR_PROGRAM_WIZARD_STEP_EVENT } from "@/lib/hub/tour";
 import {
-  formatProgramScheduleLabel,
   programActionLabel,
   type ProgramActionKind,
 } from "@/lib/programs/schedule";
 import type { ProgramLocationKind } from "@/lib/programs/location";
 import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
 import { flattenProgramDays } from "@/lib/programs/days";
+import type { WizardScheduleState } from "@/lib/programs/wizard-state";
 
 export type ProgramWizardBranch = {
   id: string;
   name: string;
   country: string | null;
+};
+
+export type ProgramWizardInitial = {
+  id: string;
+  title: string;
+  shortDescription: string;
+  featuredMediaId: string | null;
+  posterPreviewUrl: string | null;
+  posterAlt: string | null;
+  schedule: WizardScheduleState;
+  locationKind: ProgramLocationKind | "";
+  locationBranchId: string;
+  locationLabel: string;
+  actionKind: ProgramActionKind;
+  ctaUrl: string;
+  placement: "none" | "featured";
+  status: "draft" | "preview" | "published" | "archived";
+  timezone: string;
 };
 
 type ScheduleMode = "one_day" | "several_days";
@@ -146,6 +169,20 @@ function formatTimeLabel(raw: string): string {
   });
 }
 
+function daysFromSchedule(schedule: WizardScheduleState): DayDraft[] {
+  return schedule.days.map((day) => ({
+    key: newKey(),
+    sessionDate: day.sessionDate,
+    sessions: day.sessions.map((session) =>
+      emptyDaySession({
+        startTime: session.startTime,
+        endTime: session.endTime,
+        label: session.label,
+      }),
+    ),
+  }));
+}
+
 export function ProgramCreateWizard({
   branches,
   media,
@@ -153,35 +190,76 @@ export function ProgramCreateWizard({
   branches: ProgramWizardBranch[];
   media: MediaChooserItem[];
 }) {
+  return <ProgramWizard mode="create" branches={branches} media={media} />;
+}
+
+export function ProgramWizard({
+  mode,
+  branches,
+  media,
+  initial,
+  canPublish = false,
+}: {
+  mode: "create" | "edit";
+  branches: ProgramWizardBranch[];
+  media: MediaChooserItem[];
+  initial?: ProgramWizardInitial;
+  canPublish?: boolean;
+}) {
+  const isEdit = mode === "edit" && Boolean(initial);
+  const isPublished = isEdit && initial?.status === "published";
+  const isDraft = !isPublished;
+
   const [step, setStep] = useState(1);
   const [stepError, setStepError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [changeUnlocked, setChangeUnlocked] = useState(!isPublished);
 
-  const [title, setTitle] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [shortDescription, setShortDescription] = useState(
+    initial?.shortDescription ?? "",
+  );
   const [posterMode, setPosterMode] = useState<"none" | "upload" | "library">(
-    "none",
+    initial?.featuredMediaId ? "library" : "none",
   );
   const [posterFile, setPosterFile] = useState<File | null>(null);
-  const [posterAlt, setPosterAlt] = useState("");
-  const [featuredMediaId, setFeaturedMediaId] = useState("");
+  const [posterAlt, setPosterAlt] = useState(initial?.posterAlt ?? "");
+  const [featuredMediaId, setFeaturedMediaId] = useState(
+    initial?.featuredMediaId ?? "",
+  );
+  const [placement] = useState<"none" | "featured">(
+    initial?.placement ?? "none",
+  );
 
-  const [scheduleMode, setScheduleMode] = useState<ScheduleMode>("one_day");
-  const [oneDay, setOneDay] = useState({
-    sessionDate: "",
-    startTime: "",
-    endTime: "",
-  });
-  const [days, setDays] = useState<DayDraft[]>([emptyDay()]);
+  const [scheduleMode, setScheduleMode] = useState<ScheduleMode>(
+    initial?.schedule.scheduleMode ?? "one_day",
+  );
+  const [oneDay, setOneDay] = useState(
+    initial?.schedule.oneDay ?? {
+      sessionDate: "",
+      startTime: "",
+      endTime: "",
+    },
+  );
+  const [days, setDays] = useState<DayDraft[]>(() =>
+    initial ? daysFromSchedule(initial.schedule) : [emptyDay()],
+  );
 
   const [locationKind, setLocationKind] = useState<ProgramLocationKind | "">(
-    "",
+    initial?.locationKind ?? "",
   );
-  const [locationBranchId, setLocationBranchId] = useState("");
-  const [locationLabel, setLocationLabel] = useState("");
+  const [locationBranchId, setLocationBranchId] = useState(
+    initial?.locationBranchId ?? "",
+  );
+  const [locationLabel, setLocationLabel] = useState(
+    initial?.locationLabel ?? "",
+  );
 
-  const [actionKind, setActionKind] = useState<ProgramActionKind>("none");
-  const [ctaUrl, setCtaUrl] = useState("");
+  const [actionKind, setActionKind] = useState<ProgramActionKind>(
+    initial?.actionKind ?? "none",
+  );
+  const [ctaUrl, setCtaUrl] = useState(initial?.ctaUrl ?? "");
+  const [reviewPreviewed, setReviewPreviewed] = useState(false);
 
   useEffect(() => {
     function onTourWizardStep(event: Event) {
@@ -198,6 +276,8 @@ export function ProgramCreateWizard({
         onTourWizardStep,
       );
   }, []);
+
+  const fieldsLocked = isPublished && !changeUnlocked;
 
   const selectedBranch = branches.find((b) => b.id === locationBranchId);
   const selectedMedia = media.find((m) => m.id === featuredMediaId);
@@ -218,15 +298,13 @@ export function ProgramCreateWizard({
     return flattenProgramDays(days);
   }, [scheduleMode, oneDay, days]);
 
-  const schedulePreview = formatProgramScheduleLabel(
-    effectiveSessions.map((s) => ({
-      sessionDate: s.session_date,
-      startTime: s.start_time,
-      endTime: s.end_time,
-      label: s.label,
-      sortOrder: s.sort_order,
-    })),
-  );
+  const scheduleSessions = effectiveSessions.map((s) => ({
+    sessionDate: s.session_date,
+    startTime: s.start_time,
+    endTime: s.end_time,
+    label: s.label,
+    sortOrder: s.sort_order,
+  }));
 
   function validateStep(current: number): string | null {
     if (current === 1) {
@@ -355,7 +433,7 @@ export function ProgramCreateWizard({
     return `${label} → ${ctaUrl.trim() || "(link missing)"}`;
   }
 
-  function submitDraft() {
+  function submitWizard(intent: "draft" | "live") {
     const errors = [1, 2, 3, 4]
       .map((s) => validateStep(s))
       .filter(Boolean) as string[];
@@ -363,13 +441,25 @@ export function ProgramCreateWizard({
       setStepError(errors[0]);
       return;
     }
+    if (isPublished && intent === "live" && !reviewPreviewed) {
+      setStepError("Preview your changes before making them live.");
+      return;
+    }
 
     const fd = new FormData();
+    if (isEdit && initial) {
+      fd.set("id", initial.id);
+      fd.set("save_intent", intent);
+      fd.set("placement", placement);
+      fd.set("body_text", "");
+    } else {
+      fd.set("body_text", "");
+      fd.set("placement", "none");
+    }
     fd.set("title", title.trim());
     fd.set("short_description", shortDescription.trim());
-    fd.set("body_text", "");
     fd.set("sessions_json", JSON.stringify(effectiveSessions));
-    fd.set("timezone", DEFAULT_PROGRAM_TIMEZONE);
+    fd.set("timezone", initial?.timezone ?? DEFAULT_PROGRAM_TIMEZONE);
     fd.set("location_kind", locationKind);
     if (locationKind === "branch") {
       fd.set("location_branch_id", locationBranchId);
@@ -382,10 +472,12 @@ export function ProgramCreateWizard({
     if (actionKind !== "none") {
       fd.set("cta_url", ctaUrl.trim());
     }
-    fd.set("placement", "none");
 
     if (posterMode === "library" && featuredMediaId) {
       fd.set("featured_media_id", featuredMediaId);
+    }
+    if (posterMode === "none" && isEdit) {
+      fd.set("featured_media_id", "");
     }
     if (posterMode === "upload" && posterFile) {
       fd.set("file", posterFile);
@@ -396,12 +488,78 @@ export function ProgramCreateWizard({
     }
 
     startTransition(() => {
-      void createProgram(fd);
+      if (isEdit) {
+        void saveProgramWizardEdit(fd);
+      } else {
+        void createProgram(fd);
+      }
     });
   }
 
+  const statusBanner =
+    isEdit && isDraft ? (
+      <p
+        className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-tint)] px-4 py-3 text-base font-semibold text-[var(--color-text-body)]"
+        data-testid="program-draft-banner"
+      >
+        DRAFT — NOT ON THE WEBSITE
+      </p>
+    ) : isPublished ? (
+      <p
+        className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-4 py-3 text-base font-semibold text-[var(--color-text-body)]"
+        data-testid="program-live-banner"
+      >
+        Currently on the website
+      </p>
+    ) : null;
+
   return (
     <div className="max-w-2xl space-y-8" data-tour="program-wizard">
+      {statusBanner}
+
+      {isPublished && !changeUnlocked ? (
+        <div className="space-y-4" data-testid="program-live-locked">
+          <dl className="space-y-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 text-base">
+            <div>
+              <dt className="font-medium text-[var(--color-text-muted)]">Name</dt>
+              <dd className="mt-1 text-[var(--color-text-body)]">
+                {title.trim() || "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium text-[var(--color-text-muted)]">When</dt>
+              <dd className="mt-1 text-[var(--color-text-body)]">
+                <ProgramReviewScheduleSummary sessions={scheduleSessions} />
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium text-[var(--color-text-muted)]">Where</dt>
+              <dd className="mt-1 text-[var(--color-text-body)]">
+                {locationSummary()}
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium text-[var(--color-text-muted)]">
+                Visitor link
+              </dt>
+              <dd className="mt-1 break-all text-[var(--color-text-body)]">
+                {actionSummary()}
+              </dd>
+            </div>
+          </dl>
+          <button
+            type="button"
+            onClick={() => setChangeUnlocked(true)}
+            className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 text-base font-semibold text-[var(--color-action-primary-fg)]"
+            data-tour="program-change"
+          >
+            {HUB_ACTION_LABELS.changeSermonDetails}
+          </button>
+        </div>
+      ) : null}
+
+      {!(isPublished && !changeUnlocked) ? (
+        <>
       <nav aria-label="Program steps" className="space-y-3">
         <ol className="flex flex-wrap gap-2">
           {STEPS.map((item) => {
@@ -426,8 +584,11 @@ export function ProgramCreateWizard({
           })}
         </ol>
         <p className="text-base text-[var(--color-text-muted)]">
-          Step {step} of {STEPS.length}. This saves as a draft — not on the
-          website yet.
+          {isEdit
+            ? isPublished
+              ? `Step ${step} of ${STEPS.length}. Changes stay private until you make them live.`
+              : `Step ${step} of ${STEPS.length}. Save keeps this as a draft — not on the website.`
+            : `Step ${step} of ${STEPS.length}. This saves as a draft — not on the website yet.`}
         </p>
       </nav>
 
@@ -439,6 +600,11 @@ export function ProgramCreateWizard({
           {stepError}
         </p>
       ) : null}
+
+      <fieldset
+        disabled={fieldsLocked}
+        className="min-w-0 space-y-8 border-0 p-0 disabled:opacity-70"
+      >
 
       {step === 1 ? (
         <section className="space-y-6" data-tour="program-wizard-about">
@@ -465,15 +631,45 @@ export function ProgramCreateWizard({
             <legend className="text-base font-medium text-[var(--color-text-body)]">
               Program poster / main photo
             </legend>
-            <p className="hub-help text-[var(--color-text-muted)]">
-              Optional. You can upload a new photo here or reuse one already
-              saved.
-            </p>
+            {isEdit &&
+            (initial?.posterPreviewUrl ||
+              (posterMode === "library" && featuredMediaId)) ? (
+              <div className="space-y-3 rounded-[var(--radius-md)] border border-[var(--color-border)] p-4">
+                <p className="text-base font-medium text-[var(--color-text-body)]">
+                  Current poster
+                </p>
+                {initial?.posterPreviewUrl || selectedMedia?.previewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- Hub admin preview of existing asset URL
+                  <img
+                    src={
+                      selectedMedia?.previewUrl ??
+                      initial?.posterPreviewUrl ??
+                      ""
+                    }
+                    alt={
+                      selectedMedia?.alt ||
+                      initial?.posterAlt ||
+                      "Current program poster"
+                    }
+                    className="aspect-[4/3] w-full max-w-sm rounded-[var(--radius-md)] object-cover"
+                  />
+                ) : null}
+                <p className="hub-help text-[var(--color-text-muted)]">
+                  {HUB_ACTION_LABELS.replacePhoto}: choose upload or an existing
+                  photo below. Preview on Review, then save.
+                </p>
+              </div>
+            ) : (
+              <p className="hub-help text-[var(--color-text-muted)]">
+                Optional. You can upload a new photo here or reuse one already
+                saved.
+              </p>
+            )}
             {(
               [
                 { value: "none", label: "No photo for now" },
-                { value: "upload", label: "Upload a new photo" },
-                { value: "library", label: "Use a photo already saved" },
+                { value: "upload", label: HUB_ACTION_LABELS.uploadNewPhoto },
+                { value: "library", label: HUB_ACTION_LABELS.useSavedPhoto },
               ] as const
             ).map((option) => (
               <label
@@ -488,7 +684,11 @@ export function ProgramCreateWizard({
                   onChange={() => {
                     setPosterMode(option.value);
                     if (option.value !== "upload") setPosterFile(null);
-                    if (option.value !== "library") setFeaturedMediaId("");
+                    if (option.value === "library" && initial?.featuredMediaId) {
+                      setFeaturedMediaId(initial.featuredMediaId);
+                    } else if (option.value !== "library") {
+                      setFeaturedMediaId("");
+                    }
                   }}
                 />
                 <span>{option.label}</span>
@@ -556,6 +756,7 @@ export function ProgramCreateWizard({
               <input
                 type="radio"
                 name="schedule_mode"
+                value="one_day"
                 className="mt-1 size-5"
                 checked={scheduleMode === "one_day"}
                 onChange={() => setScheduleMode("one_day")}
@@ -571,6 +772,7 @@ export function ProgramCreateWizard({
               <input
                 type="radio"
                 name="schedule_mode"
+                value="several_days"
                 className="mt-1 size-5"
                 checked={scheduleMode === "several_days"}
                 onChange={() => setScheduleMode("several_days")}
@@ -632,6 +834,7 @@ export function ProgramCreateWizard({
               {days.map((day, dayIndex) => (
                 <div
                   key={day.key}
+                  data-program-day={day.sessionDate || String(dayIndex + 1)}
                   className="space-y-4 rounded-[var(--radius-md)] border border-[var(--color-border)] p-4"
                 >
                   <div className="space-y-3">
@@ -951,7 +1154,11 @@ export function ProgramCreateWizard({
       {step === 5 ? (
         <section className="space-y-6" data-tour="program-wizard-review">
           <h2 className="text-xl font-semibold text-[var(--color-text-body)]">
-            Review and save as draft
+            {isPublished
+              ? "Review your changes"
+              : isEdit
+                ? "Review and save draft changes"
+                : "Review and save as draft"}
           </h2>
           <dl className="space-y-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 text-base">
             <div>
@@ -973,22 +1180,18 @@ export function ProgramCreateWizard({
               <dd className="mt-1 text-[var(--color-text-body)]">
                 {posterMode === "upload" && posterFile
                   ? `New upload: ${posterFile.name}`
-                  : posterMode === "library" && selectedMedia
-                    ? selectedMedia.alt || "Saved photo"
+                  : posterMode === "library" &&
+                      (selectedMedia || initial?.posterPreviewUrl)
+                    ? selectedMedia?.alt ||
+                      initial?.posterAlt ||
+                      "Current poster"
                     : "No photo"}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-[var(--color-text-muted)]">When</dt>
               <dd className="mt-1 text-[var(--color-text-body)]">
-                {schedulePreview ??
-                  (scheduleMode === "one_day" && oneDay.sessionDate
-                    ? `${formatDateHeading(oneDay.sessionDate)}${
-                        oneDay.startTime
-                          ? ` · ${formatTimeLabel(oneDay.startTime)}`
-                          : ""
-                      }`
-                    : "—")}
+                <ProgramReviewScheduleSummary sessions={scheduleSessions} />
               </dd>
             </div>
             <div>
@@ -1006,12 +1209,20 @@ export function ProgramCreateWizard({
               </dd>
             </div>
           </dl>
-          <p className="text-base text-[var(--color-text-muted)]">
-            Homepage spotlight is not set here. After this draft exists, you can
-            feature it from the Homepage editor if needed.
-          </p>
+          {!isPublished ? (
+            <p className="text-base text-[var(--color-text-muted)]">
+              {isEdit
+                ? "Saving keeps this program as a draft. It will not appear on the public website."
+                : "Homepage spotlight is not set here. After this draft exists, you can feature it from the Homepage editor if needed."}
+            </p>
+          ) : (
+            <p className="text-base text-[var(--color-text-muted)]">
+              Preview first. Making these changes live updates what visitors see.
+            </p>
+          )}
         </section>
       ) : null}
+      </fieldset>
 
       <div className="flex flex-wrap gap-3 border-t border-[var(--color-border)] pt-6">
         {step > 1 ? (
@@ -1031,17 +1242,48 @@ export function ProgramCreateWizard({
           >
             Next step
           </button>
+        ) : isPublished ? (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                setStepError(null);
+                setReviewPreviewed(true);
+              }}
+              className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-base font-semibold text-[var(--color-text-body)]"
+            >
+              {HUB_ACTION_LABELS.previewChanges}
+            </button>
+            <button
+              type="button"
+              disabled={isPending || !reviewPreviewed || !canPublish}
+              onClick={() => submitWizard("live")}
+              className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 text-base font-semibold text-[var(--color-action-primary-fg)] transition-[filter,opacity] disabled:cursor-not-allowed disabled:opacity-50"
+              data-testid="program-make-live"
+            >
+              {isPending
+                ? "Saving…"
+                : HUB_ACTION_LABELS.makeChangesLive}
+            </button>
+          </>
         ) : (
           <button
             type="button"
             disabled={isPending}
-            onClick={submitDraft}
+            onClick={() => submitWizard("draft")}
             className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 text-base font-semibold text-[var(--color-action-primary-fg)] transition-[filter,opacity] disabled:cursor-not-allowed disabled:opacity-50"
+            data-testid="program-save-draft"
           >
-            {isPending ? "Saving draft…" : "Save as a draft (not public yet)"}
+            {isPending
+              ? "Saving…"
+              : isEdit
+                ? "Save draft changes"
+                : HUB_ACTION_LABELS.createProgramDraft}
           </button>
         )}
       </div>
+        </>
+      ) : null}
     </div>
   );
 }

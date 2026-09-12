@@ -214,6 +214,28 @@ async function insertProgramSessions(
   return { error: error?.message ?? null };
 }
 
+/**
+ * Replace all sessions for a program after validation succeeds.
+ * Delete runs only after the payload is non-empty and validated upstream.
+ */
+async function replaceProgramSessions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  programId: string,
+  sessions: ParsedProgramSession[],
+): Promise<{ error: string | null }> {
+  if (sessions.length === 0) {
+    return { error: "Add at least one date and start time for this program." };
+  }
+  const { error: deleteError } = await supabase
+    .from("program_sessions")
+    .delete()
+    .eq("program_id", programId);
+  if (deleteError) {
+    return { error: deleteError.message };
+  }
+  return insertProgramSessions(supabase, programId, sessions);
+}
+
 export async function createProgram(formData: FormData) {
   const gate = await requireAnyPermission([
     "programs.create",
@@ -393,8 +415,7 @@ export async function updateProgram(formData: FormData) {
   }
 
   if (parsed.fields.hasSessionPayload) {
-    await supabase.from("program_sessions").delete().eq("program_id", id);
-    const sessionsResult = await insertProgramSessions(
+    const sessionsResult = await replaceProgramSessions(
       supabase,
       id,
       parsed.fields.sessions,
@@ -405,6 +426,174 @@ export async function updateProgram(formData: FormData) {
   }
 
   redirectWithMessage(`/admin/programs/${id}`, "Your program details are saved.");
+}
+
+/**
+ * D1.8.1 wizard edit save — same field model as create.
+ * save_intent=draft keeps draft; save_intent=live updates a published program
+ * without changing status (explicit Make live for already-published content).
+ */
+export async function saveProgramWizardEdit(formData: FormData) {
+  const id = emptyToNull(formData.get("id"));
+  if (!id) {
+    redirectWithError("/admin/programs", "Missing program id.");
+  }
+
+  const intentRaw = emptyToNull(formData.get("save_intent")) ?? "draft";
+  const intent = intentRaw === "live" ? "live" : "draft";
+
+  const gate =
+    intent === "live"
+      ? await requireStaffAction("programs.publish")
+      : await requireAnyPermission(["programs.update", "programs.create"]);
+  if (!gate.ok) {
+    redirectWithError(`/admin/programs/${id}`, gate.message);
+  }
+
+  const parsed = parseProgramFields(formData, { forcePlacementNone: false });
+  if (!parsed.ok) {
+    redirectWithError(`/admin/programs/${id}`, parsed.error);
+  }
+  if (!parsed.fields.hasSessionPayload || parsed.fields.sessions.length === 0) {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      "Add at least one date and start time for this program.",
+    );
+  }
+  if (!parsed.fields.hasLocationPayload || !parsed.fields.location_kind) {
+    redirectWithError(`/admin/programs/${id}`, "Choose where this program happens.");
+  }
+  if (!parsed.fields.hasActionKindPayload) {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      "Say whether visitors need a link for this program.",
+    );
+  }
+
+  const actorId = gate.session.user.id;
+  const supabase = await createClient();
+
+  const { data: existing, error: loadError } = await supabase
+    .from("programs")
+    .select(
+      "id, title, slug, short_description, body_text, starts_at, ends_at, featured_media_id, cta_label, cta_url, placement, status, published_at, archived_at, action_kind, location_kind, location_branch_id, location_label, timezone",
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (loadError || !existing) {
+    redirectWithError(`/admin/programs/${id}`, "That program could not be found.");
+  }
+
+  if (intent === "draft" && existing.status === "published") {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      "This program is already live. Use Make these changes live after preview.",
+    );
+  }
+  if (intent === "live" && existing.status !== "published") {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      "Only live programs use Make these changes live. Save as a draft first, then publish separately.",
+    );
+  }
+
+  if (
+    parsed.fields.location_kind === "branch" &&
+    parsed.fields.location_branch_id
+  ) {
+    const { data: branch } = await supabase
+      .from("church_branches")
+      .select("id, status")
+      .eq("id", parsed.fields.location_branch_id)
+      .maybeSingle();
+    if (!branch || branch.status !== "published") {
+      redirectWithError(
+        `/admin/programs/${id}`,
+        "That branch is not available. Choose a published branch.",
+      );
+    }
+  }
+
+  const timezone = await resolveTimezoneForFields(supabase, parsed.fields);
+  const legacy = legacyIntervalFromSessions(parsed.fields.sessions, timezone);
+
+  const poster = await ingestPosterFromForm(formData, actorId);
+  if (!poster.ok) {
+    redirectWithError(`/admin/programs/${id}`, poster.error);
+  }
+
+  const featuredMediaId = poster.mediaId
+    ? poster.mediaId
+    : formData.has("featured_media_id")
+      ? parsed.fields.featured_media_id
+      : existing.featured_media_id;
+
+  const placement =
+    parsed.fields.placement === "featured" || parsed.fields.placement === "none"
+      ? parsed.fields.placement
+      : existing.placement;
+
+  const slug = await uniqueProgramSlug(supabase, parsed.fields.title, id);
+
+  const patch: Database["public"]["Tables"]["programs"]["Update"] = {
+    title: parsed.fields.title,
+    short_description: parsed.fields.short_description,
+    body_text: parsed.fields.body_text,
+    starts_at: legacy.startsAt,
+    ends_at: legacy.endsAt,
+    featured_media_id: featuredMediaId,
+    cta_label: parsed.fields.cta_label,
+    cta_url: parsed.fields.cta_url,
+    placement,
+    action_kind: parsed.fields.action_kind,
+    location_kind: parsed.fields.location_kind,
+    location_branch_id: parsed.fields.location_branch_id,
+    location_label: parsed.fields.location_label,
+    timezone,
+    slug,
+    updated_by: actorId,
+  };
+
+  // Validate sessions before mutating the program row when possible —
+  // sessions were already schema-validated in parseProgramFields.
+  const { error } = await supabase.from("programs").update(patch).eq("id", id);
+  if (error) {
+    redirectWithError(`/admin/programs/${id}`, error.message);
+  }
+
+  const sessionsResult = await replaceProgramSessions(
+    supabase,
+    id,
+    parsed.fields.sessions,
+  );
+  if (sessionsResult.error) {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      `Program details were saved, but the schedule could not be updated: ${sessionsResult.error}`,
+    );
+  }
+
+  await writeAuditEvent({
+    actorId,
+    action:
+      intent === "live" ? "program.update_live" : "program.update_draft",
+    entityType: "program",
+    entityId: id,
+    metadata: {
+      intent,
+      title: parsed.fields.title,
+      sessionCount: parsed.fields.sessions.length,
+      status: existing.status,
+    },
+  });
+
+  redirectWithMessage(
+    `/admin/programs/${id}`,
+    intent === "live"
+      ? "Your changes are live on the website."
+      : "Your draft changes are saved. This program is still not on the website.",
+  );
 }
 
 export async function setProgramStatus(formData: FormData) {
