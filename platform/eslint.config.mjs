@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "playwright-report/**",
     "test-results/**",
+    // Local QA artifacts (gitignored) — never lint generated closeout trees
+    ".qa-*/**",
+    ".auth/**",
   ]),
 ]);
 
