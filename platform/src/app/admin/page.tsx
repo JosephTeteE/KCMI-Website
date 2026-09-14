@@ -9,6 +9,7 @@ import { humanAuditAction } from "@/lib/hub/humanize";
 const CARD_TOUR: Record<string, string> = {
   "/admin/website/home": "dashboard-homepage",
   "/admin/programs": "dashboard-programs",
+  "/admin/events": "dashboard-events",
   "/admin/branches": "dashboard-branches",
   "/admin/sermons": "dashboard-sermons",
   "/admin/livestream": "dashboard-livestream",

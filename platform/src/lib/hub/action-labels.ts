@@ -34,6 +34,7 @@ export const HUB_ACTION_LABELS = {
   saveBranch: "Make these branch details live",
   saveSermonDraft: "Save my sermon draft",
   createProgramDraft: "Save as a draft (not public yet)",
+  createEventDraft: "Save as a draft (not public yet)",
   createSermonDraft: "Save as a draft (not public yet)",
   replayTour: "Replay Hub Tour",
   helpTutorial: "Help & Tutorial",

@@ -6,7 +6,8 @@ export type ContentRevisionEntityType =
   | "church_branch"
   | "sermon"
   | "livestream_settings"
-  | "website_document";
+  | "website_document"
+  | "event";
 
 export type SaveRevisionInput = {
   entityType: ContentRevisionEntityType;

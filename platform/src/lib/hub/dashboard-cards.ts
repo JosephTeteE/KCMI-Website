@@ -16,6 +16,11 @@ export const HUB_DASHBOARD_CARDS: readonly HubDashboardCard[] = [
     outcome: "Add or update programs and announcements shown on the website.",
   },
   {
+    title: "Events",
+    href: "/admin/events",
+    outcome: "Create and publish camps, conferences, and other gatherings.",
+  },
+  {
     title: "Branches",
     href: "/admin/branches",
     outcome: "Change service times, addresses and branch photos.",

@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/website", label: "Website pages" },
   { href: "/admin/programs", label: "Programs & Announcements" },
+  { href: "/admin/events", label: "Events" },
   { href: "/admin/sermons", label: "Sermons" },
   { href: "/admin/media", label: "Photos" },
   { href: "/admin/branches", label: "Branches" },

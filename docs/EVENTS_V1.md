@@ -1,7 +1,7 @@
-# Events V1 — E1 implemented model
+# Events V1 — E1 public + E2 Hub editor
 
-**Status:** E1 implementation (schema + public experience)  
-**Does not authorize:** Hub Events editor (E2), registration (E3), payment evidence (E4), Camp content migration (E5), Search Event indexing, Giving, Pastoral.
+**Status:** E1 public experience + E2 Hub Events editor  
+**Does not authorize:** registration (E3), payment evidence (E4), Camp content migration (E5), Search Event indexing, Giving, Pastoral.
 
 ## Events ≠ Programs
 
@@ -37,28 +37,61 @@
 
 Past **published** events remain listed under **Past Events** after their end (or start) date.
 
-## RLS (E1)
+## RLS
+
+### E1 (read)
 
 - `anon` / public: **SELECT** where `status = 'published'` only.
-- `authenticated`: published **or** `hub.access` (staff may read drafts later in Hub).
-- **No** INSERT/UPDATE/DELETE policies in E1.
-- E2 will add writes gated by `events.manage`.
+- `authenticated`: published **or** `hub.access` (staff may read drafts in Hub).
 - Service-role remains server-only.
+
+### E2 (write)
+
+- Migration: `platform/supabase/migrations/20260914190000_events_e2_hub_writes.sql`
+- INSERT/UPDATE: `has_permission('events.manage')` only.
+- No DELETE policy — remove from website via `archived`.
+- `media_admin` gains `events.manage` in DB + `DEFAULT_ROLE_PERMISSIONS`.
+- `media_admin` still has **no** `registrations.manage` / `payment_evidence.review`.
 
 ## Public routes
 
 - `/events` — Upcoming (chronological) + Past (newest first); calm empty state when none.
 - `/events/[slug]` — Featured media or branded text layout; dates; venue/branch; summary/body; contact when set.
 - **No** Register / payment / receipt UI until E3/E4.
-- Hostname rewrite unchanged: `events.kcmi-rcc.org/:path*` → `/events/:path*` (ADR-0002). Do not configure `camp.kcmi-rcc.org` in E1.
+- Hostname rewrite unchanged: `events.kcmi-rcc.org/:path*` → `/events/:path*` (ADR-0002).
 
-## E2 permission intent (document only — Hub UI later)
+## Hub Events (E2)
+
+Routes: `/admin/events`, `/admin/events/new`, `/admin/events/[id]`
+
+Wizard steps: Details → When → Where → Photo → Contact → Review
+
+| Flow | Behaviour |
+| --- | --- |
+| Create | Always `draft`; primary action **Save as a draft** |
+| Draft edit | Change → Preview → **Save draft changes**; **Make this live** is separate |
+| Published edit | Current → Change → Preview → **Make these changes live** (no silent auto-publish) |
+| Photo | Upload new / choose existing; live only after Make Live on published rows |
+| Archive | **Remove from public website** → `archived` with confirm; restore to draft |
+
+### Slug policy
+
+- Create / draft: slug from title; collisions get `-2`, `-3`, …
+- **Published / archived:** slug is **stable** — title edits do not rewrite the public URL
+
+### Audit / revisions
+
+- `writeAuditEvent` on create, draft/live update, publish, archive, restore
+- `saveRevision` with `entity_type='event'` on publish/archive/restore and live content updates
+- Snapshots are content fields only (no registration/payment data)
+
+## Permissions (E2)
 
 | Role | Content | Registrations | Payment evidence |
 | --- | --- | --- | --- |
-| `media_admin` | **Grant** `events.manage` in E2 | **No** `registrations.manage` | **No** `payment_evidence.review` |
-| `registrar` | `events.manage` where needed | `registrations.manage` in E3 | No by default |
-| `finance_reviewer` | No events content required | No | `payment_evidence.review` in E4 |
+| `media_admin` | **`events.manage`** | **No** | **No** |
+| `registrar` | `events.manage` | `registrations.manage` (E3 ops) | No by default |
+| `finance_reviewer` | No | No | `payment_evidence.review` (E4) |
 
 Do not collapse registration/payment access into Event content permission.
 
@@ -79,9 +112,10 @@ Youth & Teens Camp 2025 “Level Up” remains historical source material only. 
 
 ## Search
 
-Events Search indexing is **deferred** until published Events content exists (likely E5 / pre-launch). Do not reopen Search V2 in E1.
+Events Search indexing is **deferred** until published Events content exists (likely E5 / pre-launch).
 
-## Migration
+## Migrations
 
-- Forward-only: `platform/supabase/migrations/20260914180000_events_e1_public.sql`
+- E1: `platform/supabase/migrations/20260914180000_events_e1_public.sql`
+- E2: `platform/supabase/migrations/20260914190000_events_e2_hub_writes.sql`
 - Staging apply only after human review. **Not** applied to production by this phase.

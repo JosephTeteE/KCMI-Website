@@ -23,6 +23,9 @@ describe("RBAC foundation", () => {
     expect(perms.has("website.manage")).toBe(true);
     expect(perms.has("livestream.manage")).toBe(true);
     expect(perms.has("branches.manage")).toBe(true);
+    expect(perms.has("events.manage")).toBe(true);
+    expect(perms.has("registrations.manage")).toBe(false);
+    expect(perms.has("payment_evidence.review")).toBe(false);
     expect(perms.has("users.manage")).toBe(false);
     expect(perms.has("giving.change")).toBe(false);
   });

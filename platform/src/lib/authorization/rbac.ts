@@ -89,11 +89,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "programs.update",
       "programs.publish",
       "sermons.manage",
+      "events.manage",
       "media.manage",
       "website.manage",
       "livestream.manage",
       "branches.manage",
-      // Operating name: HQ Content Admin. No pastoral, users.manage, or giving.change.
+      // Operating name: HQ Content Admin.
+      // events.manage = Event CONTENT only.
+      // Intentionally NO registrations.manage or payment_evidence.review.
+      // No pastoral, users.manage, or giving.change.
     ],
     program_drafter: [
       "hub.access",
