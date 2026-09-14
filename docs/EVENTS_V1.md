@@ -138,5 +138,7 @@ Current Events V1 has **no** public write submission, so Events does **not** req
 - E1: `platform/supabase/migrations/20260914180000_events_e1_public.sql`
 - E2: `platform/supabase/migrations/20260914190000_events_e2_hub_writes.sql`
 - E2.1 grants: `platform/supabase/migrations/20260914191000_events_e2_authenticated_grants.sql`
+- E3 registration (historical, deferred): `platform/supabase/migrations/20260914192000_events_e3_registration.sql` — **preserved**; do not delete
+- Registration deferred cleanup: `platform/supabase/migrations/20260914213000_events_defer_registration_cleanup.sql` — removes E3-only registration objects so the final schema matches advertising-only Events V1
 
-Note: an earlier registration experiment migration (`20260914192000_events_e3_registration.sql`) may exist in history/staging. Product use of registration is **deferred**; do not treat that schema as current Events V1 product surface. Staging cleanup, if desired, requires a separate human-approved forward migration.
+Final intended schema after the full chain: E1/E2 Events content only (no registration columns/table/RPCs).
