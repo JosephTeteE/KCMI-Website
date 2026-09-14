@@ -3,7 +3,10 @@ import type { SermonPublic } from "@/content/types";
 
 export function SermonCard({ sermon }: { sermon: SermonPublic }) {
   return (
-    <article className="min-w-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
+    <article
+      id={sermon.id}
+      className="min-w-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]"
+    >
       {sermon.thumbnailSrc ? (
         <div className="relative aspect-video bg-[var(--color-surface-tint)]">
           <Image

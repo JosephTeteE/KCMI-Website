@@ -1,7 +1,9 @@
 # KCMI Public Experience V2 (D1.7)
 
 **Status:** Implementation guidance for the D1.7 public recomposition and Hub legibility work.  
-**Does not** authorize Search V2, D2 Giving administration, pastoral workflows, or full Events/Camp.
+**Does not** authorize D2 Giving administration, pastoral workflows, or full Events/Camp.
+
+Search V2 is documented in [`SEARCH_V2.md`](SEARCH_V2.md) (public Postgres-backed search).
 
 Related: [`KCMI_VOICE_GUIDE.md`](KCMI_VOICE_GUIDE.md), [`CMS_COVERAGE_MATRIX.md`](CMS_COVERAGE_MATRIX.md), [`CONTENT_VERIFICATION_GAPS.md`](CONTENT_VERIFICATION_GAPS.md).
 

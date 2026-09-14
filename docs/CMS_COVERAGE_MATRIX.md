@@ -48,7 +48,7 @@ See also: [`PUBLIC_EXPERIENCE_V2.md`](PUBLIC_EXPERIENCE_V2.md) (includes Visual 
 | 10 | `/locations/[slug]` | Branch page | facts + media | branch + `branch_media` | Branch editor | Omit missing optional fields |
 | 11 | `/about` etc. | Existing CMS | website_documents / programs / sermons | prior D1.6 coverage | matching Hub editors | Unchanged ownership |
 
-Remaining engineering-controlled: brand logo, structural nav, giving accounts (D2), legal documents, Events/Camp, Search V2, pastoral, env canonical URL, security/layout.
+Remaining engineering-controlled: brand logo, structural nav, giving accounts (D2), legal documents, Events/Camp, pastoral, env canonical URL, security/layout. Search V2 is implemented for public corpus search (see [`SEARCH_V2.md`](SEARCH_V2.md)).
 
 ---
 
@@ -77,7 +77,7 @@ Remaining engineering-controlled: brand logo, structural nav, giving accounts (D
 | Giving account numbers | Dual-approval / D2; not this phase |
 | Privacy / Terms body | Counsel; AI must not invent legal duties |
 | Events/Camp registration | Separate approved phase; `camp-deploy` untouched |
-| Search index | Next phase; public published content only |
+| Search index | Search V2 — public published corpus only; see [`SEARCH_V2.md`](SEARCH_V2.md) |
 | Pastoral narratives | Not in D1; media_admin must not receive them |
 | `NEXT_PUBLIC_SITE_URL` / environment | Operations, not content |
 | DFR WhatsApp “message Subscribe” | Intentionally removed from global UX |

@@ -903,6 +903,22 @@ export type Database = {
       can_manage_branch: { Args: { p_branch_id: string }; Returns: boolean }
       has_permission: { Args: { permission_name: string }; Returns: boolean }
       has_role: { Args: { role_name: string }; Returns: boolean }
+      search_public_content: {
+        Args: {
+          p_query: string
+          p_type?: string | null
+          p_limit?: number
+        }
+        Returns: {
+          result_type: string
+          title: string
+          summary: string | null
+          url: string
+          context: string | null
+          image_url: string | null
+          rank_score: number
+        }[]
+      }
     }
     Enums: {
       branch_media_placement:

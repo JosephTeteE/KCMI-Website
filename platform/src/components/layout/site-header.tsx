@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import type { NavItem } from "@/content/types";
+import { SiteSearchControl } from "@/components/search/site-search-control";
 
 type Props = {
   brandName: string;
@@ -72,6 +73,7 @@ export function SiteHeader({ brandName, shortName, items, cta }: Props) {
               </Link>
             );
           })}
+          <SiteSearchControl variant="icon" />
           <Link
             href={cta.href}
             className="text-nav ml-2 inline-flex min-h-11 max-w-xs items-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-4 text-center leading-snug font-semibold text-wrap text-[var(--color-action-primary-fg)] transition-opacity hover:opacity-95"
@@ -80,26 +82,29 @@ export function SiteHeader({ brandName, shortName, items, cta }: Props) {
           </Link>
         </nav>
 
-        <button
-          type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text-body)] lg:hidden"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-          <span aria-hidden className="flex w-5 flex-col gap-1.5">
-            <span
-              className={`h-0.5 w-full bg-current transition-transform ${open ? "translate-y-2 rotate-45" : ""}`}
-            />
-            <span
-              className={`h-0.5 w-full bg-current transition-opacity ${open ? "opacity-0" : ""}`}
-            />
-            <span
-              className={`h-0.5 w-full bg-current transition-transform ${open ? "-translate-y-2 -rotate-45" : ""}`}
-            />
-          </span>
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <SiteSearchControl variant="icon" />
+          <button
+            type="button"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text-body)]"
+            aria-expanded={open}
+            aria-controls={panelId}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
+            <span aria-hidden className="flex w-5 flex-col gap-1.5">
+              <span
+                className={`h-0.5 w-full bg-current transition-transform ${open ? "translate-y-2 rotate-45" : ""}`}
+              />
+              <span
+                className={`h-0.5 w-full bg-current transition-opacity ${open ? "opacity-0" : ""}`}
+              />
+              <span
+                className={`h-0.5 w-full bg-current transition-transform ${open ? "-translate-y-2 -rotate-45" : ""}`}
+              />
+            </span>
+          </button>
+        </div>
       </div>
 
       <div
@@ -125,6 +130,10 @@ export function SiteHeader({ brandName, shortName, items, cta }: Props) {
               </Link>
             );
           })}
+          <SiteSearchControl
+            variant="menu"
+            onNavigate={() => setOpen(false)}
+          />
           <Link
             href={cta.href}
             className="text-nav mt-2 inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-secondary)] px-4 text-center leading-snug font-semibold text-wrap text-[var(--color-action-secondary-fg)]"
