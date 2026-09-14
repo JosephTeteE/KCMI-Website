@@ -21,8 +21,9 @@ No secrets, credentials, or pastoral narratives are recorded here.
 | System | What is processed | Category | Notes |
 | --- | --- | --- | --- |
 | Supabase Auth | Hub staff emails, authentication sessions, TOTP MFA for Hub (AAL2) | IMPLEMENTED | Staff accounts only. No custom password storage. MFA required before Hub actions (ADR-0003). |
-| PostgreSQL (public CMS) | Published/draft programs, sermons metadata, branch public facts, service times, livestream Facebook URL + manual `is_live`, website document payloads, media asset metadata, content revisions, audit events, RBAC | IMPLEMENTED | Anonymous Data API **SELECT** only on intended public tables. Draft/preview rows are not for public visitors. |
-| PostgreSQL (not present) | Counselling/welfare/prayer **narrative** tables, giving destination admin tables, event registration tables | NOT IN THIS PHASE | Pastoral Hub and Giving D2 are not implemented. Do not describe them as live processing. |
+| PostgreSQL (public CMS) | Published/draft programs, sermons metadata, branch public facts, service times, livestream Facebook URL + manual `is_live`, website document payloads, media asset metadata, content revisions, audit events, RBAC, **Events content** | IMPLEMENTED | Anonymous Data API **SELECT** only on intended public tables. Draft/preview rows are not for public visitors. |
+| PostgreSQL (`event_registrations`) | Event registrant name, email, phone, party size, reference code, status | IMPLEMENTED (E3) | **No public SELECT/INSERT.** Inserts only via server action + service-role function after Turnstile. Hub SELECT requires `registrations.manage`. |
+| PostgreSQL (not present) | Counselling/welfare/prayer **narrative** tables, giving destination admin tables, payment evidence | NOT IN THIS PHASE | Pastoral Hub and Giving D2 are not implemented. Payment evidence is E4. |
 | Storage bucket `marketing-public` | Public marketing images (JPEG/PNG ingested → WebP), alt text, dimensions | IMPLEMENTED | Server-only writes; Sharp normalization; metadata stripping; size/type allowlisting. Public read of marketing images after publish. |
 | Private receipt storage / payment evidence | Event or giving receipts | NOT IN THIS PHASE | ADR-0004 describes the **target** model. V2 public site does not currently collect camp/event receipts. |
 
@@ -38,12 +39,13 @@ No secrets, credentials, or pastoral narratives are recorded here.
 
 | Flow | Personal data collected by V2 | Category | Notes |
 | --- | --- | --- | --- |
-| Browsing public pages | Technical request data at the host (typical HTTP) | IMPLEMENTED | No first-party public contact form, newsletter signup, or registration form is implemented on V2 in this phase. |
+| Browsing public pages | Technical request data at the host (typical HTTP) | IMPLEMENTED | Public pages remain mostly content reads. |
+| Events registration (E3) | Full name, email, phone, number of people; Turnstile token verified server-side; reference code issued | IMPLEMENTED | Only when Event is published, registration enabled, within window, and under capacity. No payment/receipts in E3. Email confirmation via Resend when configured. |
 | Contact page | None submitted to V2; `mailto:` / `tel:` | IMPLEMENTED | Canonical public email is `contact@kcmi-rcc.org`. Phone is the published HQ number. |
 | Prayer / counselling / welfare / celebrations / cell / service-team | Submitted on **Google Forms**, not stored by V2 | LINKED EXTERNAL | Verified `forms.gle` URLs from legacy services/FAQs. Google is the processor for those forms until an approved replacement phase. |
 | Giving page | None submitted to V2; displays bank details from seed | IMPLEMENTED (display only) | Destination **administration** is D2 / not started. |
 | Sermons / livestream | None submitted to V2; outbound YouTube / Facebook | LINKED EXTERNAL | Sermon rows store YouTube **URLs** only (no embed HTML). Livestream stores a Facebook URL + staff-set live flag (ADR-0007). |
-| Events / camp registration on V2 | Not collected | NOT IN THIS PHASE | E1 publishes Event **content** only (`/events`). Registration/receipts remain E3/E4; legacy `camp-deploy` is separate. |
+| Events / camp registration on V2 | Name, email, phone, party size (E3) | IMPLEMENTED (registration only) | Receipts / payment evidence remain E4; legacy `camp-deploy` is separate. |
 
 ## 5. Public media and third-party platforms (outbound)
 
@@ -62,7 +64,7 @@ No secrets, credentials, or pastoral narratives are recorded here.
 
 | Item | Category | Notes |
 | --- | --- | --- |
-| Cloudflare Turnstile | IMPLEMENTED in platform code for **public write** endpoints when those exist (ADR-0005) | No first-party public write form is live on the public site in this phase, so Turnstile is not described as currently collecting visitor tokens on Contact. |
+| Cloudflare Turnstile | IMPLEMENTED for E3 Event registration (and other public write endpoints when present) | Server-side token verification. Deterministic `TEST_PASS` only when non-production test mode is explicitly enabled. |
 | reCAPTCHA v2/v3 | NOT used by V2 public site | Legacy only. Must not be described as current. |
 | First-party analytics product | NOT IN THIS PHASE | Do not claim Google Analytics or similar unless added later. |
 
@@ -74,6 +76,7 @@ No secrets, credentials, or pastoral narratives are recorded here.
 | Marketing images | Remain until staff archive/remove; branch unlink does not delete the library file | Factual. |
 | Hub auth sessions | Supabase Auth session behaviour | Do not invent expiry copy beyond “staff sessions are authenticated and MFA-gated.” |
 | Audit / revisions | Append-only; no purge job in repo | Factual. |
+| Event registrations (E3) | Provisional policy: 12 months after Event end; **no automated purge in E3** | Documented intent only until policy confirmation. |
 | Legacy camp Google Sheet / Drive / Cloudinary receipts | Not processed by V2 | Must not appear as current V2 practice. |
 | Google Forms responses | Retention is Google’s and the ministry’s use of that form — **EXTERNAL VERIFICATION REQUIRED** | V2 does not store those responses. |
 

@@ -1,13 +1,11 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
 import { HubFlash } from "@/components/hub/hub-flash";
 import { HubStatusBadge } from "@/components/hub/hub-form-fields";
-import {
-  EventWizard,
-  type EventWizardInitial,
-} from "@/components/hub/event-create-wizard";
+import { EventWizard, type EventWizardInitial } from "@/components/hub/event-create-wizard";
 import { EventLifecycleActions } from "@/components/hub/event-lifecycle-actions";
 import { loadHubPhotoLibrary } from "@/lib/hub/photo-library";
 import { utcIsoToLocalParts } from "@/lib/events/datetime";
@@ -33,6 +31,8 @@ export default async function EditEventPage({
   const session = await getStaffSession();
   const canManage =
     !!session && staffHasPermission(session.profile, "events.manage");
+  const canViewRegistrations =
+    !!session && staffHasPermission(session.profile, "registrations.manage");
 
   if (!session) {
     redirect("/auth/sign-in");
@@ -42,7 +42,7 @@ export default async function EditEventPage({
   const { data: event } = await supabase
     .from("events")
     .select(
-      "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display",
+      "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display, registration_enabled, registration_opens_at, registration_closes_at, capacity",
     )
     .eq("id", id)
     .maybeSingle();
@@ -65,6 +65,12 @@ export default async function EditEventPage({
   const startParts = utcIsoToLocalParts(event.starts_at, event.timezone);
   const endParts = event.ends_at
     ? utcIsoToLocalParts(event.ends_at, event.timezone)
+    : { date: "", time: "" };
+  const regOpen = event.registration_opens_at
+    ? utcIsoToLocalParts(event.registration_opens_at, event.timezone)
+    : { date: "", time: "" };
+  const regClose = event.registration_closes_at
+    ? utcIsoToLocalParts(event.registration_closes_at, event.timezone)
     : { date: "", time: "" };
 
   const initial: EventWizardInitial = {
@@ -90,6 +96,12 @@ export default async function EditEventPage({
     posterAlt: cover?.alt ?? null,
     status: event.status,
     slug: event.slug,
+    registrationEnabled: event.registration_enabled === true,
+    registrationOpensDate: regOpen.date,
+    registrationOpensTime: regOpen.time === "00:00" ? "" : regOpen.time,
+    registrationClosesDate: regClose.date,
+    registrationClosesTime: regClose.time === "00:00" ? "" : regClose.time,
+    capacity: event.capacity != null ? String(event.capacity) : "",
   };
 
   const isDraft = event.status === "draft" || event.status === "preview";
@@ -107,7 +119,19 @@ export default async function EditEventPage({
         }
         backHref="/admin/events"
         backLabel="Events"
-        actions={<HubStatusBadge status={event.status} />}
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            {canViewRegistrations ? (
+              <Link
+                href={`/admin/events/${event.id}/registrations`}
+                className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-base font-semibold"
+              >
+                View registrations
+              </Link>
+            ) : null}
+            <HubStatusBadge status={event.status} />
+          </div>
+        }
       />
       <HubFlash message={flash.message} error={flash.error} />
       <EventWizard

@@ -24,6 +24,15 @@ export type PublicEventCard = {
   isPast: boolean;
 };
 
+export type PublicEventRegistrationConfig = {
+  enabled: boolean;
+  opensAt: string | null;
+  closesAt: string | null;
+  capacity: number | null;
+  /** Active party size across non-cancelled registrations (public count only). */
+  registeredPeople: number;
+};
+
 export type PublicEventDetail = PublicEventCard & {
   bodyText: string;
   timezone: string;
@@ -31,4 +40,5 @@ export type PublicEventDetail = PublicEventCard & {
   contactPhoneDisplay: string | null;
   branchName: string | null;
   branchSlug: string | null;
+  registration: PublicEventRegistrationConfig;
 };

@@ -1,6 +1,9 @@
 /**
  * Cloudflare Turnstile server-side verification helper.
- * Does not call production until TURNSTILE_SECRET_KEY is provisioned.
+ *
+ * Deterministic non-production test mode:
+ *   TURNSTILE_TEST_MODE=1 (or NEXT_PUBLIC_TURNSTILE_TEST_MODE=1) and token === "TEST_PASS"
+ * never applies when KCMI_ENVIRONMENT=production or NODE_ENV=production.
  */
 
 import { getServerEnv } from "@/lib/env/server";
@@ -9,19 +12,33 @@ export type TurnstileVerifyResult =
   | { ok: true }
   | { ok: false; reason: string };
 
+function allowTurnstileTestMode(): boolean {
+  if (process.env.KCMI_ENVIRONMENT === "production") return false;
+  if (process.env.NODE_ENV === "production") return false;
+  return (
+    process.env.TURNSTILE_TEST_MODE === "1" ||
+    process.env.NEXT_PUBLIC_TURNSTILE_TEST_MODE === "1"
+  );
+}
+
 export async function verifyTurnstileToken(
   token: string,
   remoteIp?: string,
 ): Promise<TurnstileVerifyResult> {
+  if (!token) {
+    return { ok: false, reason: "Missing Turnstile token" };
+  }
+
+  if (allowTurnstileTestMode() && token === "TEST_PASS") {
+    return { ok: true };
+  }
+
   const env = getServerEnv();
   if (!env.TURNSTILE_SECRET_KEY) {
     return {
       ok: false,
       reason: "TURNSTILE_SECRET_KEY is not configured (placeholder env only)",
     };
-  }
-  if (!token) {
-    return { ok: false, reason: "Missing Turnstile token" };
   }
 
   const body = new URLSearchParams();

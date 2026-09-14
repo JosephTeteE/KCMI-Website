@@ -1,7 +1,7 @@
 # KCMI Public Experience V2 (D1.7)
 
 **Status:** Implementation guidance for the D1.7 public recomposition and Hub legibility work.  
-**Does not** authorize D2 Giving administration, pastoral workflows, or full Events/Camp registration.
+**Does not** authorize D2 Giving administration, pastoral workflows, or Camp payment/receipt workflows (E4). Public Event registration (E3) is implemented separately — see [`EVENTS_V1.md`](EVENTS_V1.md).
 
 Search V2 is documented in [`SEARCH_V2.md`](SEARCH_V2.md) (public Postgres-backed search).  
 Events E1 (public content only) is documented in [`EVENTS_V1.md`](EVENTS_V1.md).

@@ -61,5 +61,12 @@ export function toPublicEventDetail(
     contactPhoneDisplay: input.contactPhoneDisplay,
     branchName: input.branchName,
     branchSlug: input.branchSlug,
+    registration: {
+      enabled: false,
+      opensAt: null,
+      closesAt: null,
+      capacity: null,
+      registeredPeople: 0,
+    },
   };
 }
