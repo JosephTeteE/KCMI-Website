@@ -10,7 +10,7 @@ Accepted V2 (ADR-0002):
 - Vanity: `camp.kcmi-rcc.org` → eventually **redirect** to the current Camp Meeting event slug
 - Do not keep a disposable per-camp architecture as the long-term platform
 
-V2 today: `/events` and `/events/[slug]` are placeholders; Hub Events is disabled; **no events/registration schema**.
+V2 today: `/events` and `/events/[slug]` are **E1 public content routes** (published Events only; no registration). Hub Events editor is still deferred to E2. Legacy `camp-deploy` remains untouched — **no** Camp content auto-migrated. See [`EVENTS_V1.md`](EVENTS_V1.md).
 
 ---
 

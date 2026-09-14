@@ -369,6 +369,113 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          body_text: string
+          contact_email: string | null
+          contact_phone_display: string | null
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          event_kind: Database["public"]["Enums"]["event_kind"]
+          featured_media_id: string | null
+          id: string
+          location_branch_id: string | null
+          published_at: string | null
+          slug: string
+          starts_at: string
+          status: Database["public"]["Enums"]["publication_status"]
+          summary: string
+          theme: string | null
+          timezone: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          venue_city: string | null
+          venue_country: string | null
+          venue_label: string | null
+        }
+        Insert: {
+          body_text?: string
+          contact_email?: string | null
+          contact_phone_display?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          event_kind?: Database["public"]["Enums"]["event_kind"]
+          featured_media_id?: string | null
+          id?: string
+          location_branch_id?: string | null
+          published_at?: string | null
+          slug: string
+          starts_at: string
+          status?: Database["public"]["Enums"]["publication_status"]
+          summary?: string
+          theme?: string | null
+          timezone?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_city?: string | null
+          venue_country?: string | null
+          venue_label?: string | null
+        }
+        Update: {
+          body_text?: string
+          contact_email?: string | null
+          contact_phone_display?: string | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          event_kind?: Database["public"]["Enums"]["event_kind"]
+          featured_media_id?: string | null
+          id?: string
+          location_branch_id?: string | null
+          published_at?: string | null
+          slug?: string
+          starts_at?: string
+          status?: Database["public"]["Enums"]["publication_status"]
+          summary?: string
+          theme?: string | null
+          timezone?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          venue_city?: string | null
+          venue_country?: string | null
+          venue_label?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_featured_media_id_fkey"
+            columns: ["featured_media_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_location_branch_id_fkey"
+            columns: ["location_branch_id"]
+            isOneToOne: false
+            referencedRelation: "church_branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       website_documents: {
         Row: {
           created_at: string
@@ -927,6 +1034,13 @@ export type Database = {
         | "featured"
         | "announcement"
         | "general"
+      event_kind:
+        | "camp"
+        | "conference"
+        | "convention"
+        | "retreat"
+        | "special_service"
+        | "other"
       program_action_kind:
         | "none"
         | "registration"
@@ -1072,6 +1186,14 @@ export const Constants = {
         "featured",
         "announcement",
         "general",
+      ],
+      event_kind: [
+        "camp",
+        "conference",
+        "convention",
+        "retreat",
+        "special_service",
+        "other",
       ],
       program_action_kind: [
         "none",

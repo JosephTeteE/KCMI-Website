@@ -1,9 +1,10 @@
 # KCMI Public Experience V2 (D1.7)
 
 **Status:** Implementation guidance for the D1.7 public recomposition and Hub legibility work.  
-**Does not** authorize D2 Giving administration, pastoral workflows, or full Events/Camp.
+**Does not** authorize D2 Giving administration, pastoral workflows, or full Events/Camp registration.
 
-Search V2 is documented in [`SEARCH_V2.md`](SEARCH_V2.md) (public Postgres-backed search).
+Search V2 is documented in [`SEARCH_V2.md`](SEARCH_V2.md) (public Postgres-backed search).  
+Events E1 (public content only) is documented in [`EVENTS_V1.md`](EVENTS_V1.md).
 
 Related: [`KCMI_VOICE_GUIDE.md`](KCMI_VOICE_GUIDE.md), [`CMS_COVERAGE_MATRIX.md`](CMS_COVERAGE_MATRIX.md), [`CONTENT_VERIFICATION_GAPS.md`](CONTENT_VERIFICATION_GAPS.md).
 
@@ -35,7 +36,7 @@ Homepage **does not** list every branch card or repeat the full Vision/Mission w
 | No branch media | Strong typographic/brand layout |
 | No sermon | Compact YouTube / Rehoboth Wells invitation |
 | Not live | Polished not-live Watch & Listen treatment |
-| No events | Do not feature Events on Homepage |
+| No events | `/events` calm empty state; do not feature Events on Homepage |
 
 Missing data warnings belong in **Hub** (“Needs attention”), not visitor prose.
 

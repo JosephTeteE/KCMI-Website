@@ -43,7 +43,7 @@ No secrets, credentials, or pastoral narratives are recorded here.
 | Prayer / counselling / welfare / celebrations / cell / service-team | Submitted on **Google Forms**, not stored by V2 | LINKED EXTERNAL | Verified `forms.gle` URLs from legacy services/FAQs. Google is the processor for those forms until an approved replacement phase. |
 | Giving page | None submitted to V2; displays bank details from seed | IMPLEMENTED (display only) | Destination **administration** is D2 / not started. |
 | Sermons / livestream | None submitted to V2; outbound YouTube / Facebook | LINKED EXTERNAL | Sermon rows store YouTube **URLs** only (no embed HTML). Livestream stores a Facebook URL + staff-set live flag (ADR-0007). |
-| Events / camp registration on V2 | Not collected | NOT IN THIS PHASE | `/events` is an empty public shell. Legacy `camp-deploy` remains a separate system; this inventory does not claim V2 processes camp receipts. |
+| Events / camp registration on V2 | Not collected | NOT IN THIS PHASE | E1 publishes Event **content** only (`/events`). Registration/receipts remain E3/E4; legacy `camp-deploy` is separate. |
 
 ## 5. Public media and third-party platforms (outbound)
 
