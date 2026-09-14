@@ -166,15 +166,3 @@ export function isPublicPublishedEventStatus(
 ): boolean {
   return status === "published";
 }
-
-/** Visitor-facing date+time for registration open/close messages. */
-export function formatEventDateTimeLabel(
-  iso: string,
-  timezone?: string | null,
-): string {
-  const d = asDate(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const timeZone = resolveTz(timezone);
-  const { dayMonthYear, time } = formatters(timeZone);
-  return `${dayMonthYear.format(d)} · ${time.format(d)}`;
-}

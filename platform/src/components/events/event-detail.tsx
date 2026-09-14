@@ -1,32 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
-import { EventRegistrationSection } from "@/components/events/event-registration-section";
 import type { PublicEventDetail } from "@/lib/events/types";
-import { evaluateRegistrationEligibility } from "@/lib/events/registration-eligibility";
 
 export function EventDetailBody({
   event,
   showAllEventsLink = true,
-  showRegistration = true,
 }: {
   event: PublicEventDetail;
   showAllEventsLink?: boolean;
-  showRegistration?: boolean;
 }) {
   const locationLine = [event.venueLabel, event.placeLabel]
     .filter(Boolean)
     .join(" · ");
-
-  const eligibility = evaluateRegistrationEligibility({
-    status: "published",
-    registrationEnabled: event.registration.enabled,
-    registrationOpensAt: event.registration.opensAt,
-    registrationClosesAt: event.registration.closesAt,
-    capacity: event.registration.capacity,
-    registeredPeople: event.registration.registeredPeople,
-  });
-  const showRegisterCta = showRegistration && eligibility.state === "open";
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -56,17 +42,6 @@ export function EventDetailBody({
           ) : null}
         </div>
       )}
-
-      {showRegisterCta ? (
-        <p className="mb-8">
-          <a
-            href="#register"
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 font-semibold text-[var(--color-action-primary-fg)]"
-          >
-            Register
-          </a>
-        </p>
-      ) : null}
 
       <dl className="grid gap-4 sm:grid-cols-2">
         {event.theme ? (
@@ -157,8 +132,6 @@ export function EventDetailBody({
           </ul>
         </div>
       ) : null}
-
-      {showRegistration ? <EventRegistrationSection event={event} /> : null}
 
       {showAllEventsLink ? (
         <div className="mt-10">

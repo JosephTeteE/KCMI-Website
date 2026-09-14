@@ -1,5 +1,5 @@
 /**
- * Synthetic Events fixtures for visual review screenshots only.
+ * Synthetic Events fixtures for E1 visual review screenshots only.
  * Enabled when EVENTS_E1_REVIEW_FIXTURES=1 and NODE_ENV !== "production".
  * Never seeds production CMS content. Not legacy Camp 2025.
  */
@@ -77,13 +77,6 @@ const withImage: PublicEventDetail = {
   contactPhoneDisplay: null,
   branchName: "Headquarters",
   branchSlug: "headquarters",
-  registration: {
-    enabled: true,
-    opensAt: "2026-01-01T00:00:00+01:00",
-    closesAt: "2027-03-01T23:59:00+01:00",
-    capacity: 200,
-    registeredPeople: 12,
-  },
 };
 
 const withoutImage: PublicEventDetail = {
@@ -95,28 +88,6 @@ const withoutImage: PublicEventDetail = {
   contactPhoneDisplay: "+233 00 000 0000",
   branchName: null,
   branchSlug: null,
-  registration: {
-    enabled: false,
-    opensAt: null,
-    closesAt: null,
-    capacity: null,
-    registeredPeople: 0,
-  },
-};
-
-/** Closed registration fixture for E3 review shots. */
-export const reviewRegistrationClosed: PublicEventDetail = {
-  ...withImage,
-  id: "review-reg-closed",
-  slug: "registration-closed-review",
-  title: "Leaders Gathering",
-  registration: {
-    enabled: true,
-    opensAt: "2025-01-01T00:00:00+01:00",
-    closesAt: "2025-06-01T00:00:00+01:00",
-    capacity: 50,
-    registeredPeople: 50,
-  },
 };
 
 export function reviewPublishedEvents(): {
@@ -132,6 +103,5 @@ export function reviewPublishedEvents(): {
 export function reviewEventBySlug(slug: string): PublicEventDetail | null {
   if (slug === withImage.slug) return withImage;
   if (slug === withoutImage.slug) return withoutImage;
-  if (slug === reviewRegistrationClosed.slug) return reviewRegistrationClosed;
   return null;
 }

@@ -28,10 +28,6 @@ export type ParsedEventFields = {
   contact_email: string | null;
   contact_phone_display: string | null;
   featured_media_id: string | null;
-  registration_enabled: boolean;
-  registration_opens_at: string | null;
-  registration_closes_at: string | null;
-  capacity: number | null;
 };
 
 function emptyToNull(value: FormDataEntryValue | null): string | null {
@@ -43,24 +39,6 @@ function emptyToNull(value: FormDataEntryValue | null): string | null {
 const KINDS = new Set<EventKind>(
   EVENT_KIND_OPTIONS.map((o) => o.value),
 );
-
-function parseOptionalCapacity(
-  raw: FormDataEntryValue | null,
-): { ok: true; value: number | null } | { ok: false; error: string } {
-  const text = emptyToNull(raw);
-  if (!text) return { ok: true, value: null };
-  const n = Number.parseInt(text, 10);
-  if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1) {
-    return {
-      ok: false,
-      error: "Capacity must be a whole number of at least 1, or left blank.",
-    };
-  }
-  if (n > 100_000) {
-    return { ok: false, error: "That capacity is too large." };
-  }
-  return { ok: true, value: n };
-}
 
 export function parseEventFields(
   formData: FormData,
@@ -112,58 +90,6 @@ export function parseEventFields(
     return { ok: false, error: "Enter a valid contact email, or leave it blank." };
   }
 
-  const registration_enabled =
-    emptyToNull(formData.get("registration_enabled")) === "true";
-
-  const regOpenDate = emptyToNull(formData.get("registration_opens_date"));
-  const regOpenTime = emptyToNull(formData.get("registration_opens_time"));
-  let registration_opens_at: string | null = null;
-  if (regOpenDate) {
-    registration_opens_at = zonedLocalToUtcIso(
-      regOpenDate,
-      regOpenTime,
-      timezone,
-    );
-    if (!registration_opens_at) {
-      return {
-        ok: false,
-        error: "That registration open date or time could not be understood.",
-      };
-    }
-  }
-
-  const regCloseDate = emptyToNull(formData.get("registration_closes_date"));
-  const regCloseTime = emptyToNull(formData.get("registration_closes_time"));
-  let registration_closes_at: string | null = null;
-  if (regCloseDate) {
-    registration_closes_at = zonedLocalToUtcIso(
-      regCloseDate,
-      regCloseTime,
-      timezone,
-    );
-    if (!registration_closes_at) {
-      return {
-        ok: false,
-        error: "That registration close date or time could not be understood.",
-      };
-    }
-  }
-
-  if (
-    registration_opens_at &&
-    registration_closes_at &&
-    new Date(registration_closes_at).getTime() <
-      new Date(registration_opens_at).getTime()
-  ) {
-    return {
-      ok: false,
-      error: "Registration cannot close before it opens.",
-    };
-  }
-
-  const capacityParsed = parseOptionalCapacity(formData.get("capacity"));
-  if (!capacityParsed.ok) return capacityParsed;
-
   return {
     ok: true,
     fields: {
@@ -182,10 +108,6 @@ export function parseEventFields(
       contact_email,
       contact_phone_display: emptyToNull(formData.get("contact_phone_display")),
       featured_media_id: emptyToNull(formData.get("featured_media_id")),
-      registration_enabled,
-      registration_opens_at,
-      registration_closes_at,
-      capacity: capacityParsed.value,
     },
   };
 }

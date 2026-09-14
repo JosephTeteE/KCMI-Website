@@ -382,10 +382,6 @@ export type Database = {
           id: string
           location_branch_id: string | null
           published_at: string | null
-          registration_closes_at: string | null
-          registration_enabled: boolean
-          registration_opens_at: string | null
-          capacity: number | null
           slug: string
           starts_at: string
           status: Database["public"]["Enums"]["publication_status"]
@@ -401,7 +397,6 @@ export type Database = {
         }
         Insert: {
           body_text?: string
-          capacity?: number | null
           contact_email?: string | null
           contact_phone_display?: string | null
           created_at?: string
@@ -412,9 +407,6 @@ export type Database = {
           id?: string
           location_branch_id?: string | null
           published_at?: string | null
-          registration_closes_at?: string | null
-          registration_enabled?: boolean
-          registration_opens_at?: string | null
           slug: string
           starts_at: string
           status?: Database["public"]["Enums"]["publication_status"]
@@ -430,7 +422,6 @@ export type Database = {
         }
         Update: {
           body_text?: string
-          capacity?: number | null
           contact_email?: string | null
           contact_phone_display?: string | null
           created_at?: string
@@ -441,9 +432,6 @@ export type Database = {
           id?: string
           location_branch_id?: string | null
           published_at?: string | null
-          registration_closes_at?: string | null
-          registration_enabled?: boolean
-          registration_opens_at?: string | null
           slug?: string
           starts_at?: string
           status?: Database["public"]["Enums"]["publication_status"]
@@ -484,56 +472,6 @@ export type Database = {
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      event_registrations: {
-        Row: {
-          created_at: string
-          email: string
-          event_id: string
-          full_name: string
-          id: string
-          num_people: number
-          phone: string
-          reference_code: string
-          status: Database["public"]["Enums"]["event_registration_status"]
-          submitted_at: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          event_id: string
-          full_name: string
-          id?: string
-          num_people: number
-          phone: string
-          reference_code: string
-          status?: Database["public"]["Enums"]["event_registration_status"]
-          submitted_at?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          event_id?: string
-          full_name?: string
-          id?: string
-          num_people?: number
-          phone?: string
-          reference_code?: string
-          status?: Database["public"]["Enums"]["event_registration_status"]
-          submitted_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_registrations_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
@@ -1069,24 +1007,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      admin_register_for_event: {
-        Args: {
-          p_event_id: string
-          p_full_name: string
-          p_email: string
-          p_phone: string
-          p_num_people: number
-          p_reference_code: string
-        }
-        Returns: Database["public"]["Tables"]["event_registrations"]["Row"]
-      }
       can_manage_branch: { Args: { p_branch_id: string }; Returns: boolean }
       has_permission: { Args: { permission_name: string }; Returns: boolean }
       has_role: { Args: { role_name: string }; Returns: boolean }
-      public_event_registered_people: {
-        Args: { p_event_id: string }
-        Returns: number
-      }
       search_public_content: {
         Args: {
           p_query: string
@@ -1118,7 +1041,6 @@ export type Database = {
         | "retreat"
         | "special_service"
         | "other"
-      event_registration_status: "submitted" | "confirmed" | "cancelled"
       program_action_kind:
         | "none"
         | "registration"
@@ -1273,7 +1195,6 @@ export const Constants = {
         "special_service",
         "other",
       ],
-      event_registration_status: ["submitted", "confirmed", "cancelled"],
       program_action_kind: [
         "none",
         "registration",

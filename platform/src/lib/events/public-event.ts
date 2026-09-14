@@ -40,10 +40,6 @@ type EventRow = {
   venue_country: string | null;
   contact_email: string | null;
   contact_phone_display: string | null;
-  registration_enabled: boolean | null;
-  registration_opens_at: string | null;
-  registration_closes_at: string | null;
-  capacity: number | null;
   featured_media:
     | { public_url: string; alt_text: string }
     | { public_url: string; alt_text: string }[]
@@ -132,11 +128,7 @@ function mapCard(row: EventRow, now = new Date()): PublicEventCard {
   };
 }
 
-function mapDetail(
-  row: EventRow,
-  registeredPeople = 0,
-  now = new Date(),
-): PublicEventDetail {
+function mapDetail(row: EventRow, now = new Date()): PublicEventDetail {
   const card = mapCard(row, now);
   const branch = branchOf(row);
   return {
@@ -149,13 +141,6 @@ function mapDetail(
       : null,
     branchName: branch?.name ?? null,
     branchSlug: branch?.slug ?? null,
-    registration: {
-      enabled: row.registration_enabled === true,
-      opensAt: row.registration_opens_at,
-      closesAt: row.registration_closes_at,
-      capacity: row.capacity,
-      registeredPeople,
-    },
   };
 }
 
@@ -175,10 +160,6 @@ const EVENT_SELECT = `
   venue_country,
   contact_email,
   contact_phone_display,
-  registration_enabled,
-  registration_opens_at,
-  registration_closes_at,
-  capacity,
   featured_media:media_assets!events_featured_media_id_fkey (
     public_url,
     alt_text
@@ -192,17 +173,6 @@ const EVENT_SELECT = `
     status
   )
 `;
-
-async function fetchRegisteredPeople(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  eventId: string,
-): Promise<number> {
-  const { data, error } = await supabase.rpc("public_event_registered_people", {
-    p_event_id: eventId,
-  });
-  if (error || typeof data !== "number") return 0;
-  return data;
-}
 
 /**
  * Published events only. Seed mode returns empty (no invented Camp content).
@@ -260,12 +230,7 @@ export async function fetchPublishedEventBySlug(
 
   if (error) fail("fetchPublishedEventBySlug", error);
   if (!data) return null;
-  const row = data as EventRow;
-  const registeredPeople =
-    row.registration_enabled === true
-      ? await fetchRegisteredPeople(supabase, row.id)
-      : 0;
-  return mapDetail(row, registeredPeople);
+  return mapDetail(data as EventRow);
 }
 
 /**

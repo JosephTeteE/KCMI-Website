@@ -54,12 +54,6 @@ export type EventWizardInitial = {
   posterAlt: string | null;
   status: "draft" | "preview" | "published" | "archived";
   slug: string;
-  registrationEnabled: boolean;
-  registrationOpensDate: string;
-  registrationOpensTime: string;
-  registrationClosesDate: string;
-  registrationClosesTime: string;
-  capacity: string;
 };
 
 const STEPS = [
@@ -68,8 +62,7 @@ const STEPS = [
   { id: 3, title: "Where" },
   { id: 4, title: "Photo" },
   { id: 5, title: "Contact" },
-  { id: 6, title: "Registration" },
-  { id: 7, title: "Review" },
+  { id: 6, title: "Review" },
 ] as const;
 
 export function EventCreateWizard(props: {
@@ -142,23 +135,6 @@ export function EventWizard({
   const [contactPhoneDisplay, setContactPhoneDisplay] = useState(
     initial?.contactPhoneDisplay ?? "",
   );
-
-  const [registrationEnabled, setRegistrationEnabled] = useState(
-    initial?.registrationEnabled ?? false,
-  );
-  const [registrationOpensDate, setRegistrationOpensDate] = useState(
-    initial?.registrationOpensDate ?? "",
-  );
-  const [registrationOpensTime, setRegistrationOpensTime] = useState(
-    initial?.registrationOpensTime ?? "",
-  );
-  const [registrationClosesDate, setRegistrationClosesDate] = useState(
-    initial?.registrationClosesDate ?? "",
-  );
-  const [registrationClosesTime, setRegistrationClosesTime] = useState(
-    initial?.registrationClosesTime ?? "",
-  );
-  const [capacity, setCapacity] = useState(initial?.capacity ?? "");
 
   const fieldsLocked = isPublished && !changeUnlocked;
   const selectedBranch = branches.find((b) => b.id === locationBranchId);
@@ -256,21 +232,6 @@ export function EventWizard({
         return "Enter a valid contact email, or leave it blank.";
       }
     }
-    if (current === 6) {
-      if (
-        registrationOpensDate &&
-        registrationClosesDate &&
-        registrationClosesDate < registrationOpensDate
-      ) {
-        return "Registration cannot close before it opens.";
-      }
-      if (capacity.trim()) {
-        const n = Number.parseInt(capacity.trim(), 10);
-        if (!Number.isFinite(n) || n < 1) {
-          return "Capacity must be a whole number of at least 1, or left blank.";
-        }
-      }
-    }
     return null;
   }
 
@@ -281,7 +242,7 @@ export function EventWizard({
       return;
     }
     setStepError(null);
-    setStep((s) => Math.min(7, s + 1));
+    setStep((s) => Math.min(6, s + 1));
   }
 
   function goPrevious() {
@@ -309,12 +270,6 @@ export function EventWizard({
     fd.set("location_branch_id", locationBranchId);
     fd.set("contact_email", contactEmail);
     fd.set("contact_phone_display", contactPhoneDisplay);
-    fd.set("registration_enabled", registrationEnabled ? "true" : "false");
-    fd.set("registration_opens_date", registrationOpensDate);
-    fd.set("registration_opens_time", registrationOpensTime);
-    fd.set("registration_closes_date", registrationClosesDate);
-    fd.set("registration_closes_time", registrationClosesTime);
-    fd.set("capacity", capacity);
     if (posterMode === "library") {
       fd.set("featured_media_id", featuredMediaId);
     } else if (posterMode === "none") {
@@ -329,7 +284,7 @@ export function EventWizard({
   }
 
   function submitWizard(intent: "draft" | "live") {
-    for (let s = 1; s <= 7; s += 1) {
+    for (let s = 1; s <= 6; s += 1) {
       const err = validateStep(s);
       if (err) {
         setStep(s);
@@ -677,81 +632,6 @@ export function EventWizard({
             ) : null}
 
             {step === 6 ? (
-              <section className="space-y-4">
-                <p className="hub-help text-[var(--color-text-muted)]">
-                  Turn registration on when visitors may sign up for this event.
-                  Payment and receipts are not part of this step yet.
-                </p>
-                <fieldset className="space-y-3">
-                  <legend className="text-base font-semibold text-[var(--color-text-body)]">
-                    Registration
-                  </legend>
-                  <label className="flex min-h-11 items-center gap-3 text-base">
-                    <input
-                      type="radio"
-                      name="registration_enabled_ui"
-                      checked={!registrationEnabled}
-                      onChange={() => setRegistrationEnabled(false)}
-                    />
-                    Off — do not show a register form
-                  </label>
-                  <label className="flex min-h-11 items-center gap-3 text-base">
-                    <input
-                      type="radio"
-                      name="registration_enabled_ui"
-                      checked={registrationEnabled}
-                      onChange={() => setRegistrationEnabled(true)}
-                    />
-                    On — visitors can register when the window is open
-                  </label>
-                </fieldset>
-                {registrationEnabled ? (
-                  <>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <HubTextField
-                        label="Opens (optional)"
-                        id="registration_opens_date_ui"
-                        type="date"
-                        value={registrationOpensDate}
-                        onChange={(e) => setRegistrationOpensDate(e.target.value)}
-                      />
-                      <HubTextField
-                        label="Open time (optional)"
-                        id="registration_opens_time_ui"
-                        type="time"
-                        value={registrationOpensTime}
-                        onChange={(e) => setRegistrationOpensTime(e.target.value)}
-                      />
-                      <HubTextField
-                        label="Closes (optional)"
-                        id="registration_closes_date_ui"
-                        type="date"
-                        value={registrationClosesDate}
-                        onChange={(e) => setRegistrationClosesDate(e.target.value)}
-                      />
-                      <HubTextField
-                        label="Close time (optional)"
-                        id="registration_closes_time_ui"
-                        type="time"
-                        value={registrationClosesTime}
-                        onChange={(e) => setRegistrationClosesTime(e.target.value)}
-                      />
-                    </div>
-                    <HubTextField
-                      label="Capacity (optional)"
-                      id="capacity_ui"
-                      type="number"
-                      min={1}
-                      value={capacity}
-                      onChange={(e) => setCapacity(e.target.value)}
-                      hint="Total people across all registrations. Leave blank for no limit."
-                    />
-                  </>
-                ) : null}
-              </section>
-            ) : null}
-
-            {step === 7 ? (
               <section className="space-y-6">
                 <dl className="grid gap-4 text-base sm:grid-cols-2">
                   <div>
@@ -785,16 +665,6 @@ export function EventWizard({
                         .join(" · ") || "Not set"}
                     </dd>
                   </div>
-                  <div>
-                    <dt className="font-medium text-[var(--color-text-muted)]">
-                      Registration
-                    </dt>
-                    <dd className="mt-1">
-                      {registrationEnabled
-                        ? `On${capacity.trim() ? ` · capacity ${capacity.trim()}` : ""}`
-                        : "Off"}
-                    </dd>
-                  </div>
                 </dl>
 
                 <HubPreviewFrame
@@ -815,7 +685,6 @@ export function EventWizard({
                       <EventDetailBody
                         event={previewDetail}
                         showAllEventsLink={false}
-                        showRegistration={false}
                       />
                     </div>
                   </div>
@@ -847,7 +716,7 @@ export function EventWizard({
                 Previous step
               </button>
             ) : null}
-            {step < 7 ? (
+            {step < 6 ? (
               <button
                 type="button"
                 onClick={goNext}

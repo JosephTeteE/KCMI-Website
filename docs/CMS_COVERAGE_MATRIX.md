@@ -76,7 +76,7 @@ Remaining engineering-controlled: brand logo, structural nav, giving accounts (D
 | Primary/footer information architecture | IA changes are releases, not copy edits |
 | Giving account numbers | Dual-approval / D2; not this phase |
 | Privacy / Terms body | Counsel; AI must not invent legal duties |
-| Events/Camp registration | E3 public registration IMPLEMENTED (no payment); E4 receipts; see [`EVENTS_V1.md`](EVENTS_V1.md); `camp-deploy` untouched |
+| Events/Camp registration | Deferred — Events V1 is advertising/info only (E1+E2); see [`EVENTS_V1.md`](EVENTS_V1.md); `camp-deploy` untouched |
 | Search index | Search V2 — public published corpus only; see [`SEARCH_V2.md`](SEARCH_V2.md) |
 | Pastoral narratives | Not in D1; media_admin must not receive them |
 | `NEXT_PUBLIC_SITE_URL` / environment | Operations, not content |

@@ -45,10 +45,6 @@ function eventSnapshot(row: {
   contact_email: string | null;
   contact_phone_display: string | null;
   published_at: string | null;
-  registration_enabled?: boolean;
-  registration_opens_at?: string | null;
-  registration_closes_at?: string | null;
-  capacity?: number | null;
 }) {
   return {
     id: row.id,
@@ -70,53 +66,7 @@ function eventSnapshot(row: {
     contact_email: row.contact_email,
     contact_phone_display: row.contact_phone_display,
     published_at: row.published_at,
-    registration_enabled: row.registration_enabled ?? false,
-    registration_opens_at: row.registration_opens_at ?? null,
-    registration_closes_at: row.registration_closes_at ?? null,
-    capacity: row.capacity ?? null,
   };
-}
-
-const EVENT_SELECT_FULL =
-  "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display, published_at, registration_enabled, registration_opens_at, registration_closes_at, capacity";
-
-function registrationAuditDiff(
-  before: {
-    registration_enabled: boolean;
-    registration_opens_at: string | null;
-    registration_closes_at: string | null;
-    capacity: number | null;
-  },
-  after: {
-    registration_enabled: boolean;
-    registration_opens_at: string | null;
-    registration_closes_at: string | null;
-    capacity: number | null;
-  },
-) {
-  const changes: Record<string, { from: unknown; to: unknown }> = {};
-  if (before.registration_enabled !== after.registration_enabled) {
-    changes.registration_enabled = {
-      from: before.registration_enabled,
-      to: after.registration_enabled,
-    };
-  }
-  if (before.registration_opens_at !== after.registration_opens_at) {
-    changes.registration_opens_at = {
-      from: before.registration_opens_at,
-      to: after.registration_opens_at,
-    };
-  }
-  if (before.registration_closes_at !== after.registration_closes_at) {
-    changes.registration_closes_at = {
-      from: before.registration_closes_at,
-      to: after.registration_closes_at,
-    };
-  }
-  if (before.capacity !== after.capacity) {
-    changes.capacity = { from: before.capacity, to: after.capacity };
-  }
-  return Object.keys(changes).length ? changes : null;
 }
 
 async function ingestEventPhotoFromForm(
@@ -261,10 +211,6 @@ export async function createEvent(formData: FormData) {
       location_branch_id: parsed.fields.location_branch_id,
       contact_email: parsed.fields.contact_email,
       contact_phone_display: parsed.fields.contact_phone_display,
-      registration_enabled: parsed.fields.registration_enabled,
-      registration_opens_at: parsed.fields.registration_opens_at,
-      registration_closes_at: parsed.fields.registration_closes_at,
-      capacity: parsed.fields.capacity,
       created_by: actorId,
       updated_by: actorId,
     })
@@ -320,7 +266,9 @@ export async function saveEventWizardEdit(formData: FormData) {
 
   const { data: existing, error: loadError } = await supabase
     .from("events")
-    .select(EVENT_SELECT_FULL)
+    .select(
+      "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display, published_at",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -378,10 +326,6 @@ export async function saveEventWizardEdit(formData: FormData) {
     location_branch_id: parsed.fields.location_branch_id,
     contact_email: parsed.fields.contact_email,
     contact_phone_display: parsed.fields.contact_phone_display,
-    registration_enabled: parsed.fields.registration_enabled,
-    registration_opens_at: parsed.fields.registration_opens_at,
-    registration_closes_at: parsed.fields.registration_closes_at,
-    capacity: parsed.fields.capacity,
     slug,
     updated_by: actorId,
   };
@@ -390,7 +334,9 @@ export async function saveEventWizardEdit(formData: FormData) {
     .from("events")
     .update(patch)
     .eq("id", id)
-    .select(EVENT_SELECT_FULL)
+    .select(
+      "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display, published_at",
+    )
     .single();
 
   if (error || !updated) {
@@ -399,21 +345,6 @@ export async function saveEventWizardEdit(formData: FormData) {
       error?.message ?? "Could not save this event.",
     );
   }
-
-  const regDiff = registrationAuditDiff(
-    {
-      registration_enabled: existing.registration_enabled,
-      registration_opens_at: existing.registration_opens_at,
-      registration_closes_at: existing.registration_closes_at,
-      capacity: existing.capacity,
-    },
-    {
-      registration_enabled: updated.registration_enabled,
-      registration_opens_at: updated.registration_opens_at,
-      registration_closes_at: updated.registration_closes_at,
-      capacity: updated.capacity,
-    },
-  );
 
   await writeAuditEvent({
     actorId,
@@ -425,7 +356,6 @@ export async function saveEventWizardEdit(formData: FormData) {
       title: updated.title,
       slug: updated.slug,
       status: existing.status,
-      ...(regDiff ? { registration_config: regDiff } : {}),
     },
   });
 
@@ -475,7 +405,9 @@ export async function setEventStatus(formData: FormData) {
 
   const { data: existing, error: loadError } = await supabase
     .from("events")
-    .select(EVENT_SELECT_FULL)
+    .select(
+      "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display, published_at",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -501,7 +433,9 @@ export async function setEventStatus(formData: FormData) {
     .from("events")
     .update(patch)
     .eq("id", id)
-    .select(EVENT_SELECT_FULL)
+    .select(
+      "id, slug, title, theme, summary, body_text, event_kind, status, featured_media_id, starts_at, ends_at, timezone, venue_label, venue_city, venue_country, location_branch_id, contact_email, contact_phone_display, published_at",
+    )
     .single();
 
   if (error || !updated) {

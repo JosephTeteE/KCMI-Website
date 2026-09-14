@@ -1,7 +1,19 @@
-# Events V1 — E1 public + E2 Hub editor + E3 registration
+# Events V1 — public advertising + Hub editor
 
-**Status:** E1 public experience + E2 Hub Events editor + E3 public registration  
-**Does not authorize:** payment evidence (E4), Camp content migration (E5), Search Event indexing, Giving, Pastoral.
+**Status:** Events V1 ends at **E2**.  
+**Delivered:** E1 public Events pages + E2 Hub Events editor.  
+**Deferred:** public registration, payments, receipts, Camp content migration, Search Event indexing, Giving, Pastoral.
+
+## Product principle
+
+KCMI Events V1 is an **event advertising / information** system.
+
+- Events can be published **without** registration or payment.
+- Not every Event requires registration.
+- Not every Event is paid.
+- Registration and payments are **optional future capabilities** and must be designed only when a real KCMI requirement exists.
+- Paid Events should prefer a secure payment provider such as **Paystack** or another approved provider.
+- Manual bank transfer + receipt upload was a **Youth Camp legacy** workflow and is **not** the default Events model.
 
 ## Events ≠ Programs
 
@@ -24,33 +36,7 @@
 | `contact_email`, `contact_phone_display` | Optional visitor contact |
 | `published_at`, audit columns | Matches CMS pattern |
 
-## E3 registration configuration (on `events`)
-
-| Field | Notes |
-| --- | --- |
-| `registration_enabled` | Default **false** — existing Events stay closed |
-| `registration_opens_at` | Optional window start |
-| `registration_closes_at` | Optional window end |
-| `capacity` | Optional total party-size limit; null = unlimited |
-
-**Not in E3:** fee, bank account, payment required, receipt settings (E4).
-
-## E3 `event_registrations` (private)
-
-| Field | Notes |
-| --- | --- |
-| `reference_code` | Unique `KCMI-XXXXXX` (non-sequential) |
-| `full_name`, `email`, `phone`, `num_people` | Visitor fields only |
-| `status` | `submitted` \| `confirmed` \| `cancelled` |
-| `submitted_at` | Server timestamp |
-
-No DOB, medical, ID docs, address, gender, emergency contacts, pastoral notes, or `payment_status` in E3.
-
-**Retention (provisional, documented only):** 12 months after Event end. Automated deletion is **not** implemented in E3.
-
-### Duplicate protection
-
-Same Event + same email within **5 minutes** returns the existing registration (idempotent). Does not permanently block later family registrations sharing an email.
+**Not in current Events V1:** registration config, `event_registrations` product use, payment evidence, bank accounts, Turnstile for Events, Resend for Events, CSV export.
 
 ## Publication semantics
 
@@ -74,80 +60,32 @@ Past **published** events remain listed under **Past Events** after their end (o
 ### E2 (write)
 
 - Migration: `platform/supabase/migrations/20260914190000_events_e2_hub_writes.sql`
+- Grants follow-up: `platform/supabase/migrations/20260914191000_events_e2_authenticated_grants.sql`
 - INSERT/UPDATE: `has_permission('events.manage')` only.
 - No DELETE policy — remove from website via `archived`.
 - `media_admin` gains `events.manage` in DB + `DEFAULT_ROLE_PERMISSIONS`.
 - `media_admin` still has **no** `registrations.manage` / `payment_evidence.review`.
 
-### E3 (registrations)
-
-- Migration: `platform/supabase/migrations/20260914192000_events_e3_registration.sql`
-- Public / anon: **NO** SELECT, INSERT, UPDATE, DELETE on `event_registrations`
-- Authenticated: SELECT/UPDATE only with `registrations.manage` (not `hub.access` alone)
-- No authenticated INSERT — inserts via `admin_register_for_event` (**service_role only**)
-- Occupancy count helper `public_event_registered_people(uuid)` returns a number for published Events only (no rows)
-
-## Submission architecture (E3)
-
-```
-Browser form
-  → Next.js server action `registerForEvent`
-  → validate fields + rate limit (hashed event+email)
-  → Cloudflare Turnstile server verify
-  → service-role RPC `admin_register_for_event` (row lock + capacity)
-  → optional Resend confirmation email
-  → safe confirmation + reference code
-```
-
-- Never use anon/authenticated table INSERT from the browser.
-- Never expose `SUPABASE_SECRET_KEY` to client code.
-- Registration succeeds even if Resend is unconfigured or send fails.
-
-### Turnstile
-
-| Env | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Widget site key |
-| `TURNSTILE_SECRET_KEY` | Server verify |
-| `TURNSTILE_TEST_MODE=1` / `NEXT_PUBLIC_TURNSTILE_TEST_MODE=1` | Non-production only; token `TEST_PASS` |
-
-Production / `KCMI_ENVIRONMENT=production` never accepts test bypass.
-
-### Resend (optional)
-
-| Env | Purpose |
-| --- | --- |
-| `RESEND_API_KEY` | API key |
-| `RESEND_FROM_EMAIL` | From address |
-
 ## Public routes
 
-- `/events` — Upcoming + Past; calm empty state when none.
-- `/events/[slug]` — Content + registration CTA/form when eligible.
-- Eligibility messages: not open yet / Registration closed / Registration full.
-- Confirmation copy does **not** claim payment confirmed or seat guaranteed.
+- `/events` — Upcoming (chronological) + Past (newest first); calm empty state when none.
+- `/events/[slug]` — Featured media or branded text layout; dates; venue/branch; summary/body; contact when set.
+- **No** Register button, registration form, capacity messaging, or payment/receipt UI.
 - Hostname rewrite unchanged: `events.kcmi-rcc.org/:path*` → `/events/:path*` (ADR-0002).
 
-## Hub Events (E2 + E3 settings)
+## Hub Events (E2)
 
 Routes: `/admin/events`, `/admin/events/new`, `/admin/events/[id]`
 
-Wizard steps: Details → When → Where → Photo → Contact → **Registration** → Review
+Wizard steps: Details → When → Where → Photo → Contact → Review
 
 | Flow | Behaviour |
 | --- | --- |
 | Create | Always `draft`; primary action **Save as a draft** |
 | Draft edit | Change → Preview → **Save draft changes**; **Make this live** is separate |
-| Published edit | Current → Change → Preview → **Make these changes live** (registration config included) |
+| Published edit | Current → Change → Preview → **Make these changes live** (no silent auto-publish) |
 | Photo | Upload new / choose existing; live only after Make Live on published rows |
 | Archive | **Remove from public website** → `archived` with confirm; restore to draft |
-
-### Hub registrations (E3 minimum)
-
-- `/admin/events/[id]/registrations` and detail route
-- Requires `registrations.manage` (registrar / super_admin)
-- View reference, name, email, phone, party size, submitted time, status
-- **No** CSV export, payment, or receipt UI
 
 ### Slug policy
 
@@ -157,43 +95,48 @@ Wizard steps: Details → When → Where → Photo → Contact → **Registratio
 ### Audit / revisions
 
 - `writeAuditEvent` on create, draft/live update, publish, archive, restore
-- Live/draft updates include registration config diffs in audit metadata when changed (no registrant PII)
 - `saveRevision` with `entity_type='event'` on publish/archive/restore and live content updates
-- Snapshots may include registration **configuration** fields; never full registration row PII
+- Snapshots are content fields only (no registration/payment data)
 
 ## Permissions
 
 | Role | Content | Registrations | Payment evidence |
 | --- | --- | --- | --- |
 | `media_admin` | **`events.manage`** | **No** | **No** |
-| `registrar` | `events.manage` | `registrations.manage` | No by default |
-| `finance_reviewer` | No | No | `payment_evidence.review` (E4) |
+| `registrar` | `events.manage` | `registrations.manage` (future ops only) | No by default |
+| `finance_reviewer` | No | No | `payment_evidence.review` (future) |
 
-Do not collapse registration/payment access into Event content permission.
+Do not collapse future registration/payment access into Event content permission.
 
 ## Phase boundaries
 
-| Phase | Scope |
-| --- | --- |
-| **E1** | Schema, public list/detail, media/branch, RLS read, focused tests |
-| **E2** | Hub Events editor + `events.manage` write policies |
-| **E3** | Public registration + private rows + Hub settings + minimal registrar view |
-| **E4** | Private payment evidence review |
-| **E5** | Camp migration **after** human confirms current event facts |
-| **E6** | Hostname cutover / vanity redirects |
+| Phase | Scope | Status |
+| --- | --- | --- |
+| **E1** | Schema, public list/detail, media/branch, RLS read | **Delivered** |
+| **E2** | Hub Events editor + `events.manage` write policies | **Delivered** |
+| **Registration** | Optional future — redesign only with a real requirement | **Deferred** |
+| **Payments / receipts** | Optional future — prefer secure provider; not manual-transfer default | **Deferred** |
+| **Camp migration** | After human confirms current event facts | Deferred |
+| **Hostname cutover** | Vanity redirects | Deferred |
 
 ## Legacy Camp
 
-Youth & Teens Camp 2025 “Level Up” remains historical source material only. Fee, bank, venue, and Aug 2025 dates must **not** be auto-published. See [`LEGACY_CAMP_MIGRATION.md`](LEGACY_CAMP_MIGRATION.md).
+Youth & Teens Camp 2025 “Level Up” remains historical source material only. Fee, bank, venue, and Aug 2025 dates must **not** be auto-published. Legacy camp registration + receipt upload remain in the legacy Camp application and are **not** requirements for general Events V1. See [`LEGACY_CAMP_MIGRATION.md`](LEGACY_CAMP_MIGRATION.md).
+
+When the next Youth Camp is prepared, **human** decides what that specific event needs.
 
 ## Search
 
-Events Search indexing is **deferred**. Registration rows must **never** appear in Search.
+Events Search indexing is **deferred**. Registration rows must never appear in Search.
+
+## Turnstile / email for current Events
+
+Current Events V1 has **no** public write submission, so Events does **not** require Turnstile or Resend. Platform-level Turnstile/Resend architecture for other future public writes may remain documented elsewhere.
 
 ## Migrations
 
 - E1: `platform/supabase/migrations/20260914180000_events_e1_public.sql`
 - E2: `platform/supabase/migrations/20260914190000_events_e2_hub_writes.sql`
 - E2.1 grants: `platform/supabase/migrations/20260914191000_events_e2_authenticated_grants.sql`
-- E3: `platform/supabase/migrations/20260914192000_events_e3_registration.sql`
-- Staging apply only after human review. **Not** applied to production by this phase.
+
+Note: an earlier registration experiment migration (`20260914192000_events_e3_registration.sql`) may exist in history/staging. Product use of registration is **deferred**; do not treat that schema as current Events V1 product surface. Staging cleanup, if desired, requires a separate human-approved forward migration.
