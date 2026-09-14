@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export function SiteSearchControl({ variant = "icon", onNavigate }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const dialogId = useId();
   const titleId = useId();
@@ -105,9 +107,18 @@ export function SiteSearchControl({ variant = "icon", onNavigate }: Props) {
               action="/search"
               method="get"
               className="mt-4"
-              onSubmit={() => {
+              onSubmit={(e) => {
+                // Closing the dialog unmounts this form. Prevent native submit
+                // and navigate explicitly so the query is not dropped.
+                e.preventDefault();
+                const data = new FormData(e.currentTarget);
+                const q = String(data.get("q") ?? "").trim();
+                const params = new URLSearchParams();
+                if (q) params.set("q", q);
+                const href = params.size > 0 ? `/search?${params}` : "/search";
                 setOpen(false);
                 onNavigate?.();
+                router.push(href);
               }}
             >
               <label htmlFor={`${dialogId}-q`} className="sr-only">
