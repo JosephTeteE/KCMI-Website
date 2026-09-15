@@ -59,6 +59,16 @@ export const PUBLIC_SEARCH_PAGE_CATALOG: Array<
   },
   {
     type: "page",
+    title: "Prayer",
+    summary:
+      "Share a private prayer request with Kingdom Covenant Ministries International.",
+    url: "/prayer",
+    context: "Page",
+    imageUrl: null,
+    body: "prayer request pray intercession care timothy",
+  },
+  {
+    type: "page",
     title: "Contact",
     summary: "Email or call the church office and find KCMI locations.",
     url: "/contact",

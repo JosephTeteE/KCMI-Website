@@ -4,6 +4,8 @@ import { blankToUndefined, getPublicEnv } from "@/lib/env/public";
 const serverEnvSchema = z.object({
   SUPABASE_SECRET_KEY: z.string().min(1).optional(),
   TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
+  /** First-party Prayer intake cutover. Default off. Set to 1/true to enable. */
+  KCMI_PRAYER_INTAKE_ENABLED: z.string().optional(),
   CONTENT_SOURCE: z.enum(["seed", "supabase"]).optional(),
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -18,6 +20,9 @@ export function getServerEnv(): ServerEnv {
   const extra = serverEnvSchema.parse({
     SUPABASE_SECRET_KEY: blankToUndefined(process.env.SUPABASE_SECRET_KEY),
     TURNSTILE_SECRET_KEY: blankToUndefined(process.env.TURNSTILE_SECRET_KEY),
+    KCMI_PRAYER_INTAKE_ENABLED: blankToUndefined(
+      process.env.KCMI_PRAYER_INTAKE_ENABLED,
+    ),
     CONTENT_SOURCE:
       contentSource === "seed" || contentSource === "supabase"
         ? contentSource

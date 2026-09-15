@@ -179,13 +179,14 @@ describe("Care P1 Hub surface gating", () => {
 });
 
 describe("Care P1 Search / AI / sitemap exclusion", () => {
-  it("does not catalog Care or admin routes in public search pages", () => {
+  it("does not catalog Hub Care or admin routes in public search pages", () => {
     const urls = PUBLIC_SEARCH_PAGE_CATALOG.map((p) => p.url);
     expect(urls.some((u) => u.includes("/admin"))).toBe(false);
-    expect(urls.some((u) => u.includes("care"))).toBe(false);
+    expect(urls.some((u) => u.includes("/admin/care"))).toBe(false);
+    // Public /prayer informational page is allowed; submissions are not indexed.
   });
 
-  it("sitemap omits Care and admin paths", () => {
+  it("sitemap omits Hub Care and admin paths", () => {
     const sitemap = readFileSync(
       resolve(process.cwd(), "src/app/sitemap.ts"),
       "utf8",

@@ -48,7 +48,7 @@ Deletion automation is **not** in P1.
 
 ## Public intake
 
-Google Forms remain the visitor path. Privacy copy stating Forms hold responses remains accurate until P2/P3.
+Google Forms remain the visitor path until HUMAN enables `KCMI_PRAYER_INTAKE_ENABLED` and later replaces Form CTAs. See [CARE_P2_PRAYER.md](CARE_P2_PRAYER.md).
 
 ## Hub routes
 

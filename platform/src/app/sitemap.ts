@@ -13,6 +13,7 @@ const publicPaths = [
   "/giving",
   "/livestream",
   "/faqs",
+  "/prayer",
   "/privacy",
   "/terms",
   "/events",
