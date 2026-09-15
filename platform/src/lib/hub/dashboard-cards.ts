@@ -46,6 +46,12 @@ export const HUB_DASHBOARD_CARDS: readonly HubDashboardCard[] = [
     outcome:
       "Review Giving destinations and propose bank-detail changes for dual approval.",
   },
+  {
+    title: "Care",
+    href: "/admin/care",
+    outcome:
+      "Review private prayer, pastoral care, and welfare requests (authorized staff only).",
+  },
 ] as const;
 
 /** Cards that require at least one of these permissions to show on the dashboard. */
@@ -54,4 +60,5 @@ export const HUB_DASHBOARD_CARD_PERMISSIONS: Record<
   readonly string[] | undefined
 > = {
   "/admin/giving": ["giving.propose", "giving.approve", "audit.read"],
+  "/admin/care": ["prayer.read", "counselling.read", "welfare.read"],
 };

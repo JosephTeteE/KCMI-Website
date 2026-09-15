@@ -46,6 +46,55 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
+/** HIGHLY_SENSITIVE Care permissions — runtime must be DB-authoritative (fail closed). */
+export const CARE_PERMISSIONS: readonly Permission[] = [
+  "prayer.read",
+  "prayer.assign",
+  "counselling.read",
+  "counselling.assign",
+  "welfare.read",
+  "welfare.assign",
+] as const;
+
+export function isPermission(value: string): value is Permission {
+  return (PERMISSIONS as readonly string[]).includes(value);
+}
+
+export function isCarePermission(value: string): boolean {
+  return (CARE_PERMISSIONS as readonly string[]).includes(value);
+}
+
+/**
+ * Effective Hub permissions for a staff session.
+ *
+ * - Non-Care: TypeScript role defaults ∪ DB `role_permissions` (compat fallback).
+ * - Care (HIGHLY_SENSITIVE): **DB grants only**. TS defaults never restore or expand
+ *   a Care permission that is absent/revoked in the database.
+ *
+ * TS `DEFAULT_ROLE_PERMISSIONS` remains for seeds, migrations, tests, and docs —
+ * not as a silent Care allow path at runtime.
+ */
+export function mergeStaffPermissions(
+  roles: readonly HubRole[],
+  dbPermissionNames: readonly string[],
+): Permission[] {
+  const dbCareAndOther = new Set<Permission>();
+  for (const name of dbPermissionNames) {
+    if (isPermission(name)) dbCareAndOther.add(name);
+  }
+
+  const effective = new Set<Permission>();
+  for (const p of permissionsForRoles(roles)) {
+    if (!isCarePermission(p)) {
+      effective.add(p);
+    }
+  }
+  for (const p of dbCareAndOther) {
+    effective.add(p);
+  }
+  return Array.from(effective);
+}
+
 export const PASTORAL_READ_PERMISSIONS: readonly Permission[] = [
   "prayer.read",
   "counselling.read",

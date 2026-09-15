@@ -191,19 +191,21 @@ See [DATA_CLASSIFICATION.md](DATA_CLASSIFICATION.md) (updated with ACCEPTED rete
 ### Sensitivity boundaries (ACCEPTED — ADR-0004)
 
 - `engagement_submissions` — first_timer | fellowship | service_team
-- `pastoral_requests` — prayer | counselling | welfare
-- `pastoral_assignments`, `pastoral_messages`, `pastoral_case_notes`
+- `pastoral_requests` — prayer | pastoral | welfare (`pastoral` Hub label = Pastoral Care; permissions remain `counselling.*`)
+- `pastoral_case_notes`
 - `events`, `event_registrations`, `payment_evidence`
 - Content: programs/announcements, sermons, branches, media_assets
 - `profiles`, `user_roles`, `role_permissions`
 - `giving_accounts` + dual-approval workflow tables
 - `livestream_settings` — `facebook_url`, `is_live`, `updated_by`, `updated_at` (ADR-0007)
 - `audit_events`, `content_revisions`
-- Retention configuration store (central, migration/config driven)
+- Retention configuration store (central, migration/config driven) — Care deletion jobs deferred
+
+See [CARE_P1_FOUNDATION.md](CARE_P1_FOUNDATION.md).
 
 **Why isolate pastoral data:** Blast-radius reduction; RLS clarity; retention/AI exclusion; confidentiality.
 
-**Google Form schemas:** EXTERNAL VERIFICATION REQUIRED before each replacement workflow’s final columns — does **not** block unrelated foundation/public-site work (ADR-0005).
+**Google Form schemas:** EXTERNAL VERIFICATION REQUIRED before each replacement workflow’s final columns — does **not** block Care P1 Hub foundation. Forms remain live intake until P2/P3.
 
 ---
 

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { StaffProfile } from "@/lib/auth/session";
 import { operatingRoleLabel } from "@/lib/authorization/rbac";
 import { canViewGivingAdmin } from "@/lib/giving/access";
+import { canViewCareHub } from "@/lib/care/access";
 import { signOutAction } from "@/app/auth/actions";
 import { HubHelpMenu } from "@/components/hub/hub-help-menu";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
@@ -26,6 +27,9 @@ function hubNavItems(profile: StaffProfile) {
   const items: { href: string; label: string; exact?: boolean }[] = [
     ...NAV_BASE,
   ];
+  if (canViewCareHub(profile.permissions)) {
+    items.push({ href: "/admin/care", label: "Care" });
+  }
   if (canViewGivingAdmin(profile.permissions)) {
     items.push({ href: "/admin/giving", label: "Giving" });
   }

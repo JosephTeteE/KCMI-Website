@@ -4,7 +4,7 @@ import { createClient as createSupabaseJs } from "@supabase/supabase-js";
 import { requireSupabasePublicConfig } from "@/lib/env";
 import type { Database } from "@/lib/supabase/database.types";
 import {
-  permissionsForRoles,
+  mergeStaffPermissions,
   type HubRole,
   HUB_ROLES,
   type Permission,
@@ -47,14 +47,45 @@ async function resolveFromSupabase(
 
   const { data: roleRows } = await supabase
     .from("user_roles")
-    .select("roles(name)")
+    .select("roles(name, role_permissions(permissions(name)))")
     .eq("user_id", userId);
 
   const roles: HubRole[] = [];
+  const dbPermissionNames: string[] = [];
   for (const row of roleRows ?? []) {
-    const nested = row.roles as { name?: string } | { name?: string }[] | null;
-    const name = Array.isArray(nested) ? nested[0]?.name : nested?.name;
+    const nested = row.roles as
+      | {
+          name?: string;
+          role_permissions?:
+            | { permissions?: { name?: string } | { name?: string }[] | null }
+            | {
+                permissions?: { name?: string } | { name?: string }[] | null;
+              }[]
+            | null;
+        }
+      | {
+          name?: string;
+          role_permissions?:
+            | { permissions?: { name?: string } | { name?: string }[] | null }
+            | {
+                permissions?: { name?: string } | { name?: string }[] | null;
+              }[]
+            | null;
+        }[]
+      | null;
+    const role = Array.isArray(nested) ? nested[0] : nested;
+    const name = role?.name;
     if (name && isHubRole(name)) roles.push(name);
+
+    const rp = role?.role_permissions;
+    const rpList = Array.isArray(rp) ? rp : rp ? [rp] : [];
+    for (const entry of rpList) {
+      const perm = entry.permissions;
+      const permList = Array.isArray(perm) ? perm : perm ? [perm] : [];
+      for (const p of permList) {
+        if (p?.name) dbPermissionNames.push(p.name);
+      }
+    }
   }
 
   let aal = claimAal;
@@ -66,7 +97,7 @@ async function resolveFromSupabase(
     // Bearer-only clients may lack a full session; JWT aal claim is authoritative enough here.
   }
 
-  const permissions = Array.from(permissionsForRoles(roles)) as Permission[];
+  const permissions = mergeStaffPermissions(roles, dbPermissionNames);
 
   return {
     kind: "ok" as const,

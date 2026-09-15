@@ -25,6 +25,18 @@ const PERMISSION_HELP: Partial<Record<Permission, string>> = {
     "Your account is not allowed to propose Giving bank details. Ask a Finance reviewer or Super Admin.",
   "giving.approve":
     "Your account is not allowed to approve Giving bank details. Ask another Finance reviewer or Super Admin.",
+  "prayer.read":
+    "Your account cannot open Prayer requests. Ask a Pastoral Admin if you need Care access.",
+  "counselling.read":
+    "Your account cannot open Pastoral Care requests. Ask a Pastoral Admin if you need access.",
+  "welfare.read":
+    "Your account cannot open Welfare requests. Ask a Pastoral Admin if you need access.",
+  "prayer.assign":
+    "Your account cannot assign Prayer requests. Ask a Pastoral Admin.",
+  "counselling.assign":
+    "Your account cannot assign Pastoral Care requests. Ask a Pastoral Admin.",
+  "welfare.assign":
+    "Your account cannot assign Welfare requests. Ask a Pastoral Admin.",
 };
 
 export function humanPermissionDenied(permission: Permission): string {
@@ -91,6 +103,13 @@ export const HUB_AUDIT_ACTION_LABELS: Record<string, string> = {
   "giving.proposal.reject": "Giving change rejected",
   "giving.proposal.approve": "Giving change approved and published to database",
   "giving.account.apply": "Giving destination applied in database",
+  "care.request.received": "Care request received",
+  "care.request.opened": "Care request opened",
+  "care.request.assigned": "Care request assigned",
+  "care.request.status_changed": "Care request status updated",
+  "care.note.added": "Care note added",
+  "care.request.closed": "Care request closed",
+  "care.request.reopened": "Care request reopened",
 };
 
 export function humanAuditAction(action: string): string {

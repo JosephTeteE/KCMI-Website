@@ -1191,6 +1191,123 @@ export type Database = {
           },
         ]
       }
+      pastoral_case_notes: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          request_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          request_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastoral_case_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastoral_case_notes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "pastoral_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pastoral_requests: {
+        Row: {
+          assigned_to: string | null
+          branch_id: string | null
+          closed_at: string | null
+          contact_requested: boolean
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          narrative: string
+          phone: string | null
+          preferred_contact_method: Database["public"]["Enums"]["care_contact_method"] | null
+          preferred_contact_timing: string | null
+          reference_code: string
+          service_type: Database["public"]["Enums"]["care_service_type"]
+          status: Database["public"]["Enums"]["care_request_status"]
+          submitted_at: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          branch_id?: string | null
+          closed_at?: string | null
+          contact_requested?: boolean
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          narrative: string
+          phone?: string | null
+          preferred_contact_method?: Database["public"]["Enums"]["care_contact_method"] | null
+          preferred_contact_timing?: string | null
+          reference_code?: string
+          service_type: Database["public"]["Enums"]["care_service_type"]
+          status?: Database["public"]["Enums"]["care_request_status"]
+          submitted_at?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          branch_id?: string | null
+          closed_at?: string | null
+          contact_requested?: boolean
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          narrative?: string
+          phone?: string | null
+          preferred_contact_method?: Database["public"]["Enums"]["care_contact_method"] | null
+          preferred_contact_timing?: string | null
+          reference_code?: string
+          service_type?: Database["public"]["Enums"]["care_service_type"]
+          status?: Database["public"]["Enums"]["care_request_status"]
+          submitted_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pastoral_requests_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pastoral_requests_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "church_branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1200,8 +1317,36 @@ export type Database = {
         Args: { p_proposal_id: string; p_review_reason?: string | null }
         Returns: Database["public"]["Tables"]["giving_change_proposals"]["Row"]
       }
+      can_assign_pastoral_request: {
+        Args: { p_service: Database["public"]["Enums"]["care_service_type"] }
+        Returns: boolean
+      }
       can_manage_branch: { Args: { p_branch_id: string }; Returns: boolean }
+      can_select_pastoral_request: {
+        Args: {
+          p_service: Database["public"]["Enums"]["care_service_type"]
+          p_assigned_to: string | null
+        }
+        Returns: boolean
+      }
       can_view_giving_admin: { Args: never; Returns: boolean }
+      care_assign_permission_for: {
+        Args: { p_service: Database["public"]["Enums"]["care_service_type"] }
+        Returns: string
+      }
+      care_assignable_staff: {
+        Args: never
+        Returns: {
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+      }
+      care_generate_reference_code: { Args: never; Returns: string }
+      care_read_permission_for: {
+        Args: { p_service: Database["public"]["Enums"]["care_service_type"] }
+        Returns: string
+      }
       giving_snapshot_account: { Args: { p_account_id: string }; Returns: Json }
       giving_validate_snapshot: { Args: { p_snapshot: Json }; Returns: string }
       has_permission: { Args: { permission_name: string }; Returns: boolean }
@@ -1242,6 +1387,9 @@ export type Database = {
         | "featured"
         | "announcement"
         | "general"
+      care_contact_method: "email" | "phone" | "either"
+      care_request_status: "new" | "in_progress" | "closed"
+      care_service_type: "prayer" | "pastoral" | "welfare"
       event_kind:
         | "camp"
         | "conference"
@@ -1403,6 +1551,9 @@ export const Constants = {
         "announcement",
         "general",
       ],
+      care_contact_method: ["email", "phone", "either"],
+      care_request_status: ["new", "in_progress", "closed"],
+      care_service_type: ["prayer", "pastoral", "welfare"],
       event_kind: [
         "camp",
         "conference",

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertMediaCannotReadPastoral,
   canAccessPastoralNarratives,
+  mergeStaffPermissions,
   permissionsForRoles,
   roleHasPermission,
 } from "@/lib/authorization/rbac";
@@ -46,6 +47,53 @@ describe("RBAC foundation", () => {
   it("allows explicit pastoral grant alongside super_admin", () => {
     const perms = permissionsForRoles(["super_admin"], ["prayer.read"]);
     expect(canAccessPastoralNarratives(perms)).toBe(true);
+  });
+
+  it("merges DB role_permissions onto pastor defaults for Care grants", () => {
+    const merged = mergeStaffPermissions(["pastor"], ["counselling.read"]);
+    expect(merged.includes("hub.access")).toBe(true);
+    expect(merged.includes("counselling.read")).toBe(true);
+    expect(merged.includes("prayer.read")).toBe(false);
+  });
+
+  it("does not restore Care permissions from TS defaults when absent in DB", () => {
+    const merged = mergeStaffPermissions(["pastoral_admin"], []);
+    expect(merged.includes("hub.access")).toBe(true);
+    expect(merged.includes("audit.read")).toBe(true);
+    expect(merged.includes("prayer.read")).toBe(false);
+    expect(merged.includes("counselling.read")).toBe(false);
+    expect(merged.includes("welfare.assign")).toBe(false);
+  });
+
+  it("does not keep Care permissions from TS defaults when DB revoked them", () => {
+    // pastoral_admin TS defaults include Care; DB returns only hub.access + audit.read
+    const merged = mergeStaffPermissions(["pastoral_admin"], [
+      "hub.access",
+      "audit.read",
+    ]);
+    expect(merged.includes("prayer.read")).toBe(false);
+    expect(merged.includes("counselling.assign")).toBe(false);
+    expect(merged.includes("welfare.read")).toBe(false);
+    expect(merged.includes("hub.access")).toBe(true);
+  });
+
+  it("grants Care permissions only when present in DB names", () => {
+    const merged = mergeStaffPermissions(
+      ["pastoral_admin"],
+      [
+        "hub.access",
+        "prayer.read",
+        "prayer.assign",
+        "counselling.read",
+        "counselling.assign",
+        "welfare.read",
+        "welfare.assign",
+        "audit.read",
+      ],
+    );
+    expect(merged.includes("prayer.read")).toBe(true);
+    expect(merged.includes("counselling.read")).toBe(true);
+    expect(merged.includes("welfare.assign")).toBe(true);
   });
 
   it("program_drafter can draft but not publish", () => {

@@ -4,7 +4,7 @@ import {
   type HubRole,
   type Permission,
   HUB_ROLES,
-  permissionsForRoles,
+  mergeStaffPermissions,
 } from "@/lib/authorization/rbac";
 
 export type StaffProfile = {
@@ -92,20 +92,51 @@ export async function getStaffSession(): Promise<{
 
   const { data: roleRows } = await supabase
     .from("user_roles")
-    .select("roles(name)")
+    .select("roles(name, role_permissions(permissions(name)))")
     .eq("user_id", user.id);
 
   const roles: HubRole[] = [];
+  const dbPermissionNames: string[] = [];
   for (const row of roleRows ?? []) {
-    const nested = row.roles as { name?: string } | { name?: string }[] | null;
-    const name = Array.isArray(nested) ? nested[0]?.name : nested?.name;
+    const nested = row.roles as
+      | {
+          name?: string;
+          role_permissions?:
+            | { permissions?: { name?: string } | { name?: string }[] | null }
+            | {
+                permissions?: { name?: string } | { name?: string }[] | null;
+              }[]
+            | null;
+        }
+      | {
+          name?: string;
+          role_permissions?:
+            | { permissions?: { name?: string } | { name?: string }[] | null }
+            | {
+                permissions?: { name?: string } | { name?: string }[] | null;
+              }[]
+            | null;
+        }[]
+      | null;
+    const role = Array.isArray(nested) ? nested[0] : nested;
+    const name = role?.name;
     if (name && isHubRole(name)) roles.push(name);
+
+    const rp = role?.role_permissions;
+    const rpList = Array.isArray(rp) ? rp : rp ? [rp] : [];
+    for (const entry of rpList) {
+      const perm = entry.permissions;
+      const permList = Array.isArray(perm) ? perm : perm ? [perm] : [];
+      for (const p of permList) {
+        if (p?.name) dbPermissionNames.push(p.name);
+      }
+    }
   }
 
   const { data: aalData } =
     await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
-  const permissions = Array.from(permissionsForRoles(roles));
+  const permissions = mergeStaffPermissions(roles, dbPermissionNames);
 
   return {
     user,
