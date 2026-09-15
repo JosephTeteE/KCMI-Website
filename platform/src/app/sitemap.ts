@@ -14,6 +14,8 @@ const publicPaths = [
   "/livestream",
   "/faqs",
   "/prayer",
+  "/pastoral-care",
+  "/welfare",
   "/privacy",
   "/terms",
   "/events",

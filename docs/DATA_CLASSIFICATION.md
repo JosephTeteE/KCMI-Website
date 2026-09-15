@@ -29,6 +29,8 @@
 
 **Why isolate Care data:** Limits blast radius; clarifies RLS; separate retention; AI exclusion; confidentiality. Super Admin does **not** imply Care narrative read (ADR-0003). Media Admin has **no** Care access.
 
+Care P3 adds gated first-party Pastoral Care (`/pastoral-care`) and Welfare (`/welfare`) intake. Google Forms remain live visitor CTAs until an approved cutover. See [CARE_P3_PASTORAL_WELFARE.md](CARE_P3_PASTORAL_WELFARE.md).
+
 ## Retention defaults
 
 Configurable centrally; change via approved migrations/configuration. Deletion jobs are **not** implemented in Care P1.

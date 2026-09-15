@@ -5,9 +5,11 @@ import {
 } from "@/app/admin/care/actions";
 import type { CareCaseNote, CareRequestDetail } from "@/lib/care/types";
 import {
+  CARE_CONTACT_METHOD_LABELS,
   CARE_SERVICE_LABELS,
   CARE_STATUS_LABELS,
   CARE_STATUSES,
+  WELFARE_REQUEST_CATEGORY_LABELS,
 } from "@/lib/care/types";
 
 function formatWhen(iso: string): string {
@@ -77,6 +79,26 @@ export function CareRequestDetailView({
             <div>
               <dt className="text-sm text-[var(--color-text-muted)]">Phone</dt>
               <dd className="text-base">{request.phone}</dd>
+            </div>
+          ) : null}
+          {request.requestCategory ? (
+            <div>
+              <dt className="text-sm text-[var(--color-text-muted)]">
+                Type of request
+              </dt>
+              <dd className="text-base">
+                {WELFARE_REQUEST_CATEGORY_LABELS[request.requestCategory]}
+              </dd>
+            </div>
+          ) : null}
+          {request.preferredContactMethod ? (
+            <div>
+              <dt className="text-sm text-[var(--color-text-muted)]">
+                Preferred way to speak
+              </dt>
+              <dd className="text-base">
+                {CARE_CONTACT_METHOD_LABELS[request.preferredContactMethod]}
+              </dd>
             </div>
           ) : null}
           {request.preferredContactTiming ? (

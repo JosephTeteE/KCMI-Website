@@ -6,8 +6,43 @@ export type CareServiceType = (typeof CARE_SERVICE_TYPES)[number];
 export const CARE_STATUSES = ["new", "in_progress", "closed"] as const;
 export type CareRequestStatus = (typeof CARE_STATUSES)[number];
 
-export const CARE_CONTACT_METHODS = ["email", "phone", "either"] as const;
+export const CARE_CONTACT_METHODS = [
+  "email",
+  "phone",
+  "either",
+  "in_person",
+] as const;
 export type CareContactMethod = (typeof CARE_CONTACT_METHODS)[number];
+
+export const CARE_CONTACT_METHOD_LABELS: Record<CareContactMethod, string> = {
+  email: "Email",
+  phone: "By phone",
+  either: "Either",
+  in_person: "In person",
+};
+
+/** Structured Welfare support categories (not medical intake). */
+export const WELFARE_REQUEST_CATEGORIES = [
+  "financial",
+  "food",
+  "clothing",
+  "shelter",
+  "medical",
+  "other",
+] as const;
+export type WelfareRequestCategory = (typeof WELFARE_REQUEST_CATEGORIES)[number];
+
+export const WELFARE_REQUEST_CATEGORY_LABELS: Record<
+  WelfareRequestCategory,
+  string
+> = {
+  financial: "Financial",
+  food: "Food",
+  clothing: "Clothing",
+  shelter: "Shelter",
+  medical: "Medical",
+  other: "Other",
+};
 
 export const CARE_SERVICE_LABELS: Record<CareServiceType, string> = {
   prayer: "Prayer",
@@ -38,6 +73,8 @@ export type CareRequestListItem = {
   assignedTo: string | null;
   displayName: string | null;
   contactRequested: boolean;
+  /** Welfare only — safe structured category for list metadata. */
+  requestCategory: WelfareRequestCategory | null;
 };
 
 export type CareRequestDetail = CareRequestListItem & {

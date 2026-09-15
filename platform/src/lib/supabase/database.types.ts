@@ -1248,6 +1248,7 @@ export type Database = {
           preferred_contact_method: Database["public"]["Enums"]["care_contact_method"] | null
           preferred_contact_timing: string | null
           reference_code: string
+          request_category: string | null
           service_type: Database["public"]["Enums"]["care_service_type"]
           status: Database["public"]["Enums"]["care_request_status"]
           submitted_at: string
@@ -1267,6 +1268,7 @@ export type Database = {
           preferred_contact_method?: Database["public"]["Enums"]["care_contact_method"] | null
           preferred_contact_timing?: string | null
           reference_code?: string
+          request_category?: string | null
           service_type: Database["public"]["Enums"]["care_service_type"]
           status?: Database["public"]["Enums"]["care_request_status"]
           submitted_at?: string
@@ -1286,6 +1288,7 @@ export type Database = {
           preferred_contact_method?: Database["public"]["Enums"]["care_contact_method"] | null
           preferred_contact_timing?: string | null
           reference_code?: string
+          request_category?: string | null
           service_type?: Database["public"]["Enums"]["care_service_type"]
           status?: Database["public"]["Enums"]["care_request_status"]
           submitted_at?: string
@@ -1387,7 +1390,7 @@ export type Database = {
         | "featured"
         | "announcement"
         | "general"
-      care_contact_method: "email" | "phone" | "either"
+      care_contact_method: "email" | "phone" | "either" | "in_person"
       care_request_status: "new" | "in_progress" | "closed"
       care_service_type: "prayer" | "pastoral" | "welfare"
       event_kind:
@@ -1551,7 +1554,7 @@ export const Constants = {
         "announcement",
         "general",
       ],
-      care_contact_method: ["email", "phone", "either"],
+      care_contact_method: ["email", "phone", "either", "in_person"],
       care_request_status: ["new", "in_progress", "closed"],
       care_service_type: ["prayer", "pastoral", "welfare"],
       event_kind: [

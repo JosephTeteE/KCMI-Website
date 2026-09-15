@@ -13,8 +13,9 @@ import type {
   CareRequestListItem,
   CareRequestStatus,
   CareServiceType,
+  WelfareRequestCategory,
 } from "@/lib/care/types";
-import { CARE_AUDIT_ACTIONS } from "@/lib/care/types";
+import { CARE_AUDIT_ACTIONS, WELFARE_REQUEST_CATEGORIES } from "@/lib/care/types";
 import { writeAuditEvent } from "@/lib/cms/audit";
 import { createClient } from "@/lib/supabase/server";
 import type { Permission } from "@/lib/authorization/rbac";
@@ -28,7 +29,21 @@ function isCareStatus(value: string): value is CareRequestStatus {
 }
 
 function isContactMethod(value: string | null): value is CareContactMethod {
-  return value === "email" || value === "phone" || value === "either";
+  return (
+    value === "email" ||
+    value === "phone" ||
+    value === "either" ||
+    value === "in_person"
+  );
+}
+
+function isWelfareCategory(
+  value: string | null,
+): value is WelfareRequestCategory {
+  return (
+    value !== null &&
+    (WELFARE_REQUEST_CATEGORIES as readonly string[]).includes(value)
+  );
 }
 
 function mapListRow(row: {
@@ -41,6 +56,7 @@ function mapListRow(row: {
   assigned_to: string | null;
   display_name: string | null;
   contact_requested: boolean;
+  request_category: string | null;
 }): CareRequestListItem | null {
   if (!isCareServiceType(row.service_type) || !isCareStatus(row.status)) {
     return null;
@@ -55,6 +71,9 @@ function mapListRow(row: {
     assignedTo: row.assigned_to,
     displayName: row.display_name,
     contactRequested: row.contact_requested,
+    requestCategory: isWelfareCategory(row.request_category)
+      ? row.request_category
+      : null,
   };
 }
 
@@ -103,7 +122,7 @@ export async function listCareRequests(
   const { data, error } = await supabase
     .from("pastoral_requests")
     .select(
-      "id, reference_code, service_type, status, submitted_at, branch_id, assigned_to, display_name, contact_requested",
+      "id, reference_code, service_type, status, submitted_at, branch_id, assigned_to, display_name, contact_requested, request_category",
     )
     .eq("service_type", service)
     .order("submitted_at", { ascending: false })
@@ -168,7 +187,7 @@ export async function openCareRequest(requestId: string): Promise<
   const { data, error } = await supabase
     .from("pastoral_requests")
     .select(
-      "id, reference_code, service_type, status, submitted_at, branch_id, assigned_to, display_name, contact_requested, email, phone, preferred_contact_method, preferred_contact_timing, narrative, closed_at, created_at, updated_at",
+      "id, reference_code, service_type, status, submitted_at, branch_id, assigned_to, display_name, contact_requested, email, phone, preferred_contact_method, preferred_contact_timing, narrative, closed_at, created_at, updated_at, request_category",
     )
     .eq("id", requestId)
     .maybeSingle();
@@ -205,6 +224,9 @@ export async function openCareRequest(requestId: string): Promise<
     assignedTo: data.assigned_to,
     displayName: data.display_name,
     contactRequested: data.contact_requested,
+    requestCategory: isWelfareCategory(data.request_category)
+      ? data.request_category
+      : null,
     email: data.email,
     phone: data.phone,
     preferredContactMethod: isContactMethod(data.preferred_contact_method)

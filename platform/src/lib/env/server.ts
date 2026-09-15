@@ -6,6 +6,10 @@ const serverEnvSchema = z.object({
   TURNSTILE_SECRET_KEY: z.string().min(1).optional(),
   /** First-party Prayer intake cutover. Default off. Set to 1/true to enable. */
   KCMI_PRAYER_INTAKE_ENABLED: z.string().optional(),
+  /** First-party Pastoral Care intake cutover. Default off. Set to 1/true to enable. */
+  KCMI_PASTORAL_INTAKE_ENABLED: z.string().optional(),
+  /** First-party Welfare intake cutover. Default off. Set to 1/true to enable. */
+  KCMI_WELFARE_INTAKE_ENABLED: z.string().optional(),
   CONTENT_SOURCE: z.enum(["seed", "supabase"]).optional(),
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -22,6 +26,12 @@ export function getServerEnv(): ServerEnv {
     TURNSTILE_SECRET_KEY: blankToUndefined(process.env.TURNSTILE_SECRET_KEY),
     KCMI_PRAYER_INTAKE_ENABLED: blankToUndefined(
       process.env.KCMI_PRAYER_INTAKE_ENABLED,
+    ),
+    KCMI_PASTORAL_INTAKE_ENABLED: blankToUndefined(
+      process.env.KCMI_PASTORAL_INTAKE_ENABLED,
+    ),
+    KCMI_WELFARE_INTAKE_ENABLED: blankToUndefined(
+      process.env.KCMI_WELFARE_INTAKE_ENABLED,
     ),
     CONTENT_SOURCE:
       contentSource === "seed" || contentSource === "supabase"

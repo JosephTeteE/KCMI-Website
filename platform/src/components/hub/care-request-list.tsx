@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { CareRequestListItem } from "@/lib/care/types";
-import { CARE_STATUS_LABELS } from "@/lib/care/types";
+import {
+  CARE_STATUS_LABELS,
+  WELFARE_REQUEST_CATEGORY_LABELS,
+} from "@/lib/care/types";
 
 function formatSubmitted(iso: string): string {
   try {
@@ -42,6 +45,9 @@ export function CareRequestList({
               </p>
               <p className="mt-1 text-sm text-[var(--color-text-muted)]">
                 Submitted {formatSubmitted(item.submittedAt)}
+                {item.requestCategory
+                  ? ` · ${WELFARE_REQUEST_CATEGORY_LABELS[item.requestCategory]}`
+                  : ""}
                 {item.displayName ? ` · ${item.displayName}` : ""}
               </p>
             </div>

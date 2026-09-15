@@ -69,6 +69,26 @@ export const PUBLIC_SEARCH_PAGE_CATALOG: Array<
   },
   {
     type: "page",
+    title: "Pastoral Care",
+    summary:
+      "Request Pastoral Care support from Kingdom Covenant Ministries International.",
+    url: "/pastoral-care",
+    context: "Page",
+    imageUrl: null,
+    body: "pastoral care support request speak pastor",
+  },
+  {
+    type: "page",
+    title: "Welfare",
+    summary:
+      "Request Welfare support from Kingdom Covenant Ministries International.",
+    url: "/welfare",
+    context: "Page",
+    imageUrl: null,
+    body: "welfare support assistance food clothing shelter",
+  },
+  {
+    type: "page",
     title: "Contact",
     summary: "Email or call the church office and find KCMI locations.",
     url: "/contact",
