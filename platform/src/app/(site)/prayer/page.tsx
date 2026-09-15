@@ -49,19 +49,21 @@ export default function PrayerPage() {
             Before you share
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-readable-sm text-[var(--color-text-muted)]">
-            <li>This form is for prayer requests only.</li>
             <li>
-              Only authorized KCMI Prayer or Care staff may review what you write.
+              Authorized KCMI Prayer or Care staff may review what you share.
             </li>
-            <li>Share only what is necessary for prayer.</li>
+            <li>Share only what is needed for prayer.</li>
             <li>
               Contact details are optional unless you ask for a prayer call.
             </li>
             <li>
-              This is not an emergency, medical, legal, or counselling service.
-              If you are in immediate danger, contact local emergency services.
+              This is not an emergency service. If you are in immediate danger,
+              contact local emergency services.
             </li>
           </ul>
+          <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
+            Final wording: human/legal review required before production cutover.
+          </p>
         </section>
 
         {intakeEnabled ? (

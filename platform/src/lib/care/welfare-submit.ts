@@ -5,6 +5,15 @@ import {
   validateWelfareSubmission,
   type WelfareSubmitInput,
 } from "@/lib/care/welfare-intake";
+import {
+  CARE_INTAKE_GENERIC_REJECT_MESSAGE,
+  isCareIntakeHoneypotTriggered,
+} from "@/lib/care/intake-abuse";
+import { logCareIntakeEvent } from "@/lib/care/intake-log";
+import {
+  CARE_INTAKE_RATE_LIMITED_MESSAGE,
+  consumeCareIntakeRateLimit,
+} from "@/lib/care/intake-rate-limit";
 import type { Json } from "@/lib/supabase/database.types";
 
 export type WelfareSubmitResult =
@@ -13,7 +22,6 @@ export type WelfareSubmitResult =
 
 /**
  * Controlled server-side Welfare insert.
- * Uses service-role client (BYPASSRLS) for insert only — never returns rows to the browser.
  * Fail closed when KCMI_WELFARE_INTAKE_ENABLED is not set.
  */
 export async function submitWelfareRequest(raw: {
@@ -26,6 +34,7 @@ export async function submitWelfareRequest(raw: {
   company?: unknown;
 }): Promise<WelfareSubmitResult> {
   if (!isWelfareIntakeEnabled()) {
+    logCareIntakeEvent({ service: "welfare", outcome: "gate_disabled" });
     return {
       ok: false,
       message:
@@ -33,14 +42,38 @@ export async function submitWelfareRequest(raw: {
     };
   }
 
+  if (isCareIntakeHoneypotTriggered(raw.company)) {
+    logCareIntakeEvent({
+      service: "welfare",
+      outcome: "honeypot_rejected",
+      code: "honeypot",
+    });
+    return { ok: false, message: CARE_INTAKE_GENERIC_REJECT_MESSAGE };
+  }
+
+  const rate = await consumeCareIntakeRateLimit("welfare");
+  if (!rate.allowed) {
+    return { ok: false, message: CARE_INTAKE_RATE_LIMITED_MESSAGE };
+  }
+
   const validated = validateWelfareSubmission(raw);
   if (!validated.ok) {
+    logCareIntakeEvent({
+      service: "welfare",
+      outcome: "validation_rejected",
+      code: "validation",
+    });
     return validated;
   }
 
   try {
     return await insertWelfareRequest(validated.data);
   } catch {
+    logCareIntakeEvent({
+      service: "welfare",
+      outcome: "insert_failed",
+      code: "exception",
+    });
     return {
       ok: false,
       message:
@@ -74,6 +107,11 @@ async function insertWelfareRequest(
     .single();
 
   if (error || !row) {
+    logCareIntakeEvent({
+      service: "welfare",
+      outcome: "insert_failed",
+      code: error?.code ?? "no_row",
+    });
     return {
       ok: false,
       message:
@@ -96,6 +134,12 @@ async function insertWelfareRequest(
   } catch {
     // Intentional: request already stored.
   }
+
+  logCareIntakeEvent({
+    service: "welfare",
+    outcome: "accepted",
+    referenceCode: row.reference_code,
+  });
 
   return { ok: true, referenceCode: row.reference_code };
 }

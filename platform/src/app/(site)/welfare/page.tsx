@@ -35,22 +35,19 @@ export default function WelfarePage() {
             Before you share
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-readable-sm text-[var(--color-text-muted)]">
+            <li>Authorized KCMI Welfare staff may review your request.</li>
             <li>
-              Your request is reviewed only by authorized KCMI Welfare staff.
-            </li>
-            <li>
-              Share only information necessary to understand the support
+              Share only the information needed to understand the support
               request.
             </li>
-            <li>No documents are required in this form.</li>
+            <li>No supporting documents are required on this form.</li>
             <li>
               This is not an emergency service. If you are in immediate danger,
               contact local emergency services.
             </li>
           </ul>
           <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
-            Final public wording is subject to human/legal review before
-            production cutover.
+            Final wording: human/legal review required before production cutover.
           </p>
         </section>
 

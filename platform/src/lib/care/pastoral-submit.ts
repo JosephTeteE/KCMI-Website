@@ -5,6 +5,15 @@ import {
   validatePastoralSubmission,
   type PastoralSubmitInput,
 } from "@/lib/care/pastoral-intake";
+import {
+  CARE_INTAKE_GENERIC_REJECT_MESSAGE,
+  isCareIntakeHoneypotTriggered,
+} from "@/lib/care/intake-abuse";
+import { logCareIntakeEvent } from "@/lib/care/intake-log";
+import {
+  CARE_INTAKE_RATE_LIMITED_MESSAGE,
+  consumeCareIntakeRateLimit,
+} from "@/lib/care/intake-rate-limit";
 import type { Json } from "@/lib/supabase/database.types";
 
 export type PastoralSubmitResult =
@@ -13,7 +22,6 @@ export type PastoralSubmitResult =
 
 /**
  * Controlled server-side Pastoral Care insert.
- * Uses service-role client (BYPASSRLS) for insert only — never returns rows to the browser.
  * Fail closed when KCMI_PASTORAL_INTAKE_ENABLED is not set.
  */
 export async function submitPastoralRequest(raw: {
@@ -27,6 +35,7 @@ export async function submitPastoralRequest(raw: {
   company?: unknown;
 }): Promise<PastoralSubmitResult> {
   if (!isPastoralIntakeEnabled()) {
+    logCareIntakeEvent({ service: "pastoral", outcome: "gate_disabled" });
     return {
       ok: false,
       message:
@@ -34,14 +43,38 @@ export async function submitPastoralRequest(raw: {
     };
   }
 
+  if (isCareIntakeHoneypotTriggered(raw.company)) {
+    logCareIntakeEvent({
+      service: "pastoral",
+      outcome: "honeypot_rejected",
+      code: "honeypot",
+    });
+    return { ok: false, message: CARE_INTAKE_GENERIC_REJECT_MESSAGE };
+  }
+
+  const rate = await consumeCareIntakeRateLimit("pastoral");
+  if (!rate.allowed) {
+    return { ok: false, message: CARE_INTAKE_RATE_LIMITED_MESSAGE };
+  }
+
   const validated = validatePastoralSubmission(raw);
   if (!validated.ok) {
+    logCareIntakeEvent({
+      service: "pastoral",
+      outcome: "validation_rejected",
+      code: "validation",
+    });
     return validated;
   }
 
   try {
     return await insertPastoralRequest(validated.data);
   } catch {
+    logCareIntakeEvent({
+      service: "pastoral",
+      outcome: "insert_failed",
+      code: "exception",
+    });
     return {
       ok: false,
       message:
@@ -75,6 +108,11 @@ async function insertPastoralRequest(
     .single();
 
   if (error || !row) {
+    logCareIntakeEvent({
+      service: "pastoral",
+      outcome: "insert_failed",
+      code: error?.code ?? "no_row",
+    });
     return {
       ok: false,
       message:
@@ -96,6 +134,12 @@ async function insertPastoralRequest(
   } catch {
     // Intentional: request already stored.
   }
+
+  logCareIntakeEvent({
+    service: "pastoral",
+    outcome: "accepted",
+    referenceCode: row.reference_code,
+  });
 
   return { ok: true, referenceCode: row.reference_code };
 }

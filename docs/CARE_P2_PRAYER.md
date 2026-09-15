@@ -47,10 +47,10 @@ Canonical Form URL: `https://forms.gle/gKTwNc9gNiVCWWrJ6`
 
 ## Abuse controls
 
-No Turnstile configuration in P2. No existing reusable rate-limit primitive found.  
-P2 uses validation + honeypot only.
+P2 originally shipped validation + honeypot only.  
+**P4** adds server-side hashed rate limiting. See [CARE_P4_CUTOVER.md](CARE_P4_CUTOVER.md).
 
-**`ANTI_ABUSE_HARDENING_REQUIRED_BEFORE_PUBLIC_CUTOVER`**
+**`FIRST_PARTY_ABUSE_CONTROLS_SUFFICIENT_FOR_INITIAL_LAUNCH`** (P4 assessment)
 
 ## Privacy / retention
 

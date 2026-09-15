@@ -61,9 +61,9 @@ Eventual cutover locations: `/services` care section links (and any legacy stati
 
 ## Abuse controls
 
-No Turnstile configured in P3. Validation + honeypot only (same P2 strategy).
+Validation + honeypot + **P4 server rate limit**. See [CARE_P4_CUTOVER.md](CARE_P4_CUTOVER.md).
 
-**`ANTI_ABUSE_HARDENING_REQUIRED_BEFORE_PUBLIC_CUTOVER`**
+**`FIRST_PARTY_ABUSE_CONTROLS_SUFFICIENT_FOR_INITIAL_LAUNCH`**
 
 ## Privacy / retention
 

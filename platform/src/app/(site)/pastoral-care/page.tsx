@@ -36,22 +36,18 @@ export default function PastoralCarePage() {
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-readable-sm text-[var(--color-text-muted)]">
             <li>
-              Your request is reviewed only by authorized KCMI Pastoral Care
-              staff.
+              Authorized KCMI Pastoral Care staff may review your request.
             </li>
-            <li>Share only what is necessary for Pastoral Care to help.</li>
+            <li>Share only what is necessary.</li>
+            <li>KCMI may contact you using the details you supply.</li>
             <li>
-              KCMI may contact you using the details you supply.
-            </li>
-            <li>
-              This is not an emergency, medical, legal, or professional therapy
-              service. If you are in immediate danger, contact local emergency
-              services.
+              Church pastoral support is not an emergency, medical, legal, or
+              professional therapy service. If you are in immediate danger,
+              contact local emergency services.
             </li>
           </ul>
           <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
-            Final public wording is subject to human/legal review before
-            production cutover.
+            Final wording: human/legal review required before production cutover.
           </p>
         </section>
 

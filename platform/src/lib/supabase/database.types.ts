@@ -1311,6 +1311,30 @@ export type Database = {
           },
         ]
       }
+      care_intake_rate_limits: {
+        Row: {
+          attempt_count: number
+          requester_key: string
+          service_type: Database["public"]["Enums"]["care_service_type"]
+          updated_at: string
+          window_started_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          requester_key: string
+          service_type: Database["public"]["Enums"]["care_service_type"]
+          updated_at?: string
+          window_started_at: string
+        }
+        Update: {
+          attempt_count?: number
+          requester_key?: string
+          service_type?: Database["public"]["Enums"]["care_service_type"]
+          updated_at?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1346,6 +1370,15 @@ export type Database = {
         }
       }
       care_generate_reference_code: { Args: never; Returns: string }
+      care_intake_rate_limit_consume: {
+        Args: {
+          p_requester_key: string
+          p_service: Database["public"]["Enums"]["care_service_type"]
+          p_limit?: number
+          p_window_seconds?: number
+        }
+        Returns: Json
+      }
       care_read_permission_for: {
         Args: { p_service: Database["public"]["Enums"]["care_service_type"] }
         Returns: string
