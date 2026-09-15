@@ -21,6 +21,10 @@ const PERMISSION_HELP: Partial<Record<Permission, string>> = {
     "Your account cannot open the Hub. Ask a Super Admin for help.",
   "audit.read":
     "Your account cannot view recent website changes. That is OK for most volunteers.",
+  "giving.propose":
+    "Your account is not allowed to propose Giving bank details. Ask a Finance reviewer or Super Admin.",
+  "giving.approve":
+    "Your account is not allowed to approve Giving bank details. Ask another Finance reviewer or Super Admin.",
 };
 
 export function humanPermissionDenied(permission: Permission): string {
@@ -81,6 +85,12 @@ export const HUB_AUDIT_ACTION_LABELS: Record<string, string> = {
   "sermon.archive": "Sermon removed from website",
   "media.upload": "Photo added",
   "media.archive": "Photo removed from library",
+  "giving.proposal.create": "Giving change drafted",
+  "giving.proposal.submit": "Giving change submitted for approval",
+  "giving.proposal.withdraw": "Giving change returned to draft",
+  "giving.proposal.reject": "Giving change rejected",
+  "giving.proposal.approve": "Giving change approved and published to database",
+  "giving.account.apply": "Giving destination applied in database",
 };
 
 export function humanAuditAction(action: string): string {

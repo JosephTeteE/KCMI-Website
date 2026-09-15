@@ -74,7 +74,7 @@ Remaining engineering-controlled: brand logo, structural nav, giving accounts (D
 | --- | --- |
 | Brand primitives / logo / layout / CSP / RBAC | Security and design-system integrity |
 | Primary/footer information architecture | IA changes are releases, not copy edits |
-| Giving account numbers | Dual-approval / D2; not this phase |
+| Giving account numbers | Dual-approval Hub management implemented; public `/giving` still seed-backed until human cutover — [`GIVING_V1.md`](GIVING_V1.md) |
 | Privacy / Terms body | Counsel; AI must not invent legal duties |
 | Events/Camp registration | Deferred — Events V1 is advertising/info only (E1+E2); see [`EVENTS_V1.md`](EVENTS_V1.md); `camp-deploy` untouched |
 | Search index | Search V2 — public published corpus only; see [`SEARCH_V2.md`](SEARCH_V2.md) |

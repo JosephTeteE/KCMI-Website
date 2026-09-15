@@ -250,8 +250,18 @@ select ok(
 );
 
 select ok(
+  not public.has_permission('giving.propose'),
+  'media_admin cannot propose Giving destinations'
+);
+
+select ok(
+  not public.has_permission('giving.approve'),
+  'media_admin cannot approve Giving destinations'
+);
+
+select ok(
   not public.has_permission('giving.change'),
-  'media_admin cannot change Giving destinations'
+  'media_admin cannot use deprecated giving.change'
 );
 
 select ok(

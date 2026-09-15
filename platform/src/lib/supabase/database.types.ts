@@ -476,6 +476,192 @@ export type Database = {
           },
         ]
       }
+      giving_account_numbers: {
+        Row: {
+          account_number: string
+          created_at: string
+          currency: string
+          display_order: number
+          giving_account_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          account_number: string
+          created_at?: string
+          currency: string
+          display_order?: number
+          giving_account_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string
+          created_at?: string
+          currency?: string
+          display_order?: number
+          giving_account_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "giving_account_numbers_giving_account_id_fkey"
+            columns: ["giving_account_id"]
+            isOneToOne: false
+            referencedRelation: "giving_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      giving_accounts: {
+        Row: {
+          account_name: string
+          bank_name: string
+          country: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          display_order: number
+          external_url: string | null
+          id: string
+          label: string
+          stable_key: string
+          status: Database["public"]["Enums"]["giving_account_status"]
+          swift_bic: string | null
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          account_name: string
+          bank_name: string
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          display_order?: number
+          external_url?: string | null
+          id?: string
+          label: string
+          stable_key: string
+          status?: Database["public"]["Enums"]["giving_account_status"]
+          swift_bic?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          account_name?: string
+          bank_name?: string
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          display_order?: number
+          external_url?: string | null
+          id?: string
+          label?: string
+          stable_key?: string
+          status?: Database["public"]["Enums"]["giving_account_status"]
+          swift_bic?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "giving_accounts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "giving_accounts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      giving_change_proposals: {
+        Row: {
+          applied_at: string | null
+          base_snapshot: Json | null
+          base_version: number | null
+          created_at: string
+          id: string
+          proposal_type: Database["public"]["Enums"]["giving_proposal_type"]
+          proposed_snapshot: Json
+          proposer_id: string
+          review_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["giving_proposal_status"]
+          submitted_at: string | null
+          target_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          applied_at?: string | null
+          base_snapshot?: Json | null
+          base_version?: number | null
+          created_at?: string
+          id?: string
+          proposal_type: Database["public"]["Enums"]["giving_proposal_type"]
+          proposed_snapshot: Json
+          proposer_id: string
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["giving_proposal_status"]
+          submitted_at?: string | null
+          target_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          applied_at?: string | null
+          base_snapshot?: Json | null
+          base_version?: number | null
+          created_at?: string
+          id?: string
+          proposal_type?: Database["public"]["Enums"]["giving_proposal_type"]
+          proposed_snapshot?: Json
+          proposer_id?: string
+          review_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["giving_proposal_status"]
+          submitted_at?: string | null
+          target_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "giving_change_proposals_proposer_id_fkey"
+            columns: ["proposer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "giving_change_proposals_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "giving_change_proposals_target_account_id_fkey"
+            columns: ["target_account_id"]
+            isOneToOne: false
+            referencedRelation: "giving_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       website_documents: {
         Row: {
           created_at: string
@@ -1007,9 +1193,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_giving_change_proposal: {
+        Args: { p_proposal_id: string; p_review_reason?: string | null }
+        Returns: Database["public"]["Tables"]["giving_change_proposals"]["Row"]
+      }
       can_manage_branch: { Args: { p_branch_id: string }; Returns: boolean }
+      can_view_giving_admin: { Args: never; Returns: boolean }
+      giving_snapshot_account: { Args: { p_account_id: string }; Returns: Json }
+      giving_validate_snapshot: { Args: { p_snapshot: Json }; Returns: string }
       has_permission: { Args: { permission_name: string }; Returns: boolean }
       has_role: { Args: { role_name: string }; Returns: boolean }
+      reject_giving_change_proposal: {
+        Args: { p_proposal_id: string; p_review_reason: string }
+        Returns: Database["public"]["Tables"]["giving_change_proposals"]["Row"]
+      }
       search_public_content: {
         Args: {
           p_query: string
@@ -1026,6 +1223,14 @@ export type Database = {
           rank_score: number
         }[]
       }
+      submit_giving_change_proposal: {
+        Args: { p_proposal_id: string }
+        Returns: Database["public"]["Tables"]["giving_change_proposals"]["Row"]
+      }
+      withdraw_giving_change_proposal: {
+        Args: { p_proposal_id: string }
+        Returns: Database["public"]["Tables"]["giving_change_proposals"]["Row"]
+      }
     }
     Enums: {
       branch_media_placement:
@@ -1041,6 +1246,14 @@ export type Database = {
         | "retreat"
         | "special_service"
         | "other"
+      giving_account_status: "draft" | "published" | "disabled"
+      giving_proposal_status:
+        | "draft"
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "superseded"
+      giving_proposal_type: "create" | "update" | "disable" | "enable"
       program_action_kind:
         | "none"
         | "registration"
@@ -1195,6 +1408,15 @@ export const Constants = {
         "special_service",
         "other",
       ],
+      giving_account_status: ["draft", "published", "disabled"],
+      giving_proposal_status: [
+        "draft",
+        "pending",
+        "approved",
+        "rejected",
+        "superseded",
+      ],
+      giving_proposal_type: ["create", "update", "disable", "enable"],
       program_action_kind: [
         "none",
         "registration",

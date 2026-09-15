@@ -4,7 +4,8 @@ import type { GivingAccount } from "@/content/types";
  * Authoritative public giving destinations for Phase C.
  * Source: public/giving-kcmi.html (VERIFIED).
  * Do not duplicate account numbers in components — import via getGivingAccounts().
- * Hub dual-approval editing is Phase D+ (ADR-0006) — not implemented here.
+ * Hub dual-approval editing is implemented for database destinations (Giving D2).
+ * Public /giving remains seed-backed until human financial verification + cutover.
  */
 export const givingAccounts: GivingAccount[] = [
   {

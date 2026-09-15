@@ -40,4 +40,18 @@ export const HUB_DASHBOARD_CARDS: readonly HubDashboardCard[] = [
     href: "/admin/media",
     outcome: "Upload photos that can be used on website pages.",
   },
+  {
+    title: "Giving",
+    href: "/admin/giving",
+    outcome:
+      "Review Giving destinations and propose bank-detail changes for dual approval.",
+  },
 ] as const;
+
+/** Cards that require at least one of these permissions to show on the dashboard. */
+export const HUB_DASHBOARD_CARD_PERMISSIONS: Record<
+  string,
+  readonly string[] | undefined
+> = {
+  "/admin/giving": ["giving.propose", "giving.approve", "audit.read"],
+};

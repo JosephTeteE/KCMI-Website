@@ -45,7 +45,8 @@ const ROLE_PERMISSIONS = {
     "events.manage",
     "registrations.manage",
     "payment_evidence.review",
-    "giving.change",
+    "giving.propose",
+    "giving.approve",
     "livestream.manage",
     "media.manage",
     "website.manage",
@@ -97,7 +98,7 @@ const INTENDED_USERS = [
       "website.manage",
       "branches.manage",
     ],
-    mustNotHave: [...PASTORAL_READ, "users.manage", "giving.change"],
+    mustNotHave: [...PASTORAL_READ, "users.manage", "giving.propose", "giving.approve"],
   },
 ];
 
@@ -464,7 +465,8 @@ async function verify(admin) {
     "livestream.manage",
     "branches.manage",
     "users.manage",
-    "giving.change",
+    "giving.propose",
+    "giving.approve",
   ];
   const leftover = cms.filter((p) => noRolePerms.has(p));
   if (leftover.length === 0) {

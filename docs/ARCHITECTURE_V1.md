@@ -108,7 +108,7 @@
 - `events.manage`
 - `registrations.manage`
 - `payment_evidence.review`
-- `giving.change`
+- `giving.propose`, `giving.approve` (legacy `giving.change` retired for writes; see [`GIVING_V1.md`](GIVING_V1.md))
 - `users.manage`
 - `livestream.manage`
 - `branches.manage`
@@ -160,7 +160,7 @@ Version history/rollback for important editable content: **ACCEPTED** architectu
 
 ### Giving configuration (ACCEPTED — ADR-0006)
 
-Maker-checker / dual approval before publishing public giving bank-account / payment destination changes. Both actors: appropriate permission + **AAL2**.  
+Maker-checker / dual approval before publishing public giving bank-account / payment destination changes. Both actors: appropriate permission + **AAL2**. Approve = publish to the Giving database. Public `/giving` remains seed-backed until human financial verification — see [`GIVING_V1.md`](GIVING_V1.md).
 Routine event payment-evidence verification does **not** require dual approval in V1.
 
 ### Privacy / Terms (ACCEPTED — ADR-0006)

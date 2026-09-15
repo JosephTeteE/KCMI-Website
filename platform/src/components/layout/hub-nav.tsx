@@ -5,12 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { StaffProfile } from "@/lib/auth/session";
 import { operatingRoleLabel } from "@/lib/authorization/rbac";
+import { canViewGivingAdmin } from "@/lib/giving/access";
 import { signOutAction } from "@/app/auth/actions";
 import { HubHelpMenu } from "@/components/hub/hub-help-menu";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 import { HUB_TOUR_MENU_EVENT } from "@/lib/hub/tour";
 
-const NAV = [
+const NAV_BASE = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/website", label: "Website pages" },
   { href: "/admin/programs", label: "Programs & Announcements" },
@@ -20,6 +21,16 @@ const NAV = [
   { href: "/admin/branches", label: "Branches" },
   { href: "/admin/livestream", label: "Livestream" },
 ] as const;
+
+function hubNavItems(profile: StaffProfile) {
+  const items: { href: string; label: string; exact?: boolean }[] = [
+    ...NAV_BASE,
+  ];
+  if (canViewGivingAdmin(profile.permissions)) {
+    items.push({ href: "/admin/giving", label: "Giving" });
+  }
+  return items;
+}
 
 function isCurrent(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
@@ -48,14 +59,17 @@ function HubIdentity({ profile }: { profile: StaffProfile }) {
 
 function HubLinks({
   pathname,
+  profile,
   onNavigate,
 }: {
   pathname: string;
+  profile: StaffProfile;
   onNavigate?: () => void;
 }) {
+  const nav = hubNavItems(profile);
   return (
     <ul className="flex flex-col gap-1">
-      {NAV.map((item) => {
+      {nav.map((item) => {
         const current = isCurrent(
           pathname,
           item.href,
@@ -100,7 +114,11 @@ function HubNavBody({
         <HubIdentity profile={profile} />
       </div>
       <nav className="mt-6" aria-label="Hub">
-        <HubLinks pathname={pathname} onNavigate={onNavigate} />
+        <HubLinks
+          pathname={pathname}
+          profile={profile}
+          onNavigate={onNavigate}
+        />
       </nav>
       <HubHelpMenu onAction={onNavigate} />
       <form action={signOutAction} className="mt-8">

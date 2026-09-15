@@ -3,8 +3,9 @@ import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 import { hasSupabasePublicConfig, isHostedKcmiEnvironment } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
-import { HUB_DASHBOARD_CARDS } from "@/lib/hub/dashboard-cards";
+import { HUB_DASHBOARD_CARDS, HUB_DASHBOARD_CARD_PERMISSIONS } from "@/lib/hub/dashboard-cards";
 import { humanAuditAction } from "@/lib/hub/humanize";
+import type { Permission } from "@/lib/authorization/rbac";
 
 const CARD_TOUR: Record<string, string> = {
   "/admin/website/home": "dashboard-homepage",
@@ -121,7 +122,13 @@ export default async function AdminDashboardPage() {
       />
 
       <ul className="grid gap-4 sm:grid-cols-2" aria-label="Things you can update">
-        {HUB_DASHBOARD_CARDS.map((card) => (
+        {HUB_DASHBOARD_CARDS.filter((card) => {
+          const needed = HUB_DASHBOARD_CARD_PERMISSIONS[card.href];
+          if (!needed) return true;
+          return needed.some((p) =>
+            staffHasPermission(session.profile, p as Permission),
+          );
+        }).map((card) => (
           <li key={card.href}>
             <Link
               href={card.href}

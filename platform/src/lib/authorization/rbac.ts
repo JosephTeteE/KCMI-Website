@@ -33,7 +33,8 @@ export const PERMISSIONS = [
   "events.manage",
   "registrations.manage",
   "payment_evidence.review",
-  "giving.change",
+  "giving.propose",
+  "giving.approve",
   "users.manage",
   "livestream.manage",
   "media.manage",
@@ -64,7 +65,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "events.manage",
       "registrations.manage",
       "payment_evidence.review",
-      "giving.change",
+      "giving.propose",
+      "giving.approve",
       "livestream.manage",
       "media.manage",
       "website.manage",
@@ -97,7 +99,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       // Operating name: HQ Content Admin.
       // events.manage = Event CONTENT only.
       // Intentionally NO registrations.manage or payment_evidence.review.
-      // No pastoral, users.manage, or giving.change.
+      // No pastoral, users.manage, giving.propose, or giving.approve.
     ],
     program_drafter: [
       "hub.access",
@@ -110,7 +112,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
     finance_reviewer: [
       "hub.access",
       "payment_evidence.review",
-      "giving.change",
+      "giving.propose",
+      "giving.approve",
     ],
     auditor: ["hub.access", "audit.read"],
   };

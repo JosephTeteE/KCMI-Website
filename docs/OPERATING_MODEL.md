@@ -27,7 +27,7 @@ The database still uses stable technical role names (`super_admin`, `media_admin
 - Must **not**:
   - manage platform security / RBAC except ordinary own-account settings (`users.manage` remains Super Admin)
   - manage pastoral narratives
-  - change Giving destinations (`giving.change` remains later dual-approval / finance)
+  - change Giving destinations (`giving.propose` / `giving.approve` — dual-approval / finance only; see [`GIVING_V1.md`](GIVING_V1.md))
   - access infrastructure secrets
 
 Branch-specific staff accounts are **not required** for this initial rollout.

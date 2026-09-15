@@ -27,7 +27,8 @@ describe("RBAC foundation", () => {
     expect(perms.has("registrations.manage")).toBe(false);
     expect(perms.has("payment_evidence.review")).toBe(false);
     expect(perms.has("users.manage")).toBe(false);
-    expect(perms.has("giving.change")).toBe(false);
+    expect(perms.has("giving.propose")).toBe(false);
+    expect(perms.has("giving.approve")).toBe(false);
   });
 
   it("grants media.manage, website.manage, and programs.update to super_admin", () => {
