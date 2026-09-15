@@ -35,6 +35,7 @@ import {
   fetchMediaAssetPublic,
   fetchPublishedBranchBySlug,
   fetchPublishedBranches,
+  fetchPublishedGivingAccounts,
   fetchPublishedSermons,
   fetchWebsiteDocumentPayload,
 } from "@/content/adapters/supabase-public";
@@ -283,7 +284,15 @@ export async function getGivingCta() {
   return home.giving;
 }
 
-export function getGivingAccounts() {
+export async function getGivingAccounts() {
+  if (shouldUseSeedContent()) {
+    return givingAccounts;
+  }
+  return fetchPublishedGivingAccounts();
+}
+
+/** Seed reference retained for bootstrap provenance / local CONTENT_SOURCE=seed. */
+export function getGivingAccountsSeed() {
   return givingAccounts;
 }
 

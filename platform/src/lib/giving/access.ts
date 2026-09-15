@@ -80,6 +80,7 @@ export function emptyGivingSnapshot(): GivingDestinationSnapshot {
     account_name: "",
     swift_bic: null,
     external_url: null,
+    visitor_note: null,
     display_order: 0,
     status: "published",
     numbers: [{ currency: "NGN", account_number: "", display_order: 0 }],
@@ -100,6 +101,7 @@ export function stagingQaGivingSnapshot(
     account_name: "STAGING QA SYNTHETIC ACCOUNT",
     swift_bic: null,
     external_url: null,
+    visitor_note: null,
     display_order: 900,
     status: "published",
     numbers: [

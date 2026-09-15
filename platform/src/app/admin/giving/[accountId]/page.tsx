@@ -25,7 +25,7 @@ export default async function AdminGivingAccountPage({
   const { data: account } = await supabase
     .from("giving_accounts")
     .select(
-      "id, stable_key, label, description, country, bank_name, account_name, swift_bic, external_url, display_order, status, version, giving_account_numbers(currency, account_number, display_order)",
+      "id, stable_key, label, description, country, bank_name, account_name, swift_bic, external_url, visitor_note, display_order, status, version, giving_account_numbers(currency, account_number, display_order)",
     )
     .eq("id", accountId)
     .maybeSingle();

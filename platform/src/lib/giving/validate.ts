@@ -31,6 +31,7 @@ export function validateGivingSnapshot(
   const account_name = (input.account_name ?? "").trim();
   const swift_bic = emptyToNull(input.swift_bic ?? null)?.toUpperCase() ?? null;
   const external_url = emptyToNull(input.external_url ?? null);
+  const visitor_note = emptyToNull(input.visitor_note ?? null);
   const display_order = Number.isFinite(input.display_order)
     ? Number(input.display_order)
     : 0;
@@ -48,6 +49,9 @@ export function validateGivingSnapshot(
   }
   if (description.length > 2000) {
     return { ok: false, error: "Please shorten the description." };
+  }
+  if (visitor_note && visitor_note.length > 500) {
+    return { ok: false, error: "Please shorten the visitor note." };
   }
   if (!bank_name || bank_name.length > 120) {
     return { ok: false, error: "Please enter the bank name." };
@@ -131,6 +135,7 @@ export function validateGivingSnapshot(
       account_name,
       swift_bic,
       external_url,
+      visitor_note,
       display_order,
       status,
       numbers,
@@ -162,6 +167,7 @@ export function parseGivingSnapshotFromForm(
     account_name: String(formData.get("account_name") ?? ""),
     swift_bic: String(formData.get("swift_bic") ?? ""),
     external_url: String(formData.get("external_url") ?? ""),
+    visitor_note: String(formData.get("visitor_note") ?? ""),
     display_order: Number(formData.get("display_order") ?? 0),
     status: String(formData.get("status") ?? "published") as
       | "draft"

@@ -60,6 +60,7 @@ export function GivingSnapshotView({
         />
         <Field label="SWIFT / BIC" value={snapshot.swift_bic} />
         <Field label="External link" value={snapshot.external_url} />
+        <Field label="Visitor note" value={snapshot.visitor_note} />
         <div className="min-w-0 sm:col-span-2">
           <dt className="text-sm font-semibold text-[var(--color-text-body)]">
             Description

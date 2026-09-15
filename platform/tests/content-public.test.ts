@@ -70,7 +70,7 @@ describe("public content adapters", () => {
       branches: await getBranches(),
       social: await getSocialLinks(),
       prayer: await getPrayerCta(),
-      giving: getGivingAccounts(),
+      giving: await getGivingAccounts(),
       faqs: await getFaqs(),
       about: await getAboutLeadPastor(),
       live: await getLivestreamPublic(),
@@ -86,8 +86,8 @@ describe("public content adapters", () => {
     expect(await getFeaturedProgram()).toBeNull();
   });
 
-  it("centralizes giving accounts from a single seed (verified banks)", () => {
-    const accounts = getGivingAccounts();
+  it("centralizes giving accounts from a single seed (verified banks)", async () => {
+    const accounts = await getGivingAccounts();
     expect(accounts).toHaveLength(3);
     expect(accounts.map((a) => a.bankName).sort()).toEqual([
       "ECOBANK",

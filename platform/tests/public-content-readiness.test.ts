@@ -93,11 +93,11 @@ async function publicVisitorText(): Promise<string> {
     ...faqItems.flatMap((faq) => [faq.question, ...faq.answerParagraphs]),
     ...offerings.flatMap((item) => [item.title, item.body]),
     ...platforms.map((item) => item.description),
-    ...getGivingAccounts().flatMap((account) => [
+    ...((await getGivingAccounts()).flatMap((account) => [
       account.purpose,
       account.description,
       account.note ?? "",
-    ]),
+    ])),
     ...headquartersServiceTimes.map((t) => `${t.day} ${t.time}`),
     ...branches.flatMap((branch) => [
       branch.name,

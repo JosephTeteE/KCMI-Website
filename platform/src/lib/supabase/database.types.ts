@@ -532,6 +532,7 @@ export type Database = {
           updated_at: string
           updated_by: string | null
           version: number
+          visitor_note: string | null
         }
         Insert: {
           account_name: string
@@ -550,6 +551,7 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           version?: number
+          visitor_note?: string | null
         }
         Update: {
           account_name?: string
@@ -568,6 +570,7 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           version?: number
+          visitor_note?: string | null
         }
         Relationships: [
           {

@@ -1,7 +1,8 @@
 # Giving V1 — dual-approval destination management
 
-**Status:** Hub management + schema implemented (Giving D2 core).  
-**Public cutover:** **NOT done** — `/giving` remains seed/legacy-backed until human re-confirms financial destinations.
+**Status:** Staging cutover to verified DB destinations.  
+**Public source (staging/preview):** published `giving_accounts` rows.  
+**Seed file:** retained as bootstrap/reference (`getGivingAccountsSeed()`); not deleted.
 
 ## Product principles
 
@@ -13,14 +14,26 @@
 
 ## Public `/giving` (current)
 
-- Source: `platform/src/content/seed/giving.ts` via `getGivingAccounts()` / `getGivingPageIntro()`.
-- Database Giving tables may hold STAGING QA or pre-cutover rows; **they do not drive the public page yet**.
+- **Staging/preview:** `fetchPublishedGivingAccounts()` → published DB rows only.
+- **CONTENT_SOURCE=seed (local):** still returns `giving.ts` for offline work.
+- Intro/blessing copy remains seed (`getGivingPageIntro()`).
+- Copy-account-number restored on account numbers.
+
+## Bootstrap provenance
+
+Initial live rows were migrated from `platform/src/content/seed/giving.ts` after human reconfirmation that those public destinations remain official. Bootstrap is **not** a maker/checker change. Future destination edits require dual approval.
+
+| stable_key | Purpose |
+| --- | --- |
+| `general-ecobank` | General Giving |
+| `care-union` | Care Group Giving |
+| `international-zenith` | International Giving (USD/GBP/EUR) |
 
 ## Data model
 
 | Table | Purpose |
 | --- | --- |
-| `giving_accounts` | Structured destinations (bank, account name, SWIFT, external URL, status, **version**) |
+| `giving_accounts` | Structured destinations (bank, account name, SWIFT, external URL, visitor_note, status, **version**) |
 | `giving_account_numbers` | Per-currency account numbers (not opaque JSON) |
 | `giving_change_proposals` | Maker/checker proposals with `base_snapshot` + `proposed_snapshot` |
 
@@ -28,7 +41,7 @@ No donor/transaction tables.
 
 ## Dual-approval boundary
 
-**Requires maker/checker:** bank name, account name, account numbers, currency, SWIFT/BIC, external URL, enable/disable, replace destination details.
+**Requires maker/checker:** bank name, account name, account numbers, currency, SWIFT/BIC, external URL, enable/disable, replace destination details, visitor_note.
 
 **Does not:** Giving page intro/blessing copy, homepage internal `/giving` CTA label/copy (existing `website.manage`).
 
@@ -55,21 +68,17 @@ No donor/transaction tables.
 
 `media_admin` receives **neither**.
 
+### Pre-launch governance
+
+**FINANCE_REVIEWER_REQUIRED_BEFORE_PRODUCTION_OPERATIONS** / **CHECKER_IDENTITY_REQUIRED_BEFORE_PRODUCTION** — a second finance-authorized identity must exist before production dual-approval operations. Do not grant `media_admin` approval rights.
+
 ### Legacy `giving.change`
 
-**Retired for writes:** all `role_permissions` grants removed. Permission row retained as **DEPRECATED** for historical audit only. Application RBAC uses only `giving.propose` / `giving.approve`. There is no path where `giving.change` updates live destinations.
+**Retired for writes:** all `role_permissions` grants removed. Permission row retained as **DEPRECATED** for historical audit only.
 
 ## Audit
 
-`audit_events` records: proposal create/submit/withdraw/reject/approve and account apply. Proposal table remains authoritative for before/proposed snapshots.
-
-## Implementation sequence
-
-| Phase | Scope | Status |
-| --- | --- | --- |
-| G1–G3 | Schema + Hub + maker/checker | This delivery |
-| G4 | Migrate human-verified financial content | Pending human confirmation |
-| G5 | Hosted acceptance + public cutover | Pending |
+`audit_events` records bootstrap provenance (`giving.bootstrap.seed`) plus proposal create/submit/withdraw/reject/approve and account apply.
 
 ## Future payment provider (document only)
 

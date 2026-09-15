@@ -14,6 +14,7 @@ export type GivingDestinationSnapshot = {
   account_name: string;
   swift_bic: string | null;
   external_url: string | null;
+  visitor_note: string | null;
   display_order: number;
   status: "draft" | "published" | "disabled";
   numbers: GivingAccountNumberSnapshot[];

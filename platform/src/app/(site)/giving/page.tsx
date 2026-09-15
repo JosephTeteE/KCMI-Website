@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/layout/page-shell";
+import { CopyAccountNumber } from "@/components/giving/copy-account-number";
 import { getGivingAccounts, getGivingPageIntro } from "@/content";
 import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
@@ -9,9 +10,9 @@ export const metadata = publicPageMetadata({
   path: "/giving",
 });
 
-export default function GivingPage() {
+export default async function GivingPage() {
   const intro = getGivingPageIntro();
-  const accounts = getGivingAccounts();
+  const accounts = await getGivingAccounts();
 
   return (
     <PageShell eyebrow="Stewardship" title={intro.title} description={intro.lead}>
@@ -61,6 +62,7 @@ export default function GivingPage() {
                   <dd className="text-break-safe mt-1 font-mono text-xl tracking-wide text-[var(--color-text-body)]">
                     {account.accountNumber}
                   </dd>
+                  <CopyAccountNumber value={account.accountNumber} />
                 </div>
               ) : null}
               {account.swiftCode ? (
@@ -81,6 +83,10 @@ export default function GivingPage() {
                   <dd className="text-break-safe mt-1 font-mono text-xl tracking-wide text-[var(--color-text-body)]">
                     {c.accountNumber}
                   </dd>
+                  <CopyAccountNumber
+                    value={c.accountNumber}
+                    label={`Copy ${c.currency} account number`}
+                  />
                 </div>
               ))}
             </dl>

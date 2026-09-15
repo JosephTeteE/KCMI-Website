@@ -481,3 +481,49 @@ export async function fetchHomeFeaturedSermon(): Promise<SermonPublic | null> {
     thumbnailAlt: thumb?.alt_text ?? "",
   };
 }
+
+export async function fetchPublishedGivingAccounts(): Promise<
+  import("@/content/types").GivingAccount[]
+> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("giving_accounts")
+    .select(
+      `
+      stable_key,
+      label,
+      description,
+      bank_name,
+      account_name,
+      swift_bic,
+      visitor_note,
+      display_order,
+      giving_account_numbers (
+        currency,
+        account_number,
+        display_order
+      )
+    `,
+    )
+    .eq("status", "published")
+    .not("stable_key", "like", "staging-qa-%")
+    .order("display_order", { ascending: true });
+
+  if (error) fail("fetchPublishedGivingAccounts", error);
+
+  const { mapGivingDestinationToPublic } = await import(
+    "@/lib/giving/public-map"
+  );
+  const { accountRowToSnapshot } = await import("@/lib/giving/snapshot");
+
+  return (data ?? []).map((row) =>
+    mapGivingDestinationToPublic(
+      accountRowToSnapshot({
+        ...row,
+        country: null,
+        external_url: null,
+        status: "published",
+      }),
+    ),
+  );
+}

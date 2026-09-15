@@ -5,6 +5,7 @@ import {
   permissionsForRoles,
   roleHasPermission,
 } from "@/lib/authorization/rbac";
+import { getGivingAccountsSeed } from "@/content";
 import {
   canApproveGiving,
   canCheckerApproveProposal,
@@ -14,7 +15,10 @@ import {
   stagingQaGivingSnapshot,
 } from "@/lib/giving/access";
 import { validateGivingSnapshot } from "@/lib/giving/validate";
-import { getGivingAccounts } from "@/content";
+import {
+  givingAccountParityKey,
+  mapGivingDestinationToPublic,
+} from "@/lib/giving/public-map";
 
 describe("Giving D2 RBAC", () => {
   it("grants propose+approve to finance_reviewer and super_admin", () => {
@@ -136,21 +140,71 @@ describe("Giving D2 maker/checker gates", () => {
 });
 
 describe("Giving D2 public page remains seed-backed", () => {
-  it("public /giving page still imports seed getters", () => {
+  it("public /giving page loads accounts asynchronously", () => {
     const page = readFileSync(
       resolve(process.cwd(), "src/app/(site)/giving/page.tsx"),
       "utf8",
     );
     expect(page).toMatch(/getGivingAccounts/);
     expect(page).toMatch(/getGivingPageIntro/);
-    expect(page).not.toMatch(/giving_accounts/);
-    expect(page).not.toMatch(/from\("giving_accounts"\)/);
+    expect(page).toMatch(/await getGivingAccounts/);
+    expect(page).toMatch(/CopyAccountNumber/);
   });
 
-  it("seed destinations remain available for the public page", () => {
-    const accounts = getGivingAccounts();
+  it("seed destinations remain available as bootstrap reference", () => {
+    const accounts = getGivingAccountsSeed();
     expect(accounts.length).toBeGreaterThanOrEqual(3);
     expect(accounts.some((a) => a.bankName === "ECOBANK")).toBe(true);
+  });
+
+  it("maps structured DB rows back to exact seed financial parity", () => {
+    const seed = getGivingAccountsSeed();
+    const mapped = [
+      mapGivingDestinationToPublic({
+        stable_key: "general-ecobank",
+        label: "General Giving",
+        description:
+          "For tithes, offerings, and seed gifts to support the general ministry work.",
+        bank_name: "ECOBANK",
+        account_name: "KINGDOM COVENANT MINISTRIES INTERNATIONAL",
+        swift_bic: null,
+        visitor_note: "Please title your payment description accordingly.",
+        numbers: [
+          { currency: "NGN", account_number: "1602002211", display_order: 0 },
+        ],
+      }),
+      mapGivingDestinationToPublic({
+        stable_key: "care-union",
+        label: "Care Group Giving",
+        description:
+          "For welfare, prisoner, needy, and less-privileged support.",
+        bank_name: "UNION BANK",
+        account_name: "KINGDOM COVENANT MINISTRIES INTERNATIONAL",
+        swift_bic: null,
+        visitor_note: 'Please include "Care Group" in your payment description.',
+        numbers: [
+          { currency: "NGN", account_number: "0055484937", display_order: 0 },
+        ],
+      }),
+      mapGivingDestinationToPublic({
+        stable_key: "international-zenith",
+        label: "International Giving",
+        description:
+          "For donations in foreign currencies (USD, GBP, EUR) from outside Nigeria.",
+        bank_name: "ZENITH BANK",
+        account_name: "KINGDOM COVENANT MINISTRIES INTERNATIONAL",
+        swift_bic: "ZEIBNGLA",
+        visitor_note: "Please title your payment description accordingly.",
+        numbers: [
+          { currency: "USD", account_number: "5074346861", display_order: 0 },
+          { currency: "GBP", account_number: "5061372275", display_order: 1 },
+          { currency: "EUR", account_number: "5081098025", display_order: 2 },
+        ],
+      }),
+    ];
+    expect(mapped.map(givingAccountParityKey)).toEqual(
+      seed.map(givingAccountParityKey),
+    );
   });
 
   it("Hub actions require AAL2 via requireStaffAction", () => {

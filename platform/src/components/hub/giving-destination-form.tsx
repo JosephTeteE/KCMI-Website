@@ -150,6 +150,18 @@ export function GivingDestinationForm({
 
         <label className="block sm:col-span-2">
           <span className="text-sm font-semibold text-[var(--color-text-body)]">
+            Visitor note (optional)
+          </span>
+          <input
+            id={`${idPrefix}-note`}
+            name="visitor_note"
+            defaultValue={snapshot.visitor_note ?? ""}
+            className="mt-1 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-3 text-base"
+          />
+        </label>
+
+        <label className="block sm:col-span-2">
+          <span className="text-sm font-semibold text-[var(--color-text-body)]">
             Description
           </span>
           <textarea

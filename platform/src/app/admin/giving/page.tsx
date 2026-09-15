@@ -13,7 +13,6 @@ import {
   GIVING_PROPOSAL_STATUS_LABELS,
   type GivingProposalStatus,
 } from "@/lib/giving/types";
-import { getGivingAccounts } from "@/content";
 
 type SearchParams = Promise<{ message?: string; error?: string }>;
 
@@ -56,13 +55,11 @@ export default async function AdminGivingPage({
       .order("submitted_at", { ascending: true }),
   ]);
 
-  const websiteAccounts = getGivingAccounts();
-
   return (
     <div>
       <HubPageHeader
         title="Giving"
-        description="Manage bank destinations with dual approval. The public website still shows verified seed content until a separate human cutover."
+        description="Manage bank destinations with dual approval. The public website now shows published database destinations on staging. Future changes still need a second authorized person."
         actions={
           canPropose ? (
             <Link
@@ -83,9 +80,9 @@ export default async function AdminGivingPage({
         <ul className="mt-3 list-disc space-y-2 pl-5 text-base text-[var(--color-text-muted)]">
           <li>
             <strong className="text-[var(--color-text-body)]">
-              Current website content
+              What visitors see
             </strong>{" "}
-            still comes from verified seed/legacy Giving details on{" "}
+            comes from <em>published</em> database destinations on{" "}
             <Link href="/giving" className="underline">
               /giving
             </Link>
@@ -93,62 +90,28 @@ export default async function AdminGivingPage({
           </li>
           <li>
             <strong className="text-[var(--color-text-body)]">
-              Database management state
+              Pending proposals
             </strong>{" "}
-            below is for secure dual-approval work. Empty or STAGING QA rows are{" "}
-            <em>not</em> automatically live on the public website.
+            are <em>not</em> on the website until another authorized person
+            approves them.
           </li>
           <li>
-            Approval publishes to the Giving database immediately. Public
-            cutover happens later only after human re-confirmation.
+            The original seed file remains in the repo as bootstrap/reference
+            only. Do not treat STAGING QA practice rows as live Giving content.
           </li>
         </ul>
       </section>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-[var(--color-text-body)]">
-          Current website content (seed)
+          Current Giving Details (live published)
         </h2>
         <p className="mt-2 text-base text-[var(--color-text-muted)]">
-          What visitors see today on /giving. Not edited from this screen.
-        </p>
-        <ul className="mt-4 grid gap-3">
-          {websiteAccounts.map((account) => (
-            <li
-              key={account.id}
-              className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4"
-            >
-              <p className="font-semibold text-[var(--color-text-body)]">
-                {account.purpose}
-              </p>
-              <p className="mt-1 text-base text-[var(--color-text-muted)]">
-                {account.bankName}
-                {account.accountNumber
-                  ? ` · ${account.accountNumber}`
-                  : account.accountsByCurrency
-                    ? ` · ${account.accountsByCurrency
-                        .map((c) => c.currency)
-                        .join(", ")}`
-                    : ""}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold text-[var(--color-text-body)]">
-          Current Giving Details (database)
-        </h2>
-        <p className="mt-2 text-base text-[var(--color-text-muted)]">
-          Managed destinations awaiting public cutover. Use synthetic STAGING QA
-          fixtures for workflow practice — not real KCMI numbers until verified.
+          These published destinations are what the public Giving page shows.
         </p>
         {(accounts ?? []).length === 0 ? (
           <p className="mt-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-5 text-base text-[var(--color-text-muted)]">
-            No destinations in the database yet. That is expected until human
-            verification and cutover. Propose a STAGING QA destination to
-            practice the approval flow.
+            No published Giving destinations are in the database yet.
           </p>
         ) : (
           <ul className="mt-4 grid gap-3">

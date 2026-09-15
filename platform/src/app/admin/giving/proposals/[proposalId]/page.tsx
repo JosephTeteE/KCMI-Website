@@ -102,7 +102,7 @@ export default async function GivingProposalReviewPage({
           {proposal.applied_at
             ? ` on ${new Date(proposal.applied_at).toLocaleString()}`
             : ""}
-          . The public /giving page still uses seed content until cutover.
+          . Published destinations appear on the public Giving page.
         </p>
       ) : null}
 

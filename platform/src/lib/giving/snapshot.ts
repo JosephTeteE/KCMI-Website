@@ -39,6 +39,10 @@ export function snapshotFromJson(
       o.external_url == null || o.external_url === ""
         ? null
         : String(o.external_url),
+    visitor_note:
+      o.visitor_note == null || o.visitor_note === ""
+        ? null
+        : String(o.visitor_note),
     display_order: Number(o.display_order ?? 0),
     status,
     numbers,
@@ -55,6 +59,7 @@ export function snapshotToJson(snapshot: GivingDestinationSnapshot): Json {
     account_name: snapshot.account_name,
     swift_bic: snapshot.swift_bic,
     external_url: snapshot.external_url,
+    visitor_note: snapshot.visitor_note,
     display_order: snapshot.display_order,
     status: snapshot.status,
     numbers: snapshot.numbers.map((n) => ({
@@ -74,6 +79,7 @@ export function accountRowToSnapshot(row: {
   account_name: string;
   swift_bic: string | null;
   external_url: string | null;
+  visitor_note?: string | null;
   display_order: number;
   status: "draft" | "published" | "disabled";
   giving_account_numbers?: Array<{
@@ -94,6 +100,7 @@ export function accountRowToSnapshot(row: {
     account_name: row.account_name,
     swift_bic: row.swift_bic,
     external_url: row.external_url,
+    visitor_note: row.visitor_note ?? null,
     display_order: row.display_order,
     status: row.status,
     numbers,
