@@ -96,6 +96,17 @@ describe("RBAC foundation", () => {
     expect(merged.includes("welfare.assign")).toBe(true);
   });
 
+  it("prayer_staff is least-privilege Prayer Hub access", () => {
+    const perms = permissionsForRoles(["prayer_staff"]);
+    expect(perms.has("hub.access")).toBe(true);
+    expect(perms.has("prayer.read")).toBe(true);
+    expect(perms.has("prayer.assign")).toBe(false);
+    expect(perms.has("counselling.read")).toBe(false);
+    expect(perms.has("welfare.read")).toBe(false);
+    expect(perms.has("media.manage")).toBe(false);
+    expect(perms.has("users.manage")).toBe(false);
+  });
+
   it("program_drafter can draft but not publish", () => {
     expect(roleHasPermission("program_drafter", "programs.create")).toBe(true);
     expect(roleHasPermission("program_drafter", "programs.publish")).toBe(false);

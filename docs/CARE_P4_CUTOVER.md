@@ -104,10 +104,18 @@ Forbidden: narrative, name, email, phone, additional info, raw IP.
 
 **Ops requirement before long-lived production Care:** implement scheduled deletion jobs (auditable; honor retention holds). Not built in P4.
 
-## Celebrations
+## Staging Youth Pastor Prayer onboard
 
-Celebration Announcement remains **outside Care**. Track as engagement/communications backlog only.
+Authorized staging Prayer identity (HUMAN-designated):
 
-## Migration
+- Email: `christophercookey@gmail.com`
+- Role: `prayer_staff` (`hub.access` + `prayer.read` only)
+- Script: `platform/scripts/onboard-staging-prayer-youth-pastor.mjs`
 
-`platform/supabase/migrations/20260918120000_care_p4_intake_rate_limits.sql`
+MFA/AAL2 required before Prayer staging cutover acceptance.
+
+Sign-in / enroll:
+
+- https://kcmi-preview.josephtete.com/auth/sign-in
+- https://kcmi-preview.josephtete.com/auth/mfa
+- https://kcmi-preview.josephtete.com/admin/care/prayer

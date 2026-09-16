@@ -5,6 +5,7 @@ export const HUB_ROLES = [
   "super_admin",
   "pastoral_admin",
   "pastor",
+  "prayer_staff",
   "media_admin",
   "branch_admin",
   "program_drafter",
@@ -134,6 +135,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "audit.read",
     ],
     pastor: ["hub.access"], // case-scoped pastoral perms assigned explicitly
+    prayer_staff: ["hub.access", "prayer.read"],
     media_admin: [
       "hub.access",
       "programs.create",
@@ -200,6 +202,7 @@ export const OPERATING_ROLE_LABELS: Record<HubRole, string> = {
   super_admin: "Super Admin",
   pastoral_admin: "Pastoral Admin",
   pastor: "Pastor",
+  prayer_staff: "Prayer staff",
   media_admin: "HQ Content Admin",
   branch_admin: "Branch Admin",
   program_drafter: "Program drafter",
