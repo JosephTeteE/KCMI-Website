@@ -175,18 +175,24 @@ describe("Dashboard action cards", () => {
     expect(hrefs).toEqual([
       "/admin/website/home",
       "/admin/programs",
+      "/admin/events",
       "/admin/branches",
       "/admin/sermons",
       "/admin/livestream",
       "/admin/media",
+      "/admin/giving",
+      "/admin/care",
     ]);
     expect(HUB_DASHBOARD_CARDS.map((card) => card.title)).toEqual([
       "Homepage",
       "Programs & Announcements",
+      "Events",
       "Branches",
       "Sermons",
       "Livestream",
       "Photos / Media Library",
+      "Giving",
+      "Care",
     ]);
   });
 });

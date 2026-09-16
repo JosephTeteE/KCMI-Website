@@ -36,4 +36,5 @@ internal-docs.md
 # Ignore build logs
 .vercel/
 .next/
-out/
+out/platform/scripts/giving-final-acceptance.mjs
+platform/scripts/events-e2-hosted-acceptance.mjs

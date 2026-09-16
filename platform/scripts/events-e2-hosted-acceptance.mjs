@@ -309,6 +309,7 @@ async function main() {
         fail("createDraft", "post-save page did not show draft QA event");
       }
     }
+    } // end create-draft-only when createDraft not already ok
 
     // --- 4. Reopen / reconstruct ---
     await page.goto(`${BASE}/admin/events/${results.eventId}`, NAV);
