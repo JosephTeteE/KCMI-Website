@@ -21,7 +21,7 @@ export default function WelfarePage() {
     <PageShell
       eyebrow="Care"
       title="Welfare"
-      description="Authorized KCMI Welfare staff may review support requests shared here. Share only what is necessary."
+      description="If you need practical support, you can send a request to the KCMI Welfare team."
     >
       <div className="mx-auto max-w-2xl space-y-8">
         <section
@@ -35,20 +35,16 @@ export default function WelfarePage() {
             Before you share
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-readable-sm text-[var(--color-text-muted)]">
-            <li>Authorized KCMI Welfare staff may review your request.</li>
+            <li>Share only what is needed to explain the request.</li>
+            <li>Requests are reviewed by authorized KCMI Welfare staff.</li>
             <li>
-              Share only the information needed to understand the support
-              request.
+              Supporting documents are not required through this website.
             </li>
-            <li>No supporting documents are required on this form.</li>
             <li>
               This is not an emergency service. If you are in immediate danger,
               contact local emergency services.
             </li>
           </ul>
-          <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
-            Final wording: human/legal review required before production cutover.
-          </p>
         </section>
 
         {intakeEnabled ? (
@@ -57,7 +53,7 @@ export default function WelfarePage() {
               id="welfare-form-heading"
               className="font-display text-2xl font-semibold"
             >
-              Request Welfare support
+              Request Welfare Support
             </h2>
             <div className="mt-6">
               <WelfareRequestForm />
@@ -66,12 +62,10 @@ export default function WelfarePage() {
         ) : (
           <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8">
             <h2 className="font-display text-2xl font-semibold">
-              Submit a Welfare request
+              Request Welfare Support
             </h2>
             <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-              Welfare requests are currently received through our existing form.
-              First-party intake on this page is prepared but not enabled for
-              visitors yet.
+              Use the button below to send your request to the KCMI Welfare team.
             </p>
             <a
               href={LEGACY_WELFARE_GOOGLE_FORM_URL}
@@ -79,7 +73,7 @@ export default function WelfarePage() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Open Welfare form
+              Request Welfare Support
             </a>
             <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
               You can also find care links on the{" "}

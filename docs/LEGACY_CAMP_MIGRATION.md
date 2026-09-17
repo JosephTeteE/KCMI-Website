@@ -24,7 +24,7 @@ Tracked camp files (sparse): `public/index.html` (single page), `public/css/yout
 |---|---|---|---|---|
 | Host `camp.kcmi-rcc.org` | Redirect to `events.kcmi-rcc.org/{camp-slug}` when that slug exists | Yes (cutover) | VERIFIED ADR-0002 | **Yes** — do not retire host without redirect |
 | Path `/` on camp host | `/events/{camp-slug}` (e.g. future `camp-2025` / `camp-2027`) | Yes | HUMAN: which year/slug is current | Yes |
-| Legacy main-site `/youth-camp.html`, `/camp/youth-camp.html` | Same event slug | Yes | VERIFIED Phase 0 `vercel.json` on **legacy** Vercel; **not** in V2 `legacyHtmlRedirects` | Yes on www/apex at cutover |
+| Legacy main-site `/youth-camp.html`, `/camp/youth-camp.html` | Same event slug | Yes | VERIFIED Phase 0 `vercel.json` on **legacy** Vercel; **V2 platform** now redirects `/youth-camp.html` and `/youth-camp` → `https://camp.kcmi-rcc.org` (bookmark compatibility only; Camp host unchanged) | Yes on www/apex; Camp host DNS unchanged |
 | Page title / OG: “Youth and Teens Camp 2025 — Level Up” | Event record: title, theme, year | Yes | VERIFIED HTML; **may be stale** vs calendar | Meta follows event CMS |
 | Canonical `https://camp.kcmi-rcc.org` | Event page canonical on events host | Yes | VERIFIED | After redirect, one canonical |
 | Intro / “Level Up” theme copy | Event body/theme fields | Yes | VERIFIED HTML | n/a |
@@ -68,7 +68,7 @@ When Events is built (not this phase):
 | Event entity / slug / publish | Not in schema |
 | Hub Events IA | Nav disabled |
 | Registration, receipts, anti-abuse | Not built (D2-adjacent / Events phase) |
-| V2 redirects for `/youth-camp.html` | Missing from `legacyHtmlRedirects` |
+| V2 redirects for `/youth-camp.html` / `/youth-camp` | Present in `campBookmarkRedirects` → `https://camp.kcmi-rcc.org` (bookmark compatibility; Camp DNS untouched) |
 | Camp vanity redirect | Not configured; DNS untouched |
 | Historical 2025 “Level Up” archive | HUMAN: publish as past event vs take down |
 

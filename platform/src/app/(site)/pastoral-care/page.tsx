@@ -21,7 +21,7 @@ export default function PastoralCarePage() {
     <PageShell
       eyebrow="Care"
       title="Pastoral Care"
-      description="Authorized KCMI Pastoral Care staff may review requests shared here. Share only what is necessary."
+      description="If you would like to speak with someone from KCMI Pastoral Care, you can send a request below."
     >
       <div className="mx-auto max-w-2xl space-y-8">
         <section
@@ -35,20 +35,17 @@ export default function PastoralCarePage() {
             Before you share
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-readable-sm text-[var(--color-text-muted)]">
-            <li>
-              Authorized KCMI Pastoral Care staff may review your request.
-            </li>
             <li>Share only what is necessary.</li>
+            <li>
+              Requests are reviewed by authorized KCMI Pastoral Care staff.
+            </li>
             <li>KCMI may contact you using the details you supply.</li>
             <li>
-              Church pastoral support is not an emergency, medical, legal, or
-              professional therapy service. If you are in immediate danger,
-              contact local emergency services.
+              This is church pastoral support and is not an emergency, medical,
+              legal, or professional therapy service. If you are in immediate
+              danger, contact local emergency services.
             </li>
           </ul>
-          <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
-            Final wording: human/legal review required before production cutover.
-          </p>
         </section>
 
         {intakeEnabled ? (
@@ -66,12 +63,11 @@ export default function PastoralCarePage() {
         ) : (
           <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8">
             <h2 className="font-display text-2xl font-semibold">
-              Submit a Pastoral Care request
+              Request Pastoral Care
             </h2>
             <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-              Pastoral Care requests are currently received through our existing
-              form. First-party intake on this page is prepared but not enabled
-              for visitors yet.
+              Use the button below to send your request to the KCMI Pastoral Care
+              team.
             </p>
             <a
               href={LEGACY_PASTORAL_GOOGLE_FORM_URL}
@@ -79,7 +75,7 @@ export default function PastoralCarePage() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Open Pastoral Care form
+              Request Pastoral Care
             </a>
             <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
               You can also find care links on the{" "}

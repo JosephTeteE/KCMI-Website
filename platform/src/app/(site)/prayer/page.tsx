@@ -21,7 +21,7 @@ export default function PrayerPage() {
     <PageShell
       eyebrow="Care"
       title="Prayer requests"
-      description="We welcome prayer requests. Share only what is needed. Authorized KCMI Prayer and Care staff may review what you submit."
+      description="Need prayer? We would be glad to pray with you."
     >
       <div className="mx-auto max-w-2xl space-y-8">
         <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8">
@@ -49,21 +49,19 @@ export default function PrayerPage() {
             Before you share
           </h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-readable-sm text-[var(--color-text-muted)]">
+            <li>Share only what you are comfortable sharing.</li>
             <li>
-              Authorized KCMI Prayer or Care staff may review what you share.
+              Prayer requests are reviewed by the appropriate KCMI Prayer and
+              Care team.
             </li>
-            <li>Share only what is needed for prayer.</li>
             <li>
               Contact details are optional unless you ask for a prayer call.
             </li>
             <li>
-              This is not an emergency service. If you are in immediate danger,
-              contact local emergency services.
+              This form is not monitored as an emergency service. If you are in
+              immediate danger, contact local emergency services.
             </li>
           </ul>
-          <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
-            Final wording: human/legal review required before production cutover.
-          </p>
         </section>
 
         {intakeEnabled ? (
@@ -81,12 +79,11 @@ export default function PrayerPage() {
         ) : (
           <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8">
             <h2 className="font-display text-2xl font-semibold">
-              Submit a prayer request
+              Submit a Prayer Request
             </h2>
             <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-              Prayer requests are currently received through our existing prayer
-              form. First-party intake on this page is prepared but not enabled
-              for visitors yet.
+              Use the button below to share your request with the KCMI Prayer
+              team.
             </p>
             <a
               href={LEGACY_PRAYER_GOOGLE_FORM_URL}
@@ -94,7 +91,7 @@ export default function PrayerPage() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Open prayer request form
+              Submit a Prayer Request
             </a>
             <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
               You can also find prayer and care links on the{" "}

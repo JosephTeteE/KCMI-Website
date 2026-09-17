@@ -4,7 +4,11 @@ import {
   securityHeaders,
   stagingRobotsHeaders,
 } from "./src/lib/security/headers";
-import { legacyHtmlRedirects } from "./src/lib/routing/legacy-redirects";
+import {
+  campBookmarkRedirects,
+  legacyHtmlRedirects,
+} from "./src/lib/routing/legacy-redirects";
+
 
 /**
  * Host-based rewrites for events subdomain (ADR-0002).
@@ -76,11 +80,19 @@ const nextConfig: NextConfig = {
     ];
   },
   async redirects() {
-    return legacyHtmlRedirects.map((rule) => ({
-      source: rule.source,
-      destination: rule.destination,
-      permanent: true,
-    }));
+    return [
+      ...legacyHtmlRedirects.map((rule) => ({
+        source: rule.source,
+        destination: rule.destination,
+        permanent: true,
+      })),
+      // Preserve apex Camp bookmarks → live legacy camp.kcmi-rcc.org (not Events).
+      ...campBookmarkRedirects.map((rule) => ({
+        source: rule.source,
+        destination: rule.destination,
+        permanent: true,
+      })),
+    ];
   },
   async rewrites() {
     return {

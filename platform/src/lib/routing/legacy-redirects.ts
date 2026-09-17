@@ -19,3 +19,23 @@ export const legacyHtmlRedirects = [
 ] as const;
 
 export type LegacyRedirect = (typeof legacyHtmlRedirects)[number];
+
+/**
+ * Apex-path bookmarks that still point at the live legacy Camp microsite.
+ *
+ * Why this exists: historical main-site links (`/youth-camp.html`, `/youth-camp`)
+ * previously redirected via root `vercel.json` to `camp.kcmi-rcc.org`. The V2
+ * platform app did not inherit those rules. Camp remains a separate legacy host
+ * (no V2 Camp app). These permanent redirects preserve bookmarks without
+ * changing Camp DNS, rebuilding Camp, or pointing `camp.kcmi-rcc.org` at Events.
+ *
+ * See docs/LEGACY_CAMP_MIGRATION.md and ADR-0002.
+ */
+export const CAMP_LEGACY_HOST = "https://camp.kcmi-rcc.org";
+
+export const campBookmarkRedirects = [
+  { source: "/youth-camp.html", destination: CAMP_LEGACY_HOST },
+  { source: "/youth-camp", destination: CAMP_LEGACY_HOST },
+] as const;
+
+export type CampBookmarkRedirect = (typeof campBookmarkRedirects)[number];
