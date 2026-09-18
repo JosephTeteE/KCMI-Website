@@ -34,6 +34,10 @@ const DISPLAY_NAME = "Super Admin";
 
 const PROD_ORIGIN = "https://kcmi-platform-production-ten.vercel.app";
 const PROD_SIGN_IN = `${PROD_ORIGIN}/auth/sign-in`;
+const PROD_SET_PASSWORD = `${PROD_ORIGIN}/auth/set-password`;
+const PROD_CONFIRM = `${PROD_ORIGIN}/auth/confirm`;
+const PROD_INVITE_REDIRECT = `${PROD_CONFIRM}?next=/auth/set-password`;
+const PROD_FORGOT_PASSWORD = `${PROD_ORIGIN}/auth/forgot-password`;
 const PROD_MFA = `${PROD_ORIGIN}/auth/mfa`;
 const PROD_ADMIN = `${PROD_ORIGIN}/admin`;
 
@@ -309,6 +313,8 @@ function printPlan() {
   console.log("Roles: upsert public.user_roles only for super_admin.");
   console.log("MFA: not enrolled by this script — HUMAN enrolls TOTP after invite.");
   console.log(`Hub sign-in: ${PROD_SIGN_IN}`);
+  console.log(`Invite redirectTo: ${PROD_INVITE_REDIRECT}`);
+  console.log(`Confirm route: ${PROD_CONFIRM}`);
 }
 
 async function verify(admin) {
@@ -406,7 +412,10 @@ async function apply(admin) {
       TARGET_EMAIL,
       {
         data: { display_name: DISPLAY_NAME },
-        redirectTo: PROD_SIGN_IN,
+        // SSR-safe: PKCE/default ConfirmationURL lands with ?code= on confirm,
+        // which then routes to Set Password. TokenHash templates should also
+        // target /auth/confirm (see HUMAN email-template instructions).
+        redirectTo: PROD_INVITE_REDIRECT,
       },
     );
     if (error || !data?.user) {
@@ -446,17 +455,23 @@ async function apply(admin) {
 
   console.log("");
   console.log("Next HUMAN steps (MFA secret never requested or displayed):");
-  console.log("1. Accept the invite email and set your own password.");
+  console.log(
+    "1. Accept the invite email (confirm → set password). Do not invent a password here.",
+  );
+  console.log(
+    `   If the invite was already consumed without a password: ${PROD_FORGOT_PASSWORD}`,
+  );
   console.log(
     "2. If Vercel Authentication blocks the app, sign in as a Vercel team member",
   );
   console.log("   or use an authorized bypass — do not disable Deployment Protection.");
-  console.log(`3. Sign in at ${PROD_SIGN_IN}`);
+  console.log(`3. Set password at ${PROD_SET_PASSWORD} (via invite/recovery link).`);
   console.log(`4. Enroll TOTP at ${PROD_MFA} until AAL2`);
   console.log(`5. Open Hub at ${PROD_ADMIN}`);
   console.log(
     "6. Re-run: node scripts/bootstrap-production-tech-admin.mjs --verify",
   );
+  console.log(`Confirm route (email templates): ${PROD_CONFIRM}`);
 }
 
 async function main() {

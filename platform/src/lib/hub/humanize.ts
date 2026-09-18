@@ -86,6 +86,39 @@ export function humanMfaError(message: string): string {
   return "We could not confirm the 6-digit code. Wait a moment and try again. If it still fails, ask a Super Admin for help.";
 }
 
+export function humanPasswordUpdateError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("session") || lower.includes("not authenticated")) {
+    return "Your password link has expired. Request a new recovery email and try again.";
+  }
+  if (lower.includes("weak") || lower.includes("least") || lower.includes("short")) {
+    return "That password is too short or too easy to guess. Choose a longer password.";
+  }
+  if (lower.includes("same") || lower.includes("different from the old")) {
+    return "Choose a password that is different from your previous one.";
+  }
+  return "We could not save your password. Wait a moment and try again. If it still fails, ask a Super Admin for help.";
+}
+
+export function humanAuthNotice(
+  notice: string | undefined | null,
+): string | null {
+  if (!notice) return null;
+  switch (notice) {
+    case "auth-link-invalid":
+      return "That invite or recovery link is invalid or has expired. Request a new recovery email, or ask a Super Admin to resend an invite.";
+    case "password-updated":
+      return "Your password was saved. Sign in with your email and new password.";
+    default:
+      return null;
+  }
+}
+
+/** Generic copy for resetPasswordForEmail — never reveal whether the email exists. */
+export const FORGOT_PASSWORD_GENERIC_CONFIRMATION =
+  "If an account exists for that email, a recovery link has been sent.";
+
+
 export const HUB_AUDIT_ACTION_LABELS: Record<string, string> = {
   "website_document.update": "Website wording updated",
   "livestream.update": "Livestream updated",

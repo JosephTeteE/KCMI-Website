@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { hasSupabasePublicConfig } from "@/lib/env/public";
 import { humanSignInError } from "@/lib/hub/humanize";
 
-export function SignInForm() {
+export function SignInForm({ notice }: { notice?: string | null }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,6 +48,14 @@ export function SignInForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {notice ? (
+        <p
+          className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface-page)] px-3 py-2 hub-body text-[var(--color-text-body)]"
+          role="status"
+        >
+          {notice}
+        </p>
+      ) : null}
       <div>
         <label htmlFor="email" className="block text-base font-medium">
           Email
@@ -55,7 +64,7 @@ export function SignInForm() {
           id="email"
           name="email"
           type="email"
-          autoComplete="username"
+          autoComplete="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -76,6 +85,14 @@ export function SignInForm() {
           onChange={(e) => setPassword(e.target.value)}
           className="mt-1 w-full min-h-11 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-base"
         />
+        <p className="mt-2">
+          <Link
+            href="/auth/forgot-password"
+            className="text-base font-medium text-[var(--color-action-primary)] underline-offset-2 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </p>
       </div>
       {error ? (
         <p className="hub-body text-[var(--color-destructive)]" role="alert">

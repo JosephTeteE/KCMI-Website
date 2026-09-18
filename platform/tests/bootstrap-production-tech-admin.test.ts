@@ -50,11 +50,17 @@ describe("production tech admin bootstrap script guards", () => {
     }
   });
 
-  it("points invite redirect at the production Vercel origin", () => {
+  it("points invite redirect at confirm → set-password on the production Vercel origin", () => {
     expect(source).toContain(
       'PROD_ORIGIN = "https://kcmi-platform-production-ten.vercel.app"',
     );
-    expect(source).toContain("PROD_SIGN_IN");
-    expect(source).toContain("redirectTo: PROD_SIGN_IN");
+    expect(source).toContain("PROD_SET_PASSWORD");
+    expect(source).toContain("PROD_CONFIRM");
+    expect(source).toContain("PROD_INVITE_REDIRECT");
+    expect(source).toContain("redirectTo: PROD_INVITE_REDIRECT");
+    expect(source).toContain(
+      "PROD_INVITE_REDIRECT = `${PROD_CONFIRM}?next=/auth/set-password`",
+    );
+    expect(source).not.toMatch(/redirectTo:\s*PROD_SIGN_IN/);
   });
 });

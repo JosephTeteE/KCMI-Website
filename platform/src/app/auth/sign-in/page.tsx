@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { getChurchIdentity } from "@/content";
 import { isStagingEnvironment } from "@/lib/env";
+import { humanAuthNotice } from "@/lib/hub/humanize";
 
 const identity = getChurchIdentity();
 
@@ -16,7 +17,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SignInPage() {
+type SearchParams = Promise<{ notice?: string }>;
+
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await searchParams;
+  const notice = humanAuthNotice(params.notice);
+
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12">
       {isStagingEnvironment() ? (
@@ -30,7 +40,7 @@ export default function SignInPage() {
         extra safety.
       </p>
       <div className="mt-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6">
-        <SignInForm />
+        <SignInForm notice={notice} />
       </div>
     </div>
   );
