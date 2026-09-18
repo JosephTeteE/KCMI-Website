@@ -1,9 +1,13 @@
+import { createServerClient } from "@supabase/ssr";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-
-const SET_PASSWORD_PATH = "/auth/set-password";
-const SIGN_IN_INVALID_PATH = "/auth/sign-in?notice=auth-link-invalid";
+import {
+  AUTH_LINK_INVALID_PATH,
+  AUTH_SET_PASSWORD_PATH,
+  safeAuthNextPath,
+} from "@/lib/auth/confirm-redirect";
+import { requireSupabasePublicConfig } from "@/lib/env";
+import type { Database } from "@/lib/supabase/database.types";
 
 const PASSWORD_SETUP_TYPES = new Set<EmailOtpType>([
   "invite",
@@ -12,31 +16,20 @@ const PASSWORD_SETUP_TYPES = new Set<EmailOtpType>([
   "email",
 ]);
 
-/**
- * Only allow same-origin relative /auth/* destinations (open-redirect safe).
- */
-function safeAuthNextPath(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.includes("\\")) {
-    return SET_PASSWORD_PATH;
-  }
-  const pathOnly = raw.split("?")[0] ?? raw;
-  if (!pathOnly.startsWith("/auth/")) {
-    return SET_PASSWORD_PATH;
-  }
-  return raw;
-}
-
 function defaultNextForType(type: EmailOtpType | null): string {
   if (type && PASSWORD_SETUP_TYPES.has(type)) {
-    return SET_PASSWORD_PATH;
+    return AUTH_SET_PASSWORD_PATH;
   }
-  return SET_PASSWORD_PATH;
+  return AUTH_SET_PASSWORD_PATH;
 }
 
 /**
- * SSR email confirmation: exchange token_hash (or PKCE code) for a cookie session,
- * then send invite/recovery users to Set Password — never bare sign-in.
+ * SSR email confirmation: exchange token_hash (or PKCE code) for a cookie session
+ * attached to the redirect response, then send invite/recovery users to Set Password.
  * Does not log tokens.
+ *
+ * Cookie pattern follows @supabase/ssr route-handler guidance: setAll must write
+ * onto the NextResponse used for the redirect (not only next/headers cookies()).
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -47,11 +40,29 @@ export async function GET(request: NextRequest) {
     searchParams.get("next") ?? defaultNextForType(type),
   );
 
-  const failUrl = new URL(SIGN_IN_INVALID_PATH, origin);
+  const failUrl = new URL(AUTH_LINK_INVALID_PATH, origin);
   const successUrl = new URL(next, origin);
 
+  let redirectResponse = NextResponse.redirect(successUrl);
+
   try {
-    const supabase = await createClient();
+    const { url, publishableKey } = requireSupabasePublicConfig();
+    const supabase = createServerClient<Database>(url, publishableKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
+          });
+          redirectResponse = NextResponse.redirect(successUrl);
+          cookiesToSet.forEach(({ name, value, options }) => {
+            redirectResponse.cookies.set(name, value, options);
+          });
+        },
+      },
+    });
 
     if (tokenHash && type) {
       const { error } = await supabase.auth.verifyOtp({
@@ -61,7 +72,7 @@ export async function GET(request: NextRequest) {
       if (error) {
         return NextResponse.redirect(failUrl);
       }
-      return NextResponse.redirect(successUrl);
+      return redirectResponse;
     }
 
     if (code) {
@@ -69,7 +80,7 @@ export async function GET(request: NextRequest) {
       if (error) {
         return NextResponse.redirect(failUrl);
       }
-      return NextResponse.redirect(successUrl);
+      return redirectResponse;
     }
   } catch {
     return NextResponse.redirect(failUrl);

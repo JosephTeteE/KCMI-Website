@@ -189,8 +189,9 @@ export function SetPasswordForm() {
         {pending ? "Saving…" : "Save password"}
       </button>
       <p className="hub-help text-[var(--color-text-muted)]">
-        After saving, you will set up a 6-digit authenticator code before
-        opening the Hub.
+        After saving, you will open the Hub with your authenticator app. If you
+        already set one up, enter your 6-digit code. If not, you will scan a new
+        QR code first.
       </p>
     </form>
   );

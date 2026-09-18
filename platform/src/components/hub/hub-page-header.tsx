@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { HubBackLink } from "@/components/hub/hub-back-link";
 
 type HubPageHeaderProps = {
   title: string;
@@ -19,12 +19,7 @@ export function HubPageHeader({
     <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0 space-y-2">
         {backHref ? (
-          <Link
-            href={backHref}
-            className="inline-flex min-h-11 items-center text-base font-medium text-[var(--color-action-primary)] underline-offset-2 hover:underline"
-          >
-            ← {backLabel}
-          </Link>
+          <HubBackLink fallbackHref={backHref} label={backLabel} />
         ) : null}
         <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-text-body)] sm:text-3xl">
           {title}

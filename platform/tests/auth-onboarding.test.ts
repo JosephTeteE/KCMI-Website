@@ -51,8 +51,9 @@ describe("production auth onboarding + recovery UX", () => {
     expect(confirm).toContain("verifyOtp");
     expect(confirm).toContain("token_hash");
     expect(confirm).toContain("exchangeCodeForSession");
-    expect(confirm).toContain('"/auth/set-password"');
-    expect(confirm).toContain('"invite"');
+    expect(confirm).toContain("createServerClient");
+    expect(confirm).toContain("redirectResponse.cookies.set");
+    expect(confirm).toContain("safeAuthNextPath");
     expect(confirm).not.toMatch(/console\.(log|info|debug).*token/i);
     // Must not dump users onto bare sign-in after successful confirm.
     expect(confirm).not.toMatch(
@@ -62,7 +63,7 @@ describe("production auth onboarding + recovery UX", () => {
 
   it("recovery confirmation also targets Set Password", () => {
     expect(confirm).toContain('"recovery"');
-    expect(confirm).toContain('"/auth/set-password"');
+    expect(confirm).toContain("AUTH_SET_PASSWORD_PATH");
     expect(forgotForm).toContain("resetPasswordForEmail");
     expect(forgotForm).toContain(
       "/auth/confirm?next=/auth/set-password",

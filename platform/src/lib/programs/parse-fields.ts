@@ -135,13 +135,8 @@ export function parseProgramFields(
   let starts_at = parseOptionalIso(formData.get("starts_at"));
   let ends_at = parseOptionalIso(formData.get("ends_at"));
 
-  if (hasSessionPayload) {
-    if (sessionsParsed.sessions.length === 0) {
-      return {
-        ok: false,
-        error: "Add at least one date and start time for this program.",
-      };
-    }
+  // Empty sessions_json ("[]") is a valid "no schedule" choice — do not invent dates.
+  if (hasSessionPayload && sessionsParsed.sessions.length > 0) {
     for (const session of sessionsParsed.sessions) {
       if (!session.start_time) {
         return {
@@ -153,6 +148,9 @@ export function parseProgramFields(
     const legacy = legacyIntervalFromSessions(sessionsParsed.sessions, timezone);
     starts_at = legacy.startsAt;
     ends_at = legacy.endsAt;
+  } else if (hasSessionPayload) {
+    starts_at = null;
+    ends_at = null;
   }
 
   const hasLocationPayload = formData.has("location_kind");

@@ -1,7 +1,8 @@
 import { HubPageHeader } from "@/components/hub/hub-page-header";
 import { HubFlash } from "@/components/hub/hub-flash";
-import { ProgramCreateWizard } from "@/components/hub/program-create-wizard";
+import { ProgramForm } from "@/components/hub/program-form";
 import { createClient } from "@/lib/supabase/server";
+import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 
 export const maxDuration = 60;
 
@@ -13,6 +14,9 @@ export default async function NewProgramPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
+  const session = await getStaffSession();
+  const canPublish =
+    !!session && staffHasPermission(session.profile, "programs.publish");
   const supabase = await createClient();
 
   const [{ data: media }, { data: branches }] = await Promise.all([
@@ -32,12 +36,14 @@ export default async function NewProgramPage({
     <div>
       <HubPageHeader
         title="New program"
-        description="Answer a few short questions. This saves as a draft and will not appear on the website until you make it live."
+        description="Add a name, short description, and optional poster. Save a draft or publish when ready. Schedule, location, and visitor links are optional."
         backHref="/admin/programs"
         backLabel="Programs"
       />
       <HubFlash message={params.message} error={params.error} />
-      <ProgramCreateWizard
+      <ProgramForm
+        mode="create"
+        canPublish={canPublish}
         branches={(branches ?? []).map((branch) => ({
           id: branch.id,
           name: branch.name,

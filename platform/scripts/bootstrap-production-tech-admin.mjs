@@ -10,6 +10,7 @@
  *
  *   export NEXT_PUBLIC_SUPABASE_URL="https://rujbdozepzcsmeuexdle.supabase.co"
  *   export SUPABASE_SECRET_KEY="…"   # production secret; NOT platform/.env.local
+ *   export NEXT_PUBLIC_SITE_URL="https://www.kcmi-rcc.org"
  *   export KCMI_ENVIRONMENT=production
  *   export KCMI_BOOTSTRAP_CONFIRM=production
  *   node scripts/bootstrap-production-tech-admin.mjs --dry-run
@@ -35,14 +36,46 @@ const TARGET_ROLES = ["super_admin", "care_operator"];
 const TARGET_ROLE = "super_admin"; // primary platform role (kept for logging)
 const DISPLAY_NAME = "Super Admin";
 
-const PROD_ORIGIN = "https://kcmi-platform-production-ten.vercel.app";
-const PROD_SIGN_IN = `${PROD_ORIGIN}/auth/sign-in`;
-const PROD_SET_PASSWORD = `${PROD_ORIGIN}/auth/set-password`;
-const PROD_CONFIRM = `${PROD_ORIGIN}/auth/confirm`;
-const PROD_INVITE_REDIRECT = `${PROD_CONFIRM}?next=/auth/set-password`;
-const PROD_FORGOT_PASSWORD = `${PROD_ORIGIN}/auth/forgot-password`;
-const PROD_MFA = `${PROD_ORIGIN}/auth/mfa`;
-const PROD_ADMIN = `${PROD_ORIGIN}/admin`;
+/** Canonical public origin for production invites (reject .vercel.app). */
+const REQUIRED_PRODUCTION_SITE_URL = "https://www.kcmi-rcc.org";
+
+function resolveProductionSiteUrls() {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) {
+    throw new Error(
+      `Refusing to run: set NEXT_PUBLIC_SITE_URL=${REQUIRED_PRODUCTION_SITE_URL}`,
+    );
+  }
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    throw new Error("NEXT_PUBLIC_SITE_URL is not a valid URL.");
+  }
+  if (parsed.hostname.endsWith(".vercel.app")) {
+    throw new Error(
+      "Refusing to run: production invites must not use a .vercel.app hostname. " +
+        `Set NEXT_PUBLIC_SITE_URL=${REQUIRED_PRODUCTION_SITE_URL}`,
+    );
+  }
+  const origin = parsed.origin.replace(/\/+$/, "");
+  if (origin !== REQUIRED_PRODUCTION_SITE_URL) {
+    throw new Error(
+      `Refusing to run: NEXT_PUBLIC_SITE_URL must be exactly ${REQUIRED_PRODUCTION_SITE_URL}`,
+    );
+  }
+  const confirm = `${origin}/auth/confirm`;
+  return {
+    origin,
+    signIn: `${origin}/auth/sign-in`,
+    setPassword: `${origin}/auth/set-password`,
+    confirm,
+    inviteRedirect: `${confirm}?next=/auth/set-password`,
+    forgotPassword: `${origin}/auth/forgot-password`,
+    mfa: `${origin}/auth/mfa`,
+    admin: `${origin}/admin`,
+  };
+}
 
 /** Expected grants for super_admin ∪ care_operator. */
 const MUST_HAVE = [
@@ -142,7 +175,8 @@ function requireProductionEnv() {
       `Refusing to run: URL must be exactly ${PRODUCTION_URL} (project ${PRODUCTION_PROJECT_REF}).`,
     );
   }
-  return { url, secret };
+  const site = resolveProductionSiteUrls();
+  return { url, secret, site };
 }
 
 function createAdmin(url, secret) {
@@ -308,7 +342,7 @@ function evaluatePermissions(permissions) {
   return failures;
 }
 
-function printPlan() {
+function printPlan(site) {
   console.log("KCMI production Tech Admin bootstrap");
   console.log(`Auth Admin target: ${PRODUCTION_URL}`);
   console.log(`Project ref: ${PRODUCTION_PROJECT_REF}`);
@@ -316,12 +350,12 @@ function printPlan() {
   console.log("Method: inviteUserByEmail (no password invented or printed).");
   console.log("Roles: upsert public.user_roles only for super_admin.");
   console.log("MFA: not enrolled by this script — HUMAN enrolls TOTP after invite.");
-  console.log(`Hub sign-in: ${PROD_SIGN_IN}`);
-  console.log(`Invite redirectTo: ${PROD_INVITE_REDIRECT}`);
-  console.log(`Confirm route: ${PROD_CONFIRM}`);
+  console.log(`Hub sign-in: ${site.signIn}`);
+  console.log(`Invite redirectTo: ${site.inviteRedirect}`);
+  console.log(`Confirm route: ${site.confirm}`);
 }
 
-async function verify(admin) {
+async function verify(admin, site) {
   let failed = 0;
 
   const emails = await listAllUserEmails(admin);
@@ -388,16 +422,16 @@ async function verify(admin) {
       console.log(
         "TECH_ADMIN_MFA_ENROLLMENT_REQUIRED — no verified TOTP (expected until HUMAN enrolls)",
       );
-      console.log(`  Sign-in: ${PROD_SIGN_IN}`);
-      console.log(`  Enroll:  ${PROD_MFA}`);
-      console.log(`  Hub:     ${PROD_ADMIN}`);
+      console.log(`  Sign-in: ${site.signIn}`);
+      console.log(`  Enroll:  ${site.mfa}`);
+      console.log(`  Hub:     ${site.admin}`);
     }
   } else {
     console.log(
       `MFA factor check inconclusive (${mfa.reason}). HUMAN must enroll TOTP to AAL2 before privileged Hub actions.`,
     );
-    console.log(`  Sign-in: ${PROD_SIGN_IN}`);
-    console.log(`  Enroll:  ${PROD_MFA}`);
+    console.log(`  Sign-in: ${site.signIn}`);
+    console.log(`  Enroll:  ${site.mfa}`);
   }
 
   console.log("");
@@ -412,7 +446,7 @@ async function verify(admin) {
   return failed === 0 && identityOk;
 }
 
-async function apply(admin) {
+async function apply(admin, site) {
   let user = await findUserByEmail(admin, TARGET_EMAIL);
   let invited = false;
 
@@ -424,7 +458,7 @@ async function apply(admin) {
         // SSR-safe: PKCE/default ConfirmationURL lands with ?code= on confirm,
         // which then routes to Set Password. TokenHash templates should also
         // target /auth/confirm (see HUMAN email-template instructions).
-        redirectTo: PROD_INVITE_REDIRECT,
+        redirectTo: site.inviteRedirect,
       },
     );
     if (error || !data?.user) {
@@ -468,19 +502,19 @@ async function apply(admin) {
     "1. Accept the invite email (confirm → set password). Do not invent a password here.",
   );
   console.log(
-    `   If the invite was already consumed without a password: ${PROD_FORGOT_PASSWORD}`,
+    `   If the invite was already consumed without a password: ${site.forgotPassword}`,
   );
   console.log(
     "2. If Vercel Authentication blocks the app, sign in as a Vercel team member",
   );
   console.log("   or use an authorized bypass — do not disable Deployment Protection.");
-  console.log(`3. Set password at ${PROD_SET_PASSWORD} (via invite/recovery link).`);
-  console.log(`4. Enroll TOTP at ${PROD_MFA} until AAL2`);
-  console.log(`5. Open Hub at ${PROD_ADMIN}`);
+  console.log(`3. Set password at ${site.setPassword} (via invite/recovery link).`);
+  console.log(`4. Enroll TOTP at ${site.mfa} until AAL2`);
+  console.log(`5. Open Hub at ${site.admin}`);
   console.log(
     "6. Re-run: node scripts/bootstrap-production-tech-admin.mjs --verify",
   );
-  console.log(`Confirm route (email templates): ${PROD_CONFIRM}`);
+  console.log(`Confirm route (email templates): ${site.confirm}`);
 }
 
 async function main() {
@@ -493,7 +527,12 @@ async function main() {
   }
 
   if (!args.dryRun && !args.verify && !args.apply) {
-    printPlan();
+    try {
+      printPlan(resolveProductionSiteUrls());
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : err);
+      process.exit(1);
+    }
     console.error("");
     console.error(
       "Refusing to mutate. Pass --dry-run, --verify, or --apply. No invite sent by this invocation.",
@@ -506,11 +545,19 @@ async function main() {
     process.exit(1);
   }
 
-  const { url, secret } = requireProductionEnv();
+  let url;
+  let secret;
+  let site;
+  try {
+    ({ url, secret, site } = requireProductionEnv());
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  }
   const admin = createAdmin(url, secret);
 
   if (args.dryRun) {
-    printPlan();
+    printPlan(site);
     console.log("");
     console.log("Current Auth state (read-only):");
     const user = await findUserByEmail(admin, TARGET_EMAIL);
@@ -524,14 +571,14 @@ async function main() {
   }
 
   if (args.verify) {
-    const ok = await verify(admin);
+    const ok = await verify(admin, site);
     process.exit(ok ? 0 : 1);
   }
 
   if (!stdin.isTTY) {
     throw new Error("--apply requires an interactive TTY.");
   }
-  printPlan();
+  printPlan(site);
   const typed = await promptLine(
     `Type "production" to invite/repair Tech Admin ${TARGET_EMAIL}: `,
   );
@@ -539,7 +586,7 @@ async function main() {
     console.error("Confirmation mismatch. No changes.");
     process.exit(1);
   }
-  await apply(admin);
+  await apply(admin, site);
 }
 
 main().catch((err) => {

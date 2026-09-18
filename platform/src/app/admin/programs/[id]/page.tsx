@@ -5,13 +5,14 @@ import { HubPageHeader } from "@/components/hub/hub-page-header";
 import { HubFlash } from "@/components/hub/hub-flash";
 import { HubStatusBadge } from "@/components/hub/hub-form-fields";
 import {
-  ProgramWizard,
-  type ProgramWizardInitial,
-} from "@/components/hub/program-create-wizard";
+  ProgramForm,
+  type ProgramFormInitial,
+} from "@/components/hub/program-form";
 import { loadHubPhotoLibrary } from "@/lib/hub/photo-library";
 import { parseProgramActionKind } from "@/lib/programs/action-url";
 import { parseProgramLocationKind } from "@/lib/programs/location";
 import { resolveWizardSchedule } from "@/lib/programs/wizard-state";
+import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
 
 export const maxDuration = 60;
 
@@ -75,25 +76,39 @@ export default async function EditProgramPage({
   const locationKind = parseProgramLocationKind(program.location_kind);
   const actionKind = parseProgramActionKind(program.action_kind);
 
-  const initial: ProgramWizardInitial = {
+  const firstDay = schedule.days[0];
+  const firstSlot = firstDay?.sessions[0];
+
+  const initial: ProgramFormInitial = {
     id: program.id,
     title: program.title,
     shortDescription: program.short_description ?? "",
+    status: program.status as ProgramFormInitial["status"],
     featuredMediaId: program.featured_media_id,
-    posterPreviewUrl: cover?.previewUrl ?? null,
-    posterAlt: cover?.alt ?? null,
-    schedule,
-    locationKind: locationKind ?? "",
-    locationBranchId: program.location_branch_id ?? "",
+    coverPreviewUrl: cover?.previewUrl ?? null,
+    coverAlt: cover?.alt ?? "",
+    locationKind,
+    locationBranchId: program.location_branch_id,
     locationLabel: program.location_label ?? "",
     actionKind,
     ctaUrl: program.cta_url ?? "",
-    placement: program.placement === "featured" ? "featured" : "none",
-    status: program.status,
-    timezone: program.timezone ?? "Africa/Lagos",
+    sessionDate:
+      schedule.scheduleMode === "one_day"
+        ? schedule.oneDay.sessionDate
+        : (firstDay?.sessionDate ?? ""),
+    sessionStart:
+      schedule.scheduleMode === "one_day"
+        ? schedule.oneDay.startTime
+        : (firstSlot?.startTime ?? ""),
+    sessionEnd:
+      schedule.scheduleMode === "one_day"
+        ? schedule.oneDay.endTime
+        : (firstSlot?.endTime ?? ""),
+    timezone: program.timezone ?? DEFAULT_PROGRAM_TIMEZONE,
   };
 
-  const isDraft = program.status === "draft" || program.status === "preview";
+  const isDraft =
+    program.status === "draft" || program.status === "preview";
 
   return (
     <div>
@@ -101,18 +116,19 @@ export default async function EditProgramPage({
         title={program.title}
         description={
           isDraft
-            ? "Edit this draft with the same steps as creating a program. Saving keeps it off the public website."
+            ? "Edit this draft. Save changes or publish when ready. Schedule, location, and visitor links stay optional."
             : program.status === "published"
-              ? "See what is currently live, then change, preview, and make updates live when ready."
-              : "Edit this program using the same steps as creating one."
+              ? "See what is live, then change, preview, and make updates live when ready."
+              : "Edit this program."
         }
         backHref="/admin/programs"
         backLabel="Back to Programs"
         actions={<HubStatusBadge status={program.status} />}
       />
       <HubFlash message={flash.message} error={flash.error} />
-      <ProgramWizard
+      <ProgramForm
         mode="edit"
+        canPublish={canPublish}
         branches={(branches ?? []).map((branch) => ({
           id: branch.id,
           name: branch.name,
@@ -120,7 +136,6 @@ export default async function EditProgramPage({
         }))}
         media={photoLibrary}
         initial={initial}
-        canPublish={canPublish}
       />
     </div>
   );
