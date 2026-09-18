@@ -149,6 +149,9 @@ export const servicesDocumentSchema = z.object({
   careTitle: z.string().min(1).max(120),
   careBody: z.string().min(1).max(800),
   careLinks: z.array(linkSchema).min(1).max(12),
+  testimoniesTitle: z.string().min(1).max(120),
+  testimoniesBody: z.string().min(1).max(800),
+  testimoniesCta: offeringCtaSchema,
 });
 
 export const globalDocumentSchema = z.object({

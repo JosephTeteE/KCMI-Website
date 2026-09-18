@@ -18,9 +18,6 @@ import {
 import { isPrayerIntakeEnabled } from "@/lib/care/prayer-intake";
 import { isPastoralIntakeEnabled } from "@/lib/care/pastoral-intake";
 import { isWelfareIntakeEnabled } from "@/lib/care/welfare-intake";
-import { LEGACY_PRAYER_GOOGLE_FORM_URL } from "@/lib/care/prayer-intake";
-import { LEGACY_PASTORAL_GOOGLE_FORM_URL } from "@/lib/care/pastoral-intake";
-import { LEGACY_WELFARE_GOOGLE_FORM_URL } from "@/lib/care/welfare-intake";
 import { permissionsForRoles } from "@/lib/authorization/rbac";
 import { canReadCareDomain } from "@/lib/care/access";
 import { PUBLIC_SEARCH_PAGE_CATALOG } from "@/lib/search/page-catalog";
@@ -323,7 +320,7 @@ describe("Care P4 submit wiring (mocked)", () => {
 });
 
 describe("Care P4 cutover surface invariants", () => {
-  it("keeps Google CTAs unchanged before cutover", () => {
+  it("uses native Care routes with zero Google Form CTAs", () => {
     const pages = readFileSync(
       resolve(process.cwd(), "src/content/seed/pages.ts"),
       "utf8",
@@ -336,20 +333,12 @@ describe("Care P4 cutover surface invariants", () => {
       resolve(process.cwd(), "src/content/seed/engagement.ts"),
       "utf8",
     );
-    expect(pages).toContain(LEGACY_PRAYER_GOOGLE_FORM_URL);
-    expect(pages).toContain(LEGACY_PASTORAL_GOOGLE_FORM_URL);
-    expect(pages).toContain(LEGACY_WELFARE_GOOGLE_FORM_URL);
-    expect(defaults).toContain(LEGACY_PRAYER_GOOGLE_FORM_URL);
-    expect(engagement).toContain(LEGACY_PRAYER_GOOGLE_FORM_URL);
-    expect(pages).not.toMatch(
-      /Prayer request form[\s\S]*href:\s*"\/prayer"/,
-    );
-    expect(pages).not.toMatch(
-      /Counselling request form[\s\S]*href:\s*"\/pastoral-care"/,
-    );
-    expect(pages).not.toMatch(
-      /Welfare request form[\s\S]*href:\s*"\/welfare"/,
-    );
+    expect(pages).not.toMatch(/forms\.gle/);
+    expect(defaults).not.toMatch(/forms\.gle/);
+    expect(engagement).not.toMatch(/forms\.gle/);
+    expect(pages).toMatch(/Prayer requests[\s\S]*href:\s*"\/prayer"/);
+    expect(pages).toMatch(/Pastoral Care[\s\S]*href:\s*"\/pastoral-care"/);
+    expect(pages).toMatch(/Welfare support[\s\S]*href:\s*"\/welfare"/);
   });
 
   it("keeps Search exclusion of submissions and role boundaries", () => {

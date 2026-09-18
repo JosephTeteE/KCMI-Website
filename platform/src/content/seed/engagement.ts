@@ -16,7 +16,7 @@ export const publicContact: PublicContact = {
   primaryPhoneDisplay: "+234 9134 44 8322",
   primaryPhoneTel: "+2349134448322",
   intro:
-    "Write or call the church office. Prayer, counselling, and other pastoral-care requests use the forms on the Services page.",
+    "Write or call the church office. Prayer and care requests can be shared through the Prayer, Pastoral Care, and Welfare pages.",
 };
 
 /** Planned clean routes (C1 shell links; page bodies arrive in later phases) */
@@ -80,7 +80,7 @@ export const prayerCta: PrayerCta = {
     "No matter what you're facing, know that you're not alone.",
   ],
   ctaLabel: "Submit Prayer Request",
-  ctaHref: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
+  ctaHref: "/prayer",
 };
 
 export const givingCta: GivingCta = {

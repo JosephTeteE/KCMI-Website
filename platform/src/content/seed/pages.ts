@@ -41,23 +41,23 @@ export const serviceOfferings: ServiceOffering[] = [
   {
     id: "cell-fellowships",
     title: "Cell Fellowships",
-    body: "Join a smaller group for fellowship, Bible study, and prayer. Connect with others in a supportive environment.",
+    body: "Join a smaller group for fellowship, Bible study, and prayer. Connect with others in a supportive environment. Interested in joining a Cell Fellowship? Contact us and we will help you connect.",
     kind: "ministry",
     cta: {
-      label: "Join a Cell Fellowship",
-      href: "https://forms.gle/ogHw37wRpx9HC2bs5",
-      external: true,
+      label: "Contact Us",
+      href: "/contact",
+      external: false,
     },
   },
   {
     id: "service-teams",
     title: "Service Teams",
-    body: "Use your gifts and talents to serve God and our community. Find a place to make a difference.",
+    body: "Use your gifts and talents to serve God and our community. Interested in serving with a KCMI team? Contact us to find out where you can get involved.",
     kind: "ministry",
     cta: {
-      label: "Join a Service Team",
-      href: "https://forms.gle/Xo3rbm2rFaidrqCbA",
-      external: true,
+      label: "Contact Us",
+      href: "/contact",
+      external: false,
     },
   },
   {
@@ -70,30 +70,36 @@ export const serviceOfferings: ServiceOffering[] = [
   {
     id: "care",
     title: "Prayer and care requests",
-    body: "Prayer, counselling, welfare and celebration requests are available through the forms below.",
+    body: "Share a prayer request, ask for Pastoral Care, or request Welfare support through the KCMI website.",
     kind: "care",
     links: [
       {
-        label: "Prayer request form",
-        href: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
-        external: true,
+        label: "Prayer requests",
+        href: "/prayer",
+        external: false,
       },
       {
-        label: "Counselling request form",
-        href: "https://forms.gle/L6DyfegmTCGHuSBk6",
-        external: true,
+        label: "Pastoral Care",
+        href: "/pastoral-care",
+        external: false,
       },
       {
-        label: "Welfare request form",
-        href: "https://forms.gle/NcScEq6WFDeBankw5",
-        external: true,
-      },
-      {
-        label: "Celebrations form",
-        href: "https://forms.gle/QxiASWogkGFamvEJ8",
-        external: true,
+        label: "Welfare support",
+        href: "/welfare",
+        external: false,
       },
     ],
+  },
+  {
+    id: "testimonies",
+    title: "Testimonies & Thanksgiving",
+    body: "Testimonies and thanksgiving are shared during services. If you would like to get in touch about giving thanks with the church family, you are welcome to contact us.",
+    kind: "ministry",
+    cta: {
+      label: "Contact Us",
+      href: "/contact",
+      external: false,
+    },
   },
 ];
 
@@ -216,13 +222,13 @@ export const faqs: FaqItem[] = [
     id: "prayer",
     question: "How can I submit a prayer request?",
     answerParagraphs: [
-      'You can submit a prayer request through our online form. Click "Submit Prayer Request" and it will take you to a Google Form where you can share your request.',
+      "You can submit a prayer request on the Prayer page of this website. Our Prayer and Care team reviews requests shared there.",
     ],
     links: [
       {
         label: "Submit Prayer Request",
-        href: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
-        external: true,
+        href: "/prayer",
+        external: false,
       },
     ],
   },

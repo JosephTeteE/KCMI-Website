@@ -251,14 +251,15 @@ describe("Care P1 retention documentation", () => {
   });
 });
 
-describe("Care P1 public forms stay Google Forms", () => {
-  it("does not add first-party public Care form routes", () => {
+describe("Care P1 public Care entrypoints are native", () => {
+  it("points seed Care links to native routes without Google Forms", () => {
     const services = readFileSync(
       resolve(process.cwd(), "src/content/seed/pages.ts"),
       "utf8",
     );
-    expect(services).toMatch(/forms\.gle\/gKTwNc9gNiVCWWrJ6/);
-    expect(services).toMatch(/forms\.gle\/L6DyfegmTCGHuSBk6/);
-    expect(services).toMatch(/forms\.gle\/NcScEq6WFDeBankw5/);
+    expect(services).not.toMatch(/forms\.gle/);
+    expect(services).toMatch(/href:\s*"\/prayer"/);
+    expect(services).toMatch(/href:\s*"\/pastoral-care"/);
+    expect(services).toMatch(/href:\s*"\/welfare"/);
   });
 });

@@ -134,7 +134,7 @@ export async function saveHomeDocument(formData: FormData) {
       prayerCtaLabel: emptyToNull(formData.get("prayerCtaLabel")),
       prayerCtaHref: parseHref(
         emptyToNull(formData.get("prayerCtaHref")),
-        "https://forms.gle/gKTwNc9gNiVCWWrJ6",
+        "/prayer",
       ),
       givingHeading: emptyToNull(formData.get("givingHeading")),
       givingVerse: emptyToNull(formData.get("givingVerse")),
@@ -215,13 +215,19 @@ export async function saveServicesDocument(formData: FormData) {
       mediaBody: emptyToNull(formData.get("mediaBody")),
       careTitle: emptyToNull(formData.get("careTitle")),
       careBody: emptyToNull(formData.get("careBody")),
-      careLinks: [0, 1, 2, 3]
+      careLinks: [0, 1, 2]
         .map((index) => ({
           label: emptyToNull(formData.get(`careLabel${index}`)),
           href: emptyToNull(formData.get(`careHref${index}`)),
-          external: true,
+          external: false,
         }))
         .filter((link) => link.label && link.href),
+      testimoniesTitle: emptyToNull(formData.get("testimoniesTitle")),
+      testimoniesBody: emptyToNull(formData.get("testimoniesBody")),
+      testimoniesCta: {
+        label: emptyToNull(formData.get("testimoniesCtaLabel")),
+        href: emptyToNull(formData.get("testimoniesCtaHref")),
+      },
     },
     "Updated Services website content",
   );

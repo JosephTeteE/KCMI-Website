@@ -7,15 +7,12 @@
 import { z } from "zod";
 import type { CareContactMethod } from "@/lib/care/types";
 
-/** Verified legacy Counselling Google Form — remains live CTA until HUMAN cutover. */
-export const LEGACY_PASTORAL_GOOGLE_FORM_URL =
-  "https://forms.gle/L6DyfegmTCGHuSBk6";
-
 /**
  * Server-only cutover gate.
  * HUMAN enables first-party intake by setting on the host:
  *   KCMI_PASTORAL_INTAKE_ENABLED=1
  * then redeploying. Default (unset/0/false) → fail closed.
+ * Gate-off UI must contact /contact — never Google Forms.
  */
 export function isPastoralIntakeEnabled(
   env: NodeJS.ProcessEnv = process.env,

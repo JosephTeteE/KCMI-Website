@@ -22,6 +22,7 @@ import {
   defaultSermonsPageDocument,
   defaultServicesDocument,
 } from "@/content/website/defaults";
+import { sanitizePublicHref } from "@/content/website/sanitize-public-href";
 
 function mergeParsed<T extends Record<string, unknown>>(
   defaults: T,
@@ -32,10 +33,14 @@ function mergeParsed<T extends Record<string, unknown>>(
 
 export function resolveHomeDocument(input: unknown): HomeDocument {
   const parsed = homeDocumentBaseSchema.partial().safeParse(input);
-  return mergeParsed(
+  const merged = mergeParsed(
     defaultHomeDocument,
     parsed.success ? parsed.data : undefined,
   );
+  return {
+    ...merged,
+    prayerCtaHref: sanitizePublicHref(merged.prayerCtaHref, "/prayer"),
+  };
 }
 
 export function resolveAboutDocument(input: unknown): AboutDocument {
@@ -48,10 +53,33 @@ export function resolveAboutDocument(input: unknown): AboutDocument {
 
 export function resolveServicesDocument(input: unknown): ServicesDocument {
   const parsed = servicesDocumentSchema.partial().safeParse(input);
-  return mergeParsed(
+  const merged = mergeParsed(
     defaultServicesDocument,
     parsed.success ? parsed.data : undefined,
   );
+  return {
+    ...merged,
+    cellCta: {
+      ...merged.cellCta,
+      href: sanitizePublicHref(merged.cellCta.href, "/contact"),
+    },
+    teamsCta: {
+      ...merged.teamsCta,
+      href: sanitizePublicHref(merged.teamsCta.href, "/contact"),
+    },
+    careLinks: merged.careLinks.map((link) => {
+      const href = sanitizePublicHref(link.href, "/contact");
+      return {
+        ...link,
+        href,
+        external: href.startsWith("http"),
+      };
+    }),
+    testimoniesCta: {
+      ...merged.testimoniesCta,
+      href: sanitizePublicHref(merged.testimoniesCta.href, "/contact"),
+    },
+  };
 }
 
 export function resolveGlobalDocument(input: unknown): GlobalDocument {
@@ -65,10 +93,22 @@ export function resolveGlobalDocument(input: unknown): GlobalDocument {
 
 export function resolveFaqsDocument(input: unknown): FaqsDocument {
   const parsed = faqsDocumentSchema.partial().safeParse(input);
-  if (parsed.success && parsed.data.items && parsed.data.items.length > 0) {
-    return { items: parsed.data.items };
-  }
-  return defaultFaqsDocument;
+  const doc =
+    parsed.success && parsed.data.items && parsed.data.items.length > 0
+      ? { items: parsed.data.items }
+      : defaultFaqsDocument;
+  return {
+    items: doc.items.map((item) => ({
+      ...item,
+      links: item.links?.map((link) => ({
+        ...link,
+        href: sanitizePublicHref(link.href, "/prayer"),
+        external:
+          (link.external ?? link.href.startsWith("http")) &&
+          !sanitizePublicHref(link.href, "/prayer").startsWith("/"),
+      })),
+    })),
+  };
 }
 
 export function resolveSermonsPageDocument(input: unknown): SermonsPageDocument {

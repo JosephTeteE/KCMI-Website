@@ -4,15 +4,12 @@ import { describe, expect, it } from "vitest";
 import { getGivingAccountsSeed } from "@/content";
 import {
   isPastoralIntakeEnabled,
-  LEGACY_PASTORAL_GOOGLE_FORM_URL,
 } from "@/lib/care/pastoral-intake";
 import {
   isPrayerIntakeEnabled,
-  LEGACY_PRAYER_GOOGLE_FORM_URL,
 } from "@/lib/care/prayer-intake";
 import {
   isWelfareIntakeEnabled,
-  LEGACY_WELFARE_GOOGLE_FORM_URL,
 } from "@/lib/care/welfare-intake";
 import {
   CAMP_LEGACY_HOST,
@@ -53,21 +50,22 @@ describe("prelaunch Care public copy", () => {
     }
   });
 
-  it("keeps verified Google Form destinations on gate-off CTAs", () => {
+  it("uses contact fallback when Care intake gates are off", () => {
     expect(readSrc("src/app/(site)/prayer/page.tsx")).toContain(
-      "LEGACY_PRAYER_GOOGLE_FORM_URL",
+      "CareIntakeUnavailable",
     );
     expect(readSrc("src/app/(site)/pastoral-care/page.tsx")).toContain(
-      "LEGACY_PASTORAL_GOOGLE_FORM_URL",
+      "CareIntakeUnavailable",
     );
     expect(readSrc("src/app/(site)/welfare/page.tsx")).toContain(
-      "LEGACY_WELFARE_GOOGLE_FORM_URL",
+      "CareIntakeUnavailable",
     );
-    expect(LEGACY_PRAYER_GOOGLE_FORM_URL).toBe(
-      "https://forms.gle/gKTwNc9gNiVCWWrJ6",
+    expect(readSrc("src/components/care/care-intake-unavailable.tsx")).toContain(
+      'href="/contact"',
     );
-    expect(LEGACY_PASTORAL_GOOGLE_FORM_URL).toMatch(/^https:\/\/forms\.gle\//);
-    expect(LEGACY_WELFARE_GOOGLE_FORM_URL).toMatch(/^https:\/\/forms\.gle\//);
+    expect(readSrc("src/components/care/care-intake-unavailable.tsx")).not.toMatch(
+      /forms\.gle/,
+    );
   });
 
   it("uses visitor-facing primary CTA labels", () => {

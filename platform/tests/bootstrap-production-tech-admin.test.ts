@@ -36,18 +36,16 @@ describe("production tech admin bootstrap script guards", () => {
     expect(source).not.toMatch(/promptHidden|getpass/);
   });
 
-  it("expects super_admin grants aligned with RBAC matrix", () => {
-    const expected = DEFAULT_ROLE_PERMISSIONS.super_admin;
+  it("expects super_admin ∪ care_operator grants", () => {
+    const expected = [
+      ...DEFAULT_ROLE_PERMISSIONS.super_admin,
+      ...DEFAULT_ROLE_PERMISSIONS.care_operator,
+    ];
     for (const perm of expected) {
       expect(source).toContain(`"${perm}"`);
     }
-    for (const blocked of [
-      "prayer.read",
-      "counselling.read",
-      "welfare.read",
-    ]) {
-      expect(source).toContain(`"${blocked}"`);
-    }
+    expect(source).toContain("TARGET_ROLES");
+    expect(source).toContain("care_operator");
   });
 
   it("points invite redirect at confirm → set-password on the production Vercel origin", () => {

@@ -58,10 +58,8 @@ describe("public content adapters", () => {
     expect(kasoa?.serviceTimes).toEqual([]);
   });
 
-  it("keeps prayer CTA on the verified Google Form URL", async () => {
-    expect((await getPrayerCta()).ctaHref).toBe(
-      "https://forms.gle/gKTwNc9gNiVCWWrJ6",
-    );
+  it("keeps prayer CTA on native /prayer", async () => {
+    expect((await getPrayerCta()).ctaHref).toBe("/prayer");
   });
 
   it("does not embed pastoral narrative keys or receipt URLs in public seed JSON", async () => {

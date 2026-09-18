@@ -59,7 +59,8 @@
     "validate:b1": "node scripts/phase-b1-validate.mjs",
     "validate:d11": "node scripts/phase-d11-validate.mjs",
     "hub:bootstrap-staging": "node scripts/bootstrap-staging-hub-users.mjs",
-    "hub:bootstrap-production-tech": "node scripts/bootstrap-production-tech-admin.mjs"
+    "hub:bootstrap-production-tech": "node scripts/bootstrap-production-tech-admin.mjs",
+    "hub:bootstrap-production-handover": "node scripts/bootstrap-production-handover-staff.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

@@ -33,7 +33,7 @@ export const defaultHomeDocument: HomeDocument = {
     "No matter what you're facing, know that you're not alone.",
   ],
   prayerCtaLabel: "Submit Prayer Request",
-  prayerCtaHref: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
+  prayerCtaHref: "/prayer",
   givingHeading: "Give to KCMI",
   givingVerse:
     "Whoever brings blessing will be enriched, and one who waters will himself be watered.",
@@ -91,46 +91,48 @@ export const defaultServicesDocument: ServicesDocument = {
     "Worship, cell fellowships, and service teams at Kingdom Covenant Ministries International. Headquarters times are listed below; other locations are on the Locations page.",
   cellTitle: "Cell Fellowships",
   cellBody:
-    "Join a smaller group for fellowship, Bible study, and prayer. Connect with others in a supportive environment.",
+    "Join a smaller group for fellowship, Bible study, and prayer. Connect with others in a supportive environment. Interested in joining a Cell Fellowship? Contact us and we will help you connect.",
   cellCta: {
-    label: "Join a Cell Fellowship",
-    href: "https://forms.gle/ogHw37wRpx9HC2bs5",
+    label: "Contact Us",
+    href: "/contact",
   },
   teamsTitle: "Service Teams",
   teamsBody:
-    "Use your gifts and talents to serve God and our community. Find a place to make a difference.",
+    "Use your gifts and talents to serve God and our community. Interested in serving with a KCMI team? Contact us to find out where you can get involved.",
   teamsCta: {
-    label: "Join a Service Team",
-    href: "https://forms.gle/Xo3rbm2rFaidrqCbA",
+    label: "Contact Us",
+    href: "/contact",
   },
   mediaTitle: "Sermons and media",
   mediaBody:
     "Watch and listen to messages from KCMI gatherings and Rehoboth Wells.",
   careTitle: "Prayer and care requests",
   careBody:
-    "Prayer, counselling, welfare and celebration requests are available through the forms below.",
+    "Share a prayer request, ask for Pastoral Care, or request Welfare support through the KCMI website.",
   careLinks: [
     {
-      label: "Prayer request form",
-      href: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
-      external: true,
+      label: "Prayer requests",
+      href: "/prayer",
+      external: false,
     },
     {
-      label: "Counselling request form",
-      href: "https://forms.gle/L6DyfegmTCGHuSBk6",
-      external: true,
+      label: "Pastoral Care",
+      href: "/pastoral-care",
+      external: false,
     },
     {
-      label: "Welfare request form",
-      href: "https://forms.gle/NcScEq6WFDeBankw5",
-      external: true,
-    },
-    {
-      label: "Celebrations form",
-      href: "https://forms.gle/QxiASWogkGFamvEJ8",
-      external: true,
+      label: "Welfare support",
+      href: "/welfare",
+      external: false,
     },
   ],
+  testimoniesTitle: "Testimonies & Thanksgiving",
+  testimoniesBody:
+    "Testimonies and thanksgiving are shared during services. If you would like to get in touch about giving thanks with the church family, you are welcome to contact us.",
+  testimoniesCta: {
+    label: "Contact Us",
+    href: "/contact",
+  },
 };
 
 export const defaultGlobalDocument: GlobalDocument = {
@@ -139,7 +141,7 @@ export const defaultGlobalDocument: GlobalDocument = {
   contactPhoneDisplay: "+234 9134 44 8322",
   contactPhoneTel: "+2349134448322",
   contactIntro:
-    "Write or call the church office. Prayer, counselling, and other pastoral-care requests use the forms on the Services page.",
+    "Write or call the church office. Prayer and care requests can be shared through the Prayer, Pastoral Care, and Welfare pages.",
   dfrHeading: "Daily Faith Recharge",
   dfrBody: "Short daily encouragement to strengthen your walk with Christ.",
   dfrSpotifyLabel: "Listen on Spotify",
@@ -218,13 +220,13 @@ export const defaultFaqsDocument: FaqsDocument = {
       id: "prayer",
       question: "How can I submit a prayer request?",
       answerParagraphs: [
-        'You can submit a prayer request through our online form. Click "Submit Prayer Request" and it will take you to a Google Form where you can share your request.',
+        "You can submit a prayer request on the Prayer page of this website. Our Prayer and Care team reviews requests shared there.",
       ],
       links: [
         {
           label: "Submit Prayer Request",
-          href: "https://forms.gle/gKTwNc9gNiVCWWrJ6",
-          external: true,
+          href: "/prayer",
+          external: false,
         },
       ],
     },

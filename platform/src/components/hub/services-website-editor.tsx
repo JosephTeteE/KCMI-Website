@@ -8,17 +8,18 @@ import type { ServicesDocument } from "@/content/website/schemas";
 
 export function ServicesWebsiteEditor({ services }: { services: ServicesDocument }) {
   const care = [...services.careLinks];
-  while (care.length < 4) care.push({ label: "", href: "", external: true });
+  while (care.length < 3) care.push({ label: "", href: "", external: false });
 
   return (
     <HubCopyProposeForm
       action={saveServicesDocument}
       what="Ministries and care"
-      where="The Services page — cell fellowships, service teams, sermons, and care request buttons."
+      where="The Services page — cell fellowships, service teams, sermons, care, and testimonies."
       extraHelp={
         <HubHelpDetails summary="What is this?">
-          Keep existing care form links unless a person gives you a replacement
-          link.
+          Care buttons should point to /prayer, /pastoral-care, and /welfare.
+          Cell fellowships and service teams should point to /contact. Do not use
+          Google Forms.
         </HubHelpDetails>
       }
       fields={[
@@ -35,10 +36,14 @@ export function ServicesWebsiteEditor({ services }: { services: ServicesDocument
         { id: "mediaBody", label: "Sermons section message", kind: "textarea", current: services.mediaBody },
         { id: "careTitle", label: "Care section heading", kind: "text", current: services.careTitle },
         { id: "careBody", label: "Care section message", kind: "textarea", current: services.careBody },
-        ...care.slice(0, 4).flatMap((link, index) => [
+        ...care.slice(0, 3).flatMap((link, index) => [
           { id: `careLabel${index}`, label: `Care button ${index + 1} label`, kind: "text" as const, current: link.label },
           { id: `careHref${index}`, label: `Care button ${index + 1} destination`, kind: "text" as const, current: link.href },
         ]),
+        { id: "testimoniesTitle", label: "Testimonies heading", kind: "text", current: services.testimoniesTitle },
+        { id: "testimoniesBody", label: "Testimonies message", kind: "textarea", current: services.testimoniesBody },
+        { id: "testimoniesCtaLabel", label: "Testimonies button label", kind: "text", current: services.testimoniesCta.label },
+        { id: "testimoniesCtaHref", label: "Testimonies button destination", kind: "text", current: services.testimoniesCta.href },
       ]}
       preview={(values, mode) => (
         <HubPreviewFrame title="Services page" live={mode === "live"}>
@@ -50,6 +55,8 @@ export function ServicesWebsiteEditor({ services }: { services: ServicesDocument
             <p className="text-sm">{values.teamsBody}</p>
             <h3 className="font-display text-xl font-semibold">{values.careTitle}</h3>
             <p className="text-sm">{values.careBody}</p>
+            <h3 className="font-display text-xl font-semibold">{values.testimoniesTitle}</h3>
+            <p className="text-sm">{values.testimoniesBody}</p>
           </div>
         </HubPreviewFrame>
       )}

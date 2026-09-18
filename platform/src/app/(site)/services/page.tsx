@@ -11,7 +11,7 @@ import { publicPageMetadata } from "@/lib/seo/public-metadata";
 export const metadata = publicPageMetadata({
   title: "Services",
   description:
-    "Worship times, cell fellowships, service teams, sermons, and care request forms at Kingdom Covenant Ministries International.",
+    "Worship times, cell fellowships, service teams, sermons, and care requests at Kingdom Covenant Ministries International.",
   path: "/services",
 });
 

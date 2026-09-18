@@ -10,15 +10,12 @@ import {
   type WelfareRequestCategory,
 } from "@/lib/care/types";
 
-/** Verified legacy Welfare Google Form — remains live CTA until HUMAN cutover. */
-export const LEGACY_WELFARE_GOOGLE_FORM_URL =
-  "https://forms.gle/NcScEq6WFDeBankw5";
-
 /**
  * Server-only cutover gate.
  * HUMAN enables first-party intake by setting on the host:
  *   KCMI_WELFARE_INTAKE_ENABLED=1
  * then redeploying. Default (unset/0/false) → fail closed.
+ * Gate-off UI must contact /contact — never Google Forms.
  */
 export function isWelfareIntakeEnabled(
   env: NodeJS.ProcessEnv = process.env,

@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
+import { CareIntakeUnavailable } from "@/components/care/care-intake-unavailable";
 import { WelfareRequestForm } from "@/components/care/welfare-request-form";
-import {
-  isWelfareIntakeEnabled,
-  LEGACY_WELFARE_GOOGLE_FORM_URL,
-} from "@/lib/care/welfare-intake";
+import { isWelfareIntakeEnabled } from "@/lib/care/welfare-intake";
 import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
 export const metadata = publicPageMetadata({
@@ -60,33 +58,19 @@ export default function WelfarePage() {
             </div>
           </section>
         ) : (
-          <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8">
-            <h2 className="font-display text-2xl font-semibold">
-              Request Welfare Support
-            </h2>
-            <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-              Use the button below to send your request to the KCMI Welfare team.
-            </p>
-            <a
-              href={LEGACY_WELFARE_GOOGLE_FORM_URL}
-              className="mt-6 inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 text-base font-semibold text-white"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Request Welfare Support
-            </a>
-            <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
-              You can also find care links on the{" "}
-              <Link
-                href="/services"
-                className="font-semibold text-[var(--color-action-primary)]"
-              >
-                Services
-              </Link>{" "}
-              page.
-            </p>
-          </section>
+          <CareIntakeUnavailable heading="Request Welfare Support" />
         )}
+
+        <p className="text-readable-sm text-[var(--color-text-muted)]">
+          You can also find care links on the{" "}
+          <Link
+            href="/services"
+            className="font-semibold text-[var(--color-action-primary)]"
+          >
+            Services
+          </Link>{" "}
+          page.
+        </p>
       </div>
     </PageShell>
   );

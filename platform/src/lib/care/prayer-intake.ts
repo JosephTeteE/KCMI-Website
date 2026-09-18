@@ -5,15 +5,12 @@
 
 import { z } from "zod";
 
-/** Verified legacy Google Form — remains live CTA until HUMAN cutover. */
-export const LEGACY_PRAYER_GOOGLE_FORM_URL =
-  "https://forms.gle/gKTwNc9gNiVCWWrJ6";
-
 /**
  * Server-only cutover gate.
  * HUMAN enables first-party intake by setting on the host:
  *   KCMI_PRAYER_INTAKE_ENABLED=1
  * then redeploying. Default (unset/0/false) → fail closed.
+ * Gate-off UI must contact /contact — never Google Forms.
  */
 export function isPrayerIntakeEnabled(
   env: NodeJS.ProcessEnv = process.env,
@@ -165,10 +162,9 @@ export function validatePrayerSubmission(raw: {
   };
 }
 
-/** Locations that still point at Google Forms (do not change in P2). */
-export const PRAYER_GOOGLE_FORM_CUTOVER_LOCATIONS = [
-  "Homepage Prayer CTA (website document / seed prayerCtaHref)",
-  "/services care section — Prayer request form link",
-  "/faqs — How can I submit a prayer request?",
-  "Legacy Connect nav on static public/*.html (if still served)",
+/** Historical notes only — public runtime must not use Google Forms. */
+export const PRAYER_NATIVE_ENTRYPOINTS = [
+  "Homepage Prayer CTA → /prayer",
+  "/services care section → /prayer",
+  "/faqs prayer answer → /prayer",
 ] as const;

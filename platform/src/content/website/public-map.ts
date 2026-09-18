@@ -19,6 +19,7 @@ import type {
   SermonsPageDocument,
   ServicesDocument,
 } from "@/content/website/schemas";
+import { sanitizePublicHref } from "@/content/website/sanitize-public-href";
 import { livestreamPublic as livestreamCopy } from "@/content/seed/pages";
 
 export const FALLBACK_HERO_IMAGE: PublicMediaRef = {
@@ -66,7 +67,7 @@ export function mapHomePublic(
       verseReference: doc.prayerVerseReference,
       body: doc.prayerBody,
       ctaLabel: doc.prayerCtaLabel,
-      ctaHref: doc.prayerCtaHref,
+      ctaHref: sanitizePublicHref(doc.prayerCtaHref, "/prayer"),
     },
     giving: {
       heading: doc.givingHeading,
@@ -163,8 +164,10 @@ export function mapServicesOfferings(doc: ServicesDocument): ServiceOffering[] {
       kind: "ministry",
       cta: {
         label: doc.cellCta.label,
-        href: doc.cellCta.href,
-        external: doc.cellCta.href.startsWith("http"),
+        href: sanitizePublicHref(doc.cellCta.href, "/contact"),
+        external: sanitizePublicHref(doc.cellCta.href, "/contact").startsWith(
+          "http",
+        ),
       },
     },
     {
@@ -174,8 +177,10 @@ export function mapServicesOfferings(doc: ServicesDocument): ServiceOffering[] {
       kind: "ministry",
       cta: {
         label: doc.teamsCta.label,
-        href: doc.teamsCta.href,
-        external: doc.teamsCta.href.startsWith("http"),
+        href: sanitizePublicHref(doc.teamsCta.href, "/contact"),
+        external: sanitizePublicHref(doc.teamsCta.href, "/contact").startsWith(
+          "http",
+        ),
       },
     },
     {
@@ -190,17 +195,44 @@ export function mapServicesOfferings(doc: ServicesDocument): ServiceOffering[] {
       title: doc.careTitle,
       body: doc.careBody,
       kind: "care",
-      links: doc.careLinks.map((link) => ({
-        label: link.label,
-        href: link.href,
-        external: link.external ?? link.href.startsWith("http"),
-      })),
+      links: doc.careLinks.map((link) => {
+        const href = sanitizePublicHref(link.href, "/contact");
+        return {
+          label: link.label,
+          href,
+          external: href.startsWith("http"),
+        };
+      }),
+    },
+    {
+      id: "testimonies",
+      title: doc.testimoniesTitle,
+      body: doc.testimoniesBody,
+      kind: "ministry",
+      cta: {
+        label: doc.testimoniesCta.label,
+        href: sanitizePublicHref(doc.testimoniesCta.href, "/contact"),
+        external: sanitizePublicHref(
+          doc.testimoniesCta.href,
+          "/contact",
+        ).startsWith("http"),
+      },
     },
   ];
 }
 
 export function mapFaqs(doc: FaqsDocument): FaqItem[] {
-  return doc.items;
+  return doc.items.map((item) => ({
+    ...item,
+    links: item.links?.map((link) => {
+      const href = sanitizePublicHref(link.href, "/prayer");
+      return {
+        ...link,
+        href,
+        external: link.external ?? href.startsWith("http"),
+      };
+    }),
+  }));
 }
 
 export function mapSermonPlatforms(doc: SermonsPageDocument): SermonPlatform[] {

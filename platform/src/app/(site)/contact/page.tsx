@@ -25,7 +25,7 @@ export default async function ContactPage() {
       title="Contact Us"
       description={
         contact.intro ??
-        "Write or call the church office. Prayer and care requests use the forms on the Services page."
+        "Write or call the church office. Prayer and care requests can be shared through the Prayer, Pastoral Care, and Welfare pages."
       }
     >
       <div className="grid gap-8 lg:grid-cols-2">
@@ -56,9 +56,9 @@ export default async function ContactPage() {
             </li>
           </ul>
           <p className="mt-6 rounded-[var(--radius-md)] bg-[var(--color-surface-page)] px-4 py-3 text-readable-sm text-[var(--color-text-muted)]">
-            Email or call us using the details above. Prayer, counselling, and
-            other requests can also be sent through the forms on the Services
-            page.
+            Email or call us using the details above. Prayer, Pastoral Care, and
+            Welfare requests can also be shared through those pages on this
+            website.
           </p>
           <p className="mt-4 text-readable-sm text-[var(--color-text-muted)]">
             {faith.heading}: {faith.body}{" "}

@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   isPrayerIntakeEnabled,
-  LEGACY_PRAYER_GOOGLE_FORM_URL,
   validatePrayerSubmission,
 } from "@/lib/care/prayer-intake";
 import { permissionsForRoles } from "@/lib/authorization/rbac";
@@ -203,7 +202,7 @@ describe("Care P2 authorization boundaries", () => {
 });
 
 describe("Care P2 public surface", () => {
-  it("keeps Google Prayer Form links unchanged on seed pages", () => {
+  it("points Prayer CTAs to native /prayer", () => {
     const pages = readFileSync(
       resolve(process.cwd(), "src/content/seed/pages.ts"),
       "utf8",
@@ -212,26 +211,9 @@ describe("Care P2 public surface", () => {
       resolve(process.cwd(), "src/content/seed/engagement.ts"),
       "utf8",
     );
-    expect(pages).toContain(LEGACY_PRAYER_GOOGLE_FORM_URL);
-    expect(engagement).toContain(LEGACY_PRAYER_GOOGLE_FORM_URL);
-  });
-
-  it("does not replace homepage/services/faqs Prayer CTAs with /prayer", () => {
-    const pages = readFileSync(
-      resolve(process.cwd(), "src/content/seed/pages.ts"),
-      "utf8",
-    );
-    const engagement = readFileSync(
-      resolve(process.cwd(), "src/content/seed/engagement.ts"),
-      "utf8",
-    );
-    expect(engagement).toMatch(
-      /ctaHref:\s*"https:\/\/forms\.gle\/gKTwNc9gNiVCWWrJ6"/,
-    );
-    expect(pages).toMatch(/Prayer request form[\s\S]*forms\.gle\/gKTwNc9gNiVCWWrJ6/);
-    expect(pages).toMatch(
-      /Submit Prayer Request[\s\S]*forms\.gle\/gKTwNc9gNiVCWWrJ6/,
-    );
+    expect(pages).not.toMatch(/forms\.gle/);
+    expect(engagement).toMatch(/ctaHref:\s*"\/prayer"/);
+    expect(pages).toMatch(/Prayer requests[\s\S]*href:\s*"\/prayer"/);
   });
 
   it("indexes the public /prayer page but not pastoral_requests content", () => {

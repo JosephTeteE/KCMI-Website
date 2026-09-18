@@ -4,16 +4,13 @@ import { resolve } from "node:path";
 import {
   buildPastoralNarrative,
   isPastoralIntakeEnabled,
-  LEGACY_PASTORAL_GOOGLE_FORM_URL,
   validatePastoralSubmission,
 } from "@/lib/care/pastoral-intake";
 import {
   buildWelfareNarrative,
   isWelfareIntakeEnabled,
-  LEGACY_WELFARE_GOOGLE_FORM_URL,
   validateWelfareSubmission,
 } from "@/lib/care/welfare-intake";
-import { LEGACY_PRAYER_GOOGLE_FORM_URL } from "@/lib/care/prayer-intake";
 import { permissionsForRoles } from "@/lib/authorization/rbac";
 import {
   canReadCareDomain,
@@ -365,26 +362,14 @@ describe("Care P3 authorization boundaries", () => {
 });
 
 describe("Care P3 public surface", () => {
-  it("keeps Google Form links unchanged on seed pages", () => {
+  it("points Pastoral/Welfare Care links to native routes", () => {
     const pages = readFileSync(
       resolve(process.cwd(), "src/content/seed/pages.ts"),
       "utf8",
     );
-    expect(pages).toContain(LEGACY_PASTORAL_GOOGLE_FORM_URL);
-    expect(pages).toContain(LEGACY_WELFARE_GOOGLE_FORM_URL);
-    expect(pages).toContain(LEGACY_PRAYER_GOOGLE_FORM_URL);
-    expect(pages).toMatch(
-      /Counselling request form[\s\S]*forms\.gle\/L6DyfegmTCGHuSBk6/,
-    );
-    expect(pages).toMatch(
-      /Welfare request form[\s\S]*forms\.gle\/NcScEq6WFDeBankw5/,
-    );
-    expect(pages).not.toMatch(
-      /Counselling request form[\s\S]*href:\s*"\/pastoral-care"/,
-    );
-    expect(pages).not.toMatch(
-      /Welfare request form[\s\S]*href:\s*"\/welfare"/,
-    );
+    expect(pages).not.toMatch(/forms\.gle/);
+    expect(pages).toMatch(/Pastoral Care[\s\S]*href:\s*"\/pastoral-care"/);
+    expect(pages).toMatch(/Welfare support[\s\S]*href:\s*"\/welfare"/);
   });
 
   it("indexes informational pages but not pastoral_requests content", () => {

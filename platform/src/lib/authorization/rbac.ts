@@ -6,6 +6,7 @@ export const HUB_ROLES = [
   "pastoral_admin",
   "pastor",
   "prayer_staff",
+  "care_operator",
   "media_admin",
   "branch_admin",
   "program_drafter",
@@ -136,6 +137,16 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
     ],
     pastor: ["hub.access"], // case-scoped pastoral perms assigned explicitly
     prayer_staff: ["hub.access", "prayer.read"],
+    care_operator: [
+      "hub.access",
+      "prayer.read",
+      "prayer.assign",
+      "counselling.read",
+      "counselling.assign",
+      "welfare.read",
+      "welfare.assign",
+      // Intentionally NO users/giving/media/website/branches/livestream/events/sermons/audit
+    ],
     media_admin: [
       "hub.access",
       "programs.create",
@@ -203,6 +214,7 @@ export const OPERATING_ROLE_LABELS: Record<HubRole, string> = {
   pastoral_admin: "Pastoral Admin",
   pastor: "Pastor",
   prayer_staff: "Prayer staff",
+  care_operator: "Care operator",
   media_admin: "HQ Content Admin",
   branch_admin: "Branch Admin",
   program_drafter: "Program drafter",

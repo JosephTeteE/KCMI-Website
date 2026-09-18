@@ -2,8 +2,10 @@
  * Production-only: onboard the initial technical Super Admin.
  *
  * Uses Auth Admin inviteUserByEmail — does NOT invent or print passwords.
- * Assigns role: super_admin only (permissions from existing RBAC role grants).
+ * Assigns roles: super_admin + care_operator (Care grants via care_operator).
  *
+ * Prefer scripts/bootstrap-production-handover-staff.mjs for full handover
+ * (tech + media + Chris). This script remains for tech-only repair.
  * From platform/, interactive TTY (after HUMAN explicitly authorizes):
  *
  *   export NEXT_PUBLIC_SUPABASE_URL="https://rujbdozepzcsmeuexdle.supabase.co"
@@ -29,7 +31,8 @@ const PRODUCTION_URL = `https://${PRODUCTION_PROJECT_REF}.supabase.co`;
 const STAGING_PROJECT_REF = "rjzpiikvvetfxveowvkf";
 
 const TARGET_EMAIL = "tech@kcmi-rcc.org";
-const TARGET_ROLE = "super_admin";
+const TARGET_ROLES = ["super_admin", "care_operator"];
+const TARGET_ROLE = "super_admin"; // primary platform role (kept for logging)
 const DISPLAY_NAME = "Super Admin";
 
 const PROD_ORIGIN = "https://kcmi-platform-production-ten.vercel.app";
@@ -41,7 +44,7 @@ const PROD_FORGOT_PASSWORD = `${PROD_ORIGIN}/auth/forgot-password`;
 const PROD_MFA = `${PROD_ORIGIN}/auth/mfa`;
 const PROD_ADMIN = `${PROD_ORIGIN}/admin`;
 
-/** Expected grants for super_admin (matches DEFAULT_ROLE_PERMISSIONS in rbac.ts). */
+/** Expected grants for super_admin ∪ care_operator. */
 const MUST_HAVE = [
   "hub.access",
   "users.manage",
@@ -59,10 +62,6 @@ const MUST_HAVE = [
   "website.manage",
   "branches.manage",
   "audit.read",
-];
-
-/** Pastoral Care is never implied by super_admin alone. */
-const MUST_NOT_HAVE = [
   "prayer.read",
   "prayer.assign",
   "counselling.read",
@@ -70,6 +69,9 @@ const MUST_NOT_HAVE = [
   "welfare.read",
   "welfare.assign",
 ];
+
+/** No additional unexpected pastoral-only gaps — Care comes from care_operator. */
+const MUST_NOT_HAVE = [];
 
 function parseArgs(argv) {
   const flags = new Set(argv.slice(2));
@@ -222,22 +224,24 @@ async function ensureProfile(admin, userId, email) {
   return "inserted";
 }
 
-async function ensureSuperAdminRole(admin, userId) {
-  const { data: role, error } = await admin
-    .from("roles")
-    .select("id, name")
-    .eq("name", TARGET_ROLE)
-    .single();
-  if (error || !role) {
-    throw new Error(
-      `Role missing: ${TARGET_ROLE}. Production migrations through care_prayer_staff_role must be applied first.`,
+async function ensureTargetRoles(admin, userId) {
+  for (const roleName of TARGET_ROLES) {
+    const { data: role, error } = await admin
+      .from("roles")
+      .select("id, name")
+      .eq("name", roleName)
+      .single();
+    if (error || !role) {
+      throw new Error(
+        `Role missing: ${roleName}. Apply migration 20260920120000_care_operator_role first.`,
+      );
+    }
+    const { error: upErr } = await admin.from("user_roles").upsert(
+      { user_id: userId, role_id: role.id },
+      { onConflict: "user_id,role_id" },
     );
+    if (upErr) throw new Error(`user_roles upsert failed: ${upErr.message}`);
   }
-  const { error: upErr } = await admin.from("user_roles").upsert(
-    { user_id: userId, role_id: role.id },
-    { onConflict: "user_id,role_id" },
-  );
-  if (upErr) throw new Error(`user_roles upsert failed: ${upErr.message}`);
 }
 
 async function loadRolesAndPermissions(admin, userId) {
@@ -308,7 +312,7 @@ function printPlan() {
   console.log("KCMI production Tech Admin bootstrap");
   console.log(`Auth Admin target: ${PRODUCTION_URL}`);
   console.log(`Project ref: ${PRODUCTION_PROJECT_REF}`);
-  console.log(`User: ${TARGET_EMAIL} → role ${TARGET_ROLE} (${DISPLAY_NAME})`);
+  console.log(`User: ${TARGET_EMAIL} → roles ${TARGET_ROLES.join(" + ")} (${DISPLAY_NAME})`);
   console.log("Method: inviteUserByEmail (no password invented or printed).");
   console.log("Roles: upsert public.user_roles only for super_admin.");
   console.log("MFA: not enrolled by this script — HUMAN enrolls TOTP after invite.");
@@ -345,8 +349,8 @@ async function verify(admin) {
 
   const { roles, permissions } = await loadRolesAndPermissions(admin, user.id);
   const permFailures = evaluatePermissions(permissions);
-  const roleOk =
-    roles.includes(TARGET_ROLE) && roles.every((r) => r === TARGET_ROLE);
+  const roleOk = TARGET_ROLES.every((r) => roles.includes(r));
+  const extraRoles = roles.filter((r) => !TARGET_ROLES.includes(r));
   const profileOk =
     profile?.is_active === true &&
     (profile?.email ?? "").toLowerCase() === TARGET_EMAIL;
@@ -359,9 +363,14 @@ async function verify(admin) {
   for (const f of permFailures) console.log(`  ${f}`);
   if (!roleOk) {
     console.log(
-      `  unexpected roles (want only ${TARGET_ROLE}): ${roles.join(", ") || "(none)"}`,
+      `  missing roles (want ${TARGET_ROLES.join(" + ")}): ${roles.join(", ") || "(none)"}`,
     );
     failed += 1;
+  }
+  if (extraRoles.length) {
+    console.log(
+      `  WARN extra roles present (not stripped): ${extraRoles.join(", ")}`,
+    );
   }
   if (!profileOk) {
     console.log("  profile missing, inactive, or email mismatch");
@@ -435,10 +444,10 @@ async function apply(admin) {
   }
 
   const profileAction = await ensureProfile(admin, user.id, TARGET_EMAIL);
-  await ensureSuperAdminRole(admin, user.id);
+  await ensureTargetRoles(admin, user.id);
   const { roles, permissions } = await loadRolesAndPermissions(admin, user.id);
   const failures = evaluatePermissions(permissions);
-  const extraRoles = roles.filter((r) => r !== TARGET_ROLE);
+  const extraRoles = roles.filter((r) => !TARGET_ROLES.includes(r));
 
   console.log(
     `profile=${profileAction} invited=${invited} roles=${roles.join(",") || "(none)"}`,
