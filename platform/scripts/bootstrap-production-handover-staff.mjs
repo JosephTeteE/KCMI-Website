@@ -7,6 +7,7 @@
  *
  *   export NEXT_PUBLIC_SUPABASE_URL="https://rujbdozepzcsmeuexdle.supabase.co"
  *   export SUPABASE_SECRET_KEY="…"
+ *   export NEXT_PUBLIC_SITE_URL="https://www.kcmi-rcc.org"
  *   export KCMI_ENVIRONMENT=production
  *   export KCMI_BOOTSTRAP_CONFIRM=production
  *   node scripts/bootstrap-production-handover-staff.mjs --dry-run
@@ -18,6 +19,7 @@
  * Unset SUPABASE_SECRET_KEY when finished. Do not commit shell history.
  *
  * Requires migration 20260920120000_care_operator_role (care_operator role).
+ * Invite redirectTo is derived from NEXT_PUBLIC_SITE_URL (canonical www only).
  * Does NOT: touch staging, enroll MFA, print secrets, disable Vercel protection.
  */
 
@@ -29,14 +31,8 @@ const PRODUCTION_PROJECT_REF = "rujbdozepzcsmeuexdle";
 const PRODUCTION_URL = `https://${PRODUCTION_PROJECT_REF}.supabase.co`;
 const STAGING_PROJECT_REF = "rjzpiikvvetfxveowvkf";
 
-const PROD_ORIGIN = "https://kcmi-platform-production-ten.vercel.app";
-const PROD_SIGN_IN = `${PROD_ORIGIN}/auth/sign-in`;
-const PROD_SET_PASSWORD = `${PROD_ORIGIN}/auth/set-password`;
-const PROD_CONFIRM = `${PROD_ORIGIN}/auth/confirm`;
-const PROD_INVITE_REDIRECT = `${PROD_CONFIRM}?next=/auth/set-password`;
-const PROD_FORGOT_PASSWORD = `${PROD_ORIGIN}/auth/forgot-password`;
-const PROD_MFA = `${PROD_ORIGIN}/auth/mfa`;
-const PROD_ADMIN = `${PROD_ORIGIN}/admin`;
+/** Canonical public origin for production handover invites (reject .vercel.app). */
+const REQUIRED_PRODUCTION_SITE_URL = "https://www.kcmi-rcc.org";
 
 const STAFF = {
   tech: {
@@ -169,6 +165,52 @@ function parseArgs(argv) {
   };
 }
 
+/**
+ * Derive production invite/auth URLs from NEXT_PUBLIC_SITE_URL.
+ * Requires exact https://www.kcmi-rcc.org — rejects .vercel.app hostnames.
+ */
+function resolveProductionSiteUrls() {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) {
+    throw new Error(
+      `Refusing to run: set NEXT_PUBLIC_SITE_URL=${REQUIRED_PRODUCTION_SITE_URL}`,
+    );
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    throw new Error("NEXT_PUBLIC_SITE_URL is not a valid URL.");
+  }
+
+  if (parsed.hostname.endsWith(".vercel.app")) {
+    throw new Error(
+      "Refusing to run: production handover invites must not use a .vercel.app hostname. " +
+        `Set NEXT_PUBLIC_SITE_URL=${REQUIRED_PRODUCTION_SITE_URL}`,
+    );
+  }
+
+  const origin = parsed.origin.replace(/\/+$/, "");
+  if (origin !== REQUIRED_PRODUCTION_SITE_URL) {
+    throw new Error(
+      `Refusing to run: NEXT_PUBLIC_SITE_URL must be exactly ${REQUIRED_PRODUCTION_SITE_URL}`,
+    );
+  }
+
+  const confirm = `${origin}/auth/confirm`;
+  return {
+    origin,
+    signIn: `${origin}/auth/sign-in`,
+    setPassword: `${origin}/auth/set-password`,
+    confirm,
+    inviteRedirect: `${confirm}?next=/auth/set-password`,
+    forgotPassword: `${origin}/auth/forgot-password`,
+    mfa: `${origin}/auth/mfa`,
+    admin: `${origin}/admin`,
+  };
+}
+
 function requireProductionEnv() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const secret = process.env.SUPABASE_SECRET_KEY?.trim();
@@ -209,7 +251,9 @@ function requireProductionEnv() {
   if (url.replace(/\/+$/, "") !== PRODUCTION_URL) {
     throw new Error(`Refusing to run: expected URL ${PRODUCTION_URL}`);
   }
-  return { url, secret };
+
+  const site = resolveProductionSiteUrls();
+  return { url, secret, site };
 }
 
 function createAdmin(url, secret) {
@@ -377,10 +421,11 @@ function selectedStaff(only) {
   return [STAFF.tech, STAFF.media, STAFF.chris];
 }
 
-function printPlan(only) {
+function printPlan(only, site) {
   console.log("KCMI production handover staff bootstrap");
   console.log(`Auth Admin target: ${PRODUCTION_URL}`);
-  console.log(`Invite redirectTo: ${PROD_INVITE_REDIRECT}`);
+  console.log(`Public site: ${site.origin}`);
+  console.log(`Invite redirectTo: ${site.inviteRedirect}`);
   for (const spec of selectedStaff(only)) {
     console.log(
       `  ${spec.email} → roles [${spec.roles.join(", ")}] (${spec.displayName})`,
@@ -433,7 +478,7 @@ async function verifyOne(admin, spec) {
   return failed === 0 && identityOk;
 }
 
-async function applyOne(admin, spec) {
+async function applyOne(admin, spec, site) {
   let user = await findUserByEmail(admin, spec.email);
   let invited = false;
   if (!user) {
@@ -441,7 +486,7 @@ async function applyOne(admin, spec) {
       spec.email,
       {
         data: { display_name: spec.displayName },
-        redirectTo: PROD_INVITE_REDIRECT,
+        redirectTo: site.inviteRedirect,
       },
     );
     if (error || !data?.user) {
@@ -501,7 +546,12 @@ async function main() {
   }
 
   if (!args.dryRun && !args.verify && !args.apply) {
-    printPlan(args.only);
+    try {
+      printPlan(args.only, resolveProductionSiteUrls());
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : err);
+      process.exit(1);
+    }
     console.error("");
     console.error(
       "Refusing to mutate. Pass --dry-run, --verify, or --apply.",
@@ -513,12 +563,20 @@ async function main() {
     process.exit(1);
   }
 
-  const { url, secret } = requireProductionEnv();
+  let url;
+  let secret;
+  let site;
+  try {
+    ({ url, secret, site } = requireProductionEnv());
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  }
   const admin = createAdmin(url, secret);
   const staff = selectedStaff(args.only);
 
   if (args.dryRun) {
-    printPlan(args.only);
+    printPlan(args.only, site);
     console.log("");
     console.log("Current Auth state (read-only):");
     for (const spec of staff) {
@@ -532,32 +590,32 @@ async function main() {
   }
 
   if (args.verify) {
-    printPlan(args.only);
+    printPlan(args.only, site);
     let ok = true;
     for (const spec of staff) {
       const pass = await verifyOne(admin, spec);
       if (!pass) ok = false;
     }
     console.log("");
-    console.log(`Sign-in: ${PROD_SIGN_IN}`);
-    console.log(`Forgot password: ${PROD_FORGOT_PASSWORD}`);
-    console.log(`Set password: ${PROD_SET_PASSWORD}`);
-    console.log(`MFA: ${PROD_MFA}`);
-    console.log(`Hub: ${PROD_ADMIN}`);
+    console.log(`Sign-in: ${site.signIn}`);
+    console.log(`Forgot password: ${site.forgotPassword}`);
+    console.log(`Set password: ${site.setPassword}`);
+    console.log(`MFA: ${site.mfa}`);
+    console.log(`Hub: ${site.admin}`);
     process.exit(ok ? 0 : 1);
   }
 
-  printPlan(args.only);
+  printPlan(args.only, site);
   await promptProduction();
   for (const spec of staff) {
     console.log("");
-    await applyOne(admin, spec);
+    await applyOne(admin, spec, site);
   }
   console.log("");
   console.log("Next HUMAN steps:");
   console.log("1. Each invitee accepts email → confirm → set password → MFA.");
   console.log(
-    `2. Existing tech without password: ${PROD_FORGOT_PASSWORD}`,
+    `2. Existing tech without password: ${site.forgotPassword}`,
   );
   console.log("3. After MFA for Care staff, enable Care flags on Vercel:");
   console.log("   KCMI_PRAYER_INTAKE_ENABLED=1");

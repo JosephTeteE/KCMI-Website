@@ -230,9 +230,28 @@ describe("handover bootstrap tooling", () => {
     expect(source).toContain('"super_admin", "care_operator"');
     expect(source).toContain('"media_admin"');
     expect(source).toContain("care_operator");
-    expect(source).toContain("PROD_INVITE_REDIRECT");
     expect(source).toContain("inviteUserByEmail");
+    expect(source).toContain("redirectTo: site.inviteRedirect");
     expect(source).not.toMatch(/createUser\s*\(/);
+  });
+
+  it("derives invite redirect from NEXT_PUBLIC_SITE_URL and rejects vercel.app", () => {
+    const source = readSrc("scripts/bootstrap-production-handover-staff.mjs");
+    expect(source).toContain(
+      'REQUIRED_PRODUCTION_SITE_URL = "https://www.kcmi-rcc.org"',
+    );
+    expect(source).toContain("resolveProductionSiteUrls");
+    expect(source).toContain("NEXT_PUBLIC_SITE_URL");
+    expect(source).toContain(
+      "inviteRedirect: `${confirm}?next=/auth/set-password`",
+    );
+    expect(source).toMatch(/\.vercel\.app/);
+    expect(source).toMatch(
+      /production handover invites must not use a \.vercel\.app hostname/,
+    );
+    expect(source).not.toContain(
+      "kcmi-platform-production-ten.vercel.app",
+    );
   });
 
   it("migration defines care_operator and expands assignable staff", () => {
