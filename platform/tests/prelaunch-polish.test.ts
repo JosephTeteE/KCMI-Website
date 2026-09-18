@@ -151,4 +151,42 @@ describe("prelaunch Giving values untouched", () => {
       { currency: "EUR", accountNumber: "5081098025" },
     ]);
   });
+
+  it("keeps Giving page financial literals aligned with seed", () => {
+    const page = readSrc("src/app/(site)/giving/page.tsx");
+    expect(page).not.toMatch(/1602002211|0055484937|5074346861|5061372275|5081098025/);
+    expect(page).toContain("getGivingAccounts");
+    expect(page).toContain("CopyAccountNumber");
+  });
+
+  it("uses one max-w-4xl content column and responsive currency grid", () => {
+    const page = readSrc("src/app/(site)/giving/page.tsx");
+    expect(page).toContain('mx-auto max-w-4xl px-4 sm:px-6');
+    expect(page).toContain("text-left");
+    expect(page).toContain("grid grid-cols-1 gap-4 sm:grid-cols-2");
+    expect(page).toContain("accountsByCurrency");
+  });
+});
+
+describe("prelaunch visual polish", () => {
+  it("serves the official KCMI favicon from the App Router location", () => {
+    const faviconPath = resolve(process.cwd(), "src/app/favicon.ico");
+    const bytes = readFileSync(faviconPath);
+    expect(bytes.byteLength).toBeGreaterThan(1000);
+    // ICO magic: reserved 0, type 1
+    expect(bytes[0]).toBe(0);
+    expect(bytes[1]).toBe(0);
+    expect(bytes[2]).toBe(1);
+    expect(bytes[3]).toBe(0);
+    // Must match legacy official asset (not Next.js default triangle).
+    const legacy = readFileSync(
+      resolve(process.cwd(), "../public/favicon/favicon.ico"),
+    );
+    expect(Buffer.compare(bytes, legacy)).toBe(0);
+  });
+
+  it("locks the root color scheme to light", () => {
+    const css = readSrc("src/app/globals.css");
+    expect(css).toMatch(/color-scheme:\s*light/);
+  });
 });

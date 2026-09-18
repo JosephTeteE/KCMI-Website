@@ -1,2 +1,7 @@
 /* App-level styles compose design tokens */
 @import "../styles/tokens.css";
+
+/* Explicit light presentation — do not follow OS dark preference for native UI */
+:root {
+  color-scheme: light;
+}

@@ -38,7 +38,7 @@ export default async function SearchPage({
     <PageShell
       eyebrow="Find"
       title="Search KCMI"
-      description="Look up pages, programs, sermons, and locations on the public website."
+      description="Look up pages, programs, sermons, and locations on our website."
     >
       <div className="mx-auto max-w-3xl">
         <SearchForm query={query} type={type} />

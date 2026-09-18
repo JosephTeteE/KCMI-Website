@@ -30,7 +30,7 @@ export default async function ContactPage() {
     >
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="card-pad rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
-          <h2 className="font-display text-2xl font-semibold">Public contact</h2>
+          <h2 className="font-display text-2xl font-semibold">Email and phone</h2>
           <ul className="mt-5 space-y-4 text-readable">
             <li className="min-w-0">
               <p className="text-readable-sm font-semibold text-[var(--color-text-body)]">
