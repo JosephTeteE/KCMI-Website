@@ -6,7 +6,9 @@ import { FeaturedProgramSection } from "@/components/home/featured-program-secti
 import { FindFamilySection } from "@/components/home/find-family-section";
 import { HomeHero } from "@/components/home/home-hero";
 import { PrayerGivingSection } from "@/components/home/prayer-giving-section";
+import { UpcomingProgramsSection } from "@/components/home/upcoming-programs-section";
 import { WatchListenSection } from "@/components/home/watch-listen-section";
+import type { UpcomingProgramCard } from "@/lib/programs/upcoming-homepage";
 import {
   ContextualPhotoEditor,
   type ContextualPhotoSelection,
@@ -53,6 +55,8 @@ type Props = {
   featuredProgram: FeaturedProgram | null;
   photoLibrary: MediaChooserItem[];
   stagedPhoto: HomeStagedPhoto | null;
+  /** Data-driven public homepage section — not edited via website_documents. */
+  upcomingPrograms?: UpcomingProgramCard[];
 };
 
 type EditorView = "overview" | "section" | "category";
@@ -162,6 +166,7 @@ export function HomeWebsiteEditor({
   featuredProgram,
   photoLibrary,
   stagedPhoto,
+  upcomingPrograms = [],
 }: Props) {
   // A staged upload returns here from the server, so open the photo it belongs to.
   const stagedSection = stagedPhoto
@@ -271,6 +276,25 @@ export function HomeWebsiteEditor({
               </article>
             </li>
           ))}
+          <li className="min-w-0">
+            <article className="min-w-0 overflow-x-hidden rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4">
+              <div className="mb-4">
+                <HubPreviewFrame title="Upcoming Programs" live>
+                  <UpcomingProgramsSection
+                    programs={upcomingPrograms}
+                    allowEmptyNote
+                  />
+                </HubPreviewFrame>
+              </div>
+              <h3 className="text-lg font-semibold text-[var(--color-text-body)]">
+                Upcoming Programs
+              </h3>
+              <p className="hub-help mt-1 text-[var(--color-text-muted)]">
+                Filled automatically from published Programs with upcoming
+                dates. Edit Programs in Programs & Announcements — not here.
+              </p>
+            </article>
+          </li>
         </ul>
       </div>
     );

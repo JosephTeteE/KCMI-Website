@@ -14,6 +14,7 @@ import {
   loadHubPhotoLibrary,
 } from "@/lib/hub/photo-library";
 import { formatProgramScheduleLabel } from "@/lib/programs/schedule";
+import { fetchUpcomingProgramsForHomepage } from "@/lib/programs/upcoming-homepage";
 
 export const maxDuration = 60;
 
@@ -100,11 +101,13 @@ export default async function HubHomeContentPage({
       ),
     ) ?? null;
 
-  const [heroImage, welcomeImage, photoLibrary, stagedAsset] = await Promise.all([
+  const [heroImage, welcomeImage, photoLibrary, stagedAsset, upcomingPrograms] =
+    await Promise.all([
     mediaRef(supabase, home.heroMediaId, FALLBACK_HERO_IMAGE),
     mediaRef(supabase, home.welcomeMediaId, FALLBACK_WELCOME_IMAGE),
     loadHubPhotoLibrary(),
     loadHubPhotoAsset(flash.stagedMediaId),
+    fetchUpcomingProgramsForHomepage(3).catch(() => []),
   ]);
 
   const stagedField =
@@ -133,6 +136,7 @@ export default async function HubHomeContentPage({
         featuredProgram={featuredProgram}
         photoLibrary={photoLibrary}
         stagedPhoto={stagedPhoto}
+        upcomingPrograms={upcomingPrograms}
       />
     </div>
   );

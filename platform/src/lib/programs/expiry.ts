@@ -55,7 +55,8 @@ export function programHasUpcomingOrCurrentSession(
 }
 
 /**
- * Whether a published program should appear on upcoming/public listing surfaces.
+ * Whether a published program should appear on upcoming/public listing surfaces
+ * that allow unscheduled poster-only programs (e.g. search/featured fallbacks).
  * - No sessions → keep (intentional unscheduled / poster-only).
  * - Has sessions → only while at least one is upcoming or in progress.
  */
@@ -68,6 +69,54 @@ export function isProgramVisibleOnUpcomingSurfaces(
 ): boolean {
   if (!sessions.length) return true;
   return programHasUpcomingOrCurrentSession(sessions, options);
+}
+
+/**
+ * Homepage "Upcoming Programs" eligibility:
+ * requires at least one session that is still upcoming/in progress.
+ * Unscheduled flyer programs are NOT listed here indefinitely.
+ */
+export function isScheduledUpcomingForHomepage(
+  sessions: ProgramExpirySession[],
+  options?: {
+    timeZone?: string;
+    now?: Date;
+  },
+): boolean {
+  return programHasUpcomingOrCurrentSession(sessions, options);
+}
+
+/** Earliest effective start among sessions that have not yet ended. */
+export function nextUpcomingSessionStartIso(
+  sessions: ProgramExpirySession[],
+  options?: {
+    timeZone?: string;
+    now?: Date;
+  },
+): string | null {
+  if (!sessions.length) return null;
+  const timeZone = options?.timeZone ?? DEFAULT_PROGRAM_TIMEZONE;
+  const nowMs = (options?.now ?? new Date()).getTime();
+  let best: string | null = null;
+  let bestMs = Number.POSITIVE_INFINITY;
+
+  for (const session of sessions) {
+    const endIso = sessionEffectiveEndIso(session, timeZone);
+    if (!endIso) continue;
+    const endMs = new Date(endIso).getTime();
+    if (endMs < nowMs) continue;
+
+    const startHm =
+      (session.startTime ?? "").trim().slice(0, 5) || "00:00";
+    const startIso = zonedDateTimeToIso(session.sessionDate, startHm, timeZone);
+    if (!startIso) continue;
+    const startMs = new Date(startIso).getTime();
+    if (startMs < bestMs) {
+      bestMs = startMs;
+      best = startIso;
+    }
+  }
+  return best;
 }
 
 export function mapScheduleSessionsForExpiry(

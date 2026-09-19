@@ -5,6 +5,7 @@ import { FindFamilySection } from "@/components/home/find-family-section";
 import { HomeHero } from "@/components/home/home-hero";
 import { PrayerGivingSection } from "@/components/home/prayer-giving-section";
 import { ProgramSpotlightTakeover } from "@/components/home/program-spotlight-takeover";
+import { UpcomingProgramsSection } from "@/components/home/upcoming-programs-section";
 import { WatchListenSection } from "@/components/home/watch-listen-section";
 import {
   getChurchIdentity,
@@ -19,6 +20,8 @@ import {
   getServiceTimes,
   getSocialLinks,
 } from "@/content";
+import { fetchUpcomingProgramsForHomepage } from "@/lib/programs/upcoming-homepage";
+import { shouldUseSeedContent } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -58,6 +61,9 @@ export default async function HomePage() {
   const branches = await getBranches();
   const livestream = await getLivestreamPublic();
   const offerings = await getServiceOfferings();
+  const upcomingPrograms = shouldUseSeedContent()
+    ? []
+    : await fetchUpcomingProgramsForHomepage(3);
 
   return (
     <main id="main-content">
@@ -88,6 +94,7 @@ export default async function HomePage() {
         heading={home.locationsHeading}
         subheading={home.locationsSupporting}
       />
+      <UpcomingProgramsSection programs={upcomingPrograms} />
       <PrayerGivingSection prayer={home.prayer} giving={home.giving} />
     </main>
   );

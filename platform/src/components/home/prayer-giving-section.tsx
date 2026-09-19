@@ -10,7 +10,7 @@ export function PrayerGivingSection({ prayer, giving }: Props) {
   return (
     <section
       aria-labelledby="prayer-giving-heading"
-      className="section-space-lg"
+      className="section-space"
     >
       <h2 id="prayer-giving-heading" className="sr-only">
         Prayer and giving

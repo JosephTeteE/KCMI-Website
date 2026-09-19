@@ -33,6 +33,9 @@ function hubNavItems(profile: StaffProfile) {
   if (canViewGivingAdmin(profile.permissions)) {
     items.push({ href: "/admin/giving", label: "Giving" });
   }
+  if (profile.permissions.includes("users.manage")) {
+    items.push({ href: "/admin/users", label: "Staff & Access" });
+  }
   return items;
 }
 

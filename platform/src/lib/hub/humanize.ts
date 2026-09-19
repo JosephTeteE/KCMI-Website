@@ -37,6 +37,8 @@ const PERMISSION_HELP: Partial<Record<Permission, string>> = {
     "Your account cannot assign Pastoral Care requests. Ask a Pastoral Admin.",
   "welfare.assign":
     "Your account cannot assign Welfare requests. Ask a Pastoral Admin.",
+  "users.manage":
+    "Your account cannot manage Hub staff. Ask a Super Admin for help.",
 };
 
 export function humanPermissionDenied(permission: Permission): string {

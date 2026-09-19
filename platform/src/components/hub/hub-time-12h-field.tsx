@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import {
   TIME_12H_HOURS,
   TIME_12H_MINUTES,
@@ -36,10 +36,12 @@ export function HubTime12hField({
   const [parts, setParts] = useState<Time12hParts>(() =>
     splitTime24To12(value || null),
   );
+  const [syncedValue, setSyncedValue] = useState(value);
 
-  useEffect(() => {
+  if (value !== syncedValue) {
+    setSyncedValue(value);
     setParts(splitTime24To12(value || null));
-  }, [value]);
+  }
 
   function commit(next: Time12hParts) {
     setParts(next);
@@ -48,7 +50,6 @@ export function HubTime12hField({
       onChange(joined);
       return;
     }
-    // Incomplete or fully blank → store blank (do not invent a time).
     if (!next.hour && !next.minute && !next.meridiem) {
       onChange("");
     }

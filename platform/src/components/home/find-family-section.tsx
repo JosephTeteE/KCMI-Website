@@ -44,7 +44,7 @@ export function FindFamilySection({
     <section
       id="locations"
       aria-labelledby="find-family-heading"
-      className="section-space-lg"
+      className="section-space"
     >
       <div className="site-container-editorial">
         <div className="find-family-panel motion-fade-up overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-tint)] px-6 py-10 sm:px-10 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-end lg:gap-10 lg:px-14 lg:py-14">
