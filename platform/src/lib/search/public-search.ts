@@ -12,6 +12,8 @@ import type {
   PublicSearchResultType,
   PublicSearchTypeFilter,
 } from "@/lib/search/types";
+import { isProgramVisibleOnUpcomingSurfaces } from "@/lib/programs/expiry";
+import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
 import { createClient } from "@/lib/supabase/server";
 
 export type SearchPublicInput = {
@@ -144,7 +146,66 @@ async function searchViaRpc(
     });
     if (sanitized) out.push(sanitized);
   }
-  return out;
+  return excludeExpiredProgramSearchHits(out);
+}
+
+/**
+ * Read-time filter: expired scheduled programs must not appear as upcoming
+ * search hits. Unscheduled (no sessions) programs remain searchable.
+ */
+async function excludeExpiredProgramSearchHits(
+  results: PublicSearchResult[],
+): Promise<PublicSearchResult[]> {
+  const programHits = results.filter((row) => row.type === "program");
+  if (programHits.length === 0) return results;
+
+  const slugs = programHits
+    .map((row) => row.url.replace(/^\/programs\//, "").split("?")[0]!)
+    .filter(Boolean);
+  if (slugs.length === 0) return results;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("programs")
+    .select(
+      `
+      slug,
+      timezone,
+      program_sessions (
+        session_date,
+        start_time,
+        end_time
+      )
+    `,
+    )
+    .in("slug", slugs)
+    .eq("status", "published");
+
+  if (error) {
+    throw new Error(`Public search program expiry check failed: ${error.message}`);
+  }
+
+  const keep = new Set<string>();
+  for (const row of data ?? []) {
+    const sessions = (row.program_sessions ?? []).map((s) => ({
+      sessionDate: s.session_date,
+      startTime: s.start_time,
+      endTime: s.end_time,
+    }));
+    if (
+      isProgramVisibleOnUpcomingSurfaces(sessions, {
+        timeZone: row.timezone?.trim() || DEFAULT_PROGRAM_TIMEZONE,
+      })
+    ) {
+      keep.add(row.slug);
+    }
+  }
+
+  return results.filter((row) => {
+    if (row.type !== "program") return true;
+    const slug = row.url.replace(/^\/programs\//, "").split("?")[0]!;
+    return keep.has(slug);
+  });
 }
 
 /**

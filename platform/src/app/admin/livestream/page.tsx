@@ -17,7 +17,7 @@ export default async function AdminLivestreamPage({
   const [{ data: settings }, { data: globalRow }] = await Promise.all([
     supabase
       .from("livestream_settings")
-      .select("facebook_url, is_live")
+      .select("facebook_url, is_live, auto_end_at")
       .eq("singleton_key", "default")
       .maybeSingle(),
     supabase
@@ -38,6 +38,7 @@ export default async function AdminLivestreamPage({
       <LivestreamEditor
         currentUrl={settings?.facebook_url ?? null}
         isLive={settings?.is_live ?? false}
+        autoEndAt={settings?.auto_end_at ?? null}
         heading={global.livestreamHeading}
         liveMessage={global.livestreamLiveMessage}
         notLiveMessage={global.livestreamNotLiveMessage}

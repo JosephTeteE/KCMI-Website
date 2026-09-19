@@ -207,10 +207,14 @@ export function legacyIntervalFromSessions(
 
   const first = sessions[0]!;
   const last = sessions[sessions.length - 1]!;
-  const startsAt = zonedDateTimeToIso(first.session_date, first.start_time, timeZone);
+  const startsAt = zonedDateTimeToIso(
+    first.session_date,
+    first.start_time ?? "00:00",
+    timeZone,
+  );
   const endsAt = zonedDateTimeToIso(
     last.session_date,
-    last.end_time ?? last.start_time,
+    last.end_time ?? last.start_time ?? "23:59",
     timeZone,
   );
 

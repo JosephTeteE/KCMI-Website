@@ -136,15 +136,8 @@ export function parseProgramFields(
   let ends_at = parseOptionalIso(formData.get("ends_at"));
 
   // Empty sessions_json ("[]") is a valid "no schedule" choice — do not invent dates.
+  // Date-only sessions are allowed (start/end times may stay blank).
   if (hasSessionPayload && sessionsParsed.sessions.length > 0) {
-    for (const session of sessionsParsed.sessions) {
-      if (!session.start_time) {
-        return {
-          ok: false,
-          error: "Every session needs a start time.",
-        };
-      }
-    }
     const legacy = legacyIntervalFromSessions(sessionsParsed.sessions, timezone);
     starts_at = legacy.startsAt;
     ends_at = legacy.endsAt;

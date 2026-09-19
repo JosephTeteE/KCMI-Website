@@ -76,8 +76,26 @@ export default async function EditProgramPage({
   const locationKind = parseProgramLocationKind(program.location_kind);
   const actionKind = parseProgramActionKind(program.action_kind);
 
-  const firstDay = schedule.days[0];
-  const firstSlot = firstDay?.sessions[0];
+  const flatSessions =
+    schedule.scheduleMode === "one_day"
+      ? schedule.oneDay.sessionDate
+        ? [
+            {
+              key: "legacy-0",
+              sessionDate: schedule.oneDay.sessionDate,
+              startTime: schedule.oneDay.startTime,
+              endTime: schedule.oneDay.endTime,
+            },
+          ]
+        : []
+      : schedule.days.flatMap((day, dayIndex) =>
+          day.sessions.map((slot, slotIndex) => ({
+            key: `d${dayIndex}-s${slotIndex}`,
+            sessionDate: day.sessionDate,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+          })),
+        );
 
   const initial: ProgramFormInitial = {
     id: program.id,
@@ -92,18 +110,7 @@ export default async function EditProgramPage({
     locationLabel: program.location_label ?? "",
     actionKind,
     ctaUrl: program.cta_url ?? "",
-    sessionDate:
-      schedule.scheduleMode === "one_day"
-        ? schedule.oneDay.sessionDate
-        : (firstDay?.sessionDate ?? ""),
-    sessionStart:
-      schedule.scheduleMode === "one_day"
-        ? schedule.oneDay.startTime
-        : (firstSlot?.startTime ?? ""),
-    sessionEnd:
-      schedule.scheduleMode === "one_day"
-        ? schedule.oneDay.endTime
-        : (firstSlot?.endTime ?? ""),
+    sessions: flatSessions,
     timezone: program.timezone ?? DEFAULT_PROGRAM_TIMEZONE,
   };
 

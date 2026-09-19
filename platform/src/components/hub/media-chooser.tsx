@@ -15,6 +15,7 @@ type Props = {
   onSelect: (item: MediaChooserItem) => void;
   searchThreshold?: number;
   heading?: string;
+  help?: string;
 };
 
 /**
@@ -27,6 +28,7 @@ export function MediaChooser({
   onSelect,
   searchThreshold = 8,
   heading = "Choose an existing photo",
+  help = "Pick a photo already in the library. It will not go live until you preview and make it live.",
 }: Props) {
   const searchId = useId();
   const [query, setQuery] = useState("");
@@ -47,10 +49,7 @@ export function MediaChooser({
         <h3 className="text-base font-semibold text-[var(--color-text-body)]">
           {heading}
         </h3>
-        <p className="mt-1 hub-help text-[var(--color-text-muted)]">
-          Pick a photo already in the library. It will not go live until you
-          preview and make it live.
-        </p>
+        <p className="mt-1 hub-help text-[var(--color-text-muted)]">{help}</p>
       </div>
 
       {showSearch ? (

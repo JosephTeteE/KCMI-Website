@@ -51,7 +51,7 @@ describe("program optional advanced fields", () => {
     expect(parsed.fields.location_label).toBeNull();
   });
 
-  it("still requires start time when a date is provided", () => {
+  it("still allows date-only sessions without inventing a start time", () => {
     const parsed = parseProgramFields(
       form({
         title: "Conference",
@@ -60,6 +60,27 @@ describe("program optional advanced fields", () => {
             session_date: "2026-10-12",
             start_time: null,
             end_time: null,
+            label: null,
+            sort_order: 0,
+          },
+        ]),
+        action_kind: "none",
+      }),
+    );
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.fields.sessions[0]?.start_time).toBeNull();
+  });
+
+  it("rejects end time without start time", () => {
+    const parsed = parseProgramFields(
+      form({
+        title: "Conference",
+        sessions_json: JSON.stringify([
+          {
+            session_date: "2026-10-12",
+            start_time: null,
+            end_time: "18:00",
             label: null,
             sort_order: 0,
           },

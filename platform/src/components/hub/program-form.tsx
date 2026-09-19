@@ -8,10 +8,22 @@ import {
   setProgramStatus,
 } from "@/app/admin/programs/actions";
 import { MediaChooser, type MediaChooserItem } from "@/components/hub/media-chooser";
+import { HubTime12hField } from "@/components/hub/hub-time-12h-field";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
+import {
+  MARKETING_IMAGE_ACCEPT,
+  MARKETING_IMAGE_FORMAT_HELP,
+} from "@/lib/cms/media-validate";
 import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
 import type { ProgramActionKind } from "@/lib/programs/schedule";
 import type { ProgramLocationKind } from "@/lib/programs/location";
+
+export type ProgramFormSession = {
+  key: string;
+  sessionDate: string;
+  startTime: string;
+  endTime: string;
+};
 
 export type ProgramFormInitial = {
   id: string;
@@ -26,9 +38,7 @@ export type ProgramFormInitial = {
   locationLabel: string;
   actionKind: ProgramActionKind;
   ctaUrl: string;
-  sessionDate: string;
-  sessionStart: string;
-  sessionEnd: string;
+  sessions: ProgramFormSession[];
   timezone: string;
 };
 
@@ -41,6 +51,19 @@ type Props = {
   initial?: ProgramFormInitial;
   canPublish?: boolean;
 };
+
+function newSessionKey(): string {
+  return `s-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function emptySessionRow(): ProgramFormSession {
+  return {
+    key: newSessionKey(),
+    sessionDate: "",
+    startTime: "",
+    endTime: "",
+  };
+}
 
 /**
  * Single-screen Program editor: Name, Description, Poster + optional Advanced.
@@ -71,11 +94,19 @@ export function ProgramForm({
   );
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [posterAlt, setPosterAlt] = useState(initial?.coverAlt ?? "");
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(
+    Boolean(initial?.sessions?.some((s) => s.sessionDate)),
+  );
 
-  const [sessionDate, setSessionDate] = useState(initial?.sessionDate ?? "");
-  const [sessionStart, setSessionStart] = useState(initial?.sessionStart ?? "");
-  const [sessionEnd, setSessionEnd] = useState(initial?.sessionEnd ?? "");
+  const [sessions, setSessions] = useState<ProgramFormSession[]>(() => {
+    if (initial?.sessions?.length) {
+      return initial.sessions.map((row) => ({
+        ...row,
+        key: row.key || newSessionKey(),
+      }));
+    }
+    return [];
+  });
   const [locationKind, setLocationKind] = useState<ProgramLocationKind | "">(
     initial?.locationKind ?? "",
   );
@@ -96,18 +127,25 @@ export function ProgramForm({
   const [isPending, startTransition] = useTransition();
 
   function buildSessionsJson(): string {
-    if (!sessionDate.trim()) {
-      return "[]";
-    }
-    return JSON.stringify([
-      {
-        session_date: sessionDate.trim(),
-        start_time: sessionStart.trim() || null,
-        end_time: sessionEnd.trim() || null,
+    const rows = sessions
+      .filter((row) => row.sessionDate.trim())
+      .map((row, index) => ({
+        session_date: row.sessionDate.trim(),
+        start_time: row.startTime.trim() || null,
+        end_time: row.endTime.trim() || null,
         label: null,
-        sort_order: 0,
-      },
-    ]);
+        sort_order: index,
+      }));
+    return JSON.stringify(rows);
+  }
+
+  function updateSession(
+    key: string,
+    patch: Partial<Omit<ProgramFormSession, "key">>,
+  ) {
+    setSessions((prev) =>
+      prev.map((row) => (row.key === key ? { ...row, ...patch } : row)),
+    );
   }
 
   function appendCommonFields(fd: FormData) {
@@ -153,13 +191,29 @@ export function ProgramForm({
       setStepError("Please enter a program name.");
       return;
     }
+    if (posterMode === "upload" && !posterFile) {
+      setStepError("Select a poster image, or choose a different poster option.");
+      return;
+    }
     if (posterMode === "upload" && posterFile && !posterAlt.trim()) {
       setStepError("Add a short description of the photo (alt text).");
       return;
     }
-    if (sessionDate.trim() && !sessionStart.trim()) {
-      setStepError("Add a start time for the date, or clear the date.");
+    if (posterMode === "library" && !featuredMediaId) {
+      setStepError("Choose a saved photo, or pick a different poster option.");
       return;
+    }
+    for (const row of sessions) {
+      if (row.endTime.trim() && !row.startTime.trim()) {
+        setStepError(
+          "A session with an end time also needs a start time, or clear the end time.",
+        );
+        return;
+      }
+      if (!row.sessionDate.trim() && (row.startTime.trim() || row.endTime.trim())) {
+        setStepError("Add a date for each session that has a time, or clear the time.");
+        return;
+      }
     }
 
     const fd = new FormData();
@@ -174,11 +228,22 @@ export function ProgramForm({
     appendCommonFields(fd);
 
     startTransition(() => {
-      if (isEdit) {
-        void saveProgramWizardEdit(fd);
-      } else {
-        void createProgram(fd);
-      }
+      void (async () => {
+        const result = isEdit
+          ? await saveProgramWizardEdit(fd)
+          : await createProgram(fd);
+        if (
+          result &&
+          typeof result === "object" &&
+          "ok" in result &&
+          result.ok === false
+        ) {
+          setStepError(result.error);
+          // Keep name/description/advanced; clear only the failed upload so
+          // the operator can replace it, pick a library photo, or continue without.
+          setPosterFile(null);
+        }
+      })();
     });
   }
 
@@ -301,14 +366,17 @@ export function ProgramForm({
             />
           </div>
 
-          <fieldset className="space-y-3">
+          <fieldset className="space-y-3" data-testid="program-poster-fieldset">
             <legend className="text-base font-medium">Program poster</legend>
+            <p className="text-sm text-[var(--color-text-muted)]">
+              Add a flyer or image for this program. This is optional.
+            </p>
             <div className="flex flex-wrap gap-3">
               {(
                 [
-                  ["none", "No poster"],
-                  ["library", "Use saved photo"],
-                  ["upload", "Upload new photo"],
+                  ["upload", "Upload a new poster"],
+                  ["library", "Choose from saved photos"],
+                  ["none", "Continue without a poster"],
                 ] as const
               ).map(([value, label]) => (
                 <label
@@ -319,7 +387,12 @@ export function ProgramForm({
                     type="radio"
                     name="poster_mode"
                     checked={posterMode === value}
-                    onChange={() => setPosterMode(value)}
+                    onChange={() => {
+                      setPosterMode(value);
+                      setStepError(null);
+                      if (value !== "upload") setPosterFile(null);
+                      if (value !== "library") setFeaturedMediaId("");
+                    }}
                   />
                   {label}
                 </label>
@@ -329,20 +402,51 @@ export function ProgramForm({
               <MediaChooser
                 items={media}
                 selectedId={featuredMediaId || null}
+                heading="Select a saved photo"
+                help="You still need to pick one photo from the list below. Nothing is selected until you tap a photo."
                 onSelect={(item) => {
                   setFeaturedMediaId(item.id);
                   setPosterAlt(item.alt);
+                  setStepError(null);
                 }}
               />
             ) : null}
             {posterMode === "upload" ? (
               <div className="space-y-3">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(e) => setPosterFile(e.target.files?.[0] ?? null)}
-                  className="block w-full text-base"
-                />
+                <div>
+                  <label
+                    htmlFor="poster-file"
+                    className="block text-base font-medium"
+                  >
+                    Select poster image
+                  </label>
+                  <input
+                    id="poster-file"
+                    type="file"
+                    accept={MARKETING_IMAGE_ACCEPT}
+                    onChange={(e) => {
+                      setPosterFile(e.target.files?.[0] ?? null);
+                      setStepError(null);
+                    }}
+                    className="mt-2 block w-full text-base"
+                    data-testid="program-poster-file"
+                  />
+                  <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+                    {MARKETING_IMAGE_FORMAT_HELP}
+                  </p>
+                  {posterFile ? (
+                    <p
+                      className="mt-2 text-sm text-[var(--color-text-body)]"
+                      data-testid="program-poster-filename"
+                    >
+                      Selected: {posterFile.name}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+                      No file selected yet.
+                    </p>
+                  )}
+                </div>
                 <div>
                   <label
                     htmlFor="poster-alt"
@@ -375,45 +479,93 @@ export function ProgramForm({
             <div className="mt-4 space-y-4">
               <p className="text-sm text-[var(--color-text-muted)]">
                 Leave blank if you do not need a date, place, or visitor link.
-                Nothing is invented for you.
+                Nothing is invented for you. Times use Nigeria local time
+                (Africa/Lagos) unless a branch sets another KCMI zone.
               </p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div>
-                  <label htmlFor="session-date" className="block text-sm font-medium">
-                    Date
-                  </label>
-                  <input
-                    id="session-date"
-                    type="date"
-                    value={sessionDate}
-                    onChange={(e) => setSessionDate(e.target.value)}
-                    className="mt-1 block w-full min-h-11 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 text-base"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="session-start" className="block text-sm font-medium">
-                    Start time
-                  </label>
-                  <input
-                    id="session-start"
-                    type="time"
-                    value={sessionStart}
-                    onChange={(e) => setSessionStart(e.target.value)}
-                    className="mt-1 block w-full min-h-11 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 text-base"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="session-end" className="block text-sm font-medium">
-                    End time
-                  </label>
-                  <input
-                    id="session-end"
-                    type="time"
-                    value={sessionEnd}
-                    onChange={(e) => setSessionEnd(e.target.value)}
-                    className="mt-1 block w-full min-h-11 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 text-base"
-                  />
-                </div>
+
+              <div className="space-y-3" data-testid="program-schedule">
+                <h3 className="text-base font-semibold">Schedule</h3>
+                <p className="text-sm text-[var(--color-text-muted)]">
+                  Add one or more dates. Dates do not need to be consecutive.
+                </p>
+                {sessions.length === 0 ? (
+                  <p className="text-sm text-[var(--color-text-muted)]">
+                    No dates yet. This program can stay poster-only.
+                  </p>
+                ) : null}
+                <ul className="space-y-4">
+                  {sessions.map((row, index) => (
+                    <li
+                      key={row.key}
+                      className="space-y-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-page)] p-3"
+                      data-testid={`program-session-row-${index}`}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-medium">
+                          Session {index + 1}
+                        </p>
+                        <button
+                          type="button"
+                          className="text-sm font-medium text-[var(--color-destructive)] underline-offset-2 hover:underline"
+                          onClick={() =>
+                            setSessions((prev) =>
+                              prev.filter((item) => item.key !== row.key),
+                            )
+                          }
+                        >
+                          Remove session
+                        </button>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor={`session-date-${row.key}`}
+                          className="block text-sm font-medium"
+                        >
+                          Date
+                        </label>
+                        <input
+                          id={`session-date-${row.key}`}
+                          type="date"
+                          value={row.sessionDate}
+                          onChange={(e) =>
+                            updateSession(row.key, {
+                              sessionDate: e.target.value,
+                            })
+                          }
+                          className="mt-1 block w-full min-h-11 max-w-xs rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 text-base"
+                        />
+                      </div>
+                      <HubTime12hField
+                        id={`session-start-${row.key}`}
+                        label="Start time"
+                        value={row.startTime}
+                        onChange={(next) =>
+                          updateSession(row.key, { startTime: next })
+                        }
+                        optionalHint="Optional. Leave blank if you only need the date."
+                      />
+                      <HubTime12hField
+                        id={`session-end-${row.key}`}
+                        label="End time"
+                        value={row.endTime}
+                        onChange={(next) =>
+                          updateSession(row.key, { endTime: next })
+                        }
+                        optionalHint="Optional."
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-base font-semibold"
+                  onClick={() =>
+                    setSessions((prev) => [...prev, emptySessionRow()])
+                  }
+                  data-testid="program-add-session"
+                >
+                  + Add another date/time
+                </button>
               </div>
 
               <div>

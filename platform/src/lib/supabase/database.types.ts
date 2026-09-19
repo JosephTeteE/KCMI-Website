@@ -708,6 +708,7 @@ export type Database = {
       }
       livestream_settings: {
         Row: {
+          auto_end_at: string | null
           created_at: string
           facebook_url: string | null
           id: string
@@ -717,6 +718,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          auto_end_at?: string | null
           created_at?: string
           facebook_url?: string | null
           id?: string
@@ -726,6 +728,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          auto_end_at?: string | null
           created_at?: string
           facebook_url?: string | null
           id?: string

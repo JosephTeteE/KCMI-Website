@@ -12,6 +12,12 @@ import {
   formatProgramScheduleLabel,
   type ProgramSessionInput,
 } from "@/lib/programs/schedule";
+import {
+  isProgramVisibleOnUpcomingSurfaces,
+  mapScheduleSessionsForExpiry,
+} from "@/lib/programs/expiry";
+import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
+import { effectiveLivestreamIsLive } from "@/lib/livestream/effective-live";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -137,6 +143,7 @@ export async function fetchFeaturedProgram(
         short_description,
         starts_at,
         ends_at,
+        timezone,
         cta_label,
         cta_url,
         placement,
@@ -159,10 +166,13 @@ export async function fetchFeaturedProgram(
       .maybeSingle();
 
     if (preferredError) fail("fetchFeaturedProgram.preferred", preferredError);
-    if (preferred) return mapProgramRow(preferred as ProgramRow);
+    if (preferred) {
+      const mapped = mapProgramRow(preferred as ProgramRow);
+      if (mapped) return mapped;
+    }
   }
 
-  const { data: row, error } = await supabase
+  const { data: rows, error } = await supabase
     .from("programs")
     .select(
       `
@@ -171,6 +181,7 @@ export async function fetchFeaturedProgram(
       short_description,
       starts_at,
       ends_at,
+      timezone,
       cta_label,
       cta_url,
       placement,
@@ -191,12 +202,14 @@ export async function fetchFeaturedProgram(
     .eq("status", "published")
     .eq("placement", "featured")
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(8);
 
   if (error) fail("fetchFeaturedProgram", error);
-  if (!row) return null;
-  return mapProgramRow(row as ProgramRow);
+  for (const row of rows ?? []) {
+    const mapped = mapProgramRow(row as ProgramRow);
+    if (mapped) return mapped;
+  }
+  return null;
 }
 
 type ProgramSessionRow = {
@@ -213,6 +226,7 @@ type ProgramRow = {
   short_description: string;
   starts_at: string | null;
   ends_at: string | null;
+  timezone?: string | null;
   cta_label: string | null;
   cta_url: string | null;
   placement: FeaturedProgram["placement"];
@@ -235,12 +249,23 @@ function mapSessions(rows: ProgramSessionRow[] | null | undefined): ProgramSessi
   }));
 }
 
-function mapProgramRow(row: ProgramRow): FeaturedProgram {
+/** Returns null when the published program has fully expired for upcoming surfaces. */
+function mapProgramRow(row: ProgramRow): FeaturedProgram | null {
+  const sessions = mapSessions(row.program_sessions);
+  const timeZone = row.timezone?.trim() || DEFAULT_PROGRAM_TIMEZONE;
+  if (
+    !isProgramVisibleOnUpcomingSurfaces(mapScheduleSessionsForExpiry(sessions), {
+      timeZone,
+    })
+  ) {
+    return null;
+  }
+
   const media = Array.isArray(row.featured_media)
     ? row.featured_media[0]
     : row.featured_media;
 
-  const datesLabel = formatProgramScheduleLabel(mapSessions(row.program_sessions), {
+  const datesLabel = formatProgramScheduleLabel(sessions, {
     startsAt: row.starts_at,
     endsAt: row.ends_at,
   });
@@ -309,7 +334,7 @@ export async function fetchLivestreamPublic(): Promise<LivestreamPublic> {
   const supabase = await createClient();
   const { data: row, error } = await supabase
     .from("livestream_settings")
-    .select("facebook_url, is_live")
+    .select("facebook_url, is_live, auto_end_at")
     .eq("singleton_key", "default")
     .maybeSingle();
 
@@ -318,7 +343,10 @@ export async function fetchLivestreamPublic(): Promise<LivestreamPublic> {
   return {
     facebookPageUrl:
       row?.facebook_url ?? livestreamCopy.facebookPageUrl,
-    isLive: row?.is_live ?? false,
+    isLive: effectiveLivestreamIsLive({
+      isLive: row?.is_live ?? false,
+      autoEndAt: row?.auto_end_at ?? null,
+    }),
     heading: livestreamCopy.heading,
     notLiveMessage: livestreamCopy.notLiveMessage,
     liveMessage: livestreamCopy.liveMessage,

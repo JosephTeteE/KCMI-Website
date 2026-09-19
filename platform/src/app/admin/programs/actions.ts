@@ -284,7 +284,9 @@ export async function createProgram(formData: FormData) {
 
   const poster = await ingestPosterFromForm(formData, actorId);
   if (!poster.ok) {
-    redirectWithError(NEW_PROGRAM_PATH, poster.error);
+    // Return (do not redirect) so the client form can keep entered fields
+    // and offer replace / library / no-poster options.
+    return { ok: false as const, error: poster.error };
   }
 
   const featuredMediaId = poster.mediaId ?? parsed.fields.featured_media_id;
@@ -544,7 +546,7 @@ export async function saveProgramWizardEdit(formData: FormData) {
 
   const poster = await ingestPosterFromForm(formData, actorId);
   if (!poster.ok) {
-    redirectWithError(`/admin/programs/${id}`, poster.error);
+    return { ok: false as const, error: poster.error };
   }
 
   const featuredMediaId = poster.mediaId

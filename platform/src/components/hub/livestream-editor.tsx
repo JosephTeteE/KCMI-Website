@@ -5,6 +5,7 @@ import { FacebookVideoEmbed } from "@/components/content/facebook-embed";
 import { HubHelpDetails } from "@/components/hub/hub-help-details";
 import { HubPreviewFrame } from "@/components/hub/hub-preview-frame";
 import { HubSubmitButton, HubTextAreaField } from "@/components/hub/hub-form-fields";
+import { HubTime12hField } from "@/components/hub/hub-time-12h-field";
 import {
   FACEBOOK_EMBED_EXAMPLE,
   parseFacebookLivestreamInput,
@@ -16,18 +17,70 @@ import {
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
 import { HUB_TOUR_LIVESTREAM_BEGIN_EVENT } from "@/lib/hub/tour";
 import { updateLivestreamSettings } from "@/app/admin/livestream/actions";
+import { utcIsoToLocalParts } from "@/lib/events/datetime";
+import {
+  LIVESTREAM_AUTO_END_TIMEZONE,
+  effectiveLivestreamIsLive,
+} from "@/lib/livestream/effective-live";
 
 type Props = {
   currentUrl: string | null;
   isLive: boolean;
+  autoEndAt: string | null;
   heading: string;
   liveMessage: string;
   notLiveMessage: string;
 };
 
+function AutoEndFields({
+  date,
+  time,
+  onDate,
+  onTime,
+}: {
+  date: string;
+  time: string;
+  onDate: (v: string) => void;
+  onTime: (v: string) => void;
+}) {
+  return (
+    <div
+      className="space-y-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4"
+      data-testid="livestream-auto-end"
+    >
+      <p className="text-base font-medium">Automatically show offline at</p>
+      <p className="text-sm text-[var(--color-text-muted)]">
+        Optional. Uses Nigeria local time (Africa/Lagos). Leave blank if you
+        will turn the livestream off yourself.
+      </p>
+      <div>
+        <label htmlFor="auto_end_date" className="block text-sm font-medium">
+          Date
+        </label>
+        <input
+          id="auto_end_date"
+          name="auto_end_date"
+          type="date"
+          value={date}
+          onChange={(e) => onDate(e.target.value)}
+          className="mt-1 block w-full min-h-11 max-w-xs rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-page)] px-3 text-base"
+        />
+      </div>
+      <HubTime12hField
+        id="auto_end_time_ui"
+        label="Time"
+        value={time}
+        onChange={onTime}
+      />
+      <input type="hidden" name="auto_end_time" value={time} />
+    </div>
+  );
+}
+
 export function LivestreamEditor({
   currentUrl,
   isLive,
+  autoEndAt,
   heading,
   liveMessage,
   notLiveMessage,
@@ -39,8 +92,19 @@ export function LivestreamEditor({
   const [checkedUrl, setCheckedUrl] = useState<string | null>(null);
   const [checkError, setCheckError] = useState<string | null>(null);
 
+  const initialLocal = autoEndAt
+    ? utcIsoToLocalParts(autoEndAt, LIVESTREAM_AUTO_END_TIMEZONE)
+    : { date: "", time: "" };
+  const [autoEndDate, setAutoEndDate] = useState(initialLocal.date);
+  const [autoEndTime, setAutoEndTime] = useState(initialLocal.time);
+
+  const publicStillLive = effectiveLivestreamIsLive({
+    isLive,
+    autoEndAt,
+  });
   const editingVideo = flow === "start" || flow === "change";
-  const showingLivePreview = isLive || flow === "start" || flow === "change";
+  const showingLivePreview =
+    publicStillLive || flow === "start" || flow === "change";
 
   function begin(next: LivestreamFlow) {
     setFlow(next);
@@ -104,7 +168,10 @@ export function LivestreamEditor({
           </p>
           {showingLivePreview && previewUrl ? (
             <div className="mt-4">
-              <FacebookVideoEmbed url={previewUrl} title="Facebook livestream preview" />
+              <FacebookVideoEmbed
+                url={previewUrl}
+                title="Facebook livestream preview"
+              />
             </div>
           ) : (
             <p className="mt-4 text-sm text-[var(--color-text-muted)]">
@@ -124,11 +191,26 @@ export function LivestreamEditor({
             Currently on the website
           </h2>
           <p className="mt-2 text-sm font-medium">
-            {isLive ? "A live video is on" : "We are not live right now"}
+            {publicStillLive
+              ? "A live video is on"
+              : isLive
+                ? "Marked live in Hub, but the automatic end time has passed — visitors see offline"
+                : "We are not live right now"}
           </p>
-          {isLive && currentUrl ? (
+          {autoEndAt && isLive ? (
+            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+              Automatic offline set for{" "}
+              {utcIsoToLocalParts(autoEndAt, LIVESTREAM_AUTO_END_TIMEZONE).date}{" "}
+              {utcIsoToLocalParts(autoEndAt, LIVESTREAM_AUTO_END_TIMEZONE).time}{" "}
+              (Nigeria time).
+            </p>
+          ) : null}
+          {publicStillLive && currentUrl ? (
             <div className="mt-4">
-              <FacebookVideoEmbed url={currentUrl} title="Current Facebook livestream" />
+              <FacebookVideoEmbed
+                url={currentUrl}
+                title="Current Facebook livestream"
+              />
             </div>
           ) : currentUrl ? (
             <p className="mt-2 break-all text-sm text-[var(--color-text-muted)]">
@@ -153,20 +235,44 @@ export function LivestreamEditor({
         ) : null}
 
         {isLive && flow === "idle" ? (
-          <div className="flex flex-wrap gap-3" data-tour="livestream-start">
-            <button
-              type="button"
-              onClick={() => begin("change")}
-              className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold"
-            >
-              {HUB_ACTION_LABELS.changeLiveVideo}
-            </button>
-            <form action={updateLivestreamSettings}>
-              <input type="hidden" name="existing_facebook_url" value={currentUrl ?? ""} />
-              <input type="hidden" name="is_live" value="false" />
+          <div className="space-y-4" data-tour="livestream-start">
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => begin("change")}
+                className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-5 text-sm font-semibold"
+              >
+                {HUB_ACTION_LABELS.changeLiveVideo}
+              </button>
+              <form action={updateLivestreamSettings}>
+                <input
+                  type="hidden"
+                  name="existing_facebook_url"
+                  value={currentUrl ?? ""}
+                />
+                <input type="hidden" name="is_live" value="false" />
+                <input type="hidden" name="facebook_input" value="" />
+                <HubSubmitButton variant="danger">
+                  {HUB_ACTION_LABELS.turnOffLivestream}
+                </HubSubmitButton>
+              </form>
+            </div>
+            <form action={updateLivestreamSettings} className="space-y-3">
+              <input
+                type="hidden"
+                name="existing_facebook_url"
+                value={currentUrl ?? ""}
+              />
+              <input type="hidden" name="is_live" value="true" />
               <input type="hidden" name="facebook_input" value="" />
-              <HubSubmitButton variant="danger">
-                {HUB_ACTION_LABELS.turnOffLivestream}
+              <AutoEndFields
+                date={autoEndDate}
+                time={autoEndTime}
+                onDate={setAutoEndDate}
+                onTime={setAutoEndTime}
+              />
+              <HubSubmitButton variant="secondary">
+                Save automatic offline time
               </HubSubmitButton>
             </form>
           </div>
@@ -178,7 +284,11 @@ export function LivestreamEditor({
             className="space-y-6"
             data-tour="livestream-start"
           >
-            <input type="hidden" name="existing_facebook_url" value={currentUrl ?? ""} />
+            <input
+              type="hidden"
+              name="existing_facebook_url"
+              value={currentUrl ?? ""}
+            />
             <input type="hidden" name="is_live" value="true" />
             <input
               type="hidden"
@@ -186,10 +296,7 @@ export function LivestreamEditor({
               value={embedInput.trim() || linkInput.trim()}
             />
 
-            <div
-              className="space-y-4"
-              data-hub-role="proposed"
-            >
+            <div className="space-y-4" data-hub-role="proposed">
               <div data-tour="livestream-embed">
                 <HubTextAreaField
                   id="facebook_embed"
@@ -221,7 +328,8 @@ export function LivestreamEditor({
                 className="text-sm font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
                 onClick={() => setShowLink((value) => !value)}
               >
-                Don&apos;t have embed code? Paste the Facebook video link instead.
+                Don&apos;t have embed code? Paste the Facebook video link
+                instead.
               </button>
               {showLink ? (
                 <HubTextAreaField
@@ -245,7 +353,10 @@ export function LivestreamEditor({
                 {HUB_ACTION_LABELS.checkAndPreview}
               </button>
               {checkError ? (
-                <p role="alert" className="text-sm text-[var(--color-destructive)]">
+                <p
+                  role="alert"
+                  className="text-sm text-[var(--color-destructive)]"
+                >
                   {checkError}
                 </p>
               ) : null}
@@ -256,13 +367,23 @@ export function LivestreamEditor({
               ) : null}
             </div>
 
+            <AutoEndFields
+              date={autoEndDate}
+              time={autoEndTime}
+              onDate={setAutoEndDate}
+              onTime={setAutoEndTime}
+            />
+
             <p className="text-sm text-[var(--color-text-muted)]">
               {flow === "change"
                 ? "The public livestream does not change until you update the live video."
                 : "Visitors will see the Facebook video on the Livestream page after you start it."}
             </p>
 
-            <div className="flex flex-wrap gap-3" data-tour="livestream-make-live">
+            <div
+              className="flex flex-wrap gap-3"
+              data-tour="livestream-make-live"
+            >
               {confirmLabel ? (
                 <HubSubmitButton variant="secondary">{confirmLabel}</HubSubmitButton>
               ) : null}
@@ -279,7 +400,11 @@ export function LivestreamEditor({
 
         {isLive && flow === "change" ? (
           <form action={updateLivestreamSettings}>
-            <input type="hidden" name="existing_facebook_url" value={currentUrl ?? ""} />
+            <input
+              type="hidden"
+              name="existing_facebook_url"
+              value={currentUrl ?? ""}
+            />
             <input type="hidden" name="is_live" value="false" />
             <input type="hidden" name="facebook_input" value="" />
             <HubSubmitButton variant="danger">

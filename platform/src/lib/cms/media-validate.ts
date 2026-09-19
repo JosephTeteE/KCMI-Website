@@ -9,6 +9,14 @@ export const ALLOWED_MARKETING_IMAGE_MIMES = [
 export type AllowedMarketingImageMime =
   (typeof ALLOWED_MARKETING_IMAGE_MIMES)[number];
 
+/** File-input accept list — MIME types the server pipeline actually supports. */
+export const MARKETING_IMAGE_ACCEPT =
+  "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp";
+
+/** Concise admin-facing format guidance (no HEIC or other unverified types). */
+export const MARKETING_IMAGE_FORMAT_HELP =
+  "Accepted formats: JPEG (.jpg / .jpeg), PNG, or WebP. Maximum 15MB.";
+
 export type MediaValidateResult =
   | { ok: true; contentType: AllowedMarketingImageMime }
   | { ok: false; error: string };

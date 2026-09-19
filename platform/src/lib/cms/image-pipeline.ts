@@ -7,6 +7,7 @@ import {
   type CropAspectId,
   type FocalPoint,
 } from "@/lib/cms/image-crop";
+import { detectImageMimeFromMagicBytes } from "@/lib/cms/media-validate";
 
 type SharpInstance = ReturnType<typeof sharp>;
 
@@ -21,6 +22,9 @@ export const MAX_STORED_IMAGE_BYTES = 5 * 1024 * 1024;
 
 /** Guard against decompression bombs before decode. */
 const MAX_INPUT_PIXELS = 40_000_000;
+
+export const IMAGE_PROCESS_FAILED_MESSAGE =
+  "We couldn't process that image. Try another image or continue without a poster.";
 
 export type NormalizedMarketingImage = {
   buffer: Buffer;
@@ -45,11 +49,62 @@ export type NormalizeImageInput = {
   focalY?: unknown;
 };
 
+type SafeImagePipelineLog = {
+  operation: string;
+  detectedMime: string | null;
+  byteSize: number;
+  widthPx?: number;
+  heightPx?: number;
+  errorName?: string;
+  errorCode?: string;
+  errorMessage: string;
+};
+
+/** Sanitize Sharp/libvips errors for server logs — never log bytes or PII. */
+export function sanitizeImagePipelineError(err: unknown): {
+  errorName?: string;
+  errorCode?: string;
+  errorMessage: string;
+} {
+  if (err && typeof err === "object") {
+    const record = err as {
+      name?: unknown;
+      code?: unknown;
+      message?: unknown;
+    };
+    return {
+      errorName:
+        typeof record.name === "string"
+          ? record.name.slice(0, 80)
+          : undefined,
+      errorCode:
+        record.code != null ? String(record.code).slice(0, 40) : undefined,
+      errorMessage:
+        typeof record.message === "string"
+          ? record.message.replace(/\s+/g, " ").slice(0, 300)
+          : "unknown",
+    };
+  }
+  return { errorMessage: "unknown" };
+}
+
+function logImagePipelineFailure(entry: SafeImagePipelineLog): void {
+  console.info(
+    JSON.stringify({
+      level: "warn",
+      scope: "image-pipeline",
+      ...entry,
+    }),
+  );
+}
+
 export async function normalizeMarketingImage(
   input: NormalizeImageInput,
 ): Promise<NormalizeImageResult> {
   const cropAspect = parseCropAspect(input.cropAspect);
   const focal = parseFocalPoint(input.focalX, input.focalY);
+  const detectedMime = detectImageMimeFromMagicBytes(input.bytes);
+  const byteSize = input.bytes.byteLength;
 
   let oriented: SharpInstance;
   try {
@@ -57,7 +112,13 @@ export async function normalizeMarketingImage(
       failOn: "error",
       limitInputPixels: MAX_INPUT_PIXELS,
     }).rotate();
-  } catch {
+  } catch (err) {
+    logImagePipelineFailure({
+      operation: "sharp.open",
+      detectedMime,
+      byteSize,
+      ...sanitizeImagePipelineError(err),
+    });
     return {
       ok: false,
       error: "The file could not be read as a JPEG, PNG, or WebP image.",
@@ -76,7 +137,13 @@ export async function normalizeMarketingImage(
     }
     sourceWidth = meta.width;
     sourceHeight = meta.height;
-  } catch {
+  } catch (err) {
+    logImagePipelineFailure({
+      operation: "sharp.metadata",
+      detectedMime,
+      byteSize,
+      ...sanitizeImagePipelineError(err),
+    });
     return {
       ok: false,
       error: "The file could not be decoded as a real image.",
@@ -90,7 +157,12 @@ export async function normalizeMarketingImage(
     pipeline = pipeline.extract(rect);
   }
 
-  const encoded = await encodeWebp(pipeline);
+  const encoded = await encodeWebp(pipeline, {
+    detectedMime,
+    byteSize,
+    sourceWidth,
+    sourceHeight,
+  });
   if (!encoded.ok) return encoded;
 
   return {
@@ -111,6 +183,12 @@ export async function normalizeMarketingImage(
 
 async function encodeWebp(
   pipeline: SharpInstance,
+  context: {
+    detectedMime: string | null;
+    byteSize: number;
+    sourceWidth: number;
+    sourceHeight: number;
+  },
 ): Promise<
   | { ok: true; buffer: Buffer; width: number; height: number }
   | { ok: false; error: string }
@@ -139,10 +217,18 @@ async function encodeWebp(
         };
       }
     }
-  } catch {
+  } catch (err) {
+    logImagePipelineFailure({
+      operation: "encodeWebp",
+      detectedMime: context.detectedMime,
+      byteSize: context.byteSize,
+      widthPx: context.sourceWidth,
+      heightPx: context.sourceHeight,
+      ...sanitizeImagePipelineError(err),
+    });
     return {
       ok: false,
-      error: "The image could not be converted for the website.",
+      error: IMAGE_PROCESS_FAILED_MESSAGE,
     };
   }
 
