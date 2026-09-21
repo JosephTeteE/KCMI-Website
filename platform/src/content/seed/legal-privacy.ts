@@ -32,7 +32,8 @@ export const privacyPolicy: LegalDocument = {
       heading: "2. Information the public website collects",
       paragraphs: [
         "Browsing public pages sends ordinary technical request data to the application host (for example, IP address and pages requested, as processed by the hosting provider).",
-        "This V2 website does not currently provide a public contact form, newsletter signup, camp registration form, or payment-receipt upload. The Contact page uses email and telephone links. Giving pages display published bank details; they do not collect card payments on this site.",
+        "The Contact page may collect a name, email address, optional phone number, topic, and message for general church enquiries (for example Cell Fellowship interest, service/volunteer interest, testimonies, or other office questions). Those submissions are stored in KCMI’s protected application database for Hub staff follow-up and are not published on the website or included in public site search.",
+        "Giving pages display published bank details; they do not collect card payments on this site.",
       ],
     },
     {
@@ -66,15 +67,15 @@ export const privacyPolicy: LegalDocument = {
     {
       heading: "7. What this platform does not currently do",
       paragraphs: [
-        "This platform stores published church content, Care request records submitted through the website, and staff Hub records in Supabase. It does not store camp or event payment receipts on this site, and it does not operate public registration or bot-challenge widgets on these pages.",
+        "This platform stores published church content, Care request records submitted through the website, general Contact messages for Hub follow-up, and staff Hub records in Supabase. It does not store camp or event payment receipts on this site, and it does not operate public registration or bot-challenge widgets on these pages.",
         "Event registration remains outside this website’s public forms. The camp registration site remains a distinct system.",
       ],
     },
     {
       heading: "8. Retention",
       paragraphs: [
-        "This platform does not currently run automatic deletion jobs for published website content, marketing images, Hub audit records, or Care request records. Specific retention periods are not stated in this notice.",
-        "Automated Care retention enforcement remains a planned post-launch operations item after first-party Care is enabled.",
+        "This platform does not currently run automatic deletion jobs for published website content, marketing images, Hub audit records, Care request records, or general website Contact messages. Specific statutory retention periods are not stated in this notice.",
+        "Operational expectation for general website enquiries: keep records while follow-up is reasonably needed (commonly up to about 24 months after a request is closed), then review for deletion under church data-handling practice. Automated Care retention enforcement remains a planned post-launch operations item after first-party Care is enabled.",
       ],
     },
     {

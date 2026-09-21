@@ -11,7 +11,7 @@ export const STAFF_ASSIGNABLE_ROLE_PRESETS = [
     checkboxLabel: "Website & Media",
     title: "HQ Content Admin",
     description:
-      "Website pages, Programs, Events, Sermons, Photos, Branches and Livestream.",
+      "Website pages, Programs, Events, Sermons, Photos, Branches, Livestream, and website Messages & Requests.",
   },
   {
     role: "care_operator" as const satisfies HubRole,

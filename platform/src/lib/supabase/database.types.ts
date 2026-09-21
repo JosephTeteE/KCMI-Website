@@ -706,6 +706,89 @@ export type Database = {
           },
         ]
       }
+      website_requests: {
+        Row: {
+          assigned_to: string | null
+          closed_at: string | null
+          created_at: string
+          email: string
+          email_notified_at: string | null
+          email_notification_status: Database["public"]["Enums"]["website_request_email_status"]
+          full_name: string
+          id: string
+          message: string
+          phone: string | null
+          reference_code: string
+          source: string
+          status: Database["public"]["Enums"]["website_request_status"]
+          topic: Database["public"]["Enums"]["website_request_topic"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          closed_at?: string | null
+          created_at?: string
+          email: string
+          email_notified_at?: string | null
+          email_notification_status?: Database["public"]["Enums"]["website_request_email_status"]
+          full_name: string
+          id?: string
+          message: string
+          phone?: string | null
+          reference_code?: string
+          source?: string
+          status?: Database["public"]["Enums"]["website_request_status"]
+          topic: Database["public"]["Enums"]["website_request_topic"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          closed_at?: string | null
+          created_at?: string
+          email?: string
+          email_notified_at?: string | null
+          email_notification_status?: Database["public"]["Enums"]["website_request_email_status"]
+          full_name?: string
+          id?: string
+          message?: string
+          phone?: string | null
+          reference_code?: string
+          source?: string
+          status?: Database["public"]["Enums"]["website_request_status"]
+          topic?: Database["public"]["Enums"]["website_request_topic"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_requests_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      website_request_rate_limits: {
+        Row: {
+          attempt_count: number
+          requester_key: string
+          updated_at: string
+          window_started_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          requester_key: string
+          updated_at?: string
+          window_started_at: string
+        }
+        Update: {
+          attempt_count?: number
+          requester_key?: string
+          updated_at?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       livestream_settings: {
         Row: {
           auto_end_at: string | null
@@ -1382,6 +1465,26 @@ export type Database = {
         }
         Returns: Json
       }
+      website_request_rate_limit_consume: {
+        Args: {
+          p_requester_key: string
+          p_limit?: number
+          p_window_seconds?: number
+        }
+        Returns: Json
+      }
+      website_request_generate_reference_code: {
+        Args: never
+        Returns: string
+      }
+      website_request_assignable_staff: {
+        Args: never
+        Returns: {
+          display_name: string | null
+          email: string | null
+          id: string
+        }[]
+      }
       care_read_permission_for: {
         Args: { p_service: Database["public"]["Enums"]["care_service_type"] }
         Returns: string
@@ -1429,6 +1532,14 @@ export type Database = {
       care_contact_method: "email" | "phone" | "either" | "in_person"
       care_request_status: "new" | "in_progress" | "closed"
       care_service_type: "prayer" | "pastoral" | "welfare"
+      website_request_topic:
+        | "general"
+        | "cell_fellowship"
+        | "service_volunteer"
+        | "testimony_thanksgiving"
+        | "other"
+      website_request_status: "new" | "in_progress" | "closed"
+      website_request_email_status: "pending" | "sent" | "failed" | "skipped"
       event_kind:
         | "camp"
         | "conference"
@@ -1593,6 +1704,15 @@ export const Constants = {
       care_contact_method: ["email", "phone", "either", "in_person"],
       care_request_status: ["new", "in_progress", "closed"],
       care_service_type: ["prayer", "pastoral", "welfare"],
+      website_request_topic: [
+        "general",
+        "cell_fellowship",
+        "service_volunteer",
+        "testimony_thanksgiving",
+        "other",
+      ],
+      website_request_status: ["new", "in_progress", "closed"],
+      website_request_email_status: ["pending", "sent", "failed", "skipped"],
       event_kind: [
         "camp",
         "conference",

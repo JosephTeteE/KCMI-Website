@@ -37,6 +37,12 @@ const PERMISSION_HELP: Partial<Record<Permission, string>> = {
     "Your account cannot assign Pastoral Care requests. Ask a Pastoral Admin.",
   "welfare.assign":
     "Your account cannot assign Welfare requests. Ask a Pastoral Admin.",
+  "requests.read":
+    "Your account cannot open Messages & Requests. Ask a Super Admin or Website & Media staff member.",
+  "requests.update":
+    "Your account cannot update Messages & Requests. Ask a Super Admin or Website & Media staff member.",
+  "requests.assign":
+    "Your account cannot assign Messages & Requests. Ask a Super Admin or Website & Media staff member.",
   "users.manage":
     "Your account cannot manage Hub staff. Ask a Super Admin for help.",
 };

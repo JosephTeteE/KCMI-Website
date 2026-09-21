@@ -7,6 +7,7 @@ import type { StaffProfile } from "@/lib/auth/session";
 import { operatingRoleLabel } from "@/lib/authorization/rbac";
 import { canViewGivingAdmin } from "@/lib/giving/access";
 import { canViewCareHub } from "@/lib/care/access";
+import { canViewRequestsInbox } from "@/lib/requests/access";
 import { signOutAction } from "@/app/auth/actions";
 import { HubHelpMenu } from "@/components/hub/hub-help-menu";
 import { HUB_ACTION_LABELS } from "@/lib/hub/action-labels";
@@ -29,6 +30,9 @@ function hubNavItems(profile: StaffProfile) {
   ];
   if (canViewCareHub(profile.permissions)) {
     items.push({ href: "/admin/care", label: "Care" });
+  }
+  if (canViewRequestsInbox(profile.permissions)) {
+    items.push({ href: "/admin/requests", label: "Messages & Requests" });
   }
   if (canViewGivingAdmin(profile.permissions)) {
     items.push({ href: "/admin/giving", label: "Giving" });

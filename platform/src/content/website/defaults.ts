@@ -94,14 +94,14 @@ export const defaultServicesDocument: ServicesDocument = {
     "Join a smaller group for fellowship, Bible study, and prayer. Connect with others in a supportive environment. Interested in joining a Cell Fellowship? Contact us and we will help you connect.",
   cellCta: {
     label: "Contact Us",
-    href: "/contact",
+    href: "/contact?topic=cell-fellowship",
   },
   teamsTitle: "Service Teams",
   teamsBody:
     "Use your gifts and talents to serve God and our community. Interested in serving with a KCMI team? Contact us to find out where you can get involved.",
   teamsCta: {
     label: "Contact Us",
-    href: "/contact",
+    href: "/contact?topic=service-team",
   },
   mediaTitle: "Sermons and media",
   mediaBody:
@@ -131,7 +131,7 @@ export const defaultServicesDocument: ServicesDocument = {
     "Testimonies and thanksgiving are shared during services. If you would like to get in touch about giving thanks with the church family, you are welcome to contact us.",
   testimoniesCta: {
     label: "Contact Us",
-    href: "/contact",
+    href: "/contact?topic=testimony",
   },
 };
 

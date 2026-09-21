@@ -45,7 +45,7 @@ export const serviceOfferings: ServiceOffering[] = [
     kind: "ministry",
     cta: {
       label: "Contact Us",
-      href: "/contact",
+      href: "/contact?topic=cell-fellowship",
       external: false,
     },
   },
@@ -56,7 +56,7 @@ export const serviceOfferings: ServiceOffering[] = [
     kind: "ministry",
     cta: {
       label: "Contact Us",
-      href: "/contact",
+      href: "/contact?topic=service-team",
       external: false,
     },
   },
@@ -97,7 +97,7 @@ export const serviceOfferings: ServiceOffering[] = [
     kind: "ministry",
     cta: {
       label: "Contact Us",
-      href: "/contact",
+      href: "/contact?topic=testimony",
       external: false,
     },
   },

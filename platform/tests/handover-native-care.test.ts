@@ -144,8 +144,12 @@ describe("handover zero public Google Forms", () => {
   it("routes Prayer/Pastoral/Welfare and ministry CTAs internally", () => {
     expect(prayerCta.ctaHref).toBe("/prayer");
     expect(defaultHomeDocument.prayerCtaHref).toBe("/prayer");
-    expect(defaultServicesDocument.cellCta.href).toBe("/contact");
-    expect(defaultServicesDocument.teamsCta.href).toBe("/contact");
+    expect(defaultServicesDocument.cellCta.href).toBe(
+      "/contact?topic=cell-fellowship",
+    );
+    expect(defaultServicesDocument.teamsCta.href).toBe(
+      "/contact?topic=service-team",
+    );
     expect(defaultServicesDocument.careLinks.map((l) => l.href)).toEqual([
       "/prayer",
       "/pastoral-care",
@@ -157,7 +161,9 @@ describe("handover zero public Google Forms", () => {
       ),
     ).toBe(false);
     expect(defaultServicesDocument.testimoniesTitle).toMatch(/Testimonies/i);
-    expect(defaultServicesDocument.testimoniesCta.href).toBe("/contact");
+    expect(defaultServicesDocument.testimoniesCta.href).toBe(
+      "/contact?topic=testimony",
+    );
 
     const care = serviceOfferings.find((o) => o.id === "care");
     expect(care?.links?.map((l) => l.href)).toEqual([
@@ -166,9 +172,9 @@ describe("handover zero public Google Forms", () => {
       "/welfare",
     ]);
     const cell = serviceOfferings.find((o) => o.id === "cell-fellowships");
-    expect(cell?.cta?.href).toBe("/contact");
+    expect(cell?.cta?.href).toBe("/contact?topic=cell-fellowship");
     const teams = serviceOfferings.find((o) => o.id === "service-teams");
-    expect(teams?.cta?.href).toBe("/contact");
+    expect(teams?.cta?.href).toBe("/contact?topic=service-team");
   });
 
   it("Care gate-off never exposes Google Form and stays fail-closed", () => {

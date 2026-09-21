@@ -42,6 +42,9 @@ export const PERMISSIONS = [
   "media.manage",
   "website.manage",
   "branches.manage",
+  "requests.read",
+  "requests.update",
+  "requests.assign",
   "audit.read",
   "hub.access",
 ] as const;
@@ -122,6 +125,9 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "media.manage",
       "website.manage",
       "branches.manage",
+      "requests.read",
+      "requests.update",
+      "requests.assign",
       "audit.read",
       // Intentionally NO pastoral read/assign — must be granted explicitly
     ],
@@ -158,6 +164,9 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<HubRole, readonly Permission[]> =
       "website.manage",
       "livestream.manage",
       "branches.manage",
+      "requests.read",
+      "requests.update",
+      "requests.assign",
       // Operating name: HQ Content Admin.
       // events.manage = Event CONTENT only.
       // Intentionally NO registrations.manage or payment_evidence.review.

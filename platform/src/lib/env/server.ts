@@ -10,6 +10,12 @@ const serverEnvSchema = z.object({
   KCMI_PASTORAL_INTAKE_ENABLED: z.string().optional(),
   /** First-party Welfare intake cutover. Default off. Set to 1/true to enable. */
   KCMI_WELFARE_INTAKE_ENABLED: z.string().optional(),
+  /** Resend API key for website Contact staff notifications (server-only). */
+  RESEND_API_KEY: z.string().min(1).optional(),
+  /** Inbox destination for Contact notifications. Default contact@kcmi-rcc.org. */
+  KCMI_CONTACT_NOTIFICATION_TO: z.string().min(1).optional(),
+  /** Verified Resend From header. Default KCMI Website <no-reply@auth.kcmi-rcc.org>. */
+  KCMI_CONTACT_NOTIFICATION_FROM: z.string().min(1).optional(),
   CONTENT_SOURCE: z.enum(["seed", "supabase"]).optional(),
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -32,6 +38,13 @@ export function getServerEnv(): ServerEnv {
     ),
     KCMI_WELFARE_INTAKE_ENABLED: blankToUndefined(
       process.env.KCMI_WELFARE_INTAKE_ENABLED,
+    ),
+    RESEND_API_KEY: blankToUndefined(process.env.RESEND_API_KEY),
+    KCMI_CONTACT_NOTIFICATION_TO: blankToUndefined(
+      process.env.KCMI_CONTACT_NOTIFICATION_TO,
+    ),
+    KCMI_CONTACT_NOTIFICATION_FROM: blankToUndefined(
+      process.env.KCMI_CONTACT_NOTIFICATION_FROM,
     ),
     CONTENT_SOURCE:
       contentSource === "seed" || contentSource === "supabase"
