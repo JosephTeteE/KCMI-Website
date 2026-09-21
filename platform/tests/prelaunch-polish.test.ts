@@ -12,8 +12,8 @@ import {
   isWelfareIntakeEnabled,
 } from "@/lib/care/welfare-intake";
 import {
-  CAMP_LEGACY_HOST,
   campBookmarkRedirects,
+  CAMP_BOOKMARK_DESTINATION,
   legacyHtmlRedirects,
 } from "@/lib/routing/legacy-redirects";
 
@@ -103,24 +103,49 @@ describe("prelaunch public recovery routes", () => {
     expect(notFound).toContain("Contact Us");
   });
 
-  it("redirects legacy youth-camp bookmarks to the live Camp host", () => {
+  it("redirects legacy youth-camp bookmarks to /programs (not camp host)", () => {
     const map = Object.fromEntries(
       campBookmarkRedirects.map((r) => [r.source, r.destination]),
     );
-    expect(map["/youth-camp.html"]).toBe(CAMP_LEGACY_HOST);
-    expect(map["/youth-camp"]).toBe(CAMP_LEGACY_HOST);
-    expect(CAMP_LEGACY_HOST).toBe("https://camp.kcmi-rcc.org");
+    expect(map["/youth-camp.html"]).toBe("/programs");
+    expect(map["/youth-camp"]).toBe("/programs");
+    expect(map["/camp/youth-camp.html"]).toBe("/programs");
+    expect(CAMP_BOOKMARK_DESTINATION).toBe("/programs");
 
     const nextConfig = readSrc("next.config.ts");
     expect(nextConfig).toMatch(/campBookmarkRedirects/);
-    expect(nextConfig).not.toMatch(
-      /camp\.kcmi-rcc\.org.*events\.kcmi-rcc\.org/,
-    );
+    expect(nextConfig).not.toContain("camp.kcmi-rcc.org");
 
-    // Internal HTML redirects stay separate from Camp external bookmarks.
+    const redirects = readSrc("src/lib/routing/legacy-redirects.ts");
+    expect(redirects).not.toContain("camp.kcmi-rcc.org");
+    expect(redirects).not.toContain("kcmi-camp-temp");
+    expect(redirects).not.toContain("camp-deploy");
+
+    // Internal HTML redirects stay separate from Camp bookmark redirects.
     const internalSources: string[] = legacyHtmlRedirects.map((r) => r.source);
     expect(internalSources.includes("/youth-camp.html")).toBe(false);
     expect(internalSources.includes("/youth-camp")).toBe(false);
+  });
+
+  it("platform runtime/config does not reference the retired Camp host or submodule", () => {
+    const files = [
+      "next.config.ts",
+      "src/lib/routing/legacy-redirects.ts",
+      "README.md",
+    ];
+    for (const file of files) {
+      const source = readSrc(file);
+      expect(source).not.toContain("camp.kcmi-rcc.org");
+      expect(source).not.toContain("kcmi-camp-temp");
+      expect(source).not.toContain("camp-deploy/");
+    }
+  });
+
+  it("exposes a public /programs landing for retired Camp bookmarks", () => {
+    const page = readSrc("src/app/(site)/programs/page.tsx");
+    expect(page).toContain('path: "/programs"');
+    expect(page).toContain("fetchUpcomingProgramsForHomepage");
+    expect(page).not.toContain("camp.kcmi-rcc.org");
   });
 });
 

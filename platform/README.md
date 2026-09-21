@@ -48,4 +48,4 @@ Local CLI mapping from `npx supabase status -o env`: `API_URL` → `NEXT_PUBLIC_
 ## Notes
 
 - Session refresh: `src/proxy.ts`
-- Legacy `public/`, `server/`, `api/`, `camp-deploy/` remain untouched reference sources
+- Legacy `public/`, `server/`, and `api/` remain untouched reference sources (Camp submodule retired from this repo)

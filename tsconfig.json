@@ -14,7 +14,6 @@
     "node_modules",
     "dist",
     "uploads",
-    "camp-deploy",
     "kcmi-rcc-worker"
   ]
 }

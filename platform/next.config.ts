@@ -86,7 +86,7 @@ const nextConfig: NextConfig = {
         destination: rule.destination,
         permanent: true,
       })),
-      // Preserve apex Camp bookmarks → live legacy camp.kcmi-rcc.org (not Events).
+      // Retired Camp bookmarks → Programs (never the old Camp hostname).
       ...campBookmarkRedirects.map((rule) => ({
         source: rule.source,
         destination: rule.destination,

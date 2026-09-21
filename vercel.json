@@ -2,12 +2,17 @@
   "redirects": [
     {
       "source": "/youth-camp.html",
-      "destination": "https://camp.kcmi-rcc.org",
+      "destination": "/programs",
+      "permanent": true
+    },
+    {
+      "source": "/youth-camp",
+      "destination": "/programs",
       "permanent": true
     },
     {
       "source": "/camp/youth-camp.html",
-      "destination": "https://camp.kcmi-rcc.org",
+      "destination": "/programs",
       "permanent": true
     }
   ]
