@@ -36,6 +36,12 @@ import {
   type HubTourKind,
   type HubTourStep,
 } from "@/lib/hub/tour";
+import {
+  getTourViewport,
+  placeTourBubble,
+  tourScrollBehavior,
+  type TourTargetBox,
+} from "@/lib/hub/tour-layout";
 
 function localStore(): Storage | null {
   if (typeof window === "undefined") return null;
@@ -109,14 +115,10 @@ function readTourResume(): {
   return tourResumeSnapshot;
 }
 
-type TargetBox = {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-};
-
-function measureTarget(selector: string, scopeSelector?: string): TargetBox | null {
+function measureTarget(
+  selector: string,
+  scopeSelector?: string,
+): TourTargetBox | null {
   const scope = scopeSelector
     ? document.querySelector(scopeSelector)
     : document;
@@ -141,56 +143,43 @@ function measureTarget(selector: string, scopeSelector?: string): TargetBox | nu
 }
 
 function bubbleStyle(
-  box: TargetBox | null,
-  opts?: { openMobileMenu?: boolean },
+  box: TourTargetBox | null,
+  opts?: { openMobileMenu?: boolean; measuredHeight?: number },
 ): CSSProperties {
-  if (!box) {
+  const viewport = getTourViewport();
+  const placed = placeTourBubble({
+    target: box,
+    viewport,
+    openMobileMenu: opts?.openMobileMenu,
+    estimatedHeight: opts?.measuredHeight,
+  });
+
+  const maxHeightCss = `min(${placed.maxHeight}px, calc(100dvh - 1.5rem - env(safe-area-inset-bottom, 0px)))`;
+
+  if ("bottomAnchored" in placed) {
     return {
       position: "fixed",
       left: "50%",
-      bottom: "1.25rem",
+      bottom:
+        "max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)))",
       transform: "translateX(-50%)",
-      width: "min(24rem, calc(100vw - 2rem))",
+      width: `min(24rem, calc(100vw - 2rem))`,
+      maxHeight: maxHeightCss,
     };
   }
-  const bubbleHeight = 230;
-  const bubbleWidth = Math.min(352, window.innerWidth - 24);
-  if (opts?.openMobileMenu) {
-    // Keep the card on-screen beside/below the menu target.
-    const left = Math.min(
-      Math.max(12, box.left),
-      Math.max(12, window.innerWidth - bubbleWidth - 12),
-    );
-    const top = Math.min(
-      Math.max(12, box.top + box.height + 10),
-      Math.max(12, window.innerHeight - bubbleHeight - 12),
-    );
-    return {
-      position: "fixed",
-      top,
-      left,
-      width: bubbleWidth,
-    };
-  }
-  const spaceBelow = window.innerHeight - (box.top + box.height);
-  const placeAbove =
-    spaceBelow < bubbleHeight + 24 && box.top > bubbleHeight + 24;
-  const top = placeAbove
-    ? Math.max(12, box.top - bubbleHeight - 12)
-    : Math.min(
-        box.top + box.height + 12,
-        Math.max(12, window.innerHeight - bubbleHeight - 12),
-      );
-  const left = Math.min(
-    Math.max(12, box.left),
-    Math.max(12, window.innerWidth - bubbleWidth - 12),
-  );
+
   return {
     position: "fixed",
-    top,
-    left,
-    width: bubbleWidth,
+    top: placed.top,
+    left: placed.left,
+    width: placed.width,
+    maxHeight: maxHeightCss,
   };
+}
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 function prepareStepUi(step: HubTourStep) {
@@ -254,9 +243,12 @@ export function HubTour() {
   const [manualStep, setManualStep] = useState(0);
   const [manualKind, setManualKind] = useState<HubTourKind>("dashboard");
   const [dismissed, setDismissed] = useState(false);
-  const [targetBox, setTargetBox] = useState<TargetBox | null>(null);
+  const [targetBox, setTargetBox] = useState<TourTargetBox | null>(null);
   const [targetMissing, setTargetMissing] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [measuredBubbleHeight, setMeasuredBubbleHeight] = useState<
+    number | undefined
+  >(undefined);
 
   const kind: HubTourKind = manualActive ? manualKind : resume.kind;
   const steps = useMemo(() => hubTourStepsForKind(kind), [kind]);
@@ -339,53 +331,62 @@ export function HubTour() {
 
     prepareStepUi(current);
     let cancelled = false;
-    let timer = 0;
+    let retryTimer = 0;
+    let menuTimer = 0;
+    const reducedMotion = prefersReducedMotion();
+    const scrollBehavior = tourScrollBehavior(reducedMotion);
 
     // Mobile nav uses <dialog showModal>. Re-open the tour layer afterward
     // so the coach mark sits above the menu in the top layer.
     if (current.openMobileMenu && layerRef.current) {
       const layer = layerRef.current;
-      window.setTimeout(() => {
+      // Short delay only — avoid a long blank wait before the next card paints.
+      menuTimer = window.setTimeout(() => {
         if (cancelled) return;
         if (layer.open) layer.close();
         layer.showModal();
-      }, 120);
+      }, 40);
     }
+
+    const commitBox = (box: TourTargetBox) => {
+      if (cancelled) return;
+      setTargetBox(box);
+      setTargetMissing(false);
+      setSearching(false);
+    };
 
     const tryMeasure = (attempt: number) => {
       if (cancelled) return;
       const scope = current.openMobileMenu ? "#hub-mobile-menu" : undefined;
       const box = measureTarget(current.target, scope);
       if (box) {
-        const root = scope
-          ? document.querySelector(scope)
-          : document;
+        const root = scope ? document.querySelector(scope) : document;
         const node =
           root instanceof Element
             ? root.querySelector(current.target)
             : document.querySelector(current.target);
         if (node instanceof HTMLElement) {
           node.scrollIntoView({
-            block: "center",
+            block: "nearest",
             inline: "nearest",
-            behavior: "smooth",
+            behavior: scrollBehavior,
           });
         }
-        // Remeasure after scroll / menu open.
-        window.setTimeout(() => {
-          if (cancelled) return;
-          setTargetBox(measureTarget(current.target, scope) ?? box);
-          setTargetMissing(false);
-          setSearching(false);
-        }, current.openMobileMenu ? 220 : 60);
+        // Remeasure on the next frames — no smooth-scroll wait.
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            if (cancelled) return;
+            commitBox(measureTarget(current.target, scope) ?? box);
+          });
+        });
         return;
       }
-      // ~1.2s total: short search, then fail gracefully.
-      if (attempt < 10) {
+      // ~0.6s total: short search, then fail gracefully.
+      if (attempt < 6) {
         setSearching(true);
-        timer = window.setTimeout(
+        retryTimer = window.setTimeout(
           () => tryMeasure(attempt + 1),
-          100 + attempt * 40,
+          60 + attempt * 30,
         );
       } else {
         setTargetBox(null);
@@ -395,7 +396,7 @@ export function HubTour() {
     };
 
     const raf = window.requestAnimationFrame(() => tryMeasure(0));
-    function onResize() {
+    function onViewportChange() {
       if (cancelled) return;
       const scope = current.openMobileMenu ? "#hub-mobile-menu" : undefined;
       const next = measureTarget(current.target, scope);
@@ -405,16 +406,41 @@ export function HubTour() {
         setSearching(false);
       }
     }
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onResize, true);
+    window.addEventListener("resize", onViewportChange);
+    window.addEventListener("scroll", onViewportChange, true);
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", onViewportChange);
+    vv?.addEventListener("scroll", onViewportChange);
     return () => {
       cancelled = true;
       window.cancelAnimationFrame(raf);
-      window.clearTimeout(timer);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onResize, true);
+      window.clearTimeout(retryTimer);
+      window.clearTimeout(menuTimer);
+      window.removeEventListener("resize", onViewportChange);
+      window.removeEventListener("scroll", onViewportChange, true);
+      vv?.removeEventListener("resize", onViewportChange);
+      vv?.removeEventListener("scroll", onViewportChange);
     };
   }, [active, step, pathname, steps]);
+
+  useEffect(() => {
+    if (!active || !dialogRef.current) return;
+    const node = dialogRef.current;
+    const update = () => {
+      const height = Math.ceil(node.getBoundingClientRect().height);
+      if (height > 0) setMeasuredBubbleHeight(height);
+    };
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => update())
+        : null;
+    ro?.observe(node);
+    const raf = window.requestAnimationFrame(update);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      ro?.disconnect();
+    };
+  }, [active, step, targetBox, targetMissing, searching]);
 
   useEffect(() => {
     if (!active && !promptOpen) return;
@@ -571,32 +597,45 @@ export function HubTour() {
             aria-labelledby={titleId}
             aria-describedby={bodyId}
             data-hub-tour-kind={kind}
-            className="z-[61] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 shadow-[var(--shadow-soft)]"
+            data-hub-tour-card="true"
+            className="hub-tour-card z-[61] flex flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 shadow-[var(--shadow-soft)]"
             style={bubbleStyle(targetBox, {
               openMobileMenu: current.openMobileMenu,
+              measuredHeight: measuredBubbleHeight,
             })}
           >
-            <p className="text-sm font-semibold tracking-wide text-[var(--color-text-muted)] uppercase">
-              Step {step + 1} of {steps.length}
-            </p>
-            <h2 id={titleId} className="mt-2 text-xl font-semibold">
-              {current.title}
-            </h2>
-            <p id={bodyId} className="hub-body mt-3 text-[var(--color-text-muted)]">
-              {current.body}
-            </p>
-            {searching && !targetBox && !targetMissing ? (
-              <p className="hub-help mt-2 text-[var(--color-text-muted)]">
-                Looking for this control on the page…
+            <div
+              key={`${kind}-${step}`}
+              className="hub-tour-card-body min-h-0 flex-1 overflow-y-auto overscroll-contain"
+            >
+              <p className="text-sm font-semibold tracking-wide text-[var(--color-text-muted)] uppercase">
+                Step {step + 1} of {steps.length}
               </p>
-            ) : null}
-            {targetMissing ? (
-              <p className="hub-help mt-2 text-[var(--color-text-muted)]">
-                This step isn&apos;t available right now. Skip this step or exit
-                the tour.
+              <h2 id={titleId} className="mt-2 text-xl font-semibold">
+                {current.title}
+              </h2>
+              <p
+                id={bodyId}
+                className="hub-body mt-3 text-[var(--color-text-muted)]"
+              >
+                {current.body}
               </p>
-            ) : null}
-            <div className="mt-5 flex flex-wrap gap-3">
+              {searching && !targetBox && !targetMissing ? (
+                <p className="hub-help mt-2 text-[var(--color-text-muted)]">
+                  Looking for this control on the page…
+                </p>
+              ) : null}
+              {targetMissing ? (
+                <p className="hub-help mt-2 text-[var(--color-text-muted)]">
+                  This step isn&apos;t available right now. Skip this step or
+                  exit the tour.
+                </p>
+              ) : null}
+            </div>
+            <div
+              data-hub-tour-actions="true"
+              className="mt-5 flex shrink-0 flex-wrap gap-3 pb-[max(0px,env(safe-area-inset-bottom,0px))]"
+            >
               <button
                 type="button"
                 className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] px-4 text-base font-semibold underline-offset-2 hover:underline"
@@ -627,6 +666,7 @@ export function HubTour() {
               ) : null}
               <button
                 type="button"
+                data-hub-tour-primary-action="true"
                 className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-4 text-base font-semibold text-[var(--color-action-primary-fg)]"
                 onClick={() => {
                   if (last) {

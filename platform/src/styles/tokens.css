@@ -640,6 +640,27 @@ a[href]:hover {
   background: transparent;
 }
 
+.hub-tour-card-body {
+  animation: hub-tour-step-in 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-tour-card-body {
+    animation: none;
+  }
+}
+
+@keyframes hub-tour-step-in {
+  from {
+    opacity: 0.35;
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 /* Hub volunteer typography floor */
 .hub-body {
   font-size: 1rem;
