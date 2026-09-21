@@ -1,13 +1,20 @@
 import type { ReactNode } from "react";
 
+type ContentWidth = "readable" | "full";
+
 type Props = {
   eyebrow?: string;
   title: string;
   description?: string;
   children: ReactNode;
+  /**
+   * readable — constrain body for sparse/single-column pages on large desktops.
+   * full — use the full site container (locations, multi-column grids).
+   */
+  contentWidth?: ContentWidth;
 };
 
-export function PageHero({ eyebrow, title, description }: Omit<Props, "children">) {
+export function PageHero({ eyebrow, title, description }: Omit<Props, "children" | "contentWidth">) {
   return (
     <header className="border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
       <div className="site-container page-masthead">
@@ -31,11 +38,22 @@ export function PageHero({ eyebrow, title, description }: Omit<Props, "children"
   );
 }
 
-export function PageShell({ eyebrow, title, description, children }: Props) {
+export function PageShell({
+  eyebrow,
+  title,
+  description,
+  children,
+  contentWidth = "readable",
+}: Props) {
+  const bodyClass =
+    contentWidth === "full"
+      ? "site-container section-space"
+      : "page-shell-readable section-space";
+
   return (
     <main id="main-content">
       <PageHero eyebrow={eyebrow} title={title} description={description} />
-      <div className="site-container section-space">{children}</div>
+      <div className={bodyClass}>{children}</div>
     </main>
   );
 }

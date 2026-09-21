@@ -19,7 +19,27 @@ export default async function ProgramsPage() {
   const programs = await fetchUpcomingProgramsForHomepage(12).catch(() => []);
 
   if (programs.length > 0) {
-    return <UpcomingProgramsSection programs={programs} />;
+    return (
+      <main id="main-content">
+        <header className="border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
+          <div className="site-container page-masthead">
+            <div className="stack-heading max-w-3xl">
+              <p className="text-readable-sm font-semibold tracking-wide text-[var(--color-action-primary)] uppercase">
+                Programs
+              </p>
+              <h1 className="font-display text-3xl font-semibold text-balance sm:text-4xl">
+                Programs & announcements
+              </h1>
+              <p className="text-readable max-w-2xl text-[var(--color-text-muted)]">
+                See what is coming up next at Kingdom Covenant Ministries
+                International.
+              </p>
+            </div>
+          </div>
+        </header>
+        <UpcomingProgramsSection programs={programs} />
+      </main>
+    );
   }
 
   return (
@@ -27,10 +47,11 @@ export default async function ProgramsPage() {
       eyebrow="Programs"
       title="Programs & announcements"
       description="See what is coming up next at Kingdom Covenant Ministries International."
+      contentWidth="readable"
     >
       <section
         aria-labelledby="programs-empty-heading"
-        className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6"
+        className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8"
       >
         <h2
           id="programs-empty-heading"

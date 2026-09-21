@@ -14,8 +14,9 @@ export default async function LivestreamPage() {
   const live = await getLivestreamPublic();
 
   return (
-    <PageShell eyebrow="Watch" title={live.heading}>
-      <div className="card-pad mx-auto max-w-3xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-center">
+    <PageShell eyebrow="Watch" title={live.heading} contentWidth="readable">
+      <div className="card-pad mx-auto w-full max-w-4xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] sm:px-10 sm:py-10">
+        <div className="text-center sm:text-left">
         <p
           className={`inline-flex rounded-full px-3 py-1 text-readable-sm font-semibold ${
             live.isLive
@@ -25,9 +26,10 @@ export default async function LivestreamPage() {
         >
           {live.isLive ? "Live now" : "Not currently live"}
         </p>
-        <p className="text-readable mt-6 text-[var(--color-text-muted)]">
+        <p className="text-readable mt-6 max-w-2xl text-[var(--color-text-muted)] sm:mx-0 mx-auto">
           {live.isLive ? live.liveMessage : live.notLiveMessage}
         </p>
+        </div>
         {live.isLive && live.facebookPageUrl ? (
           <div className="mt-8 text-left">
             <FacebookVideoEmbed

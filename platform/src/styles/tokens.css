@@ -242,6 +242,22 @@ a[href]:hover {
   max-width: 100%;
 }
 
+/*
+  Sparse public pages: keep the body measure readable on large desktops
+  instead of leaving a tiny card in a wide empty canvas.
+*/
+.page-shell-readable {
+  width: min(100% - 2rem, 64rem);
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+@media (min-width: 90rem) {
+  .page-shell-readable {
+    width: min(100% - 2rem, 68rem);
+  }
+}
+
 /* Homepage editorial bands — wider media/composition without stretching prose */
 .site-container-editorial {
   margin-inline: auto;

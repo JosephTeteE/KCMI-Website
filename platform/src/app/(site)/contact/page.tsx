@@ -27,8 +27,9 @@ export default async function ContactPage() {
         contact.intro ??
         "Write or call the church office. Prayer and care requests can be shared through the Prayer, Pastoral Care, and Welfare pages."
       }
+      contentWidth="full"
     >
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
         <section className="card-pad rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
           <h2 className="font-display text-2xl font-semibold">Email and phone</h2>
           <ul className="mt-5 space-y-4 text-readable">

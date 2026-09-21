@@ -25,7 +25,7 @@ export default async function ServicesPage() {
   const care = offerings.filter((item) => item.kind === "care");
 
   return (
-    <PageShell eyebrow="Gather" title="Services at KCMI" description={intro}>
+    <PageShell eyebrow="Gather" title="Services at KCMI" description={intro} contentWidth="full">
       <div className="card-pad mb-8 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
         <h2 className="font-display text-2xl font-semibold">Headquarters worship times</h2>
         <p className="text-readable-sm mt-2 text-[var(--color-text-muted)]">

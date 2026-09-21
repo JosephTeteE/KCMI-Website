@@ -21,7 +21,12 @@ export default async function SermonsPage() {
   const sermons = await getPublishedSermons();
 
   return (
-    <PageShell eyebrow="Media" title="KCMI Sermons" description={header.sub}>
+    <PageShell
+      eyebrow="Media"
+      title="KCMI Sermons"
+      description={header.sub}
+      contentWidth="full"
+    >
       <p className="text-readable mb-8 max-w-3xl font-medium text-[var(--color-text-body)]">
         {header.headline}
       </p>

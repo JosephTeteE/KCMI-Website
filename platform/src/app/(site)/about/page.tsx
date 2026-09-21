@@ -15,9 +15,9 @@ export default async function AboutPage() {
   const about = await getAboutChurch();
 
   return (
-    <PageShell eyebrow="About KCMI" title="About KCMI">
-      <div className="mx-auto max-w-3xl space-y-8">
-        <section aria-labelledby="who-we-are-heading" className="space-y-4">
+    <PageShell eyebrow="About KCMI" title="About KCMI" contentWidth="readable">
+      <div className="space-y-10">
+        <section aria-labelledby="who-we-are-heading" className="max-w-3xl space-y-4">
           <h2 id="who-we-are-heading" className="font-display text-2xl font-semibold">
             Who We Are
           </h2>
@@ -31,6 +31,7 @@ export default async function AboutPage() {
           ))}
         </section>
 
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
         <section id="vision" aria-labelledby="vision-heading" className="space-y-4">
           <h2 id="vision-heading" className="font-display text-2xl font-semibold">
             Our Vision
@@ -50,6 +51,7 @@ export default async function AboutPage() {
             ))}
           </ol>
         </section>
+        </div>
 
         <section
           aria-labelledby="leadership-preview-heading"

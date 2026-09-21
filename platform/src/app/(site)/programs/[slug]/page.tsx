@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProgramFlyerMedia } from "@/components/content/program-flyer-media";
 import { PageShell } from "@/components/layout/page-shell";
 import { shouldUseSeedContent } from "@/lib/env";
 import { fetchPublishedProgramBySlug } from "@/lib/programs/public-program";
@@ -36,16 +36,16 @@ export default async function PublicProgramPage({ params }: Props) {
       eyebrow="Program"
       title={program.title}
       description={program.datesLabel ?? undefined}
+      contentWidth="readable"
     >
       <div className="mx-auto max-w-3xl">
         {program.imageSrc ? (
-          <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-[var(--radius-lg)] bg-[var(--color-surface-tint)]">
-            <Image
+          <div className="mb-8 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-tint)] p-3 sm:p-4">
+            <ProgramFlyerMedia
               src={program.imageSrc}
               alt={program.imageAlt || ""}
-              fill
-              className="object-cover"
-              sizes="(min-width: 768px) 48rem, 100vw"
+              variant="detail"
+              sizes="(min-width: 768px) 36rem, 100vw"
               priority
             />
           </div>
@@ -86,6 +86,12 @@ export default async function PublicProgramPage({ params }: Props) {
               {program.ctaLabel}
             </a>
           ) : null}
+          <Link
+            href="/programs"
+            className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-5 font-semibold text-[var(--color-text-body)]"
+          >
+            All programs
+          </Link>
           <Link
             href="/locations"
             className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-5 font-semibold text-[var(--color-text-body)]"

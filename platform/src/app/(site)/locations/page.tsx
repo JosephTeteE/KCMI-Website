@@ -18,6 +18,7 @@ export default async function LocationsPage() {
       eyebrow="Visit us"
       title="Our Locations"
       description="Find a KCMI branch near you."
+      contentWidth="full"
     >
       <LocationsFinder branches={branches} />
     </PageShell>

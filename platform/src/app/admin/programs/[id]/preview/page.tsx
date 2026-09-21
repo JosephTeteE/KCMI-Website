@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProgramFlyerMedia } from "@/components/content/program-flyer-media";
 import { createClient } from "@/lib/supabase/server";
 import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
@@ -117,17 +117,13 @@ export default async function ProgramPreviewPage({
               </Link>
             ) : null}
           </div>
-          <div className="relative min-h-48 bg-[color-mix(in_srgb,var(--kcmi-lavender)_35%,var(--kcmi-violet))] lg:min-h-full">
-            {media?.public_url ? (
-              <Image
-                src={media.public_url}
-                alt={media.alt_text || ""}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 40vw"
-              />
-            ) : null}
-          </div>
+          <ProgramFlyerMedia
+            src={media?.public_url}
+            alt={media?.alt_text || program.title}
+            variant="spotlight"
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            className="rounded-none bg-[color-mix(in_srgb,var(--kcmi-lavender)_35%,var(--kcmi-violet))]"
+          />
         </div>
       </article>
     </div>

@@ -18,6 +18,7 @@ export default async function FaqsPage() {
       eyebrow="Help"
       title="Frequently Asked Questions"
       description="Common questions about worship, giving, prayer, and how to get in touch."
+      contentWidth="readable"
     >
       <div className="mx-auto max-w-3xl space-y-3">
         {faqs.map((faq) => (

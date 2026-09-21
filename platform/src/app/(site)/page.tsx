@@ -94,7 +94,7 @@ export default async function HomePage() {
         heading={home.locationsHeading}
         subheading={home.locationsSupporting}
       />
-      <UpcomingProgramsSection programs={upcomingPrograms} />
+      <UpcomingProgramsSection programs={upcomingPrograms} maxItems={3} />
       <PrayerGivingSection prayer={home.prayer} giving={home.giving} />
     </main>
   );

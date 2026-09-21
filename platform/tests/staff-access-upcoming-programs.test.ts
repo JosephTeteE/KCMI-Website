@@ -170,7 +170,7 @@ describe("Homepage Upcoming Programs", () => {
     const home = readSrc("src/app/(site)/page.tsx");
     expect(section).toContain("View Program");
     expect(section).toContain("program.href");
-    expect(section).toContain("if (programs.length === 0)");
+    expect(section).toContain("if (visible.length === 0)");
     expect(section).toContain("return null");
     expect(home).toContain("UpcomingProgramsSection");
     expect(home).toContain("fetchUpcomingProgramsForHomepage");

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import {
   useCallback,
@@ -9,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { ProgramFlyerMedia } from "@/components/content/program-flyer-media";
 import { isPublicFeaturedProgram } from "@/content/featured-program";
 import type { FeaturedProgram } from "@/content/types";
 import { validateSocialUrl } from "@/lib/cms/social-url";
@@ -160,26 +160,19 @@ export function ProgramSpotlightTakeover({
       }}
       onClose={dismiss}
     >
-      <div className="relative min-h-48 bg-[var(--color-surface-brand)] sm:min-h-56">
-        {program.imageSrc ? (
-          <Image
-            src={program.imageSrc}
-            alt={program.imageAlt || ""}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 92vw, 42rem"
-          />
-        ) : (
-          <div
-            className="absolute inset-0 bg-gradient-to-br from-[var(--kcmi-violet)] to-[var(--kcmi-red)]"
-            aria-hidden
-          />
-        )}
+      <div className="relative">
+        <ProgramFlyerMedia
+          src={program.imageSrc}
+          alt={program.imageAlt || program.title}
+          variant="card"
+          sizes="(max-width: 768px) 92vw, 42rem"
+          className="max-h-[min(42vh,20rem)] rounded-none"
+        />
         <button
           ref={closeRef}
           type="button"
           onClick={dismiss}
-          className="absolute top-3 right-3 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/55 text-sm font-semibold text-white"
+          className="absolute top-3 right-3 z-10 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-black/55 text-sm font-semibold text-white"
           aria-label="Dismiss spotlight"
         >
           Close

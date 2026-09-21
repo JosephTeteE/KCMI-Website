@@ -38,6 +38,7 @@ export default async function BranchDetailPage({ params }: { params: Params }) {
       eyebrow={branch.country ?? "Locations"}
       title={branch.name}
       description={place || undefined}
+      contentWidth="full"
     >
       <div data-qa-branch-media={hero ? "with-media" : "without-media"}>
         {hero ? (

@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     template: `%s · ${identity.shortName}`,
   },
   description: `${identity.legalName} (${identity.alternateName}). ${identity.visionTagline}.`,
+  other: {
+    "color-scheme": "light",
+  },
   alternates: {
     canonical: "/",
   },
@@ -65,9 +68,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: "light" }}>
       <body
-        className={`${display.variable} ${body.variable} flex min-h-screen flex-col antialiased`}
+        className={`${display.variable} ${body.variable} flex min-h-screen flex-col bg-[var(--color-surface-page)] text-[var(--color-text-body)] antialiased`}
       >
         {children}
       </body>
