@@ -28,7 +28,7 @@ export function SermonsPageWebsiteEditor({
     return [
       { id: `platformName${index}`, label: `Watch option ${index + 1} name`, kind: "text" as const, current: platform.name },
       { id: `platformDescription${index}`, label: `Watch option ${index + 1} description`, kind: "textarea" as const, current: platform.description },
-      { id: `platformHref${index}`, label: `Watch option ${index + 1} link`, kind: "text" as const, current: platform.href },
+      { id: `platformHref${index}`, label: `Watch option ${index + 1} link (optional — leave blank for plain text)`, kind: "text" as const, current: platform.href },
     ];
   });
 

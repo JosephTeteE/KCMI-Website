@@ -12,6 +12,18 @@ const hrefSchema = z
     "Must be a site path, in-page hash, or https URL",
   );
 
+/** Sermon/media platform cards may be plain text (no outbound link). */
+const optionalPlatformHrefSchema = z
+  .string()
+  .refine(
+    (value) =>
+      value === "" ||
+      value.startsWith("/") ||
+      value.startsWith("#") ||
+      /^https:\/\//i.test(value),
+    "Must be empty, a site path, in-page hash, or https URL",
+  );
+
 const linkSchema = z.object({
   label: z.string().min(1).max(120),
   href: hrefSchema,
@@ -202,7 +214,7 @@ export const sermonsPageDocumentSchema = z.object({
         id: z.string().min(1).max(80),
         name: z.string().min(1).max(120),
         description: z.string().min(1).max(400),
-        href: hrefSchema,
+        href: optionalPlatformHrefSchema,
         external: z.boolean(),
       }),
     )

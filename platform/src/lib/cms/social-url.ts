@@ -25,8 +25,6 @@ export const SOCIAL_ALLOWED_HOSTS = [
   "open.spotify.com",
   "spotify.com",
   "www.spotify.com",
-  "silverbirdtv.com",
-  "www.silverbirdtv.com",
   "www.google.com",
   "maps.google.com",
   "goo.gl",

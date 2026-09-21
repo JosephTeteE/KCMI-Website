@@ -46,7 +46,7 @@ export const privacyPolicy: LegalDocument = {
     {
       heading: "4. Other outbound links",
       paragraphs: [
-        "The site also links to third-party platforms for media and directions, including YouTube, Facebook, Instagram, X (Twitter), TikTok, Spotify, Silverbird Television’s website, and Google Maps. Those services have their own policies.",
+        "The site also links to third-party platforms for media and directions, including YouTube, Facebook, Instagram, X (Twitter), TikTok, Spotify, and Google Maps. Those services have their own policies. Some pages may name other broadcast or venue brands as plain text without linking to their websites.",
       ],
     },
     {

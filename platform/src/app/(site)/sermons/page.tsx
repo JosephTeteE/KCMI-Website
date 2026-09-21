@@ -75,23 +75,25 @@ export default async function SermonsPage() {
             <p className="text-readable mt-3 text-[var(--color-text-muted)]">
               {platform.description}
             </p>
-            {platform.external ? (
-              <a
-                href={platform.href}
-                className="mt-5 inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Open {platform.name}
-              </a>
-            ) : (
-              <Link
-                href={platform.href}
-                className="mt-5 inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
-              >
-                View locations
-              </Link>
-            )}
+            {platform.href ? (
+              platform.external ? (
+                <a
+                  href={platform.href}
+                  className="mt-5 inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Open {platform.name}
+                </a>
+              ) : (
+                <Link
+                  href={platform.href}
+                  className="mt-5 inline-flex min-h-11 items-center text-readable-sm font-semibold text-[var(--color-action-primary)]"
+                >
+                  {platform.id === "locations" ? "View locations" : `Open ${platform.name}`}
+                </Link>
+              )
+            ) : null}
           </li>
         ))}
       </ul>

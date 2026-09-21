@@ -137,12 +137,15 @@ describe("services and sermons cleanup", () => {
     expect(JSON.stringify(offerings)).not.toMatch(/spiritual journey/i);
   });
 
-  it("does not assert an unverified Silverbird Friday schedule", async () => {
+  it("does not assert an unverified Silverbird Friday schedule or outbound Silverbird URL", async () => {
     const platforms = await getSermonPlatforms();
     const blob = JSON.stringify(platforms);
     expect(blob).not.toMatch(/8:00/i);
     expect(blob).not.toMatch(/Friday/i);
+    expect(blob).not.toMatch(/silverbirdtv\.com/i);
     expect(platforms.some((item) => /Apostle Frank/i.test(item.name))).toBe(true);
+    const silverbird = platforms.find((item) => /Silverbird/i.test(item.name));
+    expect(silverbird?.href ?? "").toBe("");
   });
 });
 

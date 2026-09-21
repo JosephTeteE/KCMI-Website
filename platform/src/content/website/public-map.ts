@@ -19,7 +19,7 @@ import type {
   SermonsPageDocument,
   ServicesDocument,
 } from "@/content/website/schemas";
-import { sanitizePublicHref } from "@/content/website/sanitize-public-href";
+import { sanitizePublicHref, sanitizePlatformHref } from "@/content/website/sanitize-public-href";
 import { livestreamPublic as livestreamCopy } from "@/content/seed/pages";
 
 export const FALLBACK_HERO_IMAGE: PublicMediaRef = {
@@ -236,7 +236,15 @@ export function mapFaqs(doc: FaqsDocument): FaqItem[] {
 }
 
 export function mapSermonPlatforms(doc: SermonsPageDocument): SermonPlatform[] {
-  return doc.platforms;
+  return doc.platforms.map((platform) => {
+    const href = sanitizePlatformHref(platform.href);
+    return {
+      ...platform,
+      href,
+      // No outbound link ⇒ not an external destination card.
+      external: Boolean(href) && platform.external && href.startsWith("http"),
+    };
+  });
 }
 
 export function sermonHighlightFromFallback(

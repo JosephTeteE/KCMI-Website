@@ -22,7 +22,7 @@ import {
   defaultSermonsPageDocument,
   defaultServicesDocument,
 } from "@/content/website/defaults";
-import { sanitizePublicHref } from "@/content/website/sanitize-public-href";
+import { sanitizePublicHref, sanitizePlatformHref } from "@/content/website/sanitize-public-href";
 
 function mergeParsed<T extends Record<string, unknown>>(
   defaults: T,
@@ -113,10 +113,21 @@ export function resolveFaqsDocument(input: unknown): FaqsDocument {
 
 export function resolveSermonsPageDocument(input: unknown): SermonsPageDocument {
   const parsed = sermonsPageDocumentSchema.partial().safeParse(input);
-  return mergeParsed(
+  const merged = mergeParsed(
     defaultSermonsPageDocument,
     parsed.success ? parsed.data : undefined,
   );
+  return {
+    ...merged,
+    platforms: merged.platforms.map((platform) => {
+      const href = sanitizePlatformHref(platform.href);
+      return {
+        ...platform,
+        href,
+        external: Boolean(href) && href.startsWith("http"),
+      };
+    }),
+  };
 }
 
 export function parseWebsiteDocumentSave(

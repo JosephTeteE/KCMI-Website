@@ -282,8 +282,8 @@ export const defaultSermonsPageDocument: SermonsPageDocument = {
       name: "Silverbird · Rehoboth Wells",
       description:
         "Rehoboth Wells airs on Silverbird Television. Broadcast times will be listed here when they are confirmed.",
-      href: "https://silverbirdtv.com",
-      external: true,
+      href: "",
+      external: false,
     },
     {
       id: "tiktok",

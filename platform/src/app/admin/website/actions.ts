@@ -6,6 +6,7 @@ import { saveRevision } from "@/lib/cms/revisions";
 import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
 import { validateCtaUrl } from "@/lib/cms/cta-url";
 import { validateSocialUrl } from "@/lib/cms/social-url";
+import { isSilverbirdOwnedHref } from "@/content/website/sanitize-public-href";
 import { parseWebsiteDocumentSave } from "@/content/website/resolve";
 import {
   WEBSITE_DOCUMENT_IDS,
@@ -299,7 +300,19 @@ export async function saveSermonsPageDocument(formData: FormData) {
     const id = emptyToNull(formData.get(`platformId${i}`));
     const name = emptyToNull(formData.get(`platformName${i}`));
     if (!id || !name) continue;
-    const href = emptyToNull(formData.get(`platformHref${i}`)) ?? "/";
+    const href = emptyToNull(formData.get(`platformHref${i}`)) ?? "";
+    if (isSilverbirdOwnedHref(href)) {
+      redirectWithError(
+        "/admin/website/sermons",
+        "Silverbird websites cannot be linked from KCMI pages. Leave the link blank and keep the name as plain text.",
+      );
+    }
+    if (href.startsWith("http")) {
+      const valid = validateSocialUrl(href);
+      if (!valid.ok) {
+        redirectWithError("/admin/website/sermons", `${name}: ${valid.error}`);
+      }
+    }
     platforms.push({
       id: id ?? `platform-${i + 1}`,
       name,
