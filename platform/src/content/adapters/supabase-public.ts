@@ -18,7 +18,7 @@ import {
 } from "@/lib/programs/expiry";
 import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
 import { effectiveLivestreamIsLive } from "@/lib/livestream/effective-live";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicContentClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
 type PhoneEntry = { display: string; tel: string };
@@ -63,7 +63,7 @@ function parsePhones(
 }
 
 export async function fetchPublishedBranches(): Promise<Branch[]> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data: rows, error } = await supabase
     .from("church_branches")
     .select(
@@ -131,7 +131,7 @@ export async function fetchPublishedBranches(): Promise<Branch[]> {
 export async function fetchFeaturedProgram(
   preferredId?: string | null,
 ): Promise<FeaturedProgram | null> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
 
   if (preferredId) {
     const { data: preferred, error: preferredError } = await supabase
@@ -287,7 +287,7 @@ function mapProgramRow(row: ProgramRow): FeaturedProgram | null {
 export async function fetchPublishedSermons(
   limit = 12,
 ): Promise<SermonPublic[]> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data: rows, error } = await supabase
     .from("sermons")
     .select(
@@ -331,7 +331,7 @@ export async function fetchPublishedSermons(
 }
 
 export async function fetchLivestreamPublic(): Promise<LivestreamPublic> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data: row, error } = await supabase
     .from("livestream_settings")
     .select("facebook_url, is_live, auto_end_at")
@@ -356,7 +356,7 @@ export async function fetchLivestreamPublic(): Promise<LivestreamPublic> {
 export async function fetchBranchMediaBySlug(
   slug: string,
 ): Promise<BranchMediaItem[]> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data: branch, error: branchError } = await supabase
     .from("church_branches")
     .select("id, slug")
@@ -434,7 +434,7 @@ export async function fetchPublishedBranchBySlug(
 export async function fetchWebsiteDocumentPayload(
   key: string,
 ): Promise<{ id: string; payload: Json; status: string } | null> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase
     .from("website_documents")
     .select("id, payload, status")
@@ -453,7 +453,7 @@ export async function fetchMediaAssetPublic(id: string | null): Promise<{
   height: number;
 } | null> {
   if (!id) return null;
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase
     .from("media_assets")
     .select("public_url, alt_text, width_px, height_px, archived_at")
@@ -471,7 +471,7 @@ export async function fetchMediaAssetPublic(id: string | null): Promise<{
 }
 
 export async function fetchHomeFeaturedSermon(): Promise<SermonPublic | null> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data: row, error } = await supabase
     .from("sermons")
     .select(
@@ -513,7 +513,7 @@ export async function fetchHomeFeaturedSermon(): Promise<SermonPublic | null> {
 export async function fetchPublishedGivingAccounts(): Promise<
   import("@/content/types").GivingAccount[]
 > {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase
     .from("giving_accounts")
     .select(

@@ -2,6 +2,7 @@
 
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
+import { revalidatePublishedLocation } from "@/lib/cms/revalidate-public";
 import { emptyToNull } from "@/lib/cms/ingest-marketing-image";
 import {
   redirectWithError,
@@ -193,6 +194,13 @@ export async function assignBranchPhoto(formData: FormData) {
       media_asset_id: loaded.asset.id,
     },
   });
+
+  const { data: branchRow } = await supabase
+    .from("church_branches")
+    .select("slug")
+    .eq("id", branchId)
+    .maybeSingle();
+  revalidatePublishedLocation(branchRow?.slug);
 
   redirectWithMessage(
     `/admin/branches/${branchId}`,

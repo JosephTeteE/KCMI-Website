@@ -48,8 +48,10 @@ export function FeaturedProgramChooser({
     <section className="space-y-4">
       <h2 className="text-xl font-semibold">KCMI Spotlight</h2>
       <p className="hub-help text-[var(--color-text-muted)]">
-        This is the large program feature on the homepage. You can also show it
-        once when visitors first open the website.
+        This is the large program feature on the homepage. Publishing a program
+        does not place it here. Choose a published program, then make the
+        Spotlight live. You can also show it once when visitors first open the
+        website.
       </p>
       <div className="space-y-8">
         <HubPreviewFrame

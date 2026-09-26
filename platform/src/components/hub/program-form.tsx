@@ -703,15 +703,23 @@ export function ProgramForm({
                       : HUB_ACTION_LABELS.createProgramDraft}
                 </button>
                 {canPublish ? (
-                  <button
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => submit("publish")}
-                    className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 text-base font-semibold text-[var(--color-action-primary-fg)] disabled:opacity-50"
-                    data-testid="program-publish"
-                  >
-                    {isPending ? "Publishing…" : "Publish Program"}
-                  </button>
+                  <>
+                    <p className="text-sm text-[var(--color-text-muted)]">
+                      Publishing places this program on the public Programs page.
+                      Add upcoming dates if it should also appear under Upcoming
+                      Programs on the homepage. Homepage Spotlight is chosen
+                      separately and is not turned on by publishing.
+                    </p>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => submit("publish")}
+                      className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-action-primary)] px-5 text-base font-semibold text-[var(--color-action-primary-fg)] disabled:opacity-50"
+                      data-testid="program-publish"
+                    >
+                      {isPending ? "Publishing…" : "Publish Program"}
+                    </button>
+                  </>
                 ) : null}
               </>
             )}

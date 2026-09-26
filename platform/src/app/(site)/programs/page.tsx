@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { UpcomingProgramsSection } from "@/components/home/upcoming-programs-section";
 import { PageShell } from "@/components/layout/page-shell";
-import { fetchUpcomingProgramsForHomepage } from "@/lib/programs/upcoming-homepage";
+import {
+  fetchUnscheduledPublishedPrograms,
+  fetchUpcomingProgramsForHomepage,
+} from "@/lib/programs/upcoming-homepage";
 import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
 export const metadata = publicPageMetadata({
@@ -12,13 +15,18 @@ export const metadata = publicPageMetadata({
 });
 
 /**
- * Public Programs landing — destination for retired Camp bookmarks and
- * homepage Program CTAs. Lists scheduled upcoming published Programs only.
+ * Public Programs landing.
+ * Upcoming = published programs with a session that has not ended (Africa/Lagos).
+ * Also lists published programs that have no schedule, so publishing is never
+ * a dead end. Expired scheduled programs stay off this page.
  */
 export default async function ProgramsPage() {
-  const programs = await fetchUpcomingProgramsForHomepage(12).catch(() => []);
+  const [upcoming, unscheduled] = await Promise.all([
+    fetchUpcomingProgramsForHomepage(24).catch(() => []),
+    fetchUnscheduledPublishedPrograms(24).catch(() => []),
+  ]);
 
-  if (programs.length > 0) {
+  if (upcoming.length > 0 || unscheduled.length > 0) {
     return (
       <main id="main-content">
         <header className="border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)]">
@@ -37,7 +45,32 @@ export default async function ProgramsPage() {
             </div>
           </div>
         </header>
-        <UpcomingProgramsSection programs={programs} />
+        <UpcomingProgramsSection programs={upcoming} />
+        {unscheduled.length > 0 ? (
+          <section className="section-space border-t border-[var(--color-border)]">
+            <div className="site-container">
+              <h2 className="font-display text-2xl font-semibold">
+                More programs
+              </h2>
+              <p className="mt-3 max-w-2xl text-base text-[var(--color-text-muted)]">
+                These programs are published and do not have upcoming dates
+                listed yet.
+              </p>
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                {unscheduled.map((program) => (
+                  <li key={program.id}>
+                    <Link
+                      href={program.href}
+                      className="block rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 text-base font-semibold"
+                    >
+                      {program.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        ) : null}
       </main>
     );
   }

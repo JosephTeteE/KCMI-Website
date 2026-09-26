@@ -5,6 +5,11 @@ import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
 type Props = { params: Promise<{ slug: string }> };
 
+/** Cache each event page on first visit. Publish calls revalidatePath. */
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const event = await fetchPublishedEventBySlug(slug);

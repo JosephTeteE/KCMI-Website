@@ -15,7 +15,7 @@ import type {
   PublicEventDetail,
   PublicEventKind,
 } from "@/lib/events/types";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicContentClient } from "@/lib/supabase/server";
 import { shouldUseSeedContent } from "@/lib/env";
 
 export type {
@@ -189,7 +189,7 @@ export async function fetchPublishedEvents(): Promise<{
     return { upcoming: [], past: [] };
   }
 
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase
     .from("events")
     .select(EVENT_SELECT)
@@ -220,7 +220,7 @@ export async function fetchPublishedEventBySlug(
   }
   if (shouldUseSeedContent()) return null;
 
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase
     .from("events")
     .select(EVENT_SELECT)

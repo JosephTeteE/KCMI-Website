@@ -2,6 +2,7 @@
 
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
+import { revalidatePublishedProgram } from "@/lib/cms/revalidate-public";
 import { saveRevision } from "@/lib/cms/revisions";
 import { slugifyTitle } from "@/lib/cms/slugify";
 import {
@@ -356,11 +357,17 @@ export async function createProgram(formData: FormData) {
     },
   });
 
+  if (intent === "publish") {
+    revalidatePublishedProgram(slug);
+    redirectWithParams(`/admin/programs/${data.id}`, {
+      message: "Program published.",
+      view: `/programs/${slug}`,
+    });
+  }
+
   redirectWithMessage(
     `/admin/programs/${data.id}`,
-    intent === "publish"
-      ? "Your program is live on the website."
-      : "Your program draft is saved. It is not on the public website yet.",
+    "Your program draft is saved. It is not on the public website yet.",
   );
 }
 
@@ -440,6 +447,15 @@ export async function updateProgram(formData: FormData) {
     if (sessionsResult.error) {
       redirectWithError(`/admin/programs/${id}`, sessionsResult.error);
     }
+  }
+
+  const { data: savedProgram } = await supabase
+    .from("programs")
+    .select("slug, status")
+    .eq("id", id)
+    .maybeSingle();
+  if (savedProgram?.status === "published") {
+    revalidatePublishedProgram(savedProgram.slug);
   }
 
   redirectWithMessage(`/admin/programs/${id}`, "Your program details are saved.");
@@ -660,13 +676,18 @@ export async function saveProgramWizardEdit(formData: FormData) {
     },
   });
 
+  if (intent === "publish" || intent === "live") {
+    revalidatePublishedProgram(slug);
+    redirectWithParams(`/admin/programs/${id}`, {
+      message:
+        intent === "publish" ? "Program published." : "Program updated.",
+      view: `/programs/${slug}`,
+    });
+  }
+
   redirectWithMessage(
     `/admin/programs/${id}`,
-    intent === "publish"
-      ? "Your program is live on the website."
-      : intent === "live"
-        ? "Your changes are live on the website."
-        : "Your draft changes are saved. This program is still not on the website.",
+    "Your draft changes are saved. This program is still not on the website.",
   );
 }
 
@@ -774,16 +795,25 @@ export async function setProgramStatus(formData: FormData) {
     });
   }
 
+  if (status === "published" || status === "archived") {
+    revalidatePublishedProgram(updated.slug);
+  }
+
+  if (status === "published") {
+    redirectWithParams(`/admin/programs/${id}`, {
+      message: "Program published.",
+      view: `/programs/${updated.slug}`,
+    });
+  }
+
   const message =
-    status === "published"
-      ? "This program is now live on the website."
-      : status === "archived"
-        ? "This program is no longer on the public website."
-        : status === "preview"
-          ? "This program is ready to preview. It is not public yet."
-          : isRestore
-            ? "This program is a draft again. It is not on the public website."
-            : "Your program draft is saved. It is not on the public website yet.";
+    status === "archived"
+      ? "This program is no longer on the public website."
+      : status === "preview"
+        ? "This program is ready to preview. It is not public yet."
+        : isRestore
+          ? "This program is a draft again. It is not on the public website."
+          : "Your program draft is saved. It is not on the public website yet.";
 
   redirectWithMessage(`/admin/programs/${id}`, message);
 }
@@ -854,16 +884,25 @@ export async function assignProgramCover(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error: updateError } = await supabase
+  const { data: covered, error: updateError } = await supabase
     .from("programs")
     .update({
       featured_media_id: loaded.asset.id,
       updated_by: gate.session.user.id,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("slug, status")
+    .single();
 
-  if (updateError) {
-    redirectWithError(`/admin/programs/${id}`, updateError.message);
+  if (updateError || !covered) {
+    redirectWithError(
+      `/admin/programs/${id}`,
+      updateError?.message ?? "The poster could not be saved.",
+    );
+  }
+
+  if (covered.status === "published") {
+    revalidatePublishedProgram(covered.slug);
   }
 
   await writeAuditEvent({

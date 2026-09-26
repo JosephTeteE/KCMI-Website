@@ -21,6 +21,24 @@ export type ProgramExpirySession = {
 };
 
 /**
+ * Calendar date from a `date` column or an accidental datetime string.
+ * Exact `YYYY-MM-DD` is required downstream; a timestamp prefix must not
+ * make a real session look missing.
+ */
+export function normalizeSessionCalendarDate(
+  value: string | null | undefined,
+): string | null {
+  const match = /^(\d{4}-\d{2}-\d{2})/.exec((value ?? "").trim());
+  return match?.[1] ?? null;
+}
+
+/** Wall-clock `HH:MM` from `HH:MM` or `HH:MM:SS`. */
+function wallClockHm(value: string | null | undefined, fallback: string): string {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)/.exec((value ?? "").trim());
+  return match ? `${match[1]}:${match[2]}` : fallback;
+}
+
+/**
  * Instant when a session stops counting as upcoming/in-progress.
  * Prefer end_time; otherwise 23:59 local on the session date.
  */
@@ -28,10 +46,10 @@ export function sessionEffectiveEndIso(
   session: ProgramExpirySession,
   timeZone: string = DEFAULT_PROGRAM_TIMEZONE,
 ): string | null {
-  const date = session.sessionDate?.trim();
+  const date = normalizeSessionCalendarDate(session.sessionDate);
   if (!date) return null;
   // Date with optional start but no end → through 23:59 local that day.
-  const endHm = (session.endTime ?? "").trim().slice(0, 5) || "23:59";
+  const endHm = wallClockHm(session.endTime, "23:59");
   return zonedDateTimeToIso(date, endHm, timeZone);
 }
 
@@ -106,9 +124,10 @@ export function nextUpcomingSessionStartIso(
     const endMs = new Date(endIso).getTime();
     if (endMs < nowMs) continue;
 
-    const startHm =
-      (session.startTime ?? "").trim().slice(0, 5) || "00:00";
-    const startIso = zonedDateTimeToIso(session.sessionDate, startHm, timeZone);
+    const startHm = wallClockHm(session.startTime, "00:00");
+    const startDate = normalizeSessionCalendarDate(session.sessionDate);
+    if (!startDate) continue;
+    const startIso = zonedDateTimeToIso(startDate, startHm, timeZone);
     if (!startIso) continue;
     const startMs = new Date(startIso).getTime();
     if (startMs < bestMs) {

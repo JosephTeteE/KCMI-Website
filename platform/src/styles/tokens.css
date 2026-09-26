@@ -644,19 +644,50 @@ a[href]:hover {
 .hub-tour-layer {
   width: 100%;
   max-width: none;
-  height: 100%;
-  max-height: none;
+  height: 100dvh;
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .hub-tour-layer::backdrop {
   background: transparent;
+  pointer-events: none;
+}
+
+.hub-tour-card,
+.hub-tour-welcome {
+  pointer-events: auto;
+}
+
+/* Instruction panel is viewport-fixed. Highlight position does not move it. */
+.hub-tour-card {
+  position: fixed;
+  left: 50%;
+  bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  width: min(30rem, calc(100vw - 1.5rem));
+  max-width: min(30rem, calc(100% - 1.5rem));
+  max-height: calc(100dvh - 1.5rem - env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+
+.hub-tour-card-heading,
+.hub-tour-card-actions {
+  flex: 0 0 auto;
 }
 
 .hub-tour-card-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   animation: hub-tour-step-in 180ms ease-out;
 }
 

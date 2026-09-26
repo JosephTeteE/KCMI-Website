@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 import { HubPageHeader } from "@/components/hub/hub-page-header";
-import { HubFlash } from "@/components/hub/hub-flash";
+import { HubFlash, safeProgramViewHref } from "@/components/hub/hub-flash";
 import { HubStatusBadge } from "@/components/hub/hub-form-fields";
 import {
   ProgramForm,
@@ -19,6 +19,7 @@ export const maxDuration = 60;
 type SearchParams = Promise<{
   message?: string;
   error?: string;
+  view?: string;
 }>;
 type Params = Promise<{ id: string }>;
 
@@ -132,7 +133,11 @@ export default async function EditProgramPage({
         backLabel="Back to Programs"
         actions={<HubStatusBadge status={program.status} />}
       />
-      <HubFlash message={flash.message} error={flash.error} />
+      <HubFlash
+        message={flash.message}
+        error={flash.error}
+        viewHref={safeProgramViewHref(flash.view)}
+      />
       <ProgramForm
         mode="edit"
         canPublish={canPublish}

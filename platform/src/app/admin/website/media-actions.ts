@@ -3,6 +3,7 @@
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
 import { saveRevision } from "@/lib/cms/revisions";
+import { revalidatePublishedWebsite } from "@/lib/cms/revalidate-public";
 import { emptyToNull } from "@/lib/cms/ingest-marketing-image";
 import {
   loadAssignableAsset,
@@ -180,5 +181,10 @@ export async function assignWebsiteContextImage(formData: FormData) {
     changeSummary: `Replaced ${target.field}`,
   });
 
-  redirectWithMessage(target.hubPath, "The new photo is now on the website.");
+  revalidatePublishedWebsite(target.key);
+
+  redirectWithMessage(
+    target.hubPath,
+    "The new photo is now on the website.",
+  );
 }

@@ -14,7 +14,7 @@ import type {
 } from "@/lib/search/types";
 import { isProgramVisibleOnUpcomingSurfaces } from "@/lib/programs/expiry";
 import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicContentClient } from "@/lib/supabase/server";
 
 export type SearchPublicInput = {
   query: string | null | undefined;
@@ -121,7 +121,7 @@ async function searchViaRpc(
   type: PublicSearchTypeFilter,
   limit: number,
 ): Promise<PublicSearchResult[]> {
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase.rpc("search_public_content", {
     p_query: query,
     p_type: type === "all" ? null : type,
@@ -164,7 +164,7 @@ async function excludeExpiredProgramSearchHits(
     .filter(Boolean);
   if (slugs.length === 0) return results;
 
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data, error } = await supabase
     .from("programs")
     .select(

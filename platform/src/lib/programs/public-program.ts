@@ -3,7 +3,7 @@ import {
   formatProgramScheduleLabel,
   type ProgramSessionInput,
 } from "@/lib/programs/schedule";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicContentClient } from "@/lib/supabase/server";
 
 export type PublicProgramDetail = {
   id: string;
@@ -28,7 +28,7 @@ export async function fetchPublishedProgramBySlug(
   const normalized = slug.trim().toLowerCase();
   if (!normalized) return null;
 
-  const supabase = await createClient();
+  const supabase = await createPublicContentClient();
   const { data: row, error } = await supabase
     .from("programs")
     .select(

@@ -3,6 +3,7 @@
 import { requireStaffAction } from "@/lib/cms/require-staff";
 import { writeAuditEvent } from "@/lib/cms/audit";
 import { saveRevision } from "@/lib/cms/revisions";
+import { revalidatePublishedWebsite } from "@/lib/cms/revalidate-public";
 import { redirectWithError, redirectWithMessage } from "@/lib/cms/hub-flash";
 import { validateCtaUrl } from "@/lib/cms/cta-url";
 import { validateSocialUrl } from "@/lib/cms/social-url";
@@ -84,6 +85,8 @@ async function saveDocument(
     changedBy: actorId,
     changeSummary: summary,
   });
+
+  revalidatePublishedWebsite(key);
 
   redirectWithMessage(
     `/admin/website/${hubPath(key)}`,
@@ -424,6 +427,8 @@ export async function setFeaturedProgramFromHome(formData: FormData) {
       spotlight_takeover_enabled: nextHome.spotlightTakeoverEnabled,
     },
   });
+
+  revalidatePublishedWebsite("home");
 
   redirectWithMessage(
     "/admin/website/home",

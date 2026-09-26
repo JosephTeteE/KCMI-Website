@@ -8,6 +8,11 @@ import { publicPageMetadata } from "@/lib/seo/public-metadata";
 
 type Params = Promise<{ slug: string }>;
 
+/** Cache each location page on first visit. Publish calls revalidatePath. */
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const detail = await getBranchPublicDetail(slug);

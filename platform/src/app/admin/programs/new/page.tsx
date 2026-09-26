@@ -1,12 +1,12 @@
 import { HubPageHeader } from "@/components/hub/hub-page-header";
-import { HubFlash } from "@/components/hub/hub-flash";
+import { HubFlash, safeProgramViewHref } from "@/components/hub/hub-flash";
 import { ProgramForm } from "@/components/hub/program-form";
 import { createClient } from "@/lib/supabase/server";
 import { getStaffSession, staffHasPermission } from "@/lib/auth/session";
 
 export const maxDuration = 60;
 
-type SearchParams = Promise<{ message?: string; error?: string }>;
+type SearchParams = Promise<{ message?: string; error?: string; view?: string }>;
 
 export default async function NewProgramPage({
   searchParams,
@@ -40,7 +40,11 @@ export default async function NewProgramPage({
         backHref="/admin/programs"
         backLabel="Programs"
       />
-      <HubFlash message={params.message} error={params.error} />
+      <HubFlash
+        message={params.message}
+        error={params.error}
+        viewHref={safeProgramViewHref(params.view)}
+      />
       <ProgramForm
         mode="create"
         canPublish={canPublish}

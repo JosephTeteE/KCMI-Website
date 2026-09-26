@@ -7,9 +7,10 @@ import {
   isScheduledUpcomingForHomepage,
   mapScheduleSessionsForExpiry,
   nextUpcomingSessionStartIso,
+  normalizeSessionCalendarDate,
 } from "@/lib/programs/expiry";
 import { DEFAULT_PROGRAM_TIMEZONE } from "@/lib/programs/sessions";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicContentClient } from "@/lib/supabase/server";
 
 export type UpcomingProgramCard = {
   id: string;
@@ -48,18 +49,7 @@ function locationLabelFor(row: {
   return null;
 }
 
-/**
- * Published, scheduled Programs still upcoming — for homepage discovery.
- * Unscheduled flyer programs are excluded (they keep /programs/[slug] only).
- */
-export async function fetchUpcomingProgramsForHomepage(
-  limit = 3,
-): Promise<UpcomingProgramCard[]> {
-  const supabase = await createClient();
-  const { data: rows, error } = await supabase
-    .from("programs")
-    .select(
-      `
+const PUBLISHED_PROGRAM_SELECT = `
       id,
       slug,
       title,
@@ -83,22 +73,95 @@ export async function fetchUpcomingProgramsForHomepage(
         label,
         sort_order
       )
-    `,
-    )
+    `;
+
+type PublishedProgramRow = {
+  id: string;
+  slug: string;
+  title: string;
+  short_description: string | null;
+  timezone: string | null;
+  location_kind: string | null;
+  location_label: string | null;
+  featured_media:
+    | { public_url: string | null; alt_text: string | null }
+    | { public_url: string | null; alt_text: string | null }[]
+    | null;
+  location_branch: { name: string } | { name: string }[] | null;
+  program_sessions:
+    | {
+        session_date: string;
+        start_time: string | null;
+        end_time: string | null;
+        label: string | null;
+        sort_order: number | null;
+      }[]
+    | null;
+};
+
+async function loadPublishedPrograms(): Promise<PublishedProgramRow[]> {
+  const supabase = await createPublicContentClient();
+  const { data: rows, error } = await supabase
+    .from("programs")
+    .select(PUBLISHED_PROGRAM_SELECT)
     .eq("status", "published")
     .is("archived_at", null)
     .order("published_at", { ascending: false, nullsFirst: false })
-    .limit(40);
+    .limit(200);
 
   if (error) {
     throw new ContentSourceError(
-      `Content source failed (fetchUpcomingProgramsForHomepage): ${error.message}`,
+      `Content source failed (loadPublishedPrograms): ${error.message}`,
       { source: "supabase", cause: error },
     );
   }
 
+  return (rows ?? []) as unknown as PublishedProgramRow[];
+}
+
+/**
+ * Apply the caller's limit. Homepage passes 3. /programs passes a larger
+ * number. This must not reintroduce a homepage-only cap of 3.
+ */
+export function limitProgramCards<T>(cards: readonly T[], requested: number): T[] {
+  const cap = Math.max(1, Math.min(requested, 48));
+  return cards.slice(0, cap);
+}
+
+function cardFromRow(
+  row: PublishedProgramRow,
+  sessions: ProgramSessionInput[],
+  nextStartIso: string,
+): UpcomingProgramCard {
+  const media = Array.isArray(row.featured_media)
+    ? row.featured_media[0]
+    : row.featured_media;
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    shortDescription: row.short_description ?? "",
+    nextDatesLabel: formatProgramScheduleLabel(sessions),
+    locationLabel: locationLabelFor(row),
+    imageSrc: media?.public_url ?? null,
+    imageAlt: media?.alt_text ?? "",
+    href: `/programs/${row.slug}`,
+    nextStartIso,
+  };
+}
+
+/**
+ * Published, scheduled Programs still upcoming — for homepage discovery.
+ * Unscheduled flyer programs are excluded (they stay on /programs).
+ */
+export async function fetchUpcomingProgramsForHomepage(
+  limit = 3,
+): Promise<UpcomingProgramCard[]> {
+  const rows = await loadPublishedPrograms();
+
   const scored: UpcomingProgramCard[] = [];
-  for (const row of rows ?? []) {
+  for (const row of rows) {
     const sessions: ProgramSessionInput[] = Array.isArray(row.program_sessions)
       ? row.program_sessions.map((s) => ({
           sessionDate: s.session_date,
@@ -122,24 +185,38 @@ export async function fetchUpcomingProgramsForHomepage(
     );
     if (!nextStartIso) continue;
 
-    const media = Array.isArray(row.featured_media)
-      ? row.featured_media[0]
-      : row.featured_media;
-
-    scored.push({
-      id: row.id,
-      slug: row.slug,
-      title: row.title,
-      shortDescription: row.short_description ?? "",
-      nextDatesLabel: formatProgramScheduleLabel(sessions),
-      locationLabel: locationLabelFor(row),
-      imageSrc: media?.public_url ?? null,
-      imageAlt: media?.alt_text ?? "",
-      href: `/programs/${row.slug}`,
-      nextStartIso,
-    });
+    scored.push(cardFromRow(row, sessions, nextStartIso));
   }
 
   scored.sort((a, b) => a.nextStartIso.localeCompare(b.nextStartIso));
-  return scored.slice(0, Math.max(1, Math.min(limit, 3)));
+  return limitProgramCards(scored, limit);
+}
+
+/**
+ * Published programs with no schedule. They are not "upcoming", but they must
+ * remain discoverable on /programs. Expired scheduled programs are excluded.
+ */
+export async function fetchUnscheduledPublishedPrograms(
+  limit = 24,
+): Promise<UpcomingProgramCard[]> {
+  const rows = await loadPublishedPrograms();
+  const cards: UpcomingProgramCard[] = [];
+  for (const row of rows) {
+    const sessions: ProgramSessionInput[] = Array.isArray(row.program_sessions)
+      ? row.program_sessions.map((s) => ({
+          sessionDate: s.session_date,
+          startTime: s.start_time,
+          endTime: s.end_time,
+          label: s.label,
+          sortOrder: s.sort_order ?? 0,
+        }))
+      : [];
+    if (
+      sessions.some((session) => normalizeSessionCalendarDate(session.sessionDate))
+    ) {
+      continue;
+    }
+    cards.push(cardFromRow(row, [], ""));
+  }
+  return limitProgramCards(cards, limit);
 }
