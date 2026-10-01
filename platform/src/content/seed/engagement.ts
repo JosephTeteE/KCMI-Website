@@ -25,6 +25,7 @@ export const primaryNav: NavItem[] = [
   { label: "About", href: "/about" },
   { label: "Locations", href: "/locations" },
   { label: "Services", href: "/services" },
+  { label: "Programs", href: "/programs" },
   { label: "Sermons", href: "/sermons" },
   { label: "Contact", href: "/contact" },
 ];
@@ -38,6 +39,7 @@ export const footerNav: NavItem[] = [
   { label: "About", href: "/about" },
   { label: "Locations", href: "/locations" },
   { label: "Services", href: "/services" },
+  { label: "Programs", href: "/programs" },
   { label: "Sermons", href: "/sermons" },
   { label: "Giving", href: "/giving" },
   { label: "FAQs", href: "/faqs" },

@@ -39,6 +39,16 @@ export const PUBLIC_SEARCH_PAGE_CATALOG: Array<
   },
   {
     type: "page",
+    title: "Programs",
+    summary:
+      "Upcoming programs and announcements visitors can join at KCMI.",
+    url: "/programs",
+    context: "Page",
+    imageUrl: null,
+    body: "programs announcements events upcoming gatherings",
+  },
+  {
+    type: "page",
     title: "Sermons",
     summary:
       "Watch KCMI sermons on YouTube and other verified media destinations.",

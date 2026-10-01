@@ -30,7 +30,7 @@ export function SiteHeader({ brandName, shortName, items, cta }: Props) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-surface-elevated)_92%,transparent)] backdrop-blur-md">
-      <div className="site-container flex h-16 items-center justify-between gap-4 sm:h-[4.25rem]">
+      <div className="site-container flex min-h-16 items-center justify-between gap-4 py-2 sm:min-h-[4.25rem]">
         <Link
           href="/"
           className="flex min-h-11 min-w-11 items-center gap-3 rounded-[var(--radius-sm)]"

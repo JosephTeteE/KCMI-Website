@@ -21,6 +21,7 @@ export function UpcomingProgramsSection({
 }: Props) {
   const visible =
     typeof maxItems === "number" ? programs.slice(0, maxItems) : programs;
+  const showViewAll = typeof maxItems === "number" && visible.length > 0;
 
   if (visible.length === 0) {
     if (!allowEmptyNote) return null;
@@ -63,6 +64,17 @@ export function UpcomingProgramsSection({
           <p className="mt-3 text-base text-[var(--color-text-muted)]">
             Join us for what is coming up next at KCMI.
           </p>
+          {showViewAll ? (
+            <p className="mt-4">
+              <Link
+                href="/programs"
+                className="ui-text-link inline-flex min-h-11 items-center text-base"
+                data-testid="view-all-programs"
+              >
+                View all programs
+              </Link>
+            </p>
+          ) : null}
         </div>
 
         <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:items-stretch">

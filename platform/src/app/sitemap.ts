@@ -8,6 +8,7 @@ const publicPaths = [
   "/about/apostle-frank-aikins",
   "/locations",
   "/services",
+  "/programs",
   "/sermons",
   "/contact",
   "/giving",
