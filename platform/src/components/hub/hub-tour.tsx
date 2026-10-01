@@ -37,7 +37,13 @@ import {
   type HubTourStep,
 } from "@/lib/hub/tour";
 import {
+  getTourViewport,
+  placeTourCard,
+  placeTourFallback,
   tourScrollBehavior,
+  TOUR_PANEL_MAX_WIDTH,
+  type TourPanelBox,
+  type TourSafeInsets,
   type TourTargetBox,
 } from "@/lib/hub/tour-layout";
 
@@ -141,16 +147,70 @@ function measureTarget(
 }
 
 function highlightStyle(box: TourTargetBox): CSSProperties {
-  const pad = 8;
   return {
     position: "fixed",
-    top: Math.max(0, box.top - pad),
-    left: Math.max(0, box.left - pad),
-    width: box.width + pad * 2,
-    height: box.height + pad * 2,
+    top: box.top,
+    left: box.left,
+    width: box.width,
+    height: box.height,
+    zIndex: 60,
     background: "transparent",
     boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.55)",
   };
+}
+
+function readSafeArea(node: HTMLElement | null): TourSafeInsets {
+  if (!node) return { top: 0, right: 0, bottom: 0, left: 0 };
+  const style = window.getComputedStyle(node);
+  const px = (value: string) => {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  return {
+    top: px(style.paddingTop),
+    right: px(style.paddingRight),
+    bottom: px(style.paddingBottom),
+    left: px(style.paddingLeft),
+  };
+}
+
+/** Move the nearest scrollable ancestor, then the window, by the planned delta. */
+function scrollTourTarget(node: HTMLElement, x: number, y: number) {
+  if (Math.abs(x) < 1 && Math.abs(y) < 1) return;
+  let remainingX = x;
+  let remainingY = y;
+  let parent = node.parentElement;
+  while (parent && (Math.abs(remainingX) >= 1 || Math.abs(remainingY) >= 1)) {
+    const style = window.getComputedStyle(parent);
+    if (
+      Math.abs(remainingY) >= 1 &&
+      parent.scrollHeight - parent.clientHeight > 1 &&
+      /(auto|scroll|overlay)/.test(style.overflowY)
+    ) {
+      const before = parent.scrollTop;
+      const max = parent.scrollHeight - parent.clientHeight;
+      parent.scrollTop = Math.min(max, Math.max(0, before + remainingY));
+      remainingY -= parent.scrollTop - before;
+    }
+    if (
+      Math.abs(remainingX) >= 1 &&
+      parent.scrollWidth - parent.clientWidth > 1 &&
+      /(auto|scroll|overlay)/.test(style.overflowX)
+    ) {
+      const before = parent.scrollLeft;
+      const max = parent.scrollWidth - parent.clientWidth;
+      parent.scrollLeft = Math.min(max, Math.max(0, before + remainingX));
+      remainingX -= parent.scrollLeft - before;
+    }
+    parent = parent.parentElement;
+  }
+  if (Math.abs(remainingX) >= 1 || Math.abs(remainingY) >= 1) {
+    window.scrollBy({
+      left: remainingX,
+      top: remainingY,
+      behavior: tourScrollBehavior(),
+    });
+  }
 }
 
 function prepareStepUi(step: HubTourStep) {
@@ -204,6 +264,7 @@ export function HubTour() {
   const pathname = usePathname();
   const dialogRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDialogElement>(null);
+  const safeRef = useRef<HTMLDivElement>(null);
   const hydrated = useHydrated();
   const resume = useSyncExternalStore(
     subscribeTourResume,
@@ -215,6 +276,7 @@ export function HubTour() {
   const [manualKind, setManualKind] = useState<HubTourKind>("dashboard");
   const [dismissed, setDismissed] = useState(false);
   const [targetBox, setTargetBox] = useState<TourTargetBox | null>(null);
+  const [panelFrame, setPanelFrame] = useState<TourPanelBox | null>(null);
   const [targetMissing, setTargetMissing] = useState(false);
   const [searching, setSearching] = useState(false);
 
@@ -246,6 +308,7 @@ export function HubTour() {
     setManualKind(nextKind);
     setManualStep(0);
     setManualActive(true);
+    setPanelFrame(null);
     setTargetMissing(false);
     setSearching(true);
     const here = (pathname ?? "").replace(/\/$/, "") || "/";
@@ -279,6 +342,7 @@ export function HubTour() {
     if (!active) {
       queueMicrotask(() => {
         setTargetBox(null);
+        setPanelFrame(null);
         setTargetMissing(false);
         setSearching(false);
       });
@@ -291,6 +355,7 @@ export function HubTour() {
     if (!tourStepMatchesRoute(current, pathname)) {
       queueMicrotask(() => {
         setTargetBox(null);
+        setPanelFrame(null);
         setTargetMissing(true);
         setSearching(false);
       });
@@ -299,31 +364,77 @@ export function HubTour() {
 
     prepareStepUi(current);
     let cancelled = false;
-    const scrollBehavior = tourScrollBehavior();
 
-    const revealAndMeasure = () => {
-      if (cancelled) return;
+    const findNode = () => {
       const scope = current.openMobileMenu ? "#hub-mobile-menu" : undefined;
       const root = scope ? document.querySelector(scope) : document;
       const node =
         root instanceof Element
           ? root.querySelector(current.target)
           : document.querySelector(current.target);
-      if (node instanceof HTMLElement) {
-        node.scrollIntoView({
-          block: "nearest",
-          inline: "nearest",
-          behavior: scrollBehavior,
-        });
-      }
+      return node instanceof HTMLElement ? node : null;
+    };
+
+    const panelSize = () => {
+      const viewport = getTourViewport();
+      const card = dialogRef.current;
+      const width = Math.min(
+        TOUR_PANEL_MAX_WIDTH,
+        Math.max(160, viewport.width - 24),
+      );
+      const fallback = viewport.width < 420 ? 272 : 224;
+      const natural = card?.scrollHeight ?? 0;
+      return {
+        width,
+        height: natural > 80 ? natural : fallback,
+      };
+    };
+
+    const revealAndMeasure = (reposition: boolean) => {
+      if (cancelled) return;
+      const scope = current.openMobileMenu ? "#hub-mobile-menu" : undefined;
+      const viewport = getTourViewport();
+      const insets = readSafeArea(safeRef.current);
+      const node = findNode();
       const box = measureTarget(current.target, scope);
-      setTargetBox(box);
-      setTargetMissing(!box);
+      const size = panelSize();
+      if (!box || !node) {
+        setTargetBox(null);
+        setPanelFrame(placeTourFallback(viewport, size, insets));
+        setTargetMissing(true);
+        setSearching(false);
+        return;
+      }
+      const plan = placeTourCard({
+        viewport,
+        target: box,
+        panel: size,
+        insets,
+        reposition,
+      });
+      if (reposition) {
+        scrollTourTarget(node, plan.scrollX, plan.scrollY);
+      }
+      const settled = measureTarget(current.target, scope) ?? box;
+      const landed =
+        Math.abs(settled.top - plan.target.top) < 8 &&
+        Math.abs(settled.left - plan.target.left) < 8;
+      const placed = landed
+        ? plan
+        : placeTourCard({
+            viewport,
+            target: settled,
+            panel: size,
+            insets,
+            reposition: false,
+          });
+      setTargetBox(placed.highlight);
+      setPanelFrame(placed.panel);
+      setTargetMissing(false);
       setSearching(false);
     };
 
-    // Panel is already on screen. Remeasure the highlight only, after paint.
-    revealAndMeasure();
+    revealAndMeasure(true);
     const rafOuter = window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
         if (cancelled) return;
@@ -333,16 +444,13 @@ export function HubTour() {
           if (layer.open) layer.close();
           layer.showModal();
         }
-        revealAndMeasure();
+        revealAndMeasure(true);
       });
     });
 
     function onViewportChange() {
       if (cancelled) return;
-      const scope = current.openMobileMenu ? "#hub-mobile-menu" : undefined;
-      const next = measureTarget(current.target, scope);
-      setTargetBox(next);
-      setTargetMissing(!next);
+      revealAndMeasure(false);
     }
     window.addEventListener("resize", onViewportChange);
     window.addEventListener("scroll", onViewportChange, true);
@@ -391,6 +499,7 @@ export function HubTour() {
     setManualActive(false);
     setManualStep(0);
     setTargetBox(null);
+    setPanelFrame(null);
     setTargetMissing(false);
     setSearching(false);
   }
@@ -407,6 +516,7 @@ export function HubTour() {
     setManualActive(true);
     setManualKind(kind);
     setManualStep(clamped);
+    setPanelFrame(null);
     setTargetMissing(false);
     setSearching(true);
 
@@ -442,6 +552,7 @@ export function HubTour() {
       }}
       onKeyDown={onKeyDown}
     >
+      <div ref={safeRef} className="hub-tour-safe-probe" aria-hidden="true" />
       {promptOpen ? (
         <div className="pointer-events-auto fixed inset-0 flex items-end justify-center bg-[color-mix(in_srgb,black_45%,transparent)] p-4 sm:items-center">
           <div
@@ -497,7 +608,18 @@ export function HubTour() {
             aria-describedby={bodyId}
             data-hub-tour-kind={kind}
             data-hub-tour-card="true"
+            data-hub-tour-side={panelFrame?.side ?? "pending"}
             className="hub-tour-card rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 shadow-[var(--shadow-soft)]"
+            style={
+              panelFrame
+                ? {
+                    top: panelFrame.top,
+                    left: panelFrame.left,
+                    width: panelFrame.width,
+                    maxHeight: panelFrame.maxHeight,
+                  }
+                : { opacity: 0, pointerEvents: "none" }
+            }
           >
             <div className="hub-tour-card-heading">
               <p className="text-sm font-semibold tracking-wide text-[var(--color-text-muted)] uppercase">
