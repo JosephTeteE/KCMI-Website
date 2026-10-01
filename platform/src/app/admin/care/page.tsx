@@ -40,7 +40,7 @@ export default async function CareHomePage({
     <div>
       <HubPageHeader
         title="Care"
-        description="Private prayer, pastoral care, and welfare requests. Visitor intake still uses Google Forms until later phases. Narratives are highly sensitive — no export, Search, or AI."
+        description="Private Prayer, Pastoral Care, and Welfare requests from the website. Only authorized Care staff can open these. Keep personal details confidential — do not export, search, or share outside Care."
       />
       <HubFlash message={params.message} error={params.error} />
 
@@ -53,7 +53,7 @@ export default async function CareHomePage({
             >
               <h2 className="text-xl font-semibold">{CARE_SERVICE_LABELS[service]}</h2>
               <p className="mt-2 text-base text-[var(--color-text-muted)]">
-                Open the {CARE_SERVICE_LABELS[service]} queue
+                Review {CARE_SERVICE_LABELS[service]} requests
               </p>
             </Link>
           </li>
@@ -62,10 +62,10 @@ export default async function CareHomePage({
 
       {allowFixtures ? (
         <section className="mt-10 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-5">
-          <h2 className="text-lg font-semibold">Synthetic fixtures (non-production)</h2>
+          <h2 className="text-lg font-semibold">Practice requests</h2>
           <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-            Creates clearly labelled fake requests for Hub review. Not available in
-            production. Requires domain assign permission.
+            Create clearly labelled practice examples for Hub training. This is
+            not available on the live production website.
           </p>
           <ul className="mt-4 flex flex-wrap gap-3">
             {domains
@@ -80,7 +80,7 @@ export default async function CareHomePage({
                       type="submit"
                       className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-base font-semibold"
                     >
-                      Add {CARE_SERVICE_LABELS[service]} fixture
+                      Add practice {CARE_SERVICE_LABELS[service]} request
                     </button>
                   </form>
                 </li>

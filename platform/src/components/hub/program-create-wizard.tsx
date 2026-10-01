@@ -667,7 +667,7 @@ export function ProgramWizard({
             )}
             {(
               [
-                { value: "none", label: "No photo for now" },
+                { value: "none", label: "Continue without a photo" },
                 { value: "upload", label: HUB_ACTION_LABELS.uploadNewPhoto },
                 { value: "library", label: HUB_ACTION_LABELS.useSavedPhoto },
               ] as const

@@ -21,7 +21,7 @@ export default async function CareWelfarePage({
         <p className="text-base text-[var(--color-text-muted)]">
           {result.reason === "aal2_required"
             ? humanAal2Required()
-            : "Your account cannot open the Welfare queue."}
+            : "Your account cannot open Welfare requests."}
         </p>
       </div>
     );
@@ -33,12 +33,12 @@ export default async function CareWelfarePage({
         title="Welfare"
         backHref="/admin/care"
         backLabel="Care"
-        description="Welfare-team queue. Full narratives open only on the detail page."
+        description="Welfare team list. Open a request to read the full message."
       />
       <HubFlash message={params.message} error={params.error} />
       <CareRequestList
         items={result.items}
-        emptyLabel="No requests yet. Visitor Care forms still use Google Forms until a later phase."
+        emptyLabel="No Welfare requests to review."
       />
     </div>
   );

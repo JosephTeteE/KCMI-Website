@@ -59,7 +59,7 @@ export default async function AdminGivingPage({
     <div>
       <HubPageHeader
         title="Giving"
-        description="Manage bank destinations with dual approval. The public website now shows published database destinations on staging. Future changes still need a second authorized person."
+        description="Manage bank details with two-person approval. Published details appear on the public Giving page. Changes need a second authorized person before they go live."
         actions={
           canPropose ? (
             <Link
@@ -82,9 +82,9 @@ export default async function AdminGivingPage({
             <strong className="text-[var(--color-text-body)]">
               What visitors see
             </strong>{" "}
-            comes from <em>published</em> database destinations on{" "}
+            comes from <em>published</em> bank details on the{" "}
             <Link href="/giving" className="underline">
-              /giving
+              Giving page
             </Link>
             .
           </li>
@@ -96,22 +96,22 @@ export default async function AdminGivingPage({
             approves them.
           </li>
           <li>
-            The original seed file remains in the repo as bootstrap/reference
-            only. Do not treat STAGING QA practice rows as live Giving content.
+            Practice or training account numbers must never be published as live
+            Giving details.
           </li>
         </ul>
       </section>
 
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-[var(--color-text-body)]">
-          Current Giving Details (live published)
+          Current Giving Details (published)
         </h2>
         <p className="mt-2 text-base text-[var(--color-text-muted)]">
           These published destinations are what the public Giving page shows.
         </p>
         {(accounts ?? []).length === 0 ? (
           <p className="mt-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-5 text-base text-[var(--color-text-muted)]">
-            No published Giving destinations are in the database yet.
+            No published Giving destinations yet.
           </p>
         ) : (
           <ul className="mt-4 grid gap-3">

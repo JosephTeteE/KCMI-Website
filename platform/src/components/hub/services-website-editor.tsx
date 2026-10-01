@@ -17,9 +17,8 @@ export function ServicesWebsiteEditor({ services }: { services: ServicesDocument
       where="The Services page — cell fellowships, service teams, sermons, care, and testimonies."
       extraHelp={
         <HubHelpDetails summary="What is this?">
-          Care buttons should point to /prayer, /pastoral-care, and /welfare.
-          Cell fellowships and service teams should point to /contact. Do not use
-          Google Forms.
+          Care buttons should point to Prayer, Pastoral Care, and Welfare on this
+          website. Cell fellowships and service teams should point to Contact Us.
         </HubHelpDetails>
       }
       fields={[

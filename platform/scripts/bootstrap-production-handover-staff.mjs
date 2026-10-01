@@ -70,7 +70,7 @@ const STAFF = {
   media: {
     key: "media",
     email: "kingdomcovenantministriesinter@gmail.com",
-    displayName: "HQ Content Admin",
+    displayName: "Website & Media",
     roles: ["media_admin"],
     mustHave: [
       "hub.access",

@@ -98,7 +98,7 @@ export default async function GivingProposalReviewPage({
           role="status"
           className="mb-6 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--kcmi-green)_12%,white)] p-4 text-base text-[var(--color-text-body)]"
         >
-          Approved and published to the Giving database
+          Approved and published to the Giving page
           {proposal.applied_at
             ? ` on ${new Date(proposal.applied_at).toLocaleString()}`
             : ""}
@@ -111,7 +111,7 @@ export default async function GivingProposalReviewPage({
           role="status"
           className="mb-6 rounded-[var(--radius-md)] border border-[var(--color-border)] p-4 text-base text-[var(--color-text-body)]"
         >
-          Rejected. Live database destination unchanged.
+          Rejected. Live Giving details were not changed.
           {proposal.review_reason ? (
             <>
               {" "}
@@ -177,11 +177,11 @@ export default async function GivingProposalReviewPage({
       {status === "pending" && canApprove && !isOwner ? (
         <div className="mt-8 space-y-6 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-5">
           <h2 className="text-lg font-semibold text-[var(--color-text-body)]">
-            Checker review
+            Second-person review
           </h2>
           <p className="text-base text-[var(--color-text-muted)]">
-            Approving publishes these bank details to the Giving database right
-            away. The public website seed page does not change until cutover.
+            Approving publishes these bank details to the public Giving page
+            right away.
           </p>
           <form action={approveGivingProposal} className="space-y-3">
             <input type="hidden" name="proposal_id" value={proposal.id} />

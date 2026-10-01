@@ -25,7 +25,7 @@ export default async function CarePastoralPage({
         <p className="text-base text-[var(--color-text-muted)]">
           {result.reason === "aal2_required"
             ? humanAal2Required()
-            : "Your account cannot open the Pastoral Care queue."}
+            : "Your account cannot open Pastoral Care requests."}
         </p>
       </div>
     );
@@ -37,12 +37,12 @@ export default async function CarePastoralPage({
         title="Pastoral Care"
         backHref="/admin/care"
         backLabel="Care"
-        description="Pastors see assigned requests only unless they hold Pastoral assign authority."
+        description="Pastoral Care list. Pastors normally see requests assigned to them."
       />
       <HubFlash message={params.message} error={params.error} />
       <CareRequestList
         items={result.items}
-        emptyLabel="No requests yet. Visitor Care forms still use Google Forms until a later phase."
+        emptyLabel="No Pastoral Care requests to review."
       />
     </div>
   );

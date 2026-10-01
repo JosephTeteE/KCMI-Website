@@ -142,7 +142,7 @@ describe("Care P3 Pastoral intake gate", () => {
     const result = await submitPastoralRequest(validPastoral);
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.message.toLowerCase()).toMatch(/not enabled/);
+      expect(result.message.toLowerCase()).toMatch(/not available right now/);
     }
   });
 });

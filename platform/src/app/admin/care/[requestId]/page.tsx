@@ -95,7 +95,7 @@ export default async function CareRequestDetailPage({
         title={result.request.referenceCode}
         backHref={backHref}
         backLabel={CARE_SERVICE_LABELS[result.request.serviceType]}
-        description="Highly sensitive Care request. Opening is audited."
+        description="Private Care request. Opening this page is recorded for accountability."
       />
       <HubFlash message={flash.message} error={flash.error} />
       <CareRequestDetailView

@@ -33,7 +33,7 @@ export const GIVING_PROPOSAL_STATUS_LABELS: Record<GivingProposalStatus, string>
   {
     draft: "Draft",
     pending: "Waiting for approval",
-    approved: "Approved and published to the database",
+    approved: "Approved and published",
     rejected: "Rejected",
     superseded: "Out of date",
   };
@@ -43,6 +43,6 @@ export const GIVING_ACCOUNT_STATUS_LABELS: Record<
   string
 > = {
   draft: "Not ready",
-  published: "Ready in database",
+  published: "Published for the website",
   disabled: "Turned off",
 };

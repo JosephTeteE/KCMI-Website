@@ -27,7 +27,7 @@ export function ContactRequestForm({
     initial,
   );
 
-  if (state.ok && state.referenceCode) {
+  if (state.ok) {
     return (
       <div
         className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8"
@@ -38,15 +38,11 @@ export function ContactRequestForm({
           Message received
         </h2>
         <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-          Thank you. Your message has been received. The KCMI team will follow
-          up using the details you provided when needed.
+          Thank you. Your message has been received by KCMI. Someone from the
+          appropriate team will follow up if needed.
         </p>
-        <p className="mt-4 font-mono text-base font-semibold text-[var(--color-text-body)]">
-          Reference: {state.referenceCode}
-        </p>
-        <p className="mt-3 text-readable-sm text-[var(--color-text-muted)]">
-          For prayer, Pastoral Care, or Welfare support, please use those
-          dedicated pages instead of this form.
+        <p className="text-readable-sm mt-4 text-[var(--color-text-muted)]">
+          You can safely close this page.
         </p>
       </div>
     );

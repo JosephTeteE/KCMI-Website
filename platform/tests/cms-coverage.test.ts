@@ -171,7 +171,7 @@ describe("privacy factual draft", () => {
     expect(text).not.toMatch(/reCAPTCHA/i);
     expect(text).not.toMatch(/1-minute/i);
     expect(text).not.toMatch(/embed code/i);
-    expect(text).toMatch(/Supabase/i);
+    expect(text).not.toMatch(/Next\.js|Vercel|Supabase Auth|Supabase/i);
   });
 });
 

@@ -47,8 +47,8 @@ export default async function ProposeGivingChangePage({
         backLabel="Back to destination"
       />
       <p className="mb-6 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[color-mix(in_srgb,var(--kcmi-red)_8%,white)] p-4 text-base text-[var(--color-text-body)]">
-        These changes are NOT on the website until approved — and the public
-        /giving page still uses seed content until cutover.
+        These changes stay off the public Giving page until another authorized
+        person approves them.
       </p>
       <div className="mb-6 flex flex-wrap gap-3 text-sm">
         <a

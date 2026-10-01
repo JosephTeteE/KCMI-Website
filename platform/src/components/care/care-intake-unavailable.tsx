@@ -12,7 +12,8 @@ export function CareIntakeUnavailable({ heading }: Props) {
     <section className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-6 sm:p-8">
       <h2 className="font-display text-2xl font-semibold">{heading}</h2>
       <p className="text-readable mt-3 text-[var(--color-text-muted)]">
-        Online requests are temporarily unavailable. Please contact KCMI.
+        Online requests are not available right now. Please contact KCMI another
+        way.
       </p>
       <Link
         href="/contact"

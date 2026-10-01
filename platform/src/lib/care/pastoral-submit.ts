@@ -7,6 +7,7 @@ import {
 } from "@/lib/care/pastoral-intake";
 import {
   CARE_INTAKE_GENERIC_REJECT_MESSAGE,
+  CARE_INTAKE_GATE_DISABLED_MESSAGE,
   isCareIntakeHoneypotTriggered,
 } from "@/lib/care/intake-abuse";
 import { logCareIntakeEvent } from "@/lib/care/intake-log";
@@ -38,8 +39,7 @@ export async function submitPastoralRequest(raw: {
     logCareIntakeEvent({ service: "pastoral", outcome: "gate_disabled" });
     return {
       ok: false,
-      message:
-        "First-party Pastoral Care intake is not enabled yet. Please use the Pastoral Care form linked from Services.",
+      message: CARE_INTAKE_GATE_DISABLED_MESSAGE,
     };
   }
 

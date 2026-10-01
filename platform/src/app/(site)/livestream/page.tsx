@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageShell } from "@/components/layout/page-shell";
 import { FacebookVideoEmbed } from "@/components/content/facebook-embed";
 import { getLivestreamPublic } from "@/content";
@@ -46,6 +47,16 @@ export default async function LivestreamPage() {
         >
           Open Facebook
         </a>
+        {!live.isLive ? (
+          <p className="mt-4 text-center sm:text-left">
+            <Link
+              href="/sermons"
+              className="inline-flex min-h-11 items-center text-base font-semibold text-[var(--color-action-primary)] underline-offset-2 hover:underline"
+            >
+              Watch past sermons
+            </Link>
+          </p>
+        ) : null}
       </div>
     </PageShell>
   );

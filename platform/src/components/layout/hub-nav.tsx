@@ -107,6 +107,28 @@ function HubLinks({
   );
 }
 
+function HubHomeLink({
+  className,
+  onNavigate,
+  id,
+}: {
+  className: string;
+  onNavigate?: () => void;
+  id?: string;
+}) {
+  return (
+    <Link
+      id={id}
+      href="/admin"
+      className={`${className} rounded-[var(--radius-sm)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]`}
+      onClick={onNavigate}
+      data-testid="hub-home-link"
+    >
+      KCMI Hub
+    </Link>
+  );
+}
+
 function HubNavBody({
   profile,
   pathname,
@@ -118,9 +140,10 @@ function HubNavBody({
 }) {
   return (
     <>
-      <p className="text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
-        KCMI Hub
-      </p>
+      <HubHomeLink
+        className="inline-block text-sm font-medium uppercase tracking-wide text-[var(--color-text-muted)]"
+        onNavigate={onNavigate}
+      />
       <div className="mt-3 min-w-0">
         <HubIdentity profile={profile} />
       </div>
@@ -176,9 +199,7 @@ export function HubNav({ profile }: { profile: StaffProfile }) {
   return (
     <>
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-4 py-3 lg:hidden">
-        <p className="text-base font-semibold tracking-wide text-[var(--color-text-body)] uppercase">
-          KCMI Hub
-        </p>
+        <HubHomeLink className="text-base font-semibold tracking-wide text-[var(--color-text-body)] uppercase" />
         <button
           type="button"
           data-tour-menu-open
@@ -206,9 +227,11 @@ export function HubNav({ profile }: { profile: StaffProfile }) {
       >
         <div className="flex h-full max-w-xs flex-col overflow-y-auto bg-[var(--color-surface-elevated)] p-4 shadow-[var(--shadow-soft)]">
           <div className="mb-2 flex items-center justify-between gap-3">
-            <p id={titleId} className="text-base font-semibold uppercase tracking-wide">
-              KCMI Hub
-            </p>
+            <HubHomeLink
+              id={titleId}
+              className="text-base font-semibold uppercase tracking-wide text-[var(--color-text-body)]"
+              onNavigate={close}
+            />
             <button
               type="button"
               className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] px-3 text-base font-semibold"

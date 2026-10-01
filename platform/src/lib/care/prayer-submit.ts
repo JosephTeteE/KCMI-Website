@@ -7,6 +7,7 @@ import {
 } from "@/lib/care/prayer-intake";
 import {
   CARE_INTAKE_GENERIC_REJECT_MESSAGE,
+  CARE_INTAKE_GATE_DISABLED_MESSAGE,
   isCareIntakeHoneypotTriggered,
 } from "@/lib/care/intake-abuse";
 import { logCareIntakeEvent } from "@/lib/care/intake-log";
@@ -37,8 +38,7 @@ export async function submitPrayerRequest(raw: {
     logCareIntakeEvent({ service: "prayer", outcome: "gate_disabled" });
     return {
       ok: false,
-      message:
-        "First-party Prayer intake is not enabled yet. Please use the Prayer form linked from Services.",
+      message: CARE_INTAKE_GATE_DISABLED_MESSAGE,
     };
   }
 

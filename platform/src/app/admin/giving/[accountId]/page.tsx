@@ -39,7 +39,11 @@ export default async function AdminGivingAccountPage({
     <div>
       <HubPageHeader
         title={account.label}
-        description={`Database destination · version ${account.version}. Not automatically shown on the public website yet.`}
+        description={
+          account.status === "published"
+            ? `Published for the website · version ${account.version}.`
+            : `Not shown on the public website yet · version ${account.version}.`
+        }
         backHref="/admin/giving"
         backLabel="Back to Giving"
         actions={
@@ -53,7 +57,7 @@ export default async function AdminGivingAccountPage({
           ) : null
         }
       />
-      <GivingSnapshotView title="Current database details" snapshot={snapshot} />
+      <GivingSnapshotView title="Current bank details" snapshot={snapshot} />
     </div>
   );
 }

@@ -263,7 +263,7 @@ export async function createCareFixtureAction(formData: FormData) {
   if (error || !data) {
     redirectWithError(
       `/admin/care/${service === "pastoral" ? "pastoral" : service}`,
-      "Could not create the synthetic fixture. Check database migration status.",
+      "Could not create the practice request. Please try again.",
     );
   }
 

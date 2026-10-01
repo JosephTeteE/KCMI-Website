@@ -134,7 +134,7 @@ describe("Care P2 Prayer intake gate", () => {
     });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.message.toLowerCase()).toMatch(/not enabled/);
+      expect(result.message.toLowerCase()).toMatch(/not available right now/);
     }
   });
 });

@@ -17,7 +17,7 @@ export default function PrivacyPage() {
     <PageShell title={doc.title}>
       {isStagingEnvironment() ? (
         <p className="mb-6 text-readable-sm text-[var(--color-text-muted)]">
-          Staging website
+          This is a non-production copy of the website.
         </p>
       ) : null}
       <LegalDocumentView doc={doc} />

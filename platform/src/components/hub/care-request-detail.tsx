@@ -118,10 +118,11 @@ export function CareRequestDetailView({
           id="care-narrative-heading"
           className="text-lg font-semibold text-[var(--color-text-body)]"
         >
-          Visitor narrative
+          Visitor message
         </h2>
         <p className="mt-1 text-sm text-[var(--color-text-muted)]">
-          Highly sensitive. Do not copy into email, chat, or public pages.
+          Private Care content. Do not copy into email, chat, WhatsApp, or public
+          pages.
         </p>
         <p className="mt-4 whitespace-pre-wrap text-base text-[var(--color-text-body)]">
           {request.narrative}

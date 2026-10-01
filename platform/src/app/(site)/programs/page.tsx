@@ -90,7 +90,7 @@ export default async function ProgramsPage() {
           id="programs-empty-heading"
           className="font-display text-2xl font-semibold"
         >
-          No upcoming programs listed yet
+          No upcoming programs are listed right now
         </h2>
         <p className="mt-3 max-w-2xl text-base text-[var(--color-text-muted)]">
           When KCMI publishes a program with upcoming dates, it will appear

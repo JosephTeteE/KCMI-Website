@@ -25,7 +25,7 @@ async function CareQueuePage({
         <p className="text-base text-[var(--color-text-muted)]">
           {result.reason === "aal2_required"
             ? humanAal2Required()
-            : `Your account cannot open the ${title} queue.`}
+            : `Your account cannot open ${title} requests.`}
         </p>
       </div>
     );
@@ -39,16 +39,22 @@ async function CareQueuePage({
         backLabel="Care"
         description={
           service === "prayer"
-            ? "Shared Prayer-team queue. Full narratives open only on the detail page."
+            ? "Prayer team list. Open a request to read the full message."
             : service === "pastoral"
-              ? "Pastors see assigned requests only unless they hold Pastoral assign authority."
-              : "Welfare-team queue. Full narratives open only on the detail page."
+              ? "Pastoral Care list. Pastors normally see requests assigned to them."
+              : "Welfare team list. Open a request to read the full message."
         }
       />
       <HubFlash message={params.message} error={params.error} />
       <CareRequestList
         items={result.items}
-        emptyLabel="No requests yet. Visitor Care forms still use Google Forms until a later phase."
+        emptyLabel={
+          service === "prayer"
+            ? "No prayer requests to review."
+            : service === "pastoral"
+              ? "No Pastoral Care requests to review."
+              : "No Welfare requests to review."
+        }
       />
     </div>
   );

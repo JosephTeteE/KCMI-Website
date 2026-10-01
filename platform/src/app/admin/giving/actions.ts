@@ -284,7 +284,7 @@ export async function approveGivingProposal(formData: FormData) {
 
   redirectWithMessage(
     `/admin/giving/proposals/${proposalId}`,
-    "Approved and published to the Giving database.",
+    "Approved and published to the Giving page.",
   );
 }
 
@@ -337,7 +337,7 @@ export async function rejectGivingProposal(formData: FormData) {
 
   redirectWithMessage(
     `/admin/giving/proposals/${proposalId}`,
-    "Rejected. The live database destination was not changed.",
+    "Rejected. The live Giving details were not changed.",
   );
 }
 

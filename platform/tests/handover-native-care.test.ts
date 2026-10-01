@@ -199,7 +199,7 @@ describe("handover zero public Google Forms", () => {
       "src/components/care/care-intake-unavailable.tsx",
     );
     expect(unavailable).toContain('href="/contact"');
-    expect(unavailable).toMatch(/temporarily unavailable/i);
+    expect(unavailable).toMatch(/not available right now/i);
     expect(unavailable).not.toMatch(/forms\.gle|docs\.google\.com\/forms/);
   });
 
@@ -208,10 +208,10 @@ describe("handover zero public Google Forms", () => {
       .flatMap((s) => s.paragraphs)
       .join("\n");
     expect(text).not.toMatch(/Google Forms/i);
+    expect(text).not.toMatch(/Next\.js|Vercel|Supabase|V2 platform|KCMI Hub/i);
     expect(text).toMatch(/Prayer, Pastoral Care, and Welfare/i);
-    expect(text).toMatch(/protected application and database/i);
+    expect(text).toMatch(/authorized Care staff/i);
     expect(text).toMatch(/not an emergency service/i);
-    expect(text).toMatch(/Automated Care retention/i);
   });
 
   it("Giving values and MFA requirements remain intact", () => {

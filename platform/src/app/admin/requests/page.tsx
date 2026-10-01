@@ -91,9 +91,11 @@ export default async function RequestsInboxPage({
       <WebsiteRequestList
         items={result.items}
         emptyLabel={
-          statusFilter === "all"
-            ? "No website messages yet."
-            : `No ${WEBSITE_REQUEST_STATUS_LABELS[statusFilter].toLowerCase()} messages.`
+          statusFilter === "all" || statusFilter === "new"
+            ? "No new messages right now."
+            : statusFilter === "in_progress"
+              ? "No messages in progress right now."
+              : "No closed messages yet."
         }
       />
     </div>

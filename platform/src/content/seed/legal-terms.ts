@@ -11,7 +11,7 @@ export const termsOfService: LegalDocument = {
     "PRE-PRODUCTION LEGAL REVIEW REQUIRED before KCMI V2 production. Public wording is the July 16, 2025 legacy Terms, formatted only.",
     "Section 9 contact email is contact@kcmi-rcc.org, matching the current public Contact identity. Confirm before production cutover.",
     "Section 1 website URL is https://kcmi-rcc.org. Confirm whether V2 public canonical host (www vs apex) should be named after cutover.",
-    "Section 4 third-party examples (YouTube, TikTok, Google Forms) still match current public outbound links; counsel should confirm this remains accurate at cutover.",
+    "Section 4 third-party examples should be confirmed by counsel against current outbound media and maps links.",
   ],
   sections: [
     {
@@ -35,7 +35,7 @@ export const termsOfService: LegalDocument = {
     {
       heading: "4. Links To Other Web Sites",
       paragraphs: [
-        "Our Service may contain links to third-party web sites or services that are not owned or controlled by KCMI, such as YouTube, TikTok, and Google Forms. KCMI has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third-party web sites or services. You further acknowledge and agree that KCMI shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.",
+        "Our Service may contain links to third-party web sites or services that are not owned or controlled by KCMI, such as YouTube, TikTok, Facebook, and Google Maps. KCMI has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third-party web sites or services. You further acknowledge and agree that KCMI shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.",
       ],
     },
     {

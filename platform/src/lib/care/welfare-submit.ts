@@ -7,6 +7,7 @@ import {
 } from "@/lib/care/welfare-intake";
 import {
   CARE_INTAKE_GENERIC_REJECT_MESSAGE,
+  CARE_INTAKE_GATE_DISABLED_MESSAGE,
   isCareIntakeHoneypotTriggered,
 } from "@/lib/care/intake-abuse";
 import { logCareIntakeEvent } from "@/lib/care/intake-log";
@@ -37,8 +38,7 @@ export async function submitWelfareRequest(raw: {
     logCareIntakeEvent({ service: "welfare", outcome: "gate_disabled" });
     return {
       ok: false,
-      message:
-        "First-party Welfare intake is not enabled yet. Please use the Welfare form linked from Services.",
+      message: CARE_INTAKE_GATE_DISABLED_MESSAGE,
     };
   }
 

@@ -223,8 +223,8 @@ describe("Hub tour persistence", () => {
   });
 });
 
-describe("HQ Content Admin authorization", () => {
-  it("keeps website.manage for HQ Content Admin and denies unrelated roles", () => {
+describe("Website & Media authorization", () => {
+  it("keeps website.manage for Website & Media and denies unrelated roles", () => {
     const hq = permissionsForRoles(["media_admin"]);
     expect(hq.has("website.manage")).toBe(true);
     expect(hq.has("hub.access")).toBe(true);
@@ -545,13 +545,13 @@ describe("Hub mobile navigation", () => {
 });
 
 describe("staging bootstrap expected permissions", () => {
-  it("includes website.manage for Super Admin and HQ Content Admin", () => {
+  it("includes website.manage for Super Admin and Website & Media", () => {
     const src = readFileSync(
       resolve(process.cwd(), "scripts/bootstrap-staging-hub-users.mjs"),
       "utf8",
     );
     expect(src).toMatch(/media_admin:[\s\S]*website\.manage/);
-    expect(src).toMatch(/HQ Content Admin[\s\S]*website\.manage/);
+    expect(src).toMatch(/Website & Media[\s\S]*website\.manage/);
     expect(src).toMatch(/Super Admin[\s\S]*website\.manage/);
   });
 });

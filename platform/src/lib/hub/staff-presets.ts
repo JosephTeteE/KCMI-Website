@@ -9,7 +9,7 @@ export const STAFF_ASSIGNABLE_ROLE_PRESETS = [
   {
     role: "media_admin" as const satisfies HubRole,
     checkboxLabel: "Website & Media",
-    title: "HQ Content Admin",
+    title: "Website & Media",
     description:
       "Website pages, Programs, Events, Sermons, Photos, Branches, Livestream, and website Messages & Requests.",
   },

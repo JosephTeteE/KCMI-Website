@@ -86,7 +86,7 @@ const INTENDED_USERS = [
   {
     email: "kingdomcovenantministriesinter@gmail.com",
     role: "media_admin",
-    operatingName: "HQ Content Admin",
+    operatingName: "Website & Media",
     mustHave: [
       "hub.access",
       "programs.create",

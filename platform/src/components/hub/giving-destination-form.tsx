@@ -199,8 +199,7 @@ export function GivingDestinationForm({
           Account numbers by currency
         </legend>
         <p className="text-sm text-[var(--color-text-muted)]">
-          Add one row per currency. Use synthetic STAGING QA numbers in tests —
-          never invent real KCMI account numbers here during discovery cutover.
+          Add one row for each currency, using the verified account number for that currency.
         </p>
         {numbers.map((n, index) => (
           <div
